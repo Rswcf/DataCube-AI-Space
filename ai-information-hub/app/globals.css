@@ -164,3 +164,36 @@
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
+/* Chat widget Markdown styles */
+.prose-chat {
+  @apply text-sm leading-relaxed;
+}
+.prose-chat p {
+  @apply my-1;
+}
+.prose-chat p:first-child {
+  @apply mt-0;
+}
+.prose-chat p:last-child {
+  @apply mb-0;
+}
+.prose-chat strong {
+  @apply font-semibold;
+}
+.prose-chat code {
+  @apply rounded bg-black/10 px-1 py-0.5 text-xs dark:bg-white/10;
+}
+.prose-chat ul,
+.prose-chat ol {
+  @apply my-1 ml-4;
+}
+.prose-chat ul {
+  @apply list-disc;
+}
+.prose-chat ol {
+  @apply list-decimal;
+}
+.prose-chat li {
+  @apply my-0.5;
+}

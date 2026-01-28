@@ -93,6 +93,7 @@ export const translations = {
     chatPlaceholder: "Frage stellen...",
     chatThinking: "Denke nach...",
     chatError: "Fehler beim Laden. Bitte versuche es erneut.",
+    chatTimeout: "Zeitüberschreitung. Bitte versuche es erneut.",
     chatClear: "Neues Gespräch",
   },
   en: {
@@ -187,6 +188,7 @@ export const translations = {
     chatPlaceholder: "Ask a question...",
     chatThinking: "Thinking...",
     chatError: "Failed to load. Please try again.",
+    chatTimeout: "Request timed out. Please try again.",
     chatClear: "New chat",
   },
 } as const;

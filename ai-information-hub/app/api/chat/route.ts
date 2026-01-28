@@ -10,24 +10,38 @@ export async function POST(req: Request) {
   try {
     const { messages, weekContext, language } = await req.json();
 
-    const systemPrompt = `You are a helpful AI assistant for the Data Cube AI Information Hub. You help users understand the weekly AI news and trends.
+    const systemPrompt = `You are the DataCube AI Hub Assistant — a concise helper for the Data Cube AI Information Hub platform.
 
-Current week data context:
-${weekContext || "No data available"}
+SCOPE:
+- Answer questions about this week's AI news, trends, investments, and tips shown on the platform.
+- Discuss general AI industry topics (models, companies, research, tools).
+- Help users navigate the platform (feeds, week selector, settings).
 
-IMPORTANT: Always respond in ${language === "de" ? "German" : "English"}.
-Be concise and helpful. When referring to specific news items, cite them clearly.`;
+OFF-TOPIC:
+- If a user asks about something unrelated (weather, sports, cooking, etc.), respond: "I'm focused on AI news and this platform's content. How can I help you with AI topics?"
 
-    // Messages are already in {role, content} format from our custom hook
-    const coreMessages = (messages || []).map((msg: { role: string; content: string }) => ({
-      role: msg.role as "user" | "assistant",
-      content: msg.content,
-    }));
+STYLE:
+- Be concise: 2-3 short paragraphs max, never exceed 300 words.
+- Cite specific news items from the context when relevant.
+- Respond in ${language === "de" ? "German" : "English"}.
+
+CONTEXT — This week's AI data:
+${weekContext || "No data available for this week."}`;
+
+    // Cap message history to last 10 messages for token budget
+    const coreMessages = (messages || [])
+      .slice(-10)
+      .map((msg: { role: string; content: string }) => ({
+        role: msg.role as "user" | "assistant",
+        content: msg.content,
+      }));
 
     const result = streamText({
-      model: openrouter("deepseek/deepseek-chat"),
+      model: openrouter.chat("deepseek/deepseek-v3.2"),
       system: systemPrompt,
       messages: coreMessages,
+      maxOutputTokens: 500,
+      temperature: 0.7,
     });
 
     return result.toTextStreamResponse();

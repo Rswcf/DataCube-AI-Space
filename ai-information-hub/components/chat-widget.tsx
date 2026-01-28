@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { useSettings } from "@/lib/settings-context";
+import ReactMarkdown from "react-markdown";
 
 interface Message {
   id: string;
@@ -17,6 +18,76 @@ interface ChatWidgetProps {
   weekId: string;
 }
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+/** Condense raw week JSON into a compact text summary for the given language. */
+function condenseWeekData(
+  tech: any,
+  investment: any,
+  tips: any,
+  trends: any,
+  lang: "de" | "en"
+): string {
+  const lines: string[] = [];
+
+  // Tech items
+  const techItems = tech?.[lang] ?? tech?.de ?? [];
+  if (techItems.length) {
+    lines.push("## Tech News");
+    for (const item of techItems) {
+      lines.push(`- [${item.category || "General"}] (${item.impact || "medium"}) ${item.content ?? ""}${item.source ? ` (Source: ${item.source})` : ""}`);
+    }
+  }
+
+  // Investment — primary market
+  const primary = investment?.primaryMarket?.[lang] ?? investment?.primaryMarket?.de ?? [];
+  if (primary.length) {
+    lines.push("## Primary Market");
+    for (const item of primary) {
+      lines.push(`- ${item.company}: ${item.amount || "undisclosed"} (${item.round || "N/A"})`);
+    }
+  }
+
+  // Investment — secondary market
+  const secondary = investment?.secondaryMarket?.[lang] ?? investment?.secondaryMarket?.de ?? [];
+  if (secondary.length) {
+    lines.push("## Secondary Market");
+    for (const item of secondary) {
+      lines.push(`- ${item.ticker}: ${item.price} (${item.direction === "up" ? "+" : ""}${item.change})`);
+    }
+  }
+
+  // Investment — M&A
+  const ma = investment?.ma?.[lang] ?? investment?.ma?.de ?? [];
+  if (ma.length) {
+    lines.push("## M&A");
+    for (const item of ma) {
+      lines.push(`- ${item.acquirer} → ${item.target}: ${item.dealValue || "undisclosed"}`);
+    }
+  }
+
+  // Tips
+  const tipItems = tips?.[lang] ?? tips?.de ?? [];
+  if (tipItems.length) {
+    lines.push("## Tips");
+    for (const item of tipItems) {
+      lines.push(`- [${item.difficulty || "General"}] ${item.tip ?? item.content ?? ""} (${item.platform || ""})`);
+    }
+  }
+
+  // Trends
+  const trendItems = trends?.trends?.[lang] ?? trends?.trends?.de ?? [];
+  if (trendItems.length) {
+    lines.push("## Trends");
+    for (const item of trendItems) {
+      lines.push(`- ${item.title} (${item.category || ""})`);
+    }
+  }
+
+  return lines.join("\n");
+}
+/* eslint-enable @typescript-eslint/no-explicit-any */
+
 export function ChatWidget({ weekId }: ChatWidgetProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [weekContext, setWeekContext] = useState<string>("");
@@ -26,8 +97,9 @@ export function ChatWidget({ weekId }: ChatWidgetProps) {
   const { language, t } = useSettings();
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
-  // Fetch week data for context
+  // Fetch week data for context — regenerate when weekId or language changes
   useEffect(() => {
     if (!weekId) return;
 
@@ -40,8 +112,8 @@ export function ChatWidget({ weekId }: ChatWidgetProps) {
           fetch(`/data/${weekId}/trends.json`).then((r) => (r.ok ? r.json() : null)),
         ]);
 
-        const context = JSON.stringify({ tech, investment, tips, trends }, null, 2);
-        setWeekContext(context);
+        const condensed = condenseWeekData(tech, investment, tips, trends, language);
+        setWeekContext(condensed);
       } catch {
         setWeekContext("");
       }
@@ -49,7 +121,14 @@ export function ChatWidget({ weekId }: ChatWidgetProps) {
 
     fetchData();
     setMessages([]); // Clear messages when week changes
-  }, [weekId]);
+  }, [weekId, language]);
+
+  // Cleanup abort controller on unmount
+  useEffect(() => {
+    return () => {
+      abortControllerRef.current?.abort();
+    };
+  }, []);
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -76,16 +155,30 @@ export function ChatWidget({ weekId }: ChatWidgetProps) {
     setMessages(newMessages);
     setIsLoading(true);
 
+    // Abort any previous in-flight request
+    abortControllerRef.current?.abort();
+
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
+    // 30-second timeout
+    const timeoutId = setTimeout(() => controller.abort(), 30000);
+
     try {
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          messages: newMessages.map((m) => ({ role: m.role, content: m.content })),
+          messages: newMessages
+            .slice(-10)
+            .map((m) => ({ role: m.role, content: m.content })),
           weekContext,
           language,
         }),
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
         throw new Error("Failed to get response");
@@ -113,14 +206,27 @@ export function ChatWidget({ weekId }: ChatWidgetProps) {
           prev.map((m) => (m.id === assistantId ? { ...m, content: assistantContent } : m))
         );
       }
+
+      // Handle empty stream — model returned nothing
+      if (!assistantContent.trim()) {
+        setMessages((prev) =>
+          prev.map((m) => (m.id === assistantId ? { ...m, content: t("chatError") } : m))
+        );
+      }
     } catch (error) {
-      console.error("Chat error:", error);
+      const isAbort = error instanceof DOMException && error.name === "AbortError";
       setMessages((prev) => [
         ...prev,
-        { id: Date.now().toString(), role: "assistant", content: t("chatError") },
+        {
+          id: Date.now().toString(),
+          role: "assistant",
+          content: isAbort ? t("chatTimeout") : t("chatError"),
+        },
       ]);
     } finally {
+      clearTimeout(timeoutId);
       setIsLoading(false);
+      abortControllerRef.current = null;
     }
   }, [messages, weekContext, language, t]);
 
@@ -133,7 +239,9 @@ export function ChatWidget({ weekId }: ChatWidgetProps) {
   };
 
   const clearMessages = () => {
+    abortControllerRef.current?.abort();
     setMessages([]);
+    setIsLoading(false);
   };
 
   return (
@@ -155,7 +263,7 @@ export function ChatWidget({ weekId }: ChatWidgetProps) {
       {isOpen && (
         <div
           className={cn(
-            "fixed z-40 flex flex-col rounded-2xl border border-border bg-background shadow-2xl",
+            "fixed z-40 flex flex-col overflow-hidden rounded-2xl border border-border bg-background shadow-2xl",
             "bottom-36 right-4 h-[500px] w-[380px] max-w-[calc(100vw-2rem)]",
             "md:bottom-24 md:right-6"
           )}
@@ -176,7 +284,7 @@ export function ChatWidget({ weekId }: ChatWidgetProps) {
           </div>
 
           {/* Messages */}
-          <ScrollArea className="flex-1 p-4">
+          <ScrollArea className="flex-1 min-w-0 overflow-hidden p-4">
             <div ref={scrollRef} className="space-y-4">
               {messages.length === 0 ? (
                 <div className="py-8 text-center text-sm text-muted-foreground">{t("chatWelcome")}</div>
@@ -194,12 +302,18 @@ export function ChatWidget({ weekId }: ChatWidgetProps) {
                           : "bg-secondary text-secondary-foreground"
                       )}
                     >
-                      <p className="whitespace-pre-wrap">{message.content}</p>
+                      {message.role === "assistant" ? (
+                        <div className="prose-chat break-words">
+                          <ReactMarkdown>{message.content}</ReactMarkdown>
+                        </div>
+                      ) : (
+                        <p className="whitespace-pre-wrap break-words">{message.content}</p>
+                      )}
                     </div>
                   </div>
                 ))
               )}
-              {isLoading && messages[messages.length - 1]?.role === "user" && (
+              {isLoading && !messages[messages.length - 1]?.content && (
                 <div className="flex justify-start">
                   <div className="rounded-2xl bg-secondary px-4 py-2 text-sm text-muted-foreground">
                     <Loader2 className="h-4 w-4 animate-spin" />
