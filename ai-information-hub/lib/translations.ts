@@ -78,10 +78,22 @@ export const translations = {
     german: "Deutsch",
     english: "English",
     
+    // Share
+    share: "Teilen",
+    copiedToClipboard: "In Zwischenablage kopiert",
+
     // Timestamps
     hoursAgo: "vor {n} Std.",
     dayAgo: "vor 1 Tag",
     daysAgo: "vor {n} Tagen",
+
+    // Chat Widget
+    chatTitle: "KI-Assistent",
+    chatWelcome: "Hallo! Ich kann dir helfen, die KI-News dieser Woche zu verstehen. Stell mir eine Frage!",
+    chatPlaceholder: "Frage stellen...",
+    chatThinking: "Denke nach...",
+    chatError: "Fehler beim Laden. Bitte versuche es erneut.",
+    chatClear: "Neues Gespräch",
   },
   en: {
     // Navigation
@@ -160,10 +172,22 @@ export const translations = {
     german: "Deutsch",
     english: "English",
     
+    // Share
+    share: "Share",
+    copiedToClipboard: "Copied to clipboard",
+
     // Timestamps
     hoursAgo: "{n}h ago",
     dayAgo: "1 day ago",
     daysAgo: "{n} days ago",
+
+    // Chat Widget
+    chatTitle: "AI Assistant",
+    chatWelcome: "Hi! I can help you understand this week's AI news. Ask me a question!",
+    chatPlaceholder: "Ask a question...",
+    chatThinking: "Thinking...",
+    chatError: "Failed to load. Please try again.",
+    chatClear: "New chat",
   },
 } as const;
 

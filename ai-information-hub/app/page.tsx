@@ -1,15 +1,33 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Sidebar } from "@/components/sidebar";
 import { Feed } from "@/components/feed";
 import { RightSidebar } from "@/components/right-sidebar";
+import { ChatWidget } from "@/components/chat-widget";
 import { Cpu, TrendingUp, Lightbulb } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSettings } from "@/lib/settings-context";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState("tech");
+  const [selectedWeekId, setSelectedWeekId] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+
+  useEffect(() => {
+    fetch("/data/weeks.json")
+      .then((res) => res.json())
+      .then((data) => {
+        const weeks = data.weeks || [];
+        const current = weeks.find((w: { current?: boolean }) => w.current);
+        if (current) {
+          setSelectedWeekId(current.id);
+        } else if (weeks.length > 0) {
+          setSelectedWeekId(weeks[0].id);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   return (
     <div className="min-h-screen w-full">
@@ -23,17 +41,20 @@ export default function Home() {
 
         {/* Main Feed - Flexible center column */}
         <div className="flex-1 min-w-0 max-w-[600px] border-x border-border">
-          <Feed activeTab={activeTab} />
+          <Feed activeTab={activeTab} selectedWeekId={selectedWeekId} onWeekChange={setSelectedWeekId} searchQuery={searchQuery} />
         </div>
 
         {/* Right Sidebar - Fixed width, hidden on smaller screens */}
         <div className="hidden lg:block w-[350px] shrink-0">
-          <RightSidebar />
+          <RightSidebar weekId={selectedWeekId} onSearchChange={setSearchQuery} />
         </div>
       </div>
 
       {/* Mobile Bottom Navigation */}
       <MobileNav activeTab={activeTab} onTabChange={setActiveTab} />
+
+      {/* AI Chat Widget */}
+      {selectedWeekId && <ChatWidget weekId={selectedWeekId} />}
     </div>
   );
 }
