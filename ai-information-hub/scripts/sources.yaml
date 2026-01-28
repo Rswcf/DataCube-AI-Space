@@ -1,0 +1,21 @@
+tech:
+  - url: "https://www.theverge.com/ai/rss/index.xml"
+    name: "The Verge"
+  - url: "https://techcrunch.com/category/artificial-intelligence/feed/"
+    name: "TechCrunch"
+  - url: "https://venturebeat.com/feed/"
+    name: "VentureBeat"
+  - url: "https://hnrss.org/newest?q=AI&points=50"
+    name: "Hacker News"
+
+investment:
+  - url: "https://techcrunch.com/tag/funding/feed/"
+    name: "TechCrunch Funding"
+  - url: "https://news.crunchbase.com/feed/"
+    name: "Crunchbase News"
+  - url: "https://www.techmeme.com/feed.xml"
+    name: "Techmeme"
+
+tips:
+  - url: "https://zapier.com/blog/feed/"
+    name: "Zapier Blog"

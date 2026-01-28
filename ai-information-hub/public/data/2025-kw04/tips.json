@@ -1,0 +1,116 @@
+{
+  "de": [
+    {
+      "id": 1,
+      "author": { "name": "AI Workflow Pro", "handle": "@aiworkflowpro", "avatar": "AW", "verified": true },
+      "platform": "X",
+      "content": "Geheimer ChatGPT-Trick: Nutze 'Agiere als Senior Developer mit 20 Jahren Erfahrung' am Anfang deiner Prompts. Die Codequalität verbessert sich dramatisch!",
+      "tip": "Agiere als Senior [ROLLE] mit [X] Jahren Erfahrung. Deine Aufgabe ist [BESCHREIBUNG]. Berücksichtige dabei [KONTEXT].",
+      "category": "Prompt Engineering",
+      "difficulty": "Anfänger",
+      "timestamp": "2025-01-24",
+      "metrics": { "comments": 234, "retweets": 1892, "likes": 8934, "views": "1,2M" }
+    },
+    {
+      "id": 2,
+      "author": { "name": "r/ChatGPT", "handle": "@reddit_chatgpt", "avatar": "RD", "verified": false },
+      "platform": "Reddit",
+      "content": "LPT: Claude ist VIEL besser für längere Dokumente. Lade PDFs direkt hoch und lass dir Zusammenfassungen erstellen. Funktioniert für bis zu 200 Seiten!",
+      "tip": "1. PDF hochladen\n2. 'Erstelle eine strukturierte Zusammenfassung mit: Executive Summary, Kernpunkte, Empfehlungen'\n3. Für Details: 'Erkläre Abschnitt X genauer'",
+      "category": "Dokumentenanalyse",
+      "difficulty": "Anfänger",
+      "timestamp": "2025-01-24",
+      "metrics": { "comments": 567, "retweets": 2341, "likes": 12500, "views": "2,1M" }
+    },
+    {
+      "id": 3,
+      "author": { "name": "Cursor Tips", "handle": "@cursortips", "avatar": "CT", "verified": true },
+      "platform": "X",
+      "content": "Cursor IDE Hack: Drücke Cmd+K in jedem Code-Block und beschreibe was du ändern willst. KI editiert inline - 10x schneller als Copy-Paste zu ChatGPT!",
+      "tip": "Cmd+K (Mac) / Ctrl+K (Windows) \u2192 Beschreibe Änderung \u2192 Enter \u2192 Tab zum Akzeptieren",
+      "category": "Entwickler-Tools",
+      "difficulty": "Mittel",
+      "timestamp": "2025-01-23",
+      "metrics": { "comments": 189, "retweets": 1456, "likes": 6780, "views": "890K" }
+    },
+    {
+      "id": 4,
+      "author": { "name": "Productivity Hacker", "handle": "@prodhacker", "avatar": "PH", "verified": true },
+      "platform": "X",
+      "content": "Midjourney V6 Geheimtipp: Füge '--style raw' hinzu für fotorealistische Bilder ohne den typischen 'AI-Look'. Kombiniere mit '--ar 16:9' für perfekte Präsentationsbilder.",
+      "tip": "/imagine [Beschreibung] --style raw --ar 16:9 --v 6",
+      "category": "Bildgenerierung",
+      "difficulty": "Mittel",
+      "timestamp": "2025-01-23",
+      "metrics": { "comments": 445, "retweets": 3201, "likes": 15600, "views": "3,4M" }
+    },
+    {
+      "id": 5,
+      "author": { "name": "r/LocalLLaMA", "handle": "@reddit_localllm", "avatar": "LL", "verified": false },
+      "platform": "Reddit",
+      "content": "Ollama Setup in 2 Minuten: 'brew install ollama && ollama run llama3.2' - Lokales LLM ohne Internet, perfekt für sensible Firmendaten!",
+      "tip": "# Installation\nbrew install ollama\n\n# Modell starten\nollama run llama3.2\n\n# API nutzen\ncurl http://localhost:11434/api/generate -d '{\"model\":\"llama3.2\",\"prompt\":\"Hallo\"}'",
+      "category": "Lokale KI",
+      "difficulty": "Fortgeschritten",
+      "timestamp": "2025-01-22",
+      "metrics": { "comments": 312, "retweets": 1890, "likes": 8900, "views": "1,5M" }
+    }
+  ],
+  "en": [
+    {
+      "id": 1,
+      "author": { "name": "AI Workflow Pro", "handle": "@aiworkflowpro", "avatar": "AW", "verified": true },
+      "platform": "X",
+      "content": "Secret ChatGPT trick: Use 'Act as a Senior Developer with 20 years of experience' at the start of your prompts. Code quality improves dramatically!",
+      "tip": "Act as a Senior [ROLE] with [X] years of experience. Your task is [DESCRIPTION]. Consider [CONTEXT].",
+      "category": "Prompt Engineering",
+      "difficulty": "Beginner",
+      "timestamp": "2025-01-24",
+      "metrics": { "comments": 234, "retweets": 1892, "likes": 8934, "views": "1.2M" }
+    },
+    {
+      "id": 2,
+      "author": { "name": "r/ChatGPT", "handle": "@reddit_chatgpt", "avatar": "RD", "verified": false },
+      "platform": "Reddit",
+      "content": "LPT: Claude is MUCH better for longer documents. Upload PDFs directly and get summaries. Works for up to 200 pages!",
+      "tip": "1. Upload PDF\n2. 'Create a structured summary with: Executive Summary, Key Points, Recommendations'\n3. For details: 'Explain section X in more detail'",
+      "category": "Document Analysis",
+      "difficulty": "Beginner",
+      "timestamp": "2025-01-24",
+      "metrics": { "comments": 567, "retweets": 2341, "likes": 12500, "views": "2.1M" }
+    },
+    {
+      "id": 3,
+      "author": { "name": "Cursor Tips", "handle": "@cursortips", "avatar": "CT", "verified": true },
+      "platform": "X",
+      "content": "Cursor IDE Hack: Press Cmd+K in any code block and describe what you want to change. AI edits inline - 10x faster than copy-pasting to ChatGPT!",
+      "tip": "Cmd+K (Mac) / Ctrl+K (Windows) \u2192 Describe change \u2192 Enter \u2192 Tab to accept",
+      "category": "Developer Tools",
+      "difficulty": "Intermediate",
+      "timestamp": "2025-01-23",
+      "metrics": { "comments": 189, "retweets": 1456, "likes": 6780, "views": "890K" }
+    },
+    {
+      "id": 4,
+      "author": { "name": "Productivity Hacker", "handle": "@prodhacker", "avatar": "PH", "verified": true },
+      "platform": "X",
+      "content": "Midjourney V6 secret tip: Add '--style raw' for photorealistic images without the typical 'AI look'. Combine with '--ar 16:9' for perfect presentation images.",
+      "tip": "/imagine [Description] --style raw --ar 16:9 --v 6",
+      "category": "Image Generation",
+      "difficulty": "Intermediate",
+      "timestamp": "2025-01-23",
+      "metrics": { "comments": 445, "retweets": 3201, "likes": 15600, "views": "3.4M" }
+    },
+    {
+      "id": 5,
+      "author": { "name": "r/LocalLLaMA", "handle": "@reddit_localllm", "avatar": "LL", "verified": false },
+      "platform": "Reddit",
+      "content": "Ollama setup in 2 minutes: 'brew install ollama && ollama run llama3.2' - Local LLM without internet, perfect for sensitive company data!",
+      "tip": "# Installation\nbrew install ollama\n\n# Start model\nollama run llama3.2\n\n# Use API\ncurl http://localhost:11434/api/generate -d '{\"model\":\"llama3.2\",\"prompt\":\"Hello\"}'",
+      "category": "Local AI",
+      "difficulty": "Advanced",
+      "timestamp": "2025-01-22",
+      "metrics": { "comments": 312, "retweets": 1890, "likes": 8900, "views": "1.5M" }
+    }
+  ]
+}

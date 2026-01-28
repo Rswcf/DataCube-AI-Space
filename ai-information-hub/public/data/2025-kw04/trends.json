@@ -1,0 +1,32 @@
+{
+  "trends": {
+    "de": [
+      { "category": "KI \u00b7 Trend", "title": "GPT-5", "posts": "124.000 Beiträge" },
+      { "category": "Technologie \u00b7 Trend", "title": "NVIDIA Blackwell", "posts": "89.000 Beiträge" },
+      { "category": "Finanzen \u00b7 Trend", "title": "KI-Aktien", "posts": "67.000 Beiträge" },
+      { "category": "Wissenschaft \u00b7 Trend", "title": "AlphaFold 3", "posts": "45.000 Beiträge" },
+      { "category": "Startups \u00b7 Trend", "title": "Anthropic", "posts": "34.000 Beiträge" }
+    ],
+    "en": [
+      { "category": "AI \u00b7 Trending", "title": "GPT-5", "posts": "124K posts" },
+      { "category": "Technology \u00b7 Trending", "title": "NVIDIA Blackwell", "posts": "89K posts" },
+      { "category": "Finance \u00b7 Trending", "title": "AI Stocks", "posts": "67K posts" },
+      { "category": "Science \u00b7 Trending", "title": "AlphaFold 3", "posts": "45K posts" },
+      { "category": "Startups \u00b7 Trending", "title": "Anthropic", "posts": "34K posts" }
+    ]
+  },
+  "teamMembers": {
+    "de": [
+      { "name": "Anna Schmidt", "role": "KI-Technologie Lead", "handle": "@anna_tech", "avatar": "AS" },
+      { "name": "Max Weber", "role": "Investment Analyst", "handle": "@max_invest", "avatar": "MW" },
+      { "name": "Lisa Müller", "role": "Data Scientist", "handle": "@lisa_data", "avatar": "LM" },
+      { "name": "Tom Fischer", "role": "Research Lead", "handle": "@tom_research", "avatar": "TF" }
+    ],
+    "en": [
+      { "name": "Anna Schmidt", "role": "AI Technology Lead", "handle": "@anna_tech", "avatar": "AS" },
+      { "name": "Max Weber", "role": "Investment Analyst", "handle": "@max_invest", "avatar": "MW" },
+      { "name": "Lisa Müller", "role": "Data Scientist", "handle": "@lisa_data", "avatar": "LM" },
+      { "name": "Tom Fischer", "role": "Research Lead", "handle": "@tom_research", "avatar": "TF" }
+    ]
+  }
+}

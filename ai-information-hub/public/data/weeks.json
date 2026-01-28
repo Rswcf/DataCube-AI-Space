@@ -1,0 +1,10 @@
+{
+  "weeks": [
+    { "id": "2025-kw04", "label": "KW 04", "year": 2025, "weekNum": 4, "dateRange": "20.01 - 26.01", "current": true },
+    { "id": "2025-kw03", "label": "KW 03", "year": 2025, "weekNum": 3, "dateRange": "13.01 - 19.01", "current": false },
+    { "id": "2025-kw02", "label": "KW 02", "year": 2025, "weekNum": 2, "dateRange": "06.01 - 12.01", "current": false },
+    { "id": "2025-kw01", "label": "KW 01", "year": 2025, "weekNum": 1, "dateRange": "01.01 - 05.01", "current": false },
+    { "id": "2024-kw52", "label": "KW 52", "year": 2024, "weekNum": 52, "dateRange": "23.12 - 31.12", "current": false },
+    { "id": "2024-kw51", "label": "KW 51", "year": 2024, "weekNum": 51, "dateRange": "16.12 - 22.12", "current": false }
+  ]
+}

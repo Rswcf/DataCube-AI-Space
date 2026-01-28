@@ -1,0 +1,58 @@
+name: Regenerate Content from PR Comment
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  regenerate:
+    if: |
+      github.event.issue.pull_request &&
+      contains(github.event.comment.body, '/regenerate')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get PR branch
+        id: pr
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+            return pr.data.head.ref;
+          result-encoding: string
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.pr.outputs.result }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r scripts/requirements.txt
+
+      - name: Regenerate content
+        run: python scripts/regenerate.py --from-comment "${{ github.event.comment.body }}"
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add public/data/
+          git diff --staged --quiet || (git commit -m "Regenerate content based on feedback" && git push)
+
+      - name: Add reaction
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.reactions.createForIssueComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: context.payload.comment.id,
+              content: 'rocket',
+            });

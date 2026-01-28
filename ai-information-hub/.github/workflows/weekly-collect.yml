@@ -1,0 +1,60 @@
+name: Weekly AI Content Collection
+on:
+  schedule:
+    - cron: '0 8 * * 1'  # Every Monday at 08:00 UTC
+  workflow_dispatch:       # Allow manual trigger
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r scripts/requirements.txt
+
+      - name: Collect weekly content
+        run: python scripts/collect.py
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+
+      - name: Get week ID
+        id: week
+        run: echo "id=$(python -c 'from datetime import datetime; now=datetime.now(); y,w,_=now.isocalendar(); print(f"{y}-kw{w:02d}")')" >> $GITHUB_OUTPUT
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          title: "AI Weekly: ${{ steps.week.outputs.id }}"
+          branch: weekly-content-${{ steps.week.outputs.id }}
+          commit-message: "Add weekly content for ${{ steps.week.outputs.id }}"
+          body: |
+            ## AI Weekly Content Update
+
+            Automatically generated content for **${{ steps.week.outputs.id }}**.
+
+            ### Sections
+            - Tech progress
+            - Investment news (Primary Market, Secondary Market, M&A)
+            - Practical tips
+
+            ### Review Checklist
+            - [ ] Tech summaries are accurate and non-technical
+            - [ ] Investment data is correct
+            - [ ] Tips are practical and actionable
+            - [ ] German translations are natural
+            - [ ] English translations are natural
+
+            ---
+            To regenerate content with feedback, comment:
+            ```
+            /regenerate tech --feedback "your feedback here"
+            /regenerate investment --feedback "your feedback here"
+            /regenerate tips --feedback "your feedback here"
+            /regenerate all --feedback "your feedback here"
+            ```
+          labels: content, automated

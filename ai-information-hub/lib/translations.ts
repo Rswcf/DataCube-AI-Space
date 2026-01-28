@@ -1,0 +1,170 @@
+export type Language = "de" | "en";
+
+export const translations = {
+  de: {
+    // Navigation
+    home: "Startseite",
+    discover: "Entdecken",
+    dataCube: "Data Cube",
+    settings: "Einstellungen",
+    categories: "Kategorien",
+    
+    // Tabs
+    aiTechnology: "KI-Technologie",
+    techProgress: "Technische Fortschritte",
+    investments: "Investitionen",
+    marketFunding: "Markt & Finanzierung",
+    practicalTips: "Praxis-Tipps",
+    handsOnAI: "Hands-on KI",
+    technology: "Technologie",
+    tips: "Tipps",
+    
+    // Week Navigation
+    weekOverview: "Wochenübersicht",
+    week: "KW",
+    current: "Aktuell",
+    
+    // Tech Feed
+    aiTechProgress: "KI-Technologie Fortschritte",
+    importantDevThisWeek: "Die wichtigsten technischen Entwicklungen dieser Woche",
+    impact: "Auswirkung",
+    source: "Quelle",
+    
+    // Impact levels
+    critical: "Kritisch",
+    high: "Hoch",
+    medium: "Mittel",
+    low: "Niedrig",
+    
+    // Investment Feed
+    aiInvestments: "KI-Investitionen",
+    fundingNewsMA: "Finanzierungsrunden, Börsennews und M&A-Aktivitäten",
+    primaryMarket: "Primärmarkt",
+    secondaryMarket: "Sekundärmarkt",
+    volume: "Volumen",
+    valuation: "Bewertung",
+    marketCap: "Marktkapitalisierung",
+    acquisition: "Akquisition",
+    acquirer: "Käufer",
+    target: "Ziel",
+    dealValue: "Dealwert",
+    
+    // Tips Feed
+    practicalTipsTitle: "Praxis-Tipps",
+    handsOnTipsFrom: "Hands-on KI-Tipps von X und Reddit",
+    beginner: "Anfänger",
+    intermediate: "Mittel",
+    advanced: "Fortgeschritten",
+    
+    // Right Sidebar
+    search: "Suchen",
+    whatsNew: "Was gibt's Neues?",
+    posts: "Beiträge",
+    team: "Data Cube Team",
+    follow: "Folgen",
+    showMore: "Mehr anzeigen",
+    
+    // Footer
+    termsOfService: "Nutzungsbedingungen",
+    privacy: "Datenschutz",
+    cookiePolicy: "Cookie-Richtlinie",
+    imprint: "Impressum",
+    accessibility: "Barrierefreiheit",
+    
+    // Settings
+    darkMode: "Dunkelmodus",
+    lightMode: "Hellmodus",
+    language: "Sprache",
+    german: "Deutsch",
+    english: "English",
+    
+    // Timestamps
+    hoursAgo: "vor {n} Std.",
+    dayAgo: "vor 1 Tag",
+    daysAgo: "vor {n} Tagen",
+  },
+  en: {
+    // Navigation
+    home: "Home",
+    discover: "Discover",
+    dataCube: "Data Cube",
+    settings: "Settings",
+    categories: "Categories",
+    
+    // Tabs
+    aiTechnology: "AI Technology",
+    techProgress: "Technical Progress",
+    investments: "Investments",
+    marketFunding: "Market & Funding",
+    practicalTips: "Practical Tips",
+    handsOnAI: "Hands-on AI",
+    technology: "Technology",
+    tips: "Tips",
+    
+    // Week Navigation
+    weekOverview: "Week Overview",
+    week: "W",
+    current: "Current",
+    
+    // Tech Feed
+    aiTechProgress: "AI Technology Progress",
+    importantDevThisWeek: "The most important technical developments this week",
+    impact: "Impact",
+    source: "Source",
+    
+    // Impact levels
+    critical: "Critical",
+    high: "High",
+    medium: "Medium",
+    low: "Low",
+    
+    // Investment Feed
+    aiInvestments: "AI Investments",
+    fundingNewsMA: "Funding rounds, stock news and M&A activities",
+    primaryMarket: "Primary Market",
+    secondaryMarket: "Secondary Market",
+    volume: "Volume",
+    valuation: "Valuation",
+    marketCap: "Market Cap",
+    acquisition: "Acquisition",
+    acquirer: "Acquirer",
+    target: "Target",
+    dealValue: "Deal Value",
+    
+    // Tips Feed
+    practicalTipsTitle: "Practical Tips",
+    handsOnTipsFrom: "Hands-on AI tips from X and Reddit",
+    beginner: "Beginner",
+    intermediate: "Intermediate",
+    advanced: "Advanced",
+    
+    // Right Sidebar
+    search: "Search",
+    whatsNew: "What's happening?",
+    posts: "posts",
+    team: "Data Cube Team",
+    follow: "Follow",
+    showMore: "Show more",
+    
+    // Footer
+    termsOfService: "Terms of Service",
+    privacy: "Privacy",
+    cookiePolicy: "Cookie Policy",
+    imprint: "Imprint",
+    accessibility: "Accessibility",
+    
+    // Settings
+    darkMode: "Dark Mode",
+    lightMode: "Light Mode",
+    language: "Language",
+    german: "Deutsch",
+    english: "English",
+    
+    // Timestamps
+    hoursAgo: "{n}h ago",
+    dayAgo: "1 day ago",
+    daysAgo: "{n} days ago",
+  },
+} as const;
+
+export type TranslationKey = keyof typeof translations.de;
