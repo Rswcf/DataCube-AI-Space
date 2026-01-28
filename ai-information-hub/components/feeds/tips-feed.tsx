@@ -1,13 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { MessageCircle, Repeat2, Heart, BarChart2, Bookmark, Share, Lightbulb, Copy, Check } from "lucide-react";
+import { ExternalLink, Lightbulb, Copy, Check } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ShareButton } from "@/components/share-button";
 import { useSettings } from "@/lib/settings-context";
 
 interface TipsFeedProps {
   weekId: string;
+  searchQuery?: string;
 }
 
 interface TipPost {
@@ -20,6 +22,7 @@ interface TipPost {
   difficulty: string;
   timestamp: string;
   metrics: { comments: number; retweets: number; likes: number; views: string };
+  sourceUrl?: string;
 }
 
 const difficultyColors: Record<string, string> = {
@@ -36,11 +39,23 @@ const platformColors: Record<string, string> = {
   Reddit: "bg-chart-4 text-chart-4-foreground",
 };
 
-export function TipsFeed({ weekId }: TipsFeedProps) {
+export function TipsFeed({ weekId, searchQuery }: TipsFeedProps) {
   const { language, t } = useSettings();
   const [posts, setPosts] = useState<TipPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [copiedId, setCopiedId] = useState<number | null>(null);
+
+  const filteredPosts = posts.filter((post) => {
+    if (!searchQuery) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      post.content.toLowerCase().includes(q) ||
+      post.tip.toLowerCase().includes(q) ||
+      post.category.toLowerCase().includes(q) ||
+      post.platform.toLowerCase().includes(q) ||
+      post.author.name.toLowerCase().includes(q)
+    );
+  });
 
   useEffect(() => {
     setLoading(true);
@@ -88,14 +103,14 @@ export function TipsFeed({ weekId }: TipsFeedProps) {
       )}
 
       {/* Empty State */}
-      {!loading && posts.length === 0 && (
+      {!loading && filteredPosts.length === 0 && (
         <div className="px-4 py-12 text-center text-muted-foreground">
           {language === "de" ? "Keine Daten für diese Woche verfügbar." : "No data available for this week."}
         </div>
       )}
 
       {/* Tips Posts */}
-      {posts.map((post) => (
+      {filteredPosts.map((post) => (
         <article
           key={post.id}
           className="px-4 py-4 transition-colors hover:bg-secondary/30 cursor-pointer"
@@ -161,40 +176,28 @@ export function TipsFeed({ weekId }: TipsFeedProps) {
                 </div>
               </div>
 
-              {/* Metrics */}
-              <div className="mt-3 flex items-center justify-between max-w-md">
-                <button className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors group">
-                  <div className="rounded-full p-2 group-hover:bg-primary/10">
-                    <MessageCircle className="h-4 w-4" />
-                  </div>
-                  <span className="text-sm">{post.metrics.comments}</span>
-                </button>
-                <button className="flex items-center gap-2 text-muted-foreground hover:text-accent transition-colors group">
-                  <div className="rounded-full p-2 group-hover:bg-accent/10">
-                    <Repeat2 className="h-4 w-4" />
-                  </div>
-                  <span className="text-sm">{post.metrics.retweets}</span>
-                </button>
-                <button className="flex items-center gap-2 text-muted-foreground hover:text-destructive transition-colors group">
-                  <div className="rounded-full p-2 group-hover:bg-destructive/10">
-                    <Heart className="h-4 w-4" />
-                  </div>
-                  <span className="text-sm">{post.metrics.likes}</span>
-                </button>
-                <button className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors group">
-                  <div className="rounded-full p-2 group-hover:bg-primary/10">
-                    <BarChart2 className="h-4 w-4" />
-                  </div>
-                  <span className="text-sm">{post.metrics.views}</span>
-                </button>
-                <div className="flex items-center gap-1">
-                  <button className="rounded-full p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors">
-                    <Bookmark className="h-4 w-4" />
-                  </button>
-                  <button className="rounded-full p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors">
-                    <Share className="h-4 w-4" />
-                  </button>
+              {/* Source */}
+              {post.sourceUrl && (
+                <div className="mt-2 flex items-center gap-1 text-sm text-muted-foreground">
+                  <ExternalLink className="h-3 w-3" />
+                  <a
+                    href={post.sourceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-primary hover:underline transition-colors"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {t("source")}
+                  </a>
                 </div>
+              )}
+
+              <div className="mt-3">
+                <ShareButton
+                  title={post.category}
+                  text={`${post.content}\n\n${post.tip}`}
+                  url={post.sourceUrl}
+                />
               </div>
             </div>
           </div>

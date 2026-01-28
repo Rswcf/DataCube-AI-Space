@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { MessageCircle, Repeat2, Heart, BarChart2, Bookmark, Share, ExternalLink, Cpu, Brain, Zap, Server } from "lucide-react";
+import { ExternalLink, Cpu, Brain, Zap, Server } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { ShareButton } from "@/components/share-button";
 import { useSettings } from "@/lib/settings-context";
 
 interface TechFeedProps {
   weekId: string;
+  searchQuery?: string;
 }
 
 interface TechPost {
@@ -20,6 +22,7 @@ interface TechPost {
   timestamp: string;
   metrics: { comments: number; retweets: number; likes: number; views: string };
   source: string;
+  sourceUrl?: string;
 }
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -41,11 +44,23 @@ const impactLabels = {
   en: { critical: "Critical", high: "High", medium: "Medium", low: "Low" },
 };
 
-export function TechFeed({ weekId }: TechFeedProps) {
+export function TechFeed({ weekId, searchQuery }: TechFeedProps) {
   const { language, t } = useSettings();
   const [posts, setPosts] = useState<TechPost[]>([]);
   const [loading, setLoading] = useState(true);
   const impacts = impactLabels[language];
+
+  const filteredPosts = posts.filter((post) => {
+    if (!searchQuery) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      post.content.toLowerCase().includes(q) ||
+      post.category.toLowerCase().includes(q) ||
+      post.source.toLowerCase().includes(q) ||
+      post.tags.some((tag) => tag.toLowerCase().includes(q)) ||
+      post.author.name.toLowerCase().includes(q)
+    );
+  });
 
   useEffect(() => {
     setLoading(true);
@@ -87,14 +102,14 @@ export function TechFeed({ weekId }: TechFeedProps) {
       )}
 
       {/* Empty State */}
-      {!loading && posts.length === 0 && (
+      {!loading && filteredPosts.length === 0 && (
         <div className="px-4 py-12 text-center text-muted-foreground">
           {language === "de" ? "Keine Daten für diese Woche verfügbar." : "No data available for this week."}
         </div>
       )}
 
       {/* Posts */}
-      {posts.map((post) => {
+      {filteredPosts.map((post) => {
         const IconComponent = iconMap[post.iconType] || Brain;
         return (
           <article
@@ -151,43 +166,27 @@ export function TechFeed({ weekId }: TechFeedProps) {
                 {/* Source */}
                 <div className="mt-2 flex items-center gap-1 text-sm text-muted-foreground">
                   <ExternalLink className="h-3 w-3" />
-                  <span>{t("source")}: {post.source}</span>
+                  {post.sourceUrl ? (
+                    <a
+                      href={post.sourceUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:text-primary hover:underline transition-colors"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {t("source")}: {post.source}
+                    </a>
+                  ) : (
+                    <span>{t("source")}: {post.source}</span>
+                  )}
                 </div>
 
-                {/* Metrics */}
-                <div className="mt-3 flex items-center justify-between max-w-md">
-                  <button className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors group">
-                    <div className="rounded-full p-2 group-hover:bg-primary/10">
-                      <MessageCircle className="h-4 w-4" />
-                    </div>
-                    <span className="text-sm">{post.metrics.comments}</span>
-                  </button>
-                  <button className="flex items-center gap-2 text-muted-foreground hover:text-accent transition-colors group">
-                    <div className="rounded-full p-2 group-hover:bg-accent/10">
-                      <Repeat2 className="h-4 w-4" />
-                    </div>
-                    <span className="text-sm">{post.metrics.retweets}</span>
-                  </button>
-                  <button className="flex items-center gap-2 text-muted-foreground hover:text-destructive transition-colors group">
-                    <div className="rounded-full p-2 group-hover:bg-destructive/10">
-                      <Heart className="h-4 w-4" />
-                    </div>
-                    <span className="text-sm">{post.metrics.likes}</span>
-                  </button>
-                  <button className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors group">
-                    <div className="rounded-full p-2 group-hover:bg-primary/10">
-                      <BarChart2 className="h-4 w-4" />
-                    </div>
-                    <span className="text-sm">{post.metrics.views}</span>
-                  </button>
-                  <div className="flex items-center gap-1">
-                    <button className="rounded-full p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors">
-                      <Bookmark className="h-4 w-4" />
-                    </button>
-                    <button className="rounded-full p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors">
-                      <Share className="h-4 w-4" />
-                    </button>
-                  </div>
+                <div className="mt-3">
+                  <ShareButton
+                    title={post.category}
+                    text={post.content}
+                    url={post.sourceUrl}
+                  />
                 </div>
               </div>
             </div>

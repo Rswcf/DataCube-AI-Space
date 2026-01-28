@@ -112,6 +112,33 @@ def fetch_all_feeds(sources: dict, section: str) -> list[dict]:
     return all_articles
 
 
+def fetch_all_sources(sources: dict) -> list[dict]:
+    """Fetch ALL feeds from ALL sections, deduplicate by URL.
+
+    Each article is tagged with its source name and the original section
+    hint from sources.yaml (used as a hint for LLM classification).
+    """
+    all_articles = []
+    seen_urls = set()
+    for section in sources:
+        for source in sources[section]:
+            print(f"  [{section}] Fetching {source['name']}...")
+            try:
+                articles = fetch_feed(source["url"])
+                added = 0
+                for a in articles:
+                    if a["link"] not in seen_urls:
+                        seen_urls.add(a["link"])
+                        a["source"] = source["name"]
+                        a["original_section"] = section
+                        all_articles.append(a)
+                        added += 1
+                print(f"    -> {len(articles)} fetched, {added} new (after dedup)")
+            except Exception as e:
+                print(f"    -> Error: {e}")
+    return all_articles
+
+
 # ---------------------------------------------------------------------------
 # LLM Processing
 # ---------------------------------------------------------------------------
@@ -132,21 +159,146 @@ def get_llm_client():
     )
 
 
-def process_tech_articles(client, articles: list[dict]) -> dict:
+def classify_articles(client, articles: list[dict]) -> list[dict]:
+    """Classify all articles into sections using a single LLM call (Pass 1).
+
+    Returns articles enriched with 'section' and 'relevance' fields.
+    Articles flagged as duplicates are removed.
+    """
+    if not articles:
+        return []
+
+    # Build a compact article listing for the prompt
+    article_entries = []
+    for i, a in enumerate(articles):
+        article_entries.append(
+            f"[{i}] Source: {a['source']} (hint: {a.get('original_section', 'unknown')})\n"
+            f"    Title: {a['title']}\n"
+            f"    Summary: {a['summary'][:300]}"
+        )
+    articles_text = "\n\n".join(article_entries)
+
+    prompt = f"""You are an AI news classifier for a bilingual (German/English) weekly newsletter.
+
+Your task: classify each article into EXACTLY ONE section. Do NOT assign an article to multiple sections.
+
+SECTION DEFINITIONS:
+- "tech": AI technology breakthroughs, new models, research papers, product launches, technical infrastructure, benchmarks, open-source releases. Focus: WHAT the technology does or achieves.
+- "investment": Funding rounds, venture capital, IPOs, stock movements of AI companies, mergers & acquisitions, partnerships, financial deals. Focus: WHO is investing/acquiring and HOW MUCH.
+- "tips": Practical AI usage tips, prompt engineering, productivity workflows, tool tutorials, how-to guides for non-technical users. Focus: HOW to use AI tools in daily work.
+
+CLASSIFICATION RULES:
+1. Each article goes to exactly ONE section based on its PRIMARY focus.
+2. An article about "Company X raises $Y to build Z" → "investment" (primary focus is the funding).
+3. An article about "Company X launches new AI model Z" → "tech" (primary focus is the technology).
+4. An article about "10 ways to use ChatGPT for email" → "tips" (primary focus is practical usage).
+5. If an article covers multiple topics, choose the section matching its headline/main point.
+6. The "original_section" hint may be wrong — classify based on actual content.
+7. If two articles cover the same event from different sources, mark the less relevant one as a duplicate.
+
+ARTICLES:
+{articles_text}
+
+Output a JSON array with one entry per article:
+[
+  {{"index": 0, "section": "tech", "relevance": 0.9, "duplicate_of": null}},
+  {{"index": 1, "section": "investment", "relevance": 0.7, "duplicate_of": null}},
+  {{"index": 2, "section": "tech", "relevance": 0.3, "duplicate_of": 0}}
+]
+
+Fields:
+- index: article index (matches [N] above)
+- section: "tech" | "investment" | "tips"
+- relevance: 0.0-1.0 how relevant/important this article is for its section
+- duplicate_of: index of a better article covering the same event, or null
+
+Output ONLY the JSON array, no markdown fences or explanation."""
+
+    response = client.chat.completions.create(
+        model="deepseek/deepseek-v3.2",
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.1,  # Low temperature for consistent classification
+    )
+
+    try:
+        classifications = json.loads(response.choices[0].message.content)
+    except json.JSONDecodeError:
+        text = response.choices[0].message.content
+        start = text.find("[")
+        end = text.rfind("]") + 1
+        if start >= 0 and end > start:
+            classifications = json.loads(text[start:end])
+        else:
+            # Fallback: use original_section hints
+            print("  Warning: Could not parse classification response, using original_section hints")
+            for a in articles:
+                a["section"] = a.get("original_section", "tech")
+                a["relevance"] = 0.5
+            return articles
+
+    # Enrich articles with classification data
+    classified = []
+    classification_map = {c["index"]: c for c in classifications}
+
+    for i, article in enumerate(articles):
+        c = classification_map.get(i)
+        if c is None:
+            # Article not in LLM output — use hint
+            article["section"] = article.get("original_section", "tech")
+            article["relevance"] = 0.5
+            classified.append(article)
+            continue
+
+        # Skip duplicates
+        if c.get("duplicate_of") is not None:
+            continue
+
+        article["section"] = c["section"]
+        article["relevance"] = c.get("relevance", 0.5)
+        classified.append(article)
+
+    # Sort by relevance within each section (highest first)
+    classified.sort(key=lambda a: a.get("relevance", 0), reverse=True)
+
+    # Log classification stats
+    from collections import Counter
+    counts = Counter(a["section"] for a in classified)
+    print(f"  Classification results: {dict(counts)}")
+    print(f"  Duplicates removed: {len(articles) - len(classified)}")
+
+    return classified
+
+
+def _build_cross_section_context(other_sections: dict[str, list[dict]] | None) -> str:
+    """Build a context string listing articles assigned to other sections."""
+    if not other_sections:
+        return ""
+    lines = ["\nARTICLES ASSIGNED TO OTHER SECTIONS (do NOT cover these topics):"]
+    for section, articles in other_sections.items():
+        if articles:
+            titles = [f"  - {a['title']}" for a in articles[:10]]
+            lines.append(f"\n[{section.upper()}]")
+            lines.extend(titles)
+    return "\n".join(lines) + "\n"
+
+
+def process_tech_articles(client, articles: list[dict], other_sections: dict[str, list[dict]] | None = None) -> dict:
     """Use LLM to process tech articles into bilingual feed format."""
     if not articles:
         return {"de": [], "en": []}
 
     articles_text = "\n\n".join(
-        f"Source: {a['source']}\nTitle: {a['title']}\nSummary: {a['summary'][:500]}\nDate: {a['published']}"
+        f"Source: {a['source']}\nTitle: {a['title']}\nLink: {a['link']}\nSummary: {a['summary'][:500]}\nDate: {a['published']}"
         for a in articles[:20]  # Limit to top 20
     )
+
+    cross_context = _build_cross_section_context(other_sections)
 
     prompt = f"""You are a tech news editor for a German/English bilingual AI newsletter.
 Target audience: Non-technical professionals who want to stay informed about AI.
 
 From the following articles, select the 5 most important/interesting ones and create feed posts.
-
+{cross_context}
 ARTICLES:
 {articles_text}
 
@@ -163,11 +315,12 @@ Output a JSON object with this exact structure:
       "impact": "critical|high|medium|low",
       "timestamp": "YYYY-MM-DD",
       "metrics": {{"comments": 0, "retweets": 0, "likes": 0, "views": "0"}},
-      "source": "Source Name"
+      "source": "Source Name",
+      "sourceUrl": "https://original-article-url"
     }}
   ],
   "en": [
-    // Same structure but English content
+    // Same structure but English content, same sourceUrl as the German version
   ]
 }}
 
@@ -176,10 +329,11 @@ Rules:
 - impact: critical = industry-changing, high = significant, medium = notable, low = informational
 - avatar: 2-letter abbreviation of source name
 - Content should be accessible to non-technical readers
+- sourceUrl: copy the exact Link URL from the original article. Do NOT make up URLs.
 - Output ONLY valid JSON, no markdown fences"""
 
     response = client.chat.completions.create(
-        model="anthropic/claude-sonnet-4",
+        model="deepseek/deepseek-v3.2",
         messages=[{"role": "user", "content": prompt}],
         temperature=0.3,
     )
@@ -196,15 +350,17 @@ Rules:
         return {"de": [], "en": []}
 
 
-def process_investment_articles(client, articles: list[dict]) -> dict:
+def process_investment_articles(client, articles: list[dict], other_sections: dict[str, list[dict]] | None = None) -> dict:
     """Use LLM to process investment articles into bilingual feed format."""
     if not articles:
         return {"primaryMarket": {"de": [], "en": []}, "secondaryMarket": {"de": [], "en": []}, "ma": {"de": [], "en": []}}
 
     articles_text = "\n\n".join(
-        f"Source: {a['source']}\nTitle: {a['title']}\nSummary: {a['summary'][:500]}\nDate: {a['published']}"
+        f"Source: {a['source']}\nTitle: {a['title']}\nLink: {a['link']}\nSummary: {a['summary'][:500]}\nDate: {a['published']}"
         for a in articles[:20]
     )
+
+    cross_context = _build_cross_section_context(other_sections)
 
     prompt = f"""You are a financial news editor for a German/English bilingual AI investment newsletter.
 Target audience: Non-professional investors interested in AI industry funding and M&A.
@@ -215,7 +371,7 @@ From the following articles, categorize into:
 3. M&A (mergers, acquisitions, partnerships)
 
 Select the most relevant articles (up to 3 per category).
-
+{cross_context}
 ARTICLES:
 {articles_text}
 
@@ -233,10 +389,11 @@ Output a JSON object with this exact structure:
         "investors": ["Investor1", "Investor2"],
         "valuation": "$X Mrd.",
         "timestamp": "YYYY-MM-DD",
-        "metrics": {{"comments": 0, "retweets": 0, "likes": 0, "views": "0"}}
+        "metrics": {{"comments": 0, "retweets": 0, "likes": 0, "views": "0"}},
+        "sourceUrl": "https://original-article-url"
       }}
     ],
-    "en": [/* same but English */]
+    "en": [/* same but English, same sourceUrl */]
   }},
   "secondaryMarket": {{
     "de": [
@@ -250,10 +407,11 @@ Output a JSON object with this exact structure:
         "direction": "up|down",
         "marketCap": "$X Bio.",
         "timestamp": "YYYY-MM-DD",
-        "metrics": {{"comments": 0, "retweets": 0, "likes": 0, "views": "0"}}
+        "metrics": {{"comments": 0, "retweets": 0, "likes": 0, "views": "0"}},
+        "sourceUrl": "https://original-article-url"
       }}
     ],
-    "en": [/* same but English */]
+    "en": [/* same but English, same sourceUrl */]
   }},
   "ma": {{
     "de": [
@@ -266,10 +424,11 @@ Output a JSON object with this exact structure:
         "dealValue": "$X Mrd.",
         "dealType": "Akquisition",
         "timestamp": "YYYY-MM-DD",
-        "metrics": {{"comments": 0, "retweets": 0, "likes": 0, "views": "0"}}
+        "metrics": {{"comments": 0, "retweets": 0, "likes": 0, "views": "0"}},
+        "sourceUrl": "https://original-article-url"
       }}
     ],
-    "en": [/* same but English, dealType in English */]
+    "en": [/* same but English, dealType in English, same sourceUrl */]
   }}
 }}
 
@@ -277,10 +436,11 @@ Rules:
 - Use German number formatting for 'de' (e.g., $2,75 Mrd., €150 Mio.)
 - Use English number formatting for 'en' (e.g., $2.75B, €150M)
 - If no articles fit a category, return empty arrays
+- sourceUrl: copy the exact Link URL from the original article. Do NOT make up URLs.
 - Output ONLY valid JSON, no markdown fences"""
 
     response = client.chat.completions.create(
-        model="anthropic/claude-sonnet-4",
+        model="deepseek/deepseek-v3.2",
         messages=[{"role": "user", "content": prompt}],
         temperature=0.3,
     )
@@ -296,15 +456,17 @@ Rules:
         return {"primaryMarket": {"de": [], "en": []}, "secondaryMarket": {"de": [], "en": []}, "ma": {"de": [], "en": []}}
 
 
-def process_tips_articles(client, articles: list[dict]) -> dict:
+def process_tips_articles(client, articles: list[dict], other_sections: dict[str, list[dict]] | None = None) -> dict:
     """Use LLM to process tips articles into bilingual feed format."""
     if not articles:
         return {"de": [], "en": []}
 
     articles_text = "\n\n".join(
-        f"Source: {a['source']}\nTitle: {a['title']}\nSummary: {a['summary'][:500]}\nDate: {a['published']}"
+        f"Source: {a['source']}\nTitle: {a['title']}\nLink: {a['link']}\nSummary: {a['summary'][:500]}\nDate: {a['published']}"
         for a in articles[:20]
     )
+
+    cross_context = _build_cross_section_context(other_sections)
 
     prompt = f"""You are an AI tips editor for a German/English bilingual newsletter.
 Target audience: Non-technical professionals who want practical AI tips they can use immediately.
@@ -312,7 +474,7 @@ Target audience: Non-technical professionals who want practical AI tips they can
 From the following articles, extract the 5 most useful, practical AI tips.
 Focus on: ChatGPT/Claude/Gemini usage, prompt techniques, AI tools, productivity workflows.
 Do NOT include: programming tutorials, API usage, model training, technical deep-dives.
-
+{cross_context}
 ARTICLES:
 {articles_text}
 
@@ -328,7 +490,8 @@ Output a JSON object with this exact structure:
       "category": "Category in German (e.g., Prompt Engineering, Dokumentenanalyse)",
       "difficulty": "Anfänger|Mittel|Fortgeschritten",
       "timestamp": "YYYY-MM-DD",
-      "metrics": {{"comments": 0, "retweets": 0, "likes": 0, "views": "0"}}
+      "metrics": {{"comments": 0, "retweets": 0, "likes": 0, "views": "0"}},
+      "sourceUrl": "https://original-article-url"
     }}
   ],
   "en": [
@@ -341,7 +504,8 @@ Output a JSON object with this exact structure:
       "category": "Category in English (e.g., Prompt Engineering, Document Analysis)",
       "difficulty": "Beginner|Intermediate|Advanced",
       "timestamp": "YYYY-MM-DD",
-      "metrics": {{"comments": 0, "retweets": 0, "likes": 0, "views": "0"}}
+      "metrics": {{"comments": 0, "retweets": 0, "likes": 0, "views": "0"}},
+      "sourceUrl": "https://original-article-url"
     }}
   ]
 }}
@@ -349,10 +513,11 @@ Output a JSON object with this exact structure:
 Rules:
 - Tips should be immediately actionable (no coding required)
 - platform: use "X" for Twitter/blog sources, "Reddit" for Reddit sources
+- sourceUrl: copy the exact Link URL from the original article. Do NOT make up URLs.
 - Output ONLY valid JSON, no markdown fences"""
 
     response = client.chat.completions.create(
-        model="anthropic/claude-sonnet-4",
+        model="deepseek/deepseek-v3.2",
         messages=[{"role": "user", "content": prompt}],
         temperature=0.3,
     )
@@ -420,7 +585,7 @@ Use categories: KI, Technologie, Finanzen, Wissenschaft, Startups (German) / AI,
 Output ONLY valid JSON, no markdown fences."""
 
     response = client.chat.completions.create(
-        model="anthropic/claude-sonnet-4",
+        model="deepseek/deepseek-v3.2",
         messages=[{"role": "user", "content": prompt}],
         temperature=0.5,
     )
@@ -523,19 +688,72 @@ def main():
     # Load sources
     sources = load_sources()
 
-    # Fetch RSS feeds
-    print("\n--- Fetching Tech feeds ---")
-    tech_articles = fetch_all_feeds(sources, "tech")
-
-    print("\n--- Fetching Investment feeds ---")
-    investment_articles = fetch_all_feeds(sources, "investment")
-
-    print("\n--- Fetching Tips feeds ---")
-    tips_articles = fetch_all_feeds(sources, "tips")
+    # Stage 0: Unified fetch + dedup
+    print("\n--- Stage 0: Fetching all feeds (unified) ---")
+    all_articles = fetch_all_sources(sources)
+    print(f"\nTotal unique articles: {len(all_articles)}")
 
     # Cache raw data
     cache_dir = CACHE_DIR / week_id
     cache_dir.mkdir(parents=True, exist_ok=True)
+
+    # Save unified raw data
+    with open(cache_dir / "raw_all.json", "w") as f:
+        json.dump(
+            {
+                "articles": all_articles,
+                "fetched_at": datetime.now().isoformat(),
+            },
+            f,
+            indent=2,
+            ensure_ascii=False,
+        )
+    # Also save legacy format for regenerate.py backward compatibility
+    legacy_raw = {"tech": [], "investment": [], "tips": [], "fetched_at": datetime.now().isoformat()}
+    for a in all_articles:
+        section = a.get("original_section", "tech")
+        if section in legacy_raw:
+            legacy_raw[section].append(a)
+    with open(cache_dir / "raw.json", "w") as f:
+        json.dump(legacy_raw, f, indent=2, ensure_ascii=False)
+    print(f"Cached raw data to {cache_dir}")
+
+    if args.dry_run:
+        print("\n--- Dry run: skipping LLM processing ---")
+        from collections import Counter
+        hint_counts = Counter(a.get("original_section", "unknown") for a in all_articles)
+        print(f"Total articles: {len(all_articles)}")
+        print(f"By original section hint: {dict(hint_counts)}")
+        return
+
+    # Process with LLM
+    client = get_llm_client()
+
+    # Stage 1: Classify all articles
+    print("\n--- Stage 1: Classifying articles with LLM ---")
+    classified = classify_articles(client, all_articles)
+
+    # Split by section
+    tech_articles = [a for a in classified if a.get("section") == "tech"]
+    investment_articles = [a for a in classified if a.get("section") == "investment"]
+    tips_articles = [a for a in classified if a.get("section") == "tips"]
+    print(f"\nClassified: tech={len(tech_articles)}, investment={len(investment_articles)}, tips={len(tips_articles)}")
+
+    # Cache classification results
+    with open(cache_dir / "classified.json", "w") as f:
+        json.dump(
+            {
+                "tech": tech_articles,
+                "investment": investment_articles,
+                "tips": tips_articles,
+                "classified_at": datetime.now().isoformat(),
+            },
+            f,
+            indent=2,
+            ensure_ascii=False,
+        )
+
+    # Update legacy raw.json with classified data (for regenerate.py)
     with open(cache_dir / "raw.json", "w") as f:
         json.dump(
             {
@@ -548,26 +766,25 @@ def main():
             indent=2,
             ensure_ascii=False,
         )
-    print(f"\nCached raw data to {cache_dir / 'raw.json'}")
 
-    if args.dry_run:
-        print("\n--- Dry run: skipping LLM processing ---")
-        print(f"Tech articles: {len(tech_articles)}")
-        print(f"Investment articles: {len(investment_articles)}")
-        print(f"Tips articles: {len(tips_articles)}")
-        return
+    # Stage 2: Generate per-section content with cross-section context
+    print("\n--- Stage 2: Processing tech articles with LLM ---")
+    tech_data = process_tech_articles(
+        client, tech_articles,
+        other_sections={"investment": investment_articles, "tips": tips_articles},
+    )
 
-    # Process with LLM
-    client = get_llm_client()
+    print("\n--- Stage 2: Processing investment articles with LLM ---")
+    investment_data = process_investment_articles(
+        client, investment_articles,
+        other_sections={"tech": tech_articles, "tips": tips_articles},
+    )
 
-    print("\n--- Processing tech articles with LLM ---")
-    tech_data = process_tech_articles(client, tech_articles)
-
-    print("\n--- Processing investment articles with LLM ---")
-    investment_data = process_investment_articles(client, investment_articles)
-
-    print("\n--- Processing tips articles with LLM ---")
-    tips_data = process_tips_articles(client, tips_articles)
+    print("\n--- Stage 2: Processing tips articles with LLM ---")
+    tips_data = process_tips_articles(
+        client, tips_articles,
+        other_sections={"tech": tech_articles, "investment": investment_articles},
+    )
 
     print("\n--- Generating trends ---")
     trends_data = generate_trends(client, tech_data, investment_data)

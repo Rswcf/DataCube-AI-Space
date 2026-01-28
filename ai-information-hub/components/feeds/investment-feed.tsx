@@ -1,13 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { MessageCircle, Repeat2, Heart, BarChart2, Bookmark, Share, TrendingUp, TrendingDown, Building2, Briefcase, GitMerge } from "lucide-react";
+import { ExternalLink, TrendingUp, TrendingDown, Building2, Briefcase, GitMerge } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { ShareButton } from "@/components/share-button";
 import { cn } from "@/lib/utils";
 import { useSettings } from "@/lib/settings-context";
 
 interface InvestmentFeedProps {
   weekId: string;
+  searchQuery?: string;
 }
 
 type MarketTab = "primary" | "secondary" | "ma";
@@ -23,6 +25,7 @@ interface PrimaryMarketPost {
   valuation: string;
   timestamp: string;
   metrics: { comments: number; retweets: number; likes: number; views: string };
+  sourceUrl?: string;
 }
 
 interface SecondaryMarketPost {
@@ -36,6 +39,7 @@ interface SecondaryMarketPost {
   marketCap: string;
   timestamp: string;
   metrics: { comments: number; retweets: number; likes: number; views: string };
+  sourceUrl?: string;
 }
 
 interface MAPost {
@@ -48,9 +52,10 @@ interface MAPost {
   dealType: string;
   timestamp: string;
   metrics: { comments: number; retweets: number; likes: number; views: string };
+  sourceUrl?: string;
 }
 
-export function InvestmentFeed({ weekId }: InvestmentFeedProps) {
+export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
   const [activeTab, setActiveTab] = useState<MarketTab>("primary");
   const { language, t } = useSettings();
   const [primaryPosts, setPrimaryPosts] = useState<PrimaryMarketPost[]>([]);
@@ -78,6 +83,21 @@ export function InvestmentFeed({ weekId }: InvestmentFeedProps) {
 
   const weekNum = weekId.split("-kw")[1];
 
+  const filterByQuery = (text: string) => {
+    if (!searchQuery) return true;
+    return text.toLowerCase().includes(searchQuery.toLowerCase());
+  };
+
+  const filteredPrimary = primaryPosts.filter((p) =>
+    !searchQuery || filterByQuery(p.content) || filterByQuery(p.company) || filterByQuery(p.round) || p.investors.some((i) => filterByQuery(i))
+  );
+  const filteredSecondary = secondaryPosts.filter((p) =>
+    !searchQuery || filterByQuery(p.content) || filterByQuery(p.ticker)
+  );
+  const filteredMa = maPosts.filter((p) =>
+    !searchQuery || filterByQuery(p.content) || filterByQuery(p.acquirer) || filterByQuery(p.target) || filterByQuery(p.dealType)
+  );
+
   const tabs = [
     { id: "primary" as const, label: t("primaryMarket"), icon: Briefcase },
     { id: "secondary" as const, label: t("secondaryMarket"), icon: TrendingUp },
@@ -90,30 +110,22 @@ export function InvestmentFeed({ weekId }: InvestmentFeedProps) {
     </svg>
   );
 
-  const MetricsBar = ({ metrics }: { metrics: { comments: number; retweets: number; likes: number; views: string } }) => (
-    <div className="mt-3 flex items-center justify-between max-w-md">
-      <button className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors group">
-        <div className="rounded-full p-2 group-hover:bg-primary/10"><MessageCircle className="h-4 w-4" /></div>
-        <span className="text-sm">{metrics.comments}</span>
-      </button>
-      <button className="flex items-center gap-2 text-muted-foreground hover:text-accent transition-colors group">
-        <div className="rounded-full p-2 group-hover:bg-accent/10"><Repeat2 className="h-4 w-4" /></div>
-        <span className="text-sm">{metrics.retweets}</span>
-      </button>
-      <button className="flex items-center gap-2 text-muted-foreground hover:text-destructive transition-colors group">
-        <div className="rounded-full p-2 group-hover:bg-destructive/10"><Heart className="h-4 w-4" /></div>
-        <span className="text-sm">{metrics.likes}</span>
-      </button>
-      <button className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors group">
-        <div className="rounded-full p-2 group-hover:bg-primary/10"><BarChart2 className="h-4 w-4" /></div>
-        <span className="text-sm">{metrics.views}</span>
-      </button>
-      <div className="flex items-center gap-1">
-        <button className="rounded-full p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"><Bookmark className="h-4 w-4" /></button>
-        <button className="rounded-full p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"><Share className="h-4 w-4" /></button>
+  const SourceLink = ({ sourceUrl }: { sourceUrl?: string }) =>
+    sourceUrl ? (
+      <div className="mt-2 flex items-center gap-1 text-sm text-muted-foreground">
+        <ExternalLink className="h-3 w-3" />
+        <a
+          href={sourceUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hover:text-primary hover:underline transition-colors"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {t("source")}
+        </a>
       </div>
-    </div>
-  );
+    ) : null;
+
 
   return (
     <div className="divide-y divide-border">
@@ -160,12 +172,12 @@ export function InvestmentFeed({ weekId }: InvestmentFeedProps) {
       {/* Primary Market Posts */}
       {!loading && activeTab === "primary" && (
         <div className="divide-y divide-border">
-          {primaryPosts.length === 0 && (
+          {filteredPrimary.length === 0 && (
             <div className="px-4 py-12 text-center text-muted-foreground">
               {language === "de" ? "Keine Daten für diese Woche verfügbar." : "No data available for this week."}
             </div>
           )}
-          {primaryPosts.map((post) => (
+          {filteredPrimary.map((post) => (
             <article key={post.id} className="px-4 py-4 transition-colors hover:bg-secondary/30 cursor-pointer">
               <div className="flex gap-3">
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-accent/20 text-accent font-bold">
@@ -207,7 +219,10 @@ export function InvestmentFeed({ weekId }: InvestmentFeedProps) {
                   </div>
 
                   <p className="mt-2 text-foreground leading-relaxed">{post.content}</p>
-                  <MetricsBar metrics={post.metrics} />
+                  <SourceLink sourceUrl={post.sourceUrl} />
+                  <div className="mt-3">
+                    <ShareButton title={post.company} text={post.content} url={post.sourceUrl} />
+                  </div>
                 </div>
               </div>
             </article>
@@ -218,12 +233,12 @@ export function InvestmentFeed({ weekId }: InvestmentFeedProps) {
       {/* Secondary Market Posts */}
       {!loading && activeTab === "secondary" && (
         <div className="divide-y divide-border">
-          {secondaryPosts.length === 0 && (
+          {filteredSecondary.length === 0 && (
             <div className="px-4 py-12 text-center text-muted-foreground">
               {language === "de" ? "Keine Daten für diese Woche verfügbar." : "No data available for this week."}
             </div>
           )}
-          {secondaryPosts.map((post) => (
+          {filteredSecondary.map((post) => (
             <article key={post.id} className="px-4 py-4 transition-colors hover:bg-secondary/30 cursor-pointer">
               <div className="flex gap-3">
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-chart-3/20 text-chart-3 font-bold">
@@ -263,7 +278,10 @@ export function InvestmentFeed({ weekId }: InvestmentFeedProps) {
                   </div>
 
                   <p className="mt-2 text-foreground leading-relaxed">{post.content}</p>
-                  <MetricsBar metrics={post.metrics} />
+                  <SourceLink sourceUrl={post.sourceUrl} />
+                  <div className="mt-3">
+                    <ShareButton title={post.ticker} text={post.content} url={post.sourceUrl} />
+                  </div>
                 </div>
               </div>
             </article>
@@ -274,12 +292,12 @@ export function InvestmentFeed({ weekId }: InvestmentFeedProps) {
       {/* M&A Posts */}
       {!loading && activeTab === "ma" && (
         <div className="divide-y divide-border">
-          {maPosts.length === 0 && (
+          {filteredMa.length === 0 && (
             <div className="px-4 py-12 text-center text-muted-foreground">
               {language === "de" ? "Keine Daten für diese Woche verfügbar." : "No data available for this week."}
             </div>
           )}
-          {maPosts.map((post) => (
+          {filteredMa.map((post) => (
             <article key={post.id} className="px-4 py-4 transition-colors hover:bg-secondary/30 cursor-pointer">
               <div className="flex gap-3">
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-chart-5/20 text-chart-5 font-bold">
@@ -316,7 +334,10 @@ export function InvestmentFeed({ weekId }: InvestmentFeedProps) {
                   </div>
 
                   <p className="mt-2 text-foreground leading-relaxed">{post.content}</p>
-                  <MetricsBar metrics={post.metrics} />
+                  <SourceLink sourceUrl={post.sourceUrl} />
+                  <div className="mt-3">
+                    <ShareButton title={`${post.acquirer} → ${post.target}`} text={post.content} url={post.sourceUrl} />
+                  </div>
                 </div>
               </div>
             </article>

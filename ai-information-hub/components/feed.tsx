@@ -9,10 +9,12 @@ import { cn } from "@/lib/utils";
 
 interface FeedProps {
   activeTab: string;
+  selectedWeekId: string;
+  onWeekChange: (weekId: string) => void;
+  searchQuery: string;
 }
 
-export function Feed({ activeTab }: FeedProps) {
-  const [selectedWeekId, setSelectedWeekId] = useState("2025-kw04");
+export function Feed({ activeTab, selectedWeekId, onWeekChange, searchQuery }: FeedProps) {
   const [direction, setDirection] = useState<"left" | "right">("left");
   const [isAnimating, setIsAnimating] = useState(false);
   const prevTabRef = useRef(activeTab);
@@ -38,19 +40,23 @@ export function Feed({ activeTab }: FeedProps) {
   const renderFeed = () => {
     switch (activeTab) {
       case "tech":
-        return <TechFeed weekId={selectedWeekId} />;
+        return <TechFeed weekId={selectedWeekId} searchQuery={searchQuery} />;
       case "investment":
-        return <InvestmentFeed weekId={selectedWeekId} />;
+        return <InvestmentFeed weekId={selectedWeekId} searchQuery={searchQuery} />;
       case "tips":
-        return <TipsFeed weekId={selectedWeekId} />;
+        return <TipsFeed weekId={selectedWeekId} searchQuery={searchQuery} />;
       default:
-        return <TechFeed weekId={selectedWeekId} />;
+        return <TechFeed weekId={selectedWeekId} searchQuery={searchQuery} />;
     }
   };
 
+  if (!selectedWeekId) {
+    return <main className="min-h-screen" />;
+  }
+
   return (
     <main className="min-h-screen">
-      <WeekNavigation selectedWeekId={selectedWeekId} onWeekChange={setSelectedWeekId} />
+      <WeekNavigation selectedWeekId={selectedWeekId} onWeekChange={onWeekChange} />
 
       <div className="overflow-hidden">
         <div

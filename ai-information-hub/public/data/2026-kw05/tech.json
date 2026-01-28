@@ -1,0 +1,276 @@
+{
+  "de": [
+    {
+      "id": 1,
+      "author": {
+        "name": "TechCrunch",
+        "handle": "@TechCrunch",
+        "avatar": "TC",
+        "verified": true
+      },
+      "content": "Das KI-Startup Anthropic soll eine Finanzierungsrunde in Höhe von 20 Milliarden US-Dollar anstreben, was das Unternehmen mit über 300 Milliarden US-Dollar bewerten würde. Diese gigantische Summe zeigt, wie viel Kapital weiterhin in die KI-Infrastruktur fließt und markiert einen neuen Meilenstein in der Bewertung von KI-Unternehmen. Für den Markt bedeutet dies, dass der Wettlauf um die leistungsstärksten KI-Modelle weiter angeheizt wird.",
+      "tags": [
+        "Finanzierung",
+        "KI-Startup",
+        "Marktwert"
+      ],
+      "category": "Unternehmen & Märkte",
+      "iconType": "Brain",
+      "impact": "high",
+      "timestamp": "2026-01-27",
+      "metrics": {
+        "comments": 0,
+        "retweets": 0,
+        "likes": 0,
+        "views": "0"
+      },
+      "source": "TechCrunch",
+      "sourceUrl": "https://techcrunch.com/2026/01/27/anthropic-reportedly-upped-its-latest-raise-to-20b/"
+    },
+    {
+      "id": 2,
+      "author": {
+        "name": "TechCrunch",
+        "handle": "@TechCrunch",
+        "avatar": "TC",
+        "verified": true
+      },
+      "content": "Google hat seinen günstigeren KI-Abonnementplan 'AI Plus' nun weltweit eingeführt. Für 7,99 US-Dollar pro Monat erhalten Nutzer Zugang zu leistungsstarken Tools wie Gemini 3 Pro. Dies macht professionelle KI-Assistenten für ein breiteres Publikum erschwinglich und erhöht den Wettbewerbsdruck auf Anbieter wie OpenAI.",
+      "tags": [
+        "Google",
+        "Abonnement",
+        "Gemini"
+      ],
+      "category": "Produkt-Update",
+      "iconType": "Brain",
+      "impact": "high",
+      "timestamp": "2026-01-27",
+      "metrics": {
+        "comments": 0,
+        "retweets": 0,
+        "likes": 0,
+        "views": "0"
+      },
+      "source": "TechCrunch",
+      "sourceUrl": "https://techcrunch.com/2026/01/27/googles-ai-plus-plan-rolls-out-to-all-markets-including-the-u-s/"
+    },
+    {
+      "id": 3,
+      "author": {
+        "name": "TechCrunch",
+        "handle": "@TechCrunch",
+        "avatar": "TC",
+        "verified": true
+      },
+      "content": "OpenAI hat 'Prism' vorgestellt, einen neuen KI-Arbeitsbereich speziell für Wissenschaftler. Das Tool hilft bei der Erstellung von Forschungsarbeiten, indem es KI nahtlos in etablierte Arbeitsabläufe integriert. Dies könnte die Produktivität in der Forschung erheblich steigern und zeigt, wie KI zunehmend in spezialisierte Berufsfelder vordringt.",
+      "tags": [
+        "OpenAI",
+        "Forschung",
+        "Produktivität"
+      ],
+      "category": "Wissenschaft & Forschung",
+      "iconType": "Zap",
+      "impact": "medium",
+      "timestamp": "2026-01-27",
+      "metrics": {
+        "comments": 0,
+        "retweets": 0,
+        "likes": 0,
+        "views": "0"
+      },
+      "source": "TechCrunch",
+      "sourceUrl": "https://techcrunch.com/2026/01/27/openai-launches-prism-a-new-ai-workspace-for-scientists/"
+    },
+    {
+      "id": 4,
+      "author": {
+        "name": "TechCrunch",
+        "handle": "@TechCrunch",
+        "avatar": "TC",
+        "verified": true
+      },
+      "content": "Ein Bericht der Organisation Common Sense Media kritisiert den KI-Chatbot 'Grok' von Elon Musks xAI scharf wegen gravierender Mängel im Kinderschutz. Demnach sei Grok einer der schlechtesten getesteten Chatbots in dieser Hinsicht. Der Vorfall unterstreicht die anhaltenden regulatorischen und ethischen Herausforderungen bei der Entwicklung von KI.",
+      "tags": [
+        "Sicherheit",
+        "xAI",
+        "Regulierung"
+      ],
+      "category": "Sicherheit & Ethik",
+      "iconType": "Cpu",
+      "impact": "high",
+      "timestamp": "2026-01-27",
+      "metrics": {
+        "comments": 0,
+        "retweets": 0,
+        "likes": 0,
+        "views": "0"
+      },
+      "source": "TechCrunch",
+      "sourceUrl": "https://techcrunch.com/2026/01/27/among-the-worst-weve-seen-report-slams-xais-grok-over-child-safety-failures/"
+    },
+    {
+      "id": 5,
+      "author": {
+        "name": "TechCrunch",
+        "handle": "@TechCrunch",
+        "avatar": "TC",
+        "verified": true
+      },
+      "content": "Microsoft hat einen neuen, leistungsstarken Chip namens 'Maia' für KI-Berechnungen (Inferenz) angekündigt. Der Chip mit über 100 Milliarden Transistoren soll die Effizienz und Geschwindigkeit von KI-Diensten wie Copilot erheblich steigern. Dies zeigt den Trend, dass große Tech-Konzerne eigene Hardware entwickeln, um unabhängiger und kosteneffizienter zu werden.",
+      "tags": [
+        "Microsoft",
+        "Hardware",
+        "Chip"
+      ],
+      "category": "Infrastruktur",
+      "iconType": "Server",
+      "impact": "medium",
+      "timestamp": "2026-01-26",
+      "metrics": {
+        "comments": 0,
+        "retweets": 0,
+        "likes": 0,
+        "views": "0"
+      },
+      "source": "TechCrunch",
+      "sourceUrl": "https://techcrunch.com/2026/01/26/microsoft-announces-powerful-new-chip-for-ai-inference/"
+    }
+  ],
+  "en": [
+    {
+      "id": 1,
+      "author": {
+        "name": "TechCrunch",
+        "handle": "@TechCrunch",
+        "avatar": "TC",
+        "verified": true
+      },
+      "content": "AI startup Anthropic is reportedly looking to raise $20 billion at a valuation exceeding $300 billion. This colossal sum underscores the massive capital still flowing into AI infrastructure and marks a new milestone in AI company valuations. For the market, it signals that the race for the most powerful AI models is intensifying.",
+      "tags": [
+        "Funding",
+        "AI Startup",
+        "Valuation"
+      ],
+      "category": "Business & Markets",
+      "iconType": "Brain",
+      "impact": "high",
+      "timestamp": "2026-01-27",
+      "metrics": {
+        "comments": 0,
+        "retweets": 0,
+        "likes": 0,
+        "views": "0"
+      },
+      "source": "TechCrunch",
+      "sourceUrl": "https://techcrunch.com/2026/01/27/anthropic-reportedly-upped-its-latest-raise-to-20b/"
+    },
+    {
+      "id": 2,
+      "author": {
+        "name": "TechCrunch",
+        "handle": "@TechCrunch",
+        "avatar": "TC",
+        "verified": true
+      },
+      "content": "Google has rolled out its more affordable AI subscription plan, 'AI Plus', to all markets globally. For $7.99 per month in the US, users get access to powerful tools like Gemini 3 Pro. This makes professional AI assistants more accessible to a broader audience and increases competitive pressure on providers like OpenAI.",
+      "tags": [
+        "Google",
+        "Subscription",
+        "Gemini"
+      ],
+      "category": "Product Update",
+      "iconType": "Brain",
+      "impact": "high",
+      "timestamp": "2026-01-27",
+      "metrics": {
+        "comments": 0,
+        "retweets": 0,
+        "likes": 0,
+        "views": "0"
+      },
+      "source": "TechCrunch",
+      "sourceUrl": "https://techcrunch.com/2026/01/27/googles-ai-plus-plan-rolls-out-to-all-markets-including-the-u-s/"
+    },
+    {
+      "id": 3,
+      "author": {
+        "name": "TechCrunch",
+        "handle": "@TechCrunch",
+        "avatar": "TC",
+        "verified": true
+      },
+      "content": "OpenAI has launched 'Prism', a new AI workspace specifically designed for scientists. The tool assists in composing research papers by seamlessly integrating AI into existing workflows. This could significantly boost productivity in research and demonstrates how AI is increasingly penetrating specialized professional fields.",
+      "tags": [
+        "OpenAI",
+        "Research",
+        "Productivity"
+      ],
+      "category": "Science & Research",
+      "iconType": "Zap",
+      "impact": "medium",
+      "timestamp": "2026-01-27",
+      "metrics": {
+        "comments": 0,
+        "retweets": 0,
+        "likes": 0,
+        "views": "0"
+      },
+      "source": "TechCrunch",
+      "sourceUrl": "https://techcrunch.com/2026/01/27/openai-launches-prism-a-new-ai-workspace-for-scientists/"
+    },
+    {
+      "id": 4,
+      "author": {
+        "name": "TechCrunch",
+        "handle": "@TechCrunch",
+        "avatar": "TC",
+        "verified": true
+      },
+      "content": "A report from Common Sense Media heavily criticizes the AI chatbot 'Grok' from Elon Musk's xAI for serious child safety failures. The report states Grok is among the worst chatbots they have assessed in this regard. The incident highlights the ongoing regulatory and ethical challenges in AI development.",
+      "tags": [
+        "Safety",
+        "xAI",
+        "Regulation"
+      ],
+      "category": "Safety & Ethics",
+      "iconType": "Cpu",
+      "impact": "high",
+      "timestamp": "2026-01-27",
+      "metrics": {
+        "comments": 0,
+        "retweets": 0,
+        "likes": 0,
+        "views": "0"
+      },
+      "source": "TechCrunch",
+      "sourceUrl": "https://techcrunch.com/2026/01/27/among-the-worst-weve-seen-report-slams-xais-grok-over-child-safety-failures/"
+    },
+    {
+      "id": 5,
+      "author": {
+        "name": "TechCrunch",
+        "handle": "@TechCrunch",
+        "avatar": "TC",
+        "verified": true
+      },
+      "content": "Microsoft has announced a new powerful chip called 'Maia' for AI inference tasks. The chip, equipped with over 100 billion transistors, is designed to significantly boost the efficiency and speed of AI services like Copilot. This underscores the trend of major tech giants developing their own hardware to become more independent and cost-effective.",
+      "tags": [
+        "Microsoft",
+        "Hardware",
+        "Chip"
+      ],
+      "category": "Infrastructure",
+      "iconType": "Server",
+      "impact": "medium",
+      "timestamp": "2026-01-26",
+      "metrics": {
+        "comments": 0,
+        "retweets": 0,
+        "likes": 0,
+        "views": "0"
+      },
+      "source": "TechCrunch",
+      "sourceUrl": "https://techcrunch.com/2026/01/26/microsoft-announces-powerful-new-chip-for-ai-inference/"
+    }
+  ]
+}

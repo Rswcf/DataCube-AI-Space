@@ -54,16 +54,26 @@ def get_llm_client():
 
 
 def load_cached_raw(week_id: str) -> dict:
-    """Load cached raw RSS data for a week."""
-    cache_file = CACHE_DIR / week_id / "raw.json"
-    if not cache_file.exists():
-        print(f"Error: No cached data found for {week_id}")
-        print(f"Expected at: {cache_file}")
-        print("Run collect.py first to fetch and cache RSS data.")
-        sys.exit(1)
+    """Load cached raw RSS data for a week.
 
-    with open(cache_file, "r") as f:
-        return json.load(f)
+    Prefers classified.json (from two-stage pipeline) over raw.json,
+    since classified data has better section assignments.
+    """
+    classified_file = CACHE_DIR / week_id / "classified.json"
+    raw_file = CACHE_DIR / week_id / "raw.json"
+
+    if classified_file.exists():
+        with open(classified_file, "r") as f:
+            return json.load(f)
+
+    if raw_file.exists():
+        with open(raw_file, "r") as f:
+            return json.load(f)
+
+    print(f"Error: No cached data found for {week_id}")
+    print(f"Expected at: {classified_file} or {raw_file}")
+    print("Run collect.py first to fetch and cache RSS data.")
+    sys.exit(1)
 
 
 def load_existing(week_id: str, section: str) -> dict:
@@ -113,7 +123,7 @@ Apply the feedback to improve the content.
 Output ONLY valid JSON, no markdown fences."""
 
     response = client.chat.completions.create(
-        model="anthropic/claude-sonnet-4",
+        model="deepseek/deepseek-v3.2",
         messages=[{"role": "user", "content": prompt}],
         temperature=0.3,
     )

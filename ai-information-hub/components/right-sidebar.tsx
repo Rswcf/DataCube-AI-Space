@@ -5,20 +5,12 @@ import React from "react"
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { useSettings } from "@/lib/settings-context";
 
 interface TrendItem {
   category: string;
   title: string;
   posts: string;
-}
-
-interface TeamMember {
-  name: string;
-  role: string;
-  handle: string;
-  avatar: string;
 }
 
 // Fallback data in case JSON fetch fails
@@ -39,26 +31,13 @@ const fallbackTrends = {
   ],
 };
 
-const fallbackTeam = {
-  de: [
-    { name: "Anna Schmidt", role: "KI-Technologie Lead", handle: "@anna_tech", avatar: "AS" },
-    { name: "Max Weber", role: "Investment Analyst", handle: "@max_invest", avatar: "MW" },
-    { name: "Lisa Müller", role: "Data Scientist", handle: "@lisa_data", avatar: "LM" },
-    { name: "Tom Fischer", role: "Research Lead", handle: "@tom_research", avatar: "TF" },
-  ],
-  en: [
-    { name: "Anna Schmidt", role: "AI Technology Lead", handle: "@anna_tech", avatar: "AS" },
-    { name: "Max Weber", role: "Investment Analyst", handle: "@max_invest", avatar: "MW" },
-    { name: "Lisa Müller", role: "Data Scientist", handle: "@lisa_data", avatar: "LM" },
-    { name: "Tom Fischer", role: "Research Lead", handle: "@tom_research", avatar: "TF" },
-  ],
-};
 
 interface RightSidebarProps {
-  weekId?: string;
+  weekId: string;
+  onSearchChange: (query: string) => void;
 }
 
-export function RightSidebar({ weekId = "2025-kw04" }: RightSidebarProps) {
+export function RightSidebar({ weekId, onSearchChange }: RightSidebarProps) {
   const sidebarRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const [sidebarStyle, setSidebarStyle] = useState<CSSProperties>({});
@@ -66,8 +45,8 @@ export function RightSidebar({ weekId = "2025-kw04" }: RightSidebarProps) {
   const currentTop = useRef(0);
   const { language, t } = useSettings();
 
+  const [searchValue, setSearchValue] = useState("");
   const [trends, setTrends] = useState<TrendItem[]>(fallbackTrends[language]);
-  const [teamMembers, setTeamMembers] = useState<TeamMember[]>(fallbackTeam[language]);
 
   useEffect(() => {
     fetch(`/data/${weekId}/trends.json`)
@@ -76,13 +55,9 @@ export function RightSidebar({ weekId = "2025-kw04" }: RightSidebarProps) {
         if (data.trends) {
           setTrends(data.trends[language] || data.trends["de"] || fallbackTrends[language]);
         }
-        if (data.teamMembers) {
-          setTeamMembers(data.teamMembers[language] || data.teamMembers["de"] || fallbackTeam[language]);
-        }
       })
       .catch(() => {
         setTrends(fallbackTrends[language]);
-        setTeamMembers(fallbackTeam[language]);
       });
   }, [weekId, language]);
 
@@ -132,6 +107,11 @@ export function RightSidebar({ weekId = "2025-kw04" }: RightSidebarProps) {
           <Input
             placeholder={t("search")}
             className="pl-10 bg-secondary border-0 focus-visible:ring-1 focus-visible:ring-primary rounded-full"
+            value={searchValue}
+            onChange={(e) => {
+              setSearchValue(e.target.value);
+              onSearchChange(e.target.value);
+            }}
           />
         </div>
 
@@ -139,7 +119,7 @@ export function RightSidebar({ weekId = "2025-kw04" }: RightSidebarProps) {
         <div className="mt-4 rounded-xl bg-secondary/50 p-4">
           <h3 className="text-xl font-bold text-foreground">{t("whatsNew")}</h3>
           <div className="mt-3 space-y-4">
-            {trends.map((trend, index) => (
+            {trends.slice(0, 5).map((trend, index) => (
               <div key={index} className="group cursor-pointer">
                 <div className="flex items-start justify-between">
                   <div>
@@ -158,47 +138,11 @@ export function RightSidebar({ weekId = "2025-kw04" }: RightSidebarProps) {
               </div>
             ))}
           </div>
-          <button className="mt-3 text-sm text-primary hover:underline">
-            {t("showMore")}
-          </button>
         </div>
 
-        {/* Team Members */}
-        <div className="mt-4 rounded-xl bg-secondary/50 p-4">
-          <h3 className="text-xl font-bold text-foreground">{t("team")}</h3>
-          <div className="mt-3 space-y-3">
-            {teamMembers.map((member, index) => (
-              <div key={index} className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/20 text-primary font-semibold text-sm">
-                    {member.avatar}
-                  </div>
-                  <div>
-                    <p className="font-semibold text-foreground text-sm">{member.name}</p>
-                    <p className="text-xs text-muted-foreground">{member.role}</p>
-                  </div>
-                </div>
-                <Button variant="outline" size="sm" className="rounded-full h-8 text-xs font-semibold bg-transparent">
-                  {t("follow")}
-                </Button>
-              </div>
-            ))}
-          </div>
-          <button className="mt-3 text-sm text-primary hover:underline">
-            {t("showMore")}
-          </button>
-        </div>
-
-        {/* Footer Links */}
+        {/* Footer */}
         <div className="mt-4 px-2">
-          <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
-            <a href="#" className="hover:underline">{t("termsOfService")}</a>
-            <a href="#" className="hover:underline">{t("privacy")}</a>
-            <a href="#" className="hover:underline">{t("cookiePolicy")}</a>
-            <a href="#" className="hover:underline">{t("imprint")}</a>
-            <a href="#" className="hover:underline">{t("accessibility")}</a>
-          </div>
-          <p className="mt-2 text-xs text-muted-foreground">© 2025 Data Cube Analytics</p>
+          <p className="text-xs text-muted-foreground">&copy; 2026 Data Cube, All Rights Reserved</p>
         </div>
       </div>
     </aside>

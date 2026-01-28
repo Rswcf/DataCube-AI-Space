@@ -1,0 +1,344 @@
+{
+  "primaryMarket": {
+    "de": [
+      {
+        "id": 1,
+        "author": {
+          "name": "Crunchbase News",
+          "handle": "@crunchbasenews",
+          "avatar": "XX",
+          "verified": true
+        },
+        "content": "Ricursive Intelligence, ein Frontier-AI-Labor, hat nur zwei Monate nach seiner Gründung eine Serie-A-Finanzierungsrunde in Höhe von 300 Mio. USD zu einer Bewertung von 4 Mrd. USD abgeschlossen.",
+        "company": "Ricursive Intelligence",
+        "amount": "$300 Mio.",
+        "round": "Serie A",
+        "investors": [],
+        "valuation": "$4 Mrd.",
+        "timestamp": "2026-01-26",
+        "metrics": {
+          "comments": 0,
+          "retweets": 0,
+          "likes": 0,
+          "views": "0"
+        },
+        "sourceUrl": "https://news.crunchbase.com/venture/startup-ai-lab-ricursive-seriesa-unicorn/"
+      },
+      {
+        "id": 2,
+        "author": {
+          "name": "TechCrunch Funding",
+          "handle": "@techcrunch",
+          "avatar": "XX",
+          "verified": true
+        },
+        "content": "Zipline, ein Drohnenzustelldienst, hat 600 Mio. USD an neuer Finanzierung für seine Expansion gesammelt. Das Unternehmen hat kürzlich seinen 2-millionsten Lieferflug absolviert.",
+        "company": "Zipline",
+        "amount": "$600 Mio.",
+        "round": "Neue Finanzierung",
+        "investors": [],
+        "valuation": "",
+        "timestamp": "2026-01-21",
+        "metrics": {
+          "comments": 0,
+          "retweets": 0,
+          "likes": 0,
+          "views": "0"
+        },
+        "sourceUrl": "https://techcrunch.com/2026/01/21/zipline-charts-drone-delivery-expansion-with-600m-in-new-funding/"
+      },
+      {
+        "id": 3,
+        "author": {
+          "name": "Crunchbase News",
+          "handle": "@crunchbasenews",
+          "avatar": "XX",
+          "verified": true
+        },
+        "content": "Zocks, ein Anbieter eines KI-Assistenten für Finanzberater, hat eine Serie-B-Finanzierungsrunde in Höhe von 45 Mio. USD unter der Co-Führung von Lightspeed Venture Partners und QED Investors abgeschlossen.",
+        "company": "Zocks",
+        "amount": "$45 Mio.",
+        "round": "Serie B",
+        "investors": [
+          "Lightspeed Venture Partners",
+          "QED Investors"
+        ],
+        "valuation": "",
+        "timestamp": "2026-01-26",
+        "metrics": {
+          "comments": 0,
+          "retweets": 0,
+          "likes": 0,
+          "views": "0"
+        },
+        "sourceUrl": "https://news.crunchbase.com/fintech/zocks-raises-seriesb-ai-assistant-financial-advisers/"
+      }
+    ],
+    "en": [
+      {
+        "id": 1,
+        "author": {
+          "name": "Crunchbase News",
+          "handle": "@crunchbasenews",
+          "avatar": "XX",
+          "verified": true
+        },
+        "content": "Ricursive Intelligence, a frontier AI lab, has raised $300 million in a Series A funding round at a $4 billion valuation just two months after its launch.",
+        "company": "Ricursive Intelligence",
+        "amount": "$300M",
+        "round": "Series A",
+        "investors": [],
+        "valuation": "$4B",
+        "timestamp": "2026-01-26",
+        "metrics": {
+          "comments": 0,
+          "retweets": 0,
+          "likes": 0,
+          "views": "0"
+        },
+        "sourceUrl": "https://news.crunchbase.com/venture/startup-ai-lab-ricursive-seriesa-unicorn/"
+      },
+      {
+        "id": 2,
+        "author": {
+          "name": "TechCrunch Funding",
+          "handle": "@techcrunch",
+          "avatar": "XX",
+          "verified": true
+        },
+        "content": "Drone delivery service Zipline has secured $600 million in new funding for its expansion. The company recently completed its 2 millionth delivery flight.",
+        "company": "Zipline",
+        "amount": "$600M",
+        "round": "New Funding",
+        "investors": [],
+        "valuation": "",
+        "timestamp": "2026-01-21",
+        "metrics": {
+          "comments": 0,
+          "retweets": 0,
+          "likes": 0,
+          "views": "0"
+        },
+        "sourceUrl": "https://techcrunch.com/2026/01/21/zipline-charts-drone-delivery-expansion-with-600m-in-new-funding/"
+      },
+      {
+        "id": 3,
+        "author": {
+          "name": "Crunchbase News",
+          "handle": "@crunchbasenews",
+          "avatar": "XX",
+          "verified": true
+        },
+        "content": "Zocks, a builder of an AI assistant for financial advisers, has raised $45 million in a Series B funding round co-led by Lightspeed Venture Partners and QED Investors.",
+        "company": "Zocks",
+        "amount": "$45M",
+        "round": "Series B",
+        "investors": [
+          "Lightspeed Venture Partners",
+          "QED Investors"
+        ],
+        "valuation": "",
+        "timestamp": "2026-01-26",
+        "metrics": {
+          "comments": 0,
+          "retweets": 0,
+          "likes": 0,
+          "views": "0"
+        },
+        "sourceUrl": "https://news.crunchbase.com/fintech/zocks-raises-seriesb-ai-assistant-financial-advisers/"
+      }
+    ]
+  },
+  "secondaryMarket": {
+    "de": [
+      {
+        "id": 1,
+        "author": {
+          "name": "Techmeme",
+          "handle": "@techmeme",
+          "avatar": "XX",
+          "verified": true
+        },
+        "content": "SK Hynix meldet Rekordquartal: Q4-Umsatz steigt um 66% auf 23 Mrd. USD, operativer Gewinn um 137% auf 13,3 Mrd. USD. Beide Zahlen übertreffen die Schätzungen, angetrieben durch die KI-Nachfrage nach HBM-Speicher.",
+        "ticker": "",
+        "price": "",
+        "change": "+66%",
+        "direction": "up",
+        "marketCap": "",
+        "timestamp": "2026-01-28",
+        "metrics": {
+          "comments": 0,
+          "retweets": 0,
+          "likes": 0,
+          "views": "0"
+        },
+        "sourceUrl": "http://www.techmeme.com/260128/p13#a260128p13"
+      },
+      {
+        "id": 2,
+        "author": {
+          "name": "Techmeme",
+          "handle": "@techmeme",
+          "avatar": "XX",
+          "verified": true
+        },
+        "content": "ASML meldet Rekordauftragseingänge von 13,2 Mrd. Euro im Q4 und übertrifft damit die Erwartungen bei weitem. Das Unternehmen prognostiziert für 2026 einen Umsatz zwischen 34 und 39 Mrd. Euro, getrieben von der KI-Nachfrage nach Chipherstellungsmaschinen.",
+        "ticker": "",
+        "price": "",
+        "change": "",
+        "direction": "up",
+        "marketCap": "",
+        "timestamp": "2026-01-28",
+        "metrics": {
+          "comments": 0,
+          "retweets": 0,
+          "likes": 0,
+          "views": "0"
+        },
+        "sourceUrl": "http://www.techmeme.com/260128/p6#a260128p6"
+      }
+    ],
+    "en": [
+      {
+        "id": 1,
+        "author": {
+          "name": "Techmeme",
+          "handle": "@techmeme",
+          "avatar": "XX",
+          "verified": true
+        },
+        "content": "SK Hynix reports a record quarter: Q4 revenue up 66% to $23B, operating profit up 137% to $13.3B. Both figures beat estimates, driven by AI demand for HBM memory.",
+        "ticker": "",
+        "price": "",
+        "change": "+66%",
+        "direction": "up",
+        "marketCap": "",
+        "timestamp": "2026-01-28",
+        "metrics": {
+          "comments": 0,
+          "retweets": 0,
+          "likes": 0,
+          "views": "0"
+        },
+        "sourceUrl": "http://www.techmeme.com/260128/p13#a260128p13"
+      },
+      {
+        "id": 2,
+        "author": {
+          "name": "Techmeme",
+          "handle": "@techmeme",
+          "avatar": "XX",
+          "verified": true
+        },
+        "content": "ASML reports record quarterly bookings of €13.2B in Q4, far exceeding expectations. The company projects 2026 sales between €34B and €39B, driven by AI demand for chipmaking equipment.",
+        "ticker": "",
+        "price": "",
+        "change": "",
+        "direction": "up",
+        "marketCap": "",
+        "timestamp": "2026-01-28",
+        "metrics": {
+          "comments": 0,
+          "retweets": 0,
+          "likes": 0,
+          "views": "0"
+        },
+        "sourceUrl": "http://www.techmeme.com/260128/p6#a260128p6"
+      }
+    ]
+  },
+  "ma": {
+    "de": [
+      {
+        "id": 1,
+        "author": {
+          "name": "Crunchbase News",
+          "handle": "@crunchbasenews",
+          "avatar": "XX",
+          "verified": true
+        },
+        "content": "Die Bank Capital One kündigt an, das Fintech-Startup Brex für 5,15 Mrd. USD in einer Kombination aus Bargeld und Aktien zu übernehmen. Es wäre laut Brex der größte Bank-Fintech-Deal der Geschichte.",
+        "acquirer": "Capital One",
+        "target": "Brex",
+        "dealValue": "$5,15 Mrd.",
+        "dealType": "Akquisition",
+        "timestamp": "2026-01-23",
+        "metrics": {
+          "comments": 0,
+          "retweets": 0,
+          "likes": 0,
+          "views": "0"
+        },
+        "sourceUrl": "https://news.crunchbase.com/ma/capital-one-acquisition-fintech-startup-brex/"
+      },
+      {
+        "id": 2,
+        "author": {
+          "name": "Techmeme",
+          "handle": "@techmeme",
+          "avatar": "XX",
+          "verified": true
+        },
+        "content": "Berichten zufolge lehnte Hugging Face ein Investitionsangebot von Nvidia in Höhe von 500 Mio. USD zu einer Bewertung von 7 Mrd. USD Ende 2025 ab. Das KI-Startup will keinen einzelnen dominanten Investor.",
+        "acquirer": "Nvidia (Angebot abgelehnt)",
+        "target": "Hugging Face",
+        "dealValue": "$500 Mio.",
+        "dealType": "Investitionsangebot",
+        "timestamp": "2026-01-28",
+        "metrics": {
+          "comments": 0,
+          "retweets": 0,
+          "likes": 0,
+          "views": "0"
+        },
+        "sourceUrl": "http://www.techmeme.com/260128/p5#a260128p5"
+      }
+    ],
+    "en": [
+      {
+        "id": 1,
+        "author": {
+          "name": "Crunchbase News",
+          "handle": "@crunchbasenews",
+          "avatar": "XX",
+          "verified": true
+        },
+        "content": "Banking giant Capital One announces it is acquiring fintech startup Brex for $5.15 billion in a cash and stock deal. Brex claims it would be the largest bank-fintech deal in history.",
+        "acquirer": "Capital One",
+        "target": "Brex",
+        "dealValue": "$5.15B",
+        "dealType": "Acquisition",
+        "timestamp": "2026-01-23",
+        "metrics": {
+          "comments": 0,
+          "retweets": 0,
+          "likes": 0,
+          "views": "0"
+        },
+        "sourceUrl": "https://news.crunchbase.com/ma/capital-one-acquisition-fintech-startup-brex/"
+      },
+      {
+        "id": 2,
+        "author": {
+          "name": "Techmeme",
+          "handle": "@techmeme",
+          "avatar": "XX",
+          "verified": true
+        },
+        "content": "Hugging Face reportedly declined Nvidia's $500 million investment offer at a $7 billion valuation in late 2025. The AI startup says it does not want a single dominant investor.",
+        "acquirer": "Nvidia (offer declined)",
+        "target": "Hugging Face",
+        "dealValue": "$500M",
+        "dealType": "Investment Offer",
+        "timestamp": "2026-01-28",
+        "metrics": {
+          "comments": 0,
+          "retweets": 0,
+          "likes": 0,
+          "views": "0"
+        },
+        "sourceUrl": "http://www.techmeme.com/260128/p5#a260128p5"
+      }
+    ]
+  }
+}
