@@ -8,16 +8,16 @@
         "avatar": "TC",
         "verified": true
       },
-      "content": "Das KI-Startup Anthropic soll eine Finanzierungsrunde in Höhe von 20 Milliarden US-Dollar anstreben, was das Unternehmen mit über 300 Milliarden US-Dollar bewerten würde. Diese gigantische Summe zeigt, wie viel Kapital weiterhin in die KI-Infrastruktur fließt und markiert einen neuen Meilenstein in der Bewertung von KI-Unternehmen. Für den Markt bedeutet dies, dass der Wettlauf um die leistungsstärksten KI-Modelle weiter angeheizt wird.",
+      "content": "Das kleine Startup Arcee AI hat mit Trinity ein 400-Milliarden-Parameter-Modell veröffentlicht, das sogar Metas Llama übertreffen soll. Es zeigt, dass auch kleine Teams dank effizienter Methoden große, leistungsstarke KI-Modelle entwickeln können. Dies könnte den Wettbewerb im Bereich Open-Source-KI weiter anheizen.",
       "tags": [
-        "Finanzierung",
-        "KI-Startup",
-        "Marktwert"
+        "Open Source",
+        "KI-Modelle",
+        "Startup"
       ],
-      "category": "Unternehmen & Märkte",
+      "category": "Technologie",
       "iconType": "Brain",
       "impact": "high",
-      "timestamp": "2026-01-27",
+      "timestamp": "2026-01-28",
       "metrics": {
         "comments": 0,
         "retweets": 0,
@@ -25,79 +25,79 @@
         "views": "0"
       },
       "source": "TechCrunch",
-      "sourceUrl": "https://techcrunch.com/2026/01/27/anthropic-reportedly-upped-its-latest-raise-to-20b/"
+      "sourceUrl": "https://techcrunch.com/2026/01/28/tiny-startup-arcee-ai-built-a-400b-open-source-llm-from-scratch-to-best-metas-llama/"
     },
     {
       "id": 2,
       "author": {
-        "name": "TechCrunch",
-        "handle": "@TechCrunch",
-        "avatar": "TC",
+        "name": "The Verge AI",
+        "handle": "@vergeai",
+        "avatar": "VA",
         "verified": true
       },
-      "content": "Google hat seinen günstigeren KI-Abonnementplan 'AI Plus' nun weltweit eingeführt. Für 7,99 US-Dollar pro Monat erhalten Nutzer Zugang zu leistungsstarken Tools wie Gemini 3 Pro. Dies macht professionelle KI-Assistenten für ein breiteres Publikum erschwinglich und erhöht den Wettbewerbsdruck auf Anbieter wie OpenAI.",
+      "content": "Google führt in Chrome eine 'Auto-Browse'-Funktion ein, die von Gemini angetrieben wird. Sie kann mehrstufige Aufgaben wie die Recherche von Reisekosten oder das Ausfüllen von Formularen übernehmen. Dies ist ein großer Schritt hin zu einem persönlichen KI-Assistenten, der direkt im Browser arbeitet.",
       "tags": [
         "Google",
-        "Abonnement",
-        "Gemini"
+        "Browser",
+        "KI-Assistent"
       ],
-      "category": "Produkt-Update",
+      "category": "Produktupdate",
       "iconType": "Brain",
       "impact": "high",
-      "timestamp": "2026-01-27",
+      "timestamp": "2026-01-28",
       "metrics": {
         "comments": 0,
         "retweets": 0,
         "likes": 0,
         "views": "0"
       },
-      "source": "TechCrunch",
-      "sourceUrl": "https://techcrunch.com/2026/01/27/googles-ai-plus-plan-rolls-out-to-all-markets-including-the-u-s/"
+      "source": "The Verge AI",
+      "sourceUrl": "https://www.theverge.com/news/869731/google-gemini-ai-chrome-auto-browse"
     },
     {
       "id": 3,
       "author": {
-        "name": "TechCrunch",
-        "handle": "@TechCrunch",
-        "avatar": "TC",
+        "name": "The Verge AI",
+        "handle": "@vergeai",
+        "avatar": "VA",
         "verified": true
       },
-      "content": "OpenAI hat 'Prism' vorgestellt, einen neuen KI-Arbeitsbereich speziell für Wissenschaftler. Das Tool hilft bei der Erstellung von Forschungsarbeiten, indem es KI nahtlos in etablierte Arbeitsabläufe integriert. Dies könnte die Produktivität in der Forschung erheblich steigern und zeigt, wie KI zunehmend in spezialisierte Berufsfelder vordringt.",
+      "content": "Astronomen haben mit Hilfe einer KI über 1.400 bisher unbekannte 'anomale Objekte' in den Hubble-Weltraumteleskop-Archiven entdeckt. Dies zeigt, wie KI dabei hilft, verborgene Muster in riesigen wissenschaftlichen Datensätzen zu finden und neue Entdeckungen zu beschleunigen.",
       "tags": [
-        "OpenAI",
+        "Wissenschaft",
         "Forschung",
-        "Produktivität"
+        "Datenanalyse"
       ],
-      "category": "Wissenschaft & Forschung",
+      "category": "Forschung",
       "iconType": "Zap",
       "impact": "medium",
-      "timestamp": "2026-01-27",
+      "timestamp": "2026-01-28",
       "metrics": {
         "comments": 0,
         "retweets": 0,
         "likes": 0,
         "views": "0"
       },
-      "source": "TechCrunch",
-      "sourceUrl": "https://techcrunch.com/2026/01/27/openai-launches-prism-a-new-ai-workspace-for-scientists/"
+      "source": "The Verge AI",
+      "sourceUrl": "https://www.theverge.com/news/869182/astronomers-ai-discover-cosmic-anomalies-hubble-archives"
     },
     {
       "id": 4,
       "author": {
-        "name": "TechCrunch",
-        "handle": "@TechCrunch",
-        "avatar": "TC",
+        "name": "The Verge AI",
+        "handle": "@vergeai",
+        "avatar": "VA",
         "verified": true
       },
-      "content": "Ein Bericht der Organisation Common Sense Media kritisiert den KI-Chatbot 'Grok' von Elon Musks xAI scharf wegen gravierender Mängel im Kinderschutz. Demnach sei Grok einer der schlechtesten getesteten Chatbots in dieser Hinsicht. Der Vorfall unterstreicht die anhaltenden regulatorischen und ethischen Herausforderungen bei der Entwicklung von KI.",
+      "content": "Moltbot ist ein lokaler KI-Agent, der Aufgaben wie Erinnerungen verwalten oder Kundengespräche führen kann und gerade zum Internet-Phänomen wird. Er zeigt, wie praktische, lokal laufende KI-Assistenten immer beliebter werden, da sie mehr Privatsphäre und Kontrolle bieten als Cloud-Dienste.",
       "tags": [
-        "Sicherheit",
-        "xAI",
-        "Regulierung"
+        "KI-Agent",
+        "Open Source",
+        "Lokale KI"
       ],
-      "category": "Sicherheit & Ethik",
+      "category": "Technologie",
       "iconType": "Cpu",
-      "impact": "high",
+      "impact": "medium",
       "timestamp": "2026-01-27",
       "metrics": {
         "comments": 0,
@@ -105,26 +105,215 @@
         "likes": 0,
         "views": "0"
       },
-      "source": "TechCrunch",
-      "sourceUrl": "https://techcrunch.com/2026/01/27/among-the-worst-weve-seen-report-slams-xais-grok-over-child-safety-failures/"
+      "source": "The Verge AI",
+      "sourceUrl": "https://www.theverge.com/report/869004/moltbot-clawdbot-local-ai-agent"
     },
     {
       "id": 5,
+      "author": {
+        "name": "Ars Technica AI",
+        "handle": "@arstechnica",
+        "avatar": "AT",
+        "verified": true
+      },
+      "content": "China hat offenbar den Import von über 400.000 hochmodernen Nvidia KI-Chips (H200) genehmigt. Dies unterstreicht den globalen Wettlauf um KI-Hardware und zeigt, wie China versucht, seine KI-Entwicklung voranzutreiben, während es gleichzeitig auf technologische Unabhängigkeit hinarbeitet.",
+      "tags": [
+        "Hardware",
+        "Geopolitik",
+        "Nvidia"
+      ],
+      "category": "Industrie",
+      "iconType": "Server",
+      "impact": "high",
+      "timestamp": "2026-01-28",
+      "metrics": {
+        "comments": 0,
+        "retweets": 0,
+        "likes": 0,
+        "views": "0"
+      },
+      "source": "Ars Technica AI",
+      "sourceUrl": "https://arstechnica.com/ai/2026/01/report-china-approves-import-of-high-end-nvidia-ai-chips-after-weeks-of-uncertainty/"
+    },
+    {
+      "id": 6,
+      "author": {
+        "name": "The Decoder",
+        "handle": "@thedecoder",
+        "avatar": "TD",
+        "verified": true
+      },
+      "content": "Figure AI zeigt einen humanoiden Roboter, der mit einer einzigen KI (einem neuronalen Netz) gesteuert wird und Geschirr ausräumen kann. Dies ist ein wichtiger Schritt hin zu vielseitigen Robotern, die komplexe, alltägliche Aufgaben in menschlichen Umgebungen übernehmen könnten.",
+      "tags": [
+        "Robotik",
+        "KI",
+        "Automatisierung"
+      ],
+      "category": "Forschung",
+      "iconType": "Cpu",
+      "impact": "high",
+      "timestamp": "2026-01-28",
+      "metrics": {
+        "comments": 0,
+        "retweets": 0,
+        "likes": 0,
+        "views": "0"
+      },
+      "source": "The Decoder",
+      "sourceUrl": "https://the-decoder.com/figure-ai-shows-robot-that-really-puts-its-hip-into-dishwasher-duty/"
+    },
+    {
+      "id": 7,
+      "author": {
+        "name": "The Decoder",
+        "handle": "@thedecoder",
+        "avatar": "TD",
+        "verified": true
+      },
+      "content": "OpenAI hat Prism veröffentlicht, ein kostenloses KI-Werkzeug für wissenschaftliches Schreiben. Es kombiniert einen LaTeX-Editor, einen Referenzmanager und GPT-5.2 und soll Forschern helfen, ihre Arbeit effizienter zu organisieren und zu schreiben.",
+      "tags": [
+        "OpenAI",
+        "Produktivität",
+        "Wissenschaft"
+      ],
+      "category": "Produktupdate",
+      "iconType": "Brain",
+      "impact": "medium",
+      "timestamp": "2026-01-28",
+      "metrics": {
+        "comments": 0,
+        "retweets": 0,
+        "likes": 0,
+        "views": "0"
+      },
+      "source": "The Decoder",
+      "sourceUrl": "https://the-decoder.com/openais-prism-combines-latex-editor-reference-manager-and-gpt-5-2-in-one-tool/"
+    },
+    {
+      "id": 8,
+      "author": {
+        "name": "The Verge AI",
+        "handle": "@vergeai",
+        "avatar": "VA",
+        "verified": true
+      },
+      "content": "Eine Studie der Anti-Defamation League stuft xAIs Grok als den Chatbot mit den meisten antisemitischen Inhalten ein. Dies wirft ernste Fragen zur Verantwortung von KI-Unternehmen bei der Kontrolle schädlicher Ausgaben auf und zeigt, wie unterschiedlich Modelle mit sensiblen Themen umgehen.",
+      "tags": [
+        "Sicherheit",
+        "Ethik",
+        "xAIGrok"
+      ],
+      "category": "Regulierung",
+      "iconType": "Cpu",
+      "impact": "high",
+      "timestamp": "2026-01-28",
+      "metrics": {
+        "comments": 0,
+        "retweets": 0,
+        "likes": 0,
+        "views": "0"
+      },
+      "source": "The Verge AI",
+      "sourceUrl": "https://www.theverge.com/news/868925/adl-ai-antisemitism-report-grok-chatgpt-gemini-claude-deepseek-llama-elon-musk"
+    },
+    {
+      "id": 9,
+      "author": {
+        "name": "The Verge AI",
+        "handle": "@vergeai",
+        "avatar": "VA",
+        "verified": true
+      },
+      "content": "Google Search erhält mit Gemini 3 aufgewertete 'AI Overviews' und ermöglicht nun Folgefragen. Die Suche wird dadurch noch mehr zu einem KI-Chat, der ein Gespräch führen kann, anstatt nur Links zu liefern.",
+      "tags": [
+        "Google",
+        "Suche",
+        "KI-Assistent"
+      ],
+      "category": "Produktupdate",
+      "iconType": "Brain",
+      "impact": "medium",
+      "timestamp": "2026-01-27",
+      "metrics": {
+        "comments": 0,
+        "retweets": 0,
+        "likes": 0,
+        "views": "0"
+      },
+      "source": "The Verge AI",
+      "sourceUrl": "https://www.theverge.com/news/868497/google-ai-search-follow-up-questions-gemini-3"
+    },
+    {
+      "id": 10,
       "author": {
         "name": "TechCrunch",
         "handle": "@TechCrunch",
         "avatar": "TC",
         "verified": true
       },
-      "content": "Microsoft hat einen neuen, leistungsstarken Chip namens 'Maia' für KI-Berechnungen (Inferenz) angekündigt. Der Chip mit über 100 Milliarden Transistoren soll die Effizienz und Geschwindigkeit von KI-Diensten wie Copilot erheblich steigern. Dies zeigt den Trend, dass große Tech-Konzerne eigene Hardware entwickeln, um unabhängiger und kosteneffizienter zu werden.",
+      "content": "Apple stellt mit Creator Studio Pro eine neue KI-Software für Content-Ersteller vor. Die KI soll bei mühsamen Aufgaben helfen, wie dem Finden von Clips oder dem Erstellen von Folien, ohne die kreative Kontrolle zu übernehmen. Es zeigt Apples Ansatz, KI als unterstützendes Werkzeug zu sehen.",
       "tags": [
-        "Microsoft",
-        "Hardware",
-        "Chip"
+        "Apple",
+        "Kreativität",
+        "Content Creation"
       ],
-      "category": "Infrastruktur",
-      "iconType": "Server",
+      "category": "Produktupdate",
+      "iconType": "Brain",
       "impact": "medium",
+      "timestamp": "2026-01-28",
+      "metrics": {
+        "comments": 0,
+        "retweets": 0,
+        "likes": 0,
+        "views": "0"
+      },
+      "source": "TechCrunch",
+      "sourceUrl": "https://techcrunch.com/2026/01/28/with-apples-new-creator-studio-pro-ai-is-a-tool-to-aid-creation-not-replace-it/"
+    },
+    {
+      "id": 11,
+      "author": {
+        "name": "Hacker News",
+        "handle": "@newsycombinator",
+        "avatar": "HN",
+        "verified": true
+      },
+      "content": "Der US-Bundesstaat Georgia erwägt ein Verbot neuer Rechenzentren, die den KI-Boom antreiben, aufgrund von Bedenken über den enormen Strom- und Wasserbedarf. Dies spiegelt die wachsenden Spannungen zwischen technologischem Fortschritt und infrastrukturellen Grenzen wider.",
+      "tags": [
+        "Infrastruktur",
+        "Regulierung",
+        "Umwelt"
+      ],
+      "category": "Politik",
+      "iconType": "Server",
+      "impact": "high",
+      "timestamp": "2026-01-26",
+      "metrics": {
+        "comments": 26,
+        "retweets": 0,
+        "likes": 52,
+        "views": "0"
+      },
+      "source": "Hacker News",
+      "sourceUrl": "https://www.theguardian.com/technology/2026/jan/26/georgia-datacenters-ai-ban"
+    },
+    {
+      "id": 12,
+      "author": {
+        "name": "Ars Technica AI",
+        "handle": "@arstechnica",
+        "avatar": "AT",
+        "verified": true
+      },
+      "content": "Die EU hat eine formelle Untersuchung gegen xAI eingeleitet, weil Grok sexualisierte Deepfakes erzeugen kann. Das Unternehmen drohen hohe Geldstrafen. Dies ist ein klares Signal, dass Regulierer KI-Missbrauch ernst nehmen und durchgreifen.",
+      "tags": [
+        "Regulierung",
+        "Deepfakes",
+        "EU"
+      ],
+      "category": "Regulierung",
+      "iconType": "Cpu",
+      "impact": "critical",
       "timestamp": "2026-01-26",
       "metrics": {
         "comments": 0,
@@ -132,8 +321,224 @@
         "likes": 0,
         "views": "0"
       },
-      "source": "TechCrunch",
-      "sourceUrl": "https://techcrunch.com/2026/01/26/microsoft-announces-powerful-new-chip-for-ai-inference/"
+      "source": "Ars Technica AI",
+      "sourceUrl": "https://arstechnica.com/tech-policy/2026/01/eu-launches-formal-investigation-of-xai-over-groks-sexualized-deepfakes/"
+    },
+    {
+      "id": 13,
+      "author": {
+        "name": "Ars Technica AI",
+        "handle": "@arstechnica",
+        "avatar": "AT",
+        "verified": true
+      },
+      "content": "Google fügt seiner KI 'Personal Intelligence' hinzu, die Antworten mit Daten aus Gmail und Fotos personalisiert. Dies macht KI-Assistenten persönlicher, wirft aber auch große Fragen zum Datenschutz und zur Kontrolle über die eigenen Informationen auf.",
+      "tags": [
+        "Google",
+        "Datenschutz",
+        "Personal Assistant"
+      ],
+      "category": "Produktupdate",
+      "iconType": "Brain",
+      "impact": "high",
+      "timestamp": "2026-01-22",
+      "metrics": {
+        "comments": 0,
+        "retweets": 0,
+        "likes": 0,
+        "views": "0"
+      },
+      "source": "Ars Technica AI",
+      "sourceUrl": "https://arstechnica.com/google/2026/01/google-ai-mode-can-now-customize-responses-with-your-email-and-photos/"
+    },
+    {
+      "id": 14,
+      "author": {
+        "name": "WIRED AI",
+        "handle": "@WIRED",
+        "avatar": "WA",
+        "verified": true
+      },
+      "content": "Mindestens 37 US-Staatsanwaltschaften gehen gegen xAI vor, nachdem Grok nicht einvernehmliche sexualisierte Bilder von Frauen und Minderjährigen erzeugt hat. Dies zeigt, wie rechtliche Konsequenzen für KI-Unternehmen real werden, die ihre Produkte nicht ausreichend kontrollieren.",
+      "tags": [
+        "Regulierung",
+        "Deepfakes",
+        "xAIGrok"
+      ],
+      "category": "Regulierung",
+      "iconType": "Cpu",
+      "impact": "critical",
+      "timestamp": "2026-01-27",
+      "metrics": {
+        "comments": 0,
+        "retweets": 0,
+        "likes": 0,
+        "views": "0"
+      },
+      "source": "WIRED AI",
+      "sourceUrl": "https://www.wired.com/story/the-state-led-crackdown-on-grok-and-xai-has-begun/"
+    },
+    {
+      "id": 15,
+      "author": {
+        "name": "AI News",
+        "handle": "@AINews",
+        "avatar": "AN",
+        "verified": true
+      },
+      "content": "Laut einer Deloitte-Studie setzen Unternehmen KI-Agenten schneller ein, als sie Sicherheitsrichtlinien entwickeln können. Dies führt zu ernsten Risiken in den Bereichen Sicherheit, Datenschutz und Haftung. Es ist ein Weckruf für verantwortungsvolles Management der neuen Technologie.",
+      "tags": [
+        "Sicherheit",
+        "Unternehmen",
+        "Risiko"
+      ],
+      "category": "Sicherheit",
+      "iconType": "Cpu",
+      "impact": "high",
+      "timestamp": "2026-01-28",
+      "metrics": {
+        "comments": 0,
+        "retweets": 0,
+        "likes": 0,
+        "views": "0"
+      },
+      "source": "AI News",
+      "sourceUrl": "https://www.artificialintelligence-news.com/news/deloitte-agentic-ai-guidelines-published/"
+    },
+    {
+      "id": 16,
+      "author": {
+        "name": "MIT Technology Review AI",
+        "handle": "@techreview",
+        "avatar": "MT",
+        "verified": true
+      },
+      "content": "Die Fähigkeit von KI, sich an Nutzer und ihre Vorlieben zu 'erinnern', wird zum neuen Verkaufsargument – und zur nächsten großen Herausforderung für den Datenschutz. Persönliche KI-Assistenten wie Googles 'Personal Intelligence' machen dies deutlich.",
+      "tags": [
+        "Datenschutz",
+        "KI-Assistent",
+        "Google"
+      ],
+      "category": "Datenschutz",
+      "iconType": "Cpu",
+      "impact": "high",
+      "timestamp": "2026-01-28",
+      "metrics": {
+        "comments": 0,
+        "retweets": 0,
+        "likes": 0,
+        "views": "0"
+      },
+      "source": "MIT Technology Review AI",
+      "sourceUrl": "https://www.technologyreview.com/2026/01/28/1131835/what-ai-remembers-about-you-is-privacys-next-frontier/"
+    },
+    {
+      "id": 17,
+      "author": {
+        "name": "The Verge AI",
+        "handle": "@vergeai",
+        "avatar": "VA",
+        "verified": true
+      },
+      "content": "YouTube hat mehrere der beliebtesten Kanäle entfernt, die massenhaft mit KI generierte Inhalte ('AI Slop') produzierten. Dies zeigt die wachsenden Bemühungen der Plattformen, gegen minderwertige, automatisierte Inhalte vorzugehen und die Qualität zu erhalten.",
+      "tags": [
+        "Content Moderation",
+        "YouTube",
+        "Generative KI"
+      ],
+      "category": "Plattformen",
+      "iconType": "Cpu",
+      "impact": "medium",
+      "timestamp": "2026-01-28",
+      "metrics": {
+        "comments": 0,
+        "retweets": 0,
+        "likes": 0,
+        "views": "0"
+      },
+      "source": "The Verge AI",
+      "sourceUrl": "https://www.theverge.com/news/869684/youtube-top-ai-channels-removed-kapwing"
+    },
+    {
+      "id": 18,
+      "author": {
+        "name": "Ars Technica AI",
+        "handle": "@arstechnica",
+        "avatar": "AT",
+        "verified": true
+      },
+      "content": "Der Leiter der US-Cyberabwehr lud versehentlich geheime Regierungsinformationen in ChatGPT hoch. Der Vorfall unterstreicht die anhaltenden Sicherheitsrisiken, wenn Mitarbeiter generative KI-Tools für sensible Daten nutzen, und die Notwendigkeit strenger Richtlinien.",
+      "tags": [
+        "Sicherheit",
+        "Regierung",
+        "ChatGPT"
+      ],
+      "category": "Sicherheit",
+      "iconType": "Cpu",
+      "impact": "high",
+      "timestamp": "2026-01-28",
+      "metrics": {
+        "comments": 0,
+        "retweets": 0,
+        "likes": 0,
+        "views": "0"
+      },
+      "source": "Ars Technica AI",
+      "sourceUrl": "https://arstechnica.com/tech-policy/2026/01/us-cyber-defense-chief-accidentally-uploaded-secret-government-info-to-chatgpt/"
+    },
+    {
+      "id": 19,
+      "author": {
+        "name": "Ars Technica AI",
+        "handle": "@arstechnica",
+        "avatar": "AT",
+        "verified": true
+      },
+      "content": "Das US-Verkehrsministerium nutzte KI, um Sicherheitsvorschriften zu entwerfen, was bei Mitarbeitern Besorgnis auslöste. Sie warnen, dass dies zu Verletzungen oder Todesfällen führen könnte. Es zeigt die Gefahren, wenn KI ohne ausreichende menschliche Aufsicht in kritischen Bereichen eingesetzt wird.",
+      "tags": [
+        "Regierung",
+        "Sicherheit",
+        "Risiko"
+      ],
+      "category": "Regulierung",
+      "iconType": "Cpu",
+      "impact": "high",
+      "timestamp": "2026-01-26",
+      "metrics": {
+        "comments": 0,
+        "retweets": 0,
+        "likes": 0,
+        "views": "0"
+      },
+      "source": "Ars Technica AI",
+      "sourceUrl": "https://arstechnica.com/tech-policy/2026/01/wildly-irresponsible-dots-use-of-ai-to-draft-safety-rules-sparks-concerns/"
+    },
+    {
+      "id": 20,
+      "author": {
+        "name": "WIRED AI",
+        "handle": "@WIRED",
+        "avatar": "WA",
+        "verified": true
+      },
+      "content": "Die US-Einwanderungsbehörde ICE nutzt KI-Tools von Palantir, um Hinweise auf ihrer Meldeplattform zusammenzufassen und zu priorisieren. Dies wirft Fragen zur Transparenz und Fairness automatisierter Entscheidungen in sensiblen Bereichen wie Strafverfolgung auf.",
+      "tags": [
+        "Strafverfolgung",
+        "Ethik",
+        "Palantir"
+      ],
+      "category": "Politik",
+      "iconType": "Cpu",
+      "impact": "high",
+      "timestamp": "2026-01-28",
+      "metrics": {
+        "comments": 0,
+        "retweets": 0,
+        "likes": 0,
+        "views": "0"
+      },
+      "source": "WIRED AI",
+      "sourceUrl": "https://www.wired.com/story/ice-is-using-palantirs-ai-tools-to-sort-through-tips/"
     }
   ],
   "en": [
@@ -145,16 +550,16 @@
         "avatar": "TC",
         "verified": true
       },
-      "content": "AI startup Anthropic is reportedly looking to raise $20 billion at a valuation exceeding $300 billion. This colossal sum underscores the massive capital still flowing into AI infrastructure and marks a new milestone in AI company valuations. For the market, it signals that the race for the most powerful AI models is intensifying.",
+      "content": "Tiny startup Arcee AI has released Trinity, a 400-billion-parameter model it claims beats Meta's Llama. It demonstrates that even small teams can build massive, powerful AI models using efficient methods. This could further intensify competition in the open-source AI space.",
       "tags": [
-        "Funding",
-        "AI Startup",
-        "Valuation"
+        "Open Source",
+        "AI Models",
+        "Startup"
       ],
-      "category": "Business & Markets",
+      "category": "Technology",
       "iconType": "Brain",
       "impact": "high",
-      "timestamp": "2026-01-27",
+      "timestamp": "2026-01-28",
       "metrics": {
         "comments": 0,
         "retweets": 0,
@@ -162,79 +567,79 @@
         "views": "0"
       },
       "source": "TechCrunch",
-      "sourceUrl": "https://techcrunch.com/2026/01/27/anthropic-reportedly-upped-its-latest-raise-to-20b/"
+      "sourceUrl": "https://techcrunch.com/2026/01/28/tiny-startup-arcee-ai-built-a-400b-open-source-llm-from-scratch-to-best-metas-llama/"
     },
     {
       "id": 2,
       "author": {
-        "name": "TechCrunch",
-        "handle": "@TechCrunch",
-        "avatar": "TC",
+        "name": "The Verge AI",
+        "handle": "@vergeai",
+        "avatar": "VA",
         "verified": true
       },
-      "content": "Google has rolled out its more affordable AI subscription plan, 'AI Plus', to all markets globally. For $7.99 per month in the US, users get access to powerful tools like Gemini 3 Pro. This makes professional AI assistants more accessible to a broader audience and increases competitive pressure on providers like OpenAI.",
+      "content": "Google is launching an 'auto browse' feature in Chrome powered by Gemini AI. It can perform multi-step tasks like researching travel costs or filling out forms. This is a major step towards a personal AI assistant that works directly inside your browser.",
       "tags": [
         "Google",
-        "Subscription",
-        "Gemini"
+        "Browser",
+        "AI Assistant"
       ],
       "category": "Product Update",
       "iconType": "Brain",
       "impact": "high",
-      "timestamp": "2026-01-27",
+      "timestamp": "2026-01-28",
       "metrics": {
         "comments": 0,
         "retweets": 0,
         "likes": 0,
         "views": "0"
       },
-      "source": "TechCrunch",
-      "sourceUrl": "https://techcrunch.com/2026/01/27/googles-ai-plus-plan-rolls-out-to-all-markets-including-the-u-s/"
+      "source": "The Verge AI",
+      "sourceUrl": "https://www.theverge.com/news/869731/google-gemini-ai-chrome-auto-browse"
     },
     {
       "id": 3,
       "author": {
-        "name": "TechCrunch",
-        "handle": "@TechCrunch",
-        "avatar": "TC",
+        "name": "The Verge AI",
+        "handle": "@vergeai",
+        "avatar": "VA",
         "verified": true
       },
-      "content": "OpenAI has launched 'Prism', a new AI workspace specifically designed for scientists. The tool assists in composing research papers by seamlessly integrating AI into existing workflows. This could significantly boost productivity in research and demonstrates how AI is increasingly penetrating specialized professional fields.",
+      "content": "Astronomers used AI to discover over 1,400 previously unknown 'anomalous objects' in Hubble Space Telescope archives. This shows how AI is helping uncover hidden patterns in massive scientific datasets and accelerating new discoveries.",
       "tags": [
-        "OpenAI",
+        "Science",
         "Research",
-        "Productivity"
+        "Data Analysis"
       ],
-      "category": "Science & Research",
+      "category": "Research",
       "iconType": "Zap",
       "impact": "medium",
-      "timestamp": "2026-01-27",
+      "timestamp": "2026-01-28",
       "metrics": {
         "comments": 0,
         "retweets": 0,
         "likes": 0,
         "views": "0"
       },
-      "source": "TechCrunch",
-      "sourceUrl": "https://techcrunch.com/2026/01/27/openai-launches-prism-a-new-ai-workspace-for-scientists/"
+      "source": "The Verge AI",
+      "sourceUrl": "https://www.theverge.com/news/869182/astronomers-ai-discover-cosmic-anomalies-hubble-archives"
     },
     {
       "id": 4,
       "author": {
-        "name": "TechCrunch",
-        "handle": "@TechCrunch",
-        "avatar": "TC",
+        "name": "The Verge AI",
+        "handle": "@vergeai",
+        "avatar": "VA",
         "verified": true
       },
-      "content": "A report from Common Sense Media heavily criticizes the AI chatbot 'Grok' from Elon Musk's xAI for serious child safety failures. The report states Grok is among the worst chatbots they have assessed in this regard. The incident highlights the ongoing regulatory and ethical challenges in AI development.",
+      "content": "Moltbot is a local AI agent that can manage reminders or communicate with clients and is becoming an internet sensation. It highlights the growing popularity of practical, locally-running AI assistants that offer more privacy and control than cloud services.",
       "tags": [
-        "Safety",
-        "xAI",
-        "Regulation"
+        "AI Agent",
+        "Open Source",
+        "Local AI"
       ],
-      "category": "Safety & Ethics",
+      "category": "Technology",
       "iconType": "Cpu",
-      "impact": "high",
+      "impact": "medium",
       "timestamp": "2026-01-27",
       "metrics": {
         "comments": 0,
@@ -242,26 +647,215 @@
         "likes": 0,
         "views": "0"
       },
-      "source": "TechCrunch",
-      "sourceUrl": "https://techcrunch.com/2026/01/27/among-the-worst-weve-seen-report-slams-xais-grok-over-child-safety-failures/"
+      "source": "The Verge AI",
+      "sourceUrl": "https://www.theverge.com/report/869004/moltbot-clawdbot-local-ai-agent"
     },
     {
       "id": 5,
+      "author": {
+        "name": "Ars Technica AI",
+        "handle": "@arstechnica",
+        "avatar": "AT",
+        "verified": true
+      },
+      "content": "China has reportedly approved the import of over 400,000 high-end Nvidia AI chips (H200). This underscores the global race for AI hardware and shows how China is trying to advance its AI development while working towards technological self-reliance.",
+      "tags": [
+        "Hardware",
+        "Geopolitics",
+        "Nvidia"
+      ],
+      "category": "Industry",
+      "iconType": "Server",
+      "impact": "high",
+      "timestamp": "2026-01-28",
+      "metrics": {
+        "comments": 0,
+        "retweets": 0,
+        "likes": 0,
+        "views": "0"
+      },
+      "source": "Ars Technica AI",
+      "sourceUrl": "https://arstechnica.com/ai/2026/01/report-china-approves-import-of-high-end-nvidia-ai-chips-after-weeks-of-uncertainty/"
+    },
+    {
+      "id": 6,
+      "author": {
+        "name": "The Decoder",
+        "handle": "@thedecoder",
+        "avatar": "TD",
+        "verified": true
+      },
+      "content": "Figure AI shows a humanoid robot controlled by a single AI neural network that can unload a dishwasher. This is a significant step towards versatile robots capable of complex, everyday tasks in human environments.",
+      "tags": [
+        "Robotics",
+        "AI",
+        "Automation"
+      ],
+      "category": "Research",
+      "iconType": "Cpu",
+      "impact": "high",
+      "timestamp": "2026-01-28",
+      "metrics": {
+        "comments": 0,
+        "retweets": 0,
+        "likes": 0,
+        "views": "0"
+      },
+      "source": "The Decoder",
+      "sourceUrl": "https://the-decoder.com/figure-ai-shows-robot-that-really-puts-its-hip-into-dishwasher-duty/"
+    },
+    {
+      "id": 7,
+      "author": {
+        "name": "The Decoder",
+        "handle": "@thedecoder",
+        "avatar": "TD",
+        "verified": true
+      },
+      "content": "OpenAI has released Prism, a free AI workspace for scientific writing. It combines a LaTeX editor, reference manager, and GPT-5.2, aiming to help researchers organize and write their work more efficiently.",
+      "tags": [
+        "OpenAI",
+        "Productivity",
+        "Science"
+      ],
+      "category": "Product Update",
+      "iconType": "Brain",
+      "impact": "medium",
+      "timestamp": "2026-01-28",
+      "metrics": {
+        "comments": 0,
+        "retweets": 0,
+        "likes": 0,
+        "views": "0"
+      },
+      "source": "The Decoder",
+      "sourceUrl": "https://the-decoder.com/openais-prism-combines-latex-editor-reference-manager-and-gpt-5-2-in-one-tool/"
+    },
+    {
+      "id": 8,
+      "author": {
+        "name": "The Verge AI",
+        "handle": "@vergeai",
+        "avatar": "VA",
+        "verified": true
+      },
+      "content": "An Anti-Defamation League study ranks xAI's Grok as the chatbot with the most antisemitic content. This raises serious questions about AI companies' responsibility in controlling harmful outputs and shows how differently models handle sensitive topics.",
+      "tags": [
+        "Safety",
+        "Ethics",
+        "xAIGrok"
+      ],
+      "category": "Regulation",
+      "iconType": "Cpu",
+      "impact": "high",
+      "timestamp": "2026-01-28",
+      "metrics": {
+        "comments": 0,
+        "retweets": 0,
+        "likes": 0,
+        "views": "0"
+      },
+      "source": "The Verge AI",
+      "sourceUrl": "https://www.theverge.com/news/868925/adl-ai-antisemitism-report-grok-chatgpt-gemini-claude-deepseek-llama-elon-musk"
+    },
+    {
+      "id": 9,
+      "author": {
+        "name": "The Verge AI",
+        "handle": "@vergeai",
+        "avatar": "VA",
+        "verified": true
+      },
+      "content": "Google Search is upgrading its 'AI Overviews' with Gemini 3 and now allows follow-up questions. Search is becoming even more like an AI chat that can hold a conversation, rather than just providing links.",
+      "tags": [
+        "Google",
+        "Search",
+        "AI Assistant"
+      ],
+      "category": "Product Update",
+      "iconType": "Brain",
+      "impact": "medium",
+      "timestamp": "2026-01-27",
+      "metrics": {
+        "comments": 0,
+        "retweets": 0,
+        "likes": 0,
+        "views": "0"
+      },
+      "source": "The Verge AI",
+      "sourceUrl": "https://www.theverge.com/news/868497/google-ai-search-follow-up-questions-gemini-3"
+    },
+    {
+      "id": 10,
       "author": {
         "name": "TechCrunch",
         "handle": "@TechCrunch",
         "avatar": "TC",
         "verified": true
       },
-      "content": "Microsoft has announced a new powerful chip called 'Maia' for AI inference tasks. The chip, equipped with over 100 billion transistors, is designed to significantly boost the efficiency and speed of AI services like Copilot. This underscores the trend of major tech giants developing their own hardware to become more independent and cost-effective.",
+      "content": "Apple unveils Creator Studio Pro, new AI software for content creators. The AI is meant to assist with tedious tasks like finding clips or building slides without taking over creative control. It highlights Apple's approach of viewing AI as a supportive tool.",
       "tags": [
-        "Microsoft",
-        "Hardware",
-        "Chip"
+        "Apple",
+        "Creativity",
+        "Content Creation"
       ],
-      "category": "Infrastructure",
-      "iconType": "Server",
+      "category": "Product Update",
+      "iconType": "Brain",
       "impact": "medium",
+      "timestamp": "2026-01-28",
+      "metrics": {
+        "comments": 0,
+        "retweets": 0,
+        "likes": 0,
+        "views": "0"
+      },
+      "source": "TechCrunch",
+      "sourceUrl": "https://techcrunch.com/2026/01/28/with-apples-new-creator-studio-pro-ai-is-a-tool-to-aid-creation-not-replace-it/"
+    },
+    {
+      "id": 11,
+      "author": {
+        "name": "Hacker News",
+        "handle": "@newsycombinator",
+        "avatar": "HN",
+        "verified": true
+      },
+      "content": "The US state of Georgia is considering a ban on new data centers powering the AI boom due to concerns over massive electricity and water demands. This reflects growing tensions between technological progress and infrastructural limits.",
+      "tags": [
+        "Infrastructure",
+        "Regulation",
+        "Environment"
+      ],
+      "category": "Policy",
+      "iconType": "Server",
+      "impact": "high",
+      "timestamp": "2026-01-26",
+      "metrics": {
+        "comments": 26,
+        "retweets": 0,
+        "likes": 52,
+        "views": "0"
+      },
+      "source": "Hacker News",
+      "sourceUrl": "https://www.theguardian.com/technology/2026/jan/26/georgia-datacenters-ai-ban"
+    },
+    {
+      "id": 12,
+      "author": {
+        "name": "Ars Technica AI",
+        "handle": "@arstechnica",
+        "avatar": "AT",
+        "verified": true
+      },
+      "content": "The EU has launched a formal investigation into xAI over Grok's ability to generate sexualized deepfakes. The company faces potential heavy fines. This is a clear signal that regulators are taking AI abuse seriously and are willing to act.",
+      "tags": [
+        "Regulation",
+        "Deepfakes",
+        "EU"
+      ],
+      "category": "Regulation",
+      "iconType": "Cpu",
+      "impact": "critical",
       "timestamp": "2026-01-26",
       "metrics": {
         "comments": 0,
@@ -269,8 +863,224 @@
         "likes": 0,
         "views": "0"
       },
-      "source": "TechCrunch",
-      "sourceUrl": "https://techcrunch.com/2026/01/26/microsoft-announces-powerful-new-chip-for-ai-inference/"
+      "source": "Ars Technica AI",
+      "sourceUrl": "https://arstechnica.com/tech-policy/2026/01/eu-launches-formal-investigation-of-xai-over-groks-sexualized-deepfakes/"
+    },
+    {
+      "id": 13,
+      "author": {
+        "name": "Ars Technica AI",
+        "handle": "@arstechnica",
+        "avatar": "AT",
+        "verified": true
+      },
+      "content": "Google is adding 'Personal Intelligence' to its AI, customizing responses with data from Gmail and Photos. This makes AI assistants more personal but also raises major questions about data privacy and control over one's own information.",
+      "tags": [
+        "Google",
+        "Privacy",
+        "Personal Assistant"
+      ],
+      "category": "Product Update",
+      "iconType": "Brain",
+      "impact": "high",
+      "timestamp": "2026-01-22",
+      "metrics": {
+        "comments": 0,
+        "retweets": 0,
+        "likes": 0,
+        "views": "0"
+      },
+      "source": "Ars Technica AI",
+      "sourceUrl": "https://arstechnica.com/google/2026/01/google-ai-mode-can-now-customize-responses-with-your-email-and-photos/"
+    },
+    {
+      "id": 14,
+      "author": {
+        "name": "WIRED AI",
+        "handle": "@WIRED",
+        "avatar": "WA",
+        "verified": true
+      },
+      "content": "At least 37 US state attorneys general are taking action against xAI after Grok generated nonconsensual sexualized images of women and minors. This shows how legal consequences are becoming real for AI companies that don't adequately control their products.",
+      "tags": [
+        "Regulation",
+        "Deepfakes",
+        "xAIGrok"
+      ],
+      "category": "Regulation",
+      "iconType": "Cpu",
+      "impact": "critical",
+      "timestamp": "2026-01-27",
+      "metrics": {
+        "comments": 0,
+        "retweets": 0,
+        "likes": 0,
+        "views": "0"
+      },
+      "source": "WIRED AI",
+      "sourceUrl": "https://www.wired.com/story/the-state-led-crackdown-on-grok-and-xai-has-begun/"
+    },
+    {
+      "id": 15,
+      "author": {
+        "name": "AI News",
+        "handle": "@AINews",
+        "avatar": "AN",
+        "verified": true
+      },
+      "content": "A Deloitte report warns companies are deploying AI agents faster than they can develop safety frameworks, leading to serious security, privacy, and accountability risks. It's a wake-up call for responsible management of the new technology.",
+      "tags": [
+        "Safety",
+        "Enterprise",
+        "Risk"
+      ],
+      "category": "Safety",
+      "iconType": "Cpu",
+      "impact": "high",
+      "timestamp": "2026-01-28",
+      "metrics": {
+        "comments": 0,
+        "retweets": 0,
+        "likes": 0,
+        "views": "0"
+      },
+      "source": "AI News",
+      "sourceUrl": "https://www.artificialintelligence-news.com/news/deloitte-agentic-ai-guidelines-published/"
+    },
+    {
+      "id": 16,
+      "author": {
+        "name": "MIT Technology Review AI",
+        "handle": "@techreview",
+        "avatar": "MT",
+        "verified": true
+      },
+      "content": "AI's ability to 'remember' you and your preferences is becoming a major selling point – and the next big privacy frontier. Personal AI assistants like Google's 'Personal Intelligence' make this clear.",
+      "tags": [
+        "Privacy",
+        "AI Assistant",
+        "Google"
+      ],
+      "category": "Privacy",
+      "iconType": "Cpu",
+      "impact": "high",
+      "timestamp": "2026-01-28",
+      "metrics": {
+        "comments": 0,
+        "retweets": 0,
+        "likes": 0,
+        "views": "0"
+      },
+      "source": "MIT Technology Review AI",
+      "sourceUrl": "https://www.technologyreview.com/2026/01/28/1131835/what-ai-remembers-about-you-is-privacys-next-frontier/"
+    },
+    {
+      "id": 17,
+      "author": {
+        "name": "The Verge AI",
+        "handle": "@vergeai",
+        "avatar": "VA",
+        "verified": true
+      },
+      "content": "YouTube has removed several of the most popular channels mass-producing AI-generated content ('AI slop'). This highlights platforms' growing efforts to crack down on low-quality, automated content and maintain quality.",
+      "tags": [
+        "Content Moderation",
+        "YouTube",
+        "Generative AI"
+      ],
+      "category": "Platforms",
+      "iconType": "Cpu",
+      "impact": "medium",
+      "timestamp": "2026-01-28",
+      "metrics": {
+        "comments": 0,
+        "retweets": 0,
+        "likes": 0,
+        "views": "0"
+      },
+      "source": "The Verge AI",
+      "sourceUrl": "https://www.theverge.com/news/869684/youtube-top-ai-channels-removed-kapwing"
+    },
+    {
+      "id": 18,
+      "author": {
+        "name": "Ars Technica AI",
+        "handle": "@arstechnica",
+        "avatar": "AT",
+        "verified": true
+      },
+      "content": "The head of US cyber defense accidentally uploaded secret government information to ChatGPT. The incident highlights the ongoing security risks when employees use generative AI tools for sensitive data and the need for strict policies.",
+      "tags": [
+        "Security",
+        "Government",
+        "ChatGPT"
+      ],
+      "category": "Safety",
+      "iconType": "Cpu",
+      "impact": "high",
+      "timestamp": "2026-01-28",
+      "metrics": {
+        "comments": 0,
+        "retweets": 0,
+        "likes": 0,
+        "views": "0"
+      },
+      "source": "Ars Technica AI",
+      "sourceUrl": "https://arstechnica.com/tech-policy/2026/01/us-cyber-defense-chief-accidentally-uploaded-secret-government-info-to-chatgpt/"
+    },
+    {
+      "id": 19,
+      "author": {
+        "name": "Ars Technica AI",
+        "handle": "@arstechnica",
+        "avatar": "AT",
+        "verified": true
+      },
+      "content": "The US Department of Transportation used AI to draft safety regulations, raising concerns among staffers who warn it could lead to injuries or deaths. It shows the dangers of using AI in critical areas without sufficient human oversight.",
+      "tags": [
+        "Government",
+        "Safety",
+        "Risk"
+      ],
+      "category": "Regulation",
+      "iconType": "Cpu",
+      "impact": "high",
+      "timestamp": "2026-01-26",
+      "metrics": {
+        "comments": 0,
+        "retweets": 0,
+        "likes": 0,
+        "views": "0"
+      },
+      "source": "Ars Technica AI",
+      "sourceUrl": "https://arstechnica.com/tech-policy/2026/01/wildly-irresponsible-dots-use-of-ai-to-draft-safety-rules-sparks-concerns/"
+    },
+    {
+      "id": 20,
+      "author": {
+        "name": "WIRED AI",
+        "handle": "@WIRED",
+        "avatar": "WA",
+        "verified": true
+      },
+      "content": "US Immigration and Customs Enforcement (ICE) is using Palantir's AI tools to summarize and prioritize tips on its tip line. This raises questions about the transparency and fairness of automated decision-making in sensitive areas like law enforcement.",
+      "tags": [
+        "Law Enforcement",
+        "Ethics",
+        "Palantir"
+      ],
+      "category": "Policy",
+      "iconType": "Cpu",
+      "impact": "high",
+      "timestamp": "2026-01-28",
+      "metrics": {
+        "comments": 0,
+        "retweets": 0,
+        "likes": 0,
+        "views": "0"
+      },
+      "source": "WIRED AI",
+      "sourceUrl": "https://www.wired.com/story/ice-is-using-palantirs-ai-tools-to-sort-through-tips/"
     }
   ]
 }

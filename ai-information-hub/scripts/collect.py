@@ -17,6 +17,7 @@ Environment:
 import argparse
 import json
 import os
+import re
 import sys
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -47,6 +48,58 @@ AUTHOR_DEFAULTS = {
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
+
+def parse_llm_json(text: str, fallback=None):
+    """Parse JSON from LLM output, handling common issues like comments, trailing commas, and control chars."""
+    decoder = json.JSONDecoder(strict=False)
+
+    # Strip markdown code fences
+    text = text.strip()
+    if text.startswith("```"):
+        text = re.sub(r"^```(?:json)?\s*\n?", "", text)
+        text = re.sub(r"\n?```\s*$", "", text)
+
+    # Try direct parse first (strict=False allows control chars in strings)
+    try:
+        return decoder.decode(text)
+    except json.JSONDecodeError:
+        pass
+
+    # Extract JSON object or array
+    obj_start = text.find("{")
+    arr_start = text.find("[")
+    if obj_start < 0 and arr_start < 0:
+        return fallback
+
+    if arr_start >= 0 and (obj_start < 0 or arr_start < obj_start):
+        start = arr_start
+        end = text.rfind("]") + 1
+    else:
+        start = obj_start
+        end = text.rfind("}") + 1
+
+    if end <= start:
+        return fallback
+
+    extracted = text[start:end]
+
+    # Try parse extracted
+    try:
+        return decoder.decode(extracted)
+    except json.JSONDecodeError:
+        pass
+
+    # Remove single-line comments (// ...) that are NOT inside strings
+    cleaned = re.sub(r'(?<!")//[^\n]*', "", extracted)
+    # Remove trailing commas before } or ]
+    cleaned = re.sub(r",\s*([}\]])", r"\1", cleaned)
+
+    try:
+        return decoder.decode(cleaned)
+    except json.JSONDecodeError as e:
+        print(f"  Warning: JSON parse failed after cleanup: {e}")
+        return fallback
 
 
 def current_week_id() -> str:
@@ -220,21 +273,14 @@ Output ONLY the JSON array, no markdown fences or explanation."""
         temperature=0.1,  # Low temperature for consistent classification
     )
 
-    try:
-        classifications = json.loads(response.choices[0].message.content)
-    except json.JSONDecodeError:
-        text = response.choices[0].message.content
-        start = text.find("[")
-        end = text.rfind("]") + 1
-        if start >= 0 and end > start:
-            classifications = json.loads(text[start:end])
-        else:
-            # Fallback: use original_section hints
-            print("  Warning: Could not parse classification response, using original_section hints")
-            for a in articles:
-                a["section"] = a.get("original_section", "tech")
-                a["relevance"] = 0.5
-            return articles
+    classifications = parse_llm_json(response.choices[0].message.content, fallback=None)
+    if classifications is None:
+        # Fallback: use original_section hints
+        print("  Warning: Could not parse classification response, using original_section hints")
+        for a in articles:
+            a["section"] = a.get("original_section", "tech")
+            a["relevance"] = 0.5
+        return articles
 
     # Enrich articles with classification data
     classified = []
@@ -282,6 +328,60 @@ def _build_cross_section_context(other_sections: dict[str, list[dict]] | None) -
     return "\n".join(lines) + "\n"
 
 
+def shortlist_articles(client, articles: list[dict], target: int, batch_size: int = 40) -> list[dict]:
+    """Read ALL articles and shortlist the most newsworthy ones.
+
+    If articles fit in a single LLM call (≤ batch_size), return as-is.
+    Otherwise, batch-process: each batch selects top candidates,
+    then merge all candidates for the final processing step.
+    """
+    if len(articles) <= batch_size:
+        return articles
+
+    print(f"    Shortlisting {len(articles)} articles in batches of {batch_size}...")
+    batches = [articles[i:i + batch_size] for i in range(0, len(articles), batch_size)]
+    # Keep more candidates per batch than the final target to avoid losing good articles
+    keep_per_batch = max((target * 2) // len(batches), target)
+
+    all_selected = []
+
+    for batch_idx, batch in enumerate(batches):
+        articles_text = "\n".join(
+            f"[{i}] {a['title']} (Source: {a['source']})\n    {a['summary'][:300]}"
+            for i, a in enumerate(batch)
+        )
+
+        prompt = f"""You are selecting the most newsworthy AI articles for a weekly newsletter.
+From these {len(batch)} articles, pick the {keep_per_batch} most important/interesting ones.
+
+ARTICLES:
+{articles_text}
+
+Return ONLY a JSON array of the selected article indices, e.g. [0, 3, 7, 12].
+Output ONLY valid JSON, no explanation."""
+
+        response = client.chat.completions.create(
+            model="deepseek/deepseek-v3.2",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.1,
+        )
+
+        try:
+            indices = parse_llm_json(response.choices[0].message.content, fallback=None)
+            if indices is None:
+                raise ValueError("Could not parse indices")
+            selected = [batch[i] for i in indices if 0 <= i < len(batch)]
+            all_selected.extend(selected)
+            print(f"    Batch {batch_idx + 1}/{len(batches)}: {len(batch)} articles → {len(selected)} selected")
+        except (ValueError, IndexError, TypeError):
+            # Fallback: keep all from this batch
+            all_selected.extend(batch)
+            print(f"    Batch {batch_idx + 1}/{len(batches)}: kept all {len(batch)} (parse error)")
+
+    print(f"    Shortlisted total: {len(all_selected)} candidates for final selection of {target}")
+    return all_selected
+
+
 def process_tech_articles(client, articles: list[dict], other_sections: dict[str, list[dict]] | None = None) -> dict:
     """Use LLM to process tech articles into bilingual feed format."""
     if not articles:
@@ -289,7 +389,7 @@ def process_tech_articles(client, articles: list[dict], other_sections: dict[str
 
     articles_text = "\n\n".join(
         f"Source: {a['source']}\nTitle: {a['title']}\nLink: {a['link']}\nSummary: {a['summary'][:500]}\nDate: {a['published']}"
-        for a in articles[:20]  # Limit to top 20
+        for a in articles
     )
 
     cross_context = _build_cross_section_context(other_sections)
@@ -297,7 +397,8 @@ def process_tech_articles(client, articles: list[dict], other_sections: dict[str
     prompt = f"""You are a tech news editor for a German/English bilingual AI newsletter.
 Target audience: Non-technical professionals who want to stay informed about AI.
 
-From the following articles, select the 5 most important/interesting ones and create feed posts.
+From the following articles, select EXACTLY 20 of the most important/interesting ones and create feed posts.
+You MUST output exactly 20 items in each language array.
 {cross_context}
 ARTICLES:
 {articles_text}
@@ -330,6 +431,7 @@ Rules:
 - avatar: 2-letter abbreviation of source name
 - Content should be accessible to non-technical readers
 - sourceUrl: copy the exact Link URL from the original article. Do NOT make up URLs.
+- You MUST return exactly 20 items in the "de" array and 20 items in the "en" array. Do not return fewer.
 - Output ONLY valid JSON, no markdown fences"""
 
     response = client.chat.completions.create(
@@ -338,16 +440,8 @@ Rules:
         temperature=0.3,
     )
 
-    try:
-        return json.loads(response.choices[0].message.content)
-    except json.JSONDecodeError:
-        # Try to extract JSON from response
-        text = response.choices[0].message.content
-        start = text.find("{")
-        end = text.rfind("}") + 1
-        if start >= 0 and end > start:
-            return json.loads(text[start:end])
-        return {"de": [], "en": []}
+    result = parse_llm_json(response.choices[0].message.content, fallback={"de": [], "en": []})
+    return result
 
 
 def process_investment_articles(client, articles: list[dict], other_sections: dict[str, list[dict]] | None = None) -> dict:
@@ -357,7 +451,7 @@ def process_investment_articles(client, articles: list[dict], other_sections: di
 
     articles_text = "\n\n".join(
         f"Source: {a['source']}\nTitle: {a['title']}\nLink: {a['link']}\nSummary: {a['summary'][:500]}\nDate: {a['published']}"
-        for a in articles[:20]
+        for a in articles
     )
 
     cross_context = _build_cross_section_context(other_sections)
@@ -370,7 +464,7 @@ From the following articles, categorize into:
 2. Secondary Market (stock price movements of AI companies)
 3. M&A (mergers, acquisitions, partnerships)
 
-Select the most relevant articles (up to 3 per category).
+Select the most relevant articles. Include up to 7 items per category — aim for as many as the data supports.
 {cross_context}
 ARTICLES:
 {articles_text}
@@ -436,6 +530,7 @@ Rules:
 - Use German number formatting for 'de' (e.g., $2,75 Mrd., €150 Mio.)
 - Use English number formatting for 'en' (e.g., $2.75B, €150M)
 - If no articles fit a category, return empty arrays
+- Aim for 5-7 items per category. Only return fewer if there truly aren't enough relevant articles.
 - sourceUrl: copy the exact Link URL from the original article. Do NOT make up URLs.
 - Output ONLY valid JSON, no markdown fences"""
 
@@ -445,15 +540,8 @@ Rules:
         temperature=0.3,
     )
 
-    try:
-        return json.loads(response.choices[0].message.content)
-    except json.JSONDecodeError:
-        text = response.choices[0].message.content
-        start = text.find("{")
-        end = text.rfind("}") + 1
-        if start >= 0 and end > start:
-            return json.loads(text[start:end])
-        return {"primaryMarket": {"de": [], "en": []}, "secondaryMarket": {"de": [], "en": []}, "ma": {"de": [], "en": []}}
+    fallback = {"primaryMarket": {"de": [], "en": []}, "secondaryMarket": {"de": [], "en": []}, "ma": {"de": [], "en": []}}
+    return parse_llm_json(response.choices[0].message.content, fallback=fallback)
 
 
 def process_tips_articles(client, articles: list[dict], other_sections: dict[str, list[dict]] | None = None) -> dict:
@@ -463,7 +551,7 @@ def process_tips_articles(client, articles: list[dict], other_sections: dict[str
 
     articles_text = "\n\n".join(
         f"Source: {a['source']}\nTitle: {a['title']}\nLink: {a['link']}\nSummary: {a['summary'][:500]}\nDate: {a['published']}"
-        for a in articles[:20]
+        for a in articles
     )
 
     cross_context = _build_cross_section_context(other_sections)
@@ -471,7 +559,8 @@ def process_tips_articles(client, articles: list[dict], other_sections: dict[str
     prompt = f"""You are an AI tips editor for a German/English bilingual newsletter.
 Target audience: Non-technical professionals who want practical AI tips they can use immediately.
 
-From the following articles, extract the 5 most useful, practical AI tips.
+From the following articles, extract EXACTLY 20 of the most useful, practical AI tips.
+You MUST output exactly 20 items in each language array.
 Focus on: ChatGPT/Claude/Gemini usage, prompt techniques, AI tools, productivity workflows.
 Do NOT include: programming tutorials, API usage, model training, technical deep-dives.
 {cross_context}
@@ -514,6 +603,7 @@ Rules:
 - Tips should be immediately actionable (no coding required)
 - platform: use "X" for Twitter/blog sources, "Reddit" for Reddit sources
 - sourceUrl: copy the exact Link URL from the original article. Do NOT make up URLs.
+- You MUST return exactly 20 tips in the "de" array and 20 tips in the "en" array. Do not return fewer.
 - Output ONLY valid JSON, no markdown fences"""
 
     response = client.chat.completions.create(
@@ -522,15 +612,7 @@ Rules:
         temperature=0.3,
     )
 
-    try:
-        return json.loads(response.choices[0].message.content)
-    except json.JSONDecodeError:
-        text = response.choices[0].message.content
-        start = text.find("{")
-        end = text.rfind("}") + 1
-        if start >= 0 and end > start:
-            return json.loads(text[start:end])
-        return {"de": [], "en": []}
+    return parse_llm_json(response.choices[0].message.content, fallback={"de": [], "en": []})
 
 
 def generate_trends(client, tech_data: dict, investment_data: dict) -> dict:
@@ -562,9 +644,10 @@ def generate_trends(client, tech_data: dict, investment_data: dict) -> dict:
             },
         }
 
-    context = "\n".join(all_content[:10])
+    context = "\n".join(all_content[:30])
 
-    prompt = f"""Based on this week's AI news content, generate 5 trending topics.
+    prompt = f"""Based on this week's AI news content, generate EXACTLY 10 trending topics.
+You MUST output exactly 10 items in each language array.
 
 CONTENT:
 {context}
@@ -590,16 +673,7 @@ Output ONLY valid JSON, no markdown fences."""
         temperature=0.5,
     )
 
-    try:
-        result = json.loads(response.choices[0].message.content)
-    except json.JSONDecodeError:
-        text = response.choices[0].message.content
-        start = text.find("{")
-        end = text.rfind("}") + 1
-        if start >= 0 and end > start:
-            result = json.loads(text[start:end])
-        else:
-            result = {"trends": {"de": [], "en": []}}
+    result = parse_llm_json(response.choices[0].message.content, fallback={"trends": {"de": [], "en": []}})
 
     # Add static team members
     result["teamMembers"] = {
@@ -767,22 +841,31 @@ def main():
             ensure_ascii=False,
         )
 
-    # Stage 2: Generate per-section content with cross-section context
-    print("\n--- Stage 2: Processing tech articles with LLM ---")
+    # Stage 2: Shortlisting + Processing
+    print("\n--- Stage 2: Shortlisting + Processing ---")
+
+    print("  [tech] Shortlisting...")
+    tech_shortlisted = shortlist_articles(client, tech_articles, target=20)
+    print("  [investment] Shortlisting...")
+    investment_shortlisted = shortlist_articles(client, investment_articles, target=21)
+    print("  [tips] Shortlisting...")
+    tips_shortlisted = shortlist_articles(client, tips_articles, target=20)
+
+    print("\n  Processing tech...")
     tech_data = process_tech_articles(
-        client, tech_articles,
+        client, tech_shortlisted,
         other_sections={"investment": investment_articles, "tips": tips_articles},
     )
 
-    print("\n--- Stage 2: Processing investment articles with LLM ---")
+    print("\n  Processing investment...")
     investment_data = process_investment_articles(
-        client, investment_articles,
+        client, investment_shortlisted,
         other_sections={"tech": tech_articles, "tips": tips_articles},
     )
 
-    print("\n--- Stage 2: Processing tips articles with LLM ---")
+    print("\n  Processing tips...")
     tips_data = process_tips_articles(
-        client, tips_articles,
+        client, tips_shortlisted,
         other_sections={"tech": tech_articles, "investment": investment_articles},
     )
 

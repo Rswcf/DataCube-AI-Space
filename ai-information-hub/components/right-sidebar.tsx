@@ -21,6 +21,11 @@ const fallbackTrends = {
     { category: "Finanzen · Trend", title: "KI-Aktien", posts: "67.000 Beiträge" },
     { category: "Wissenschaft · Trend", title: "AlphaFold 3", posts: "45.000 Beiträge" },
     { category: "Startups · Trend", title: "Anthropic", posts: "34.000 Beiträge" },
+    { category: "KI · Trend", title: "Open-Source LLMs", posts: "28.000 Beiträge" },
+    { category: "Technologie · Trend", title: "KI-Agenten", posts: "22.000 Beiträge" },
+    { category: "Finanzen · Trend", title: "KI-Infrastruktur", posts: "19.000 Beiträge" },
+    { category: "Wissenschaft · Trend", title: "Multimodale KI", posts: "15.000 Beiträge" },
+    { category: "Startups · Trend", title: "KI-Regulierung", posts: "12.000 Beiträge" },
   ],
   en: [
     { category: "AI · Trending", title: "GPT-5", posts: "124K posts" },
@@ -28,6 +33,11 @@ const fallbackTrends = {
     { category: "Finance · Trending", title: "AI Stocks", posts: "67K posts" },
     { category: "Science · Trending", title: "AlphaFold 3", posts: "45K posts" },
     { category: "Startups · Trending", title: "Anthropic", posts: "34K posts" },
+    { category: "AI · Trending", title: "Open-Source LLMs", posts: "28K posts" },
+    { category: "Technology · Trending", title: "AI Agents", posts: "22K posts" },
+    { category: "Finance · Trending", title: "AI Infrastructure", posts: "19K posts" },
+    { category: "Science · Trending", title: "Multimodal AI", posts: "15K posts" },
+    { category: "Startups · Trending", title: "AI Regulation", posts: "12K posts" },
   ],
 };
 
@@ -119,7 +129,7 @@ export function RightSidebar({ weekId, onSearchChange }: RightSidebarProps) {
         <div className="mt-4 rounded-xl bg-secondary/50 p-4">
           <h3 className="text-xl font-bold text-foreground">{t("whatsNew")}</h3>
           <div className="mt-3 space-y-4">
-            {trends.slice(0, 5).map((trend, index) => (
+            {trends.slice(0, 10).map((trend, index) => (
               <div key={index} className="group cursor-pointer">
                 <div className="flex items-start justify-between">
                   <div>

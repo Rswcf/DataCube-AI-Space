@@ -2,56 +2,106 @@
   "trends": {
     "de": [
       {
-        "category": "KI · Trend",
-        "title": "Rekordbewertungen für KI-Startups",
-        "posts": "45.000 Beiträge"
+        "category": "Startups",
+        "title": "Arcee AIs Trinity übertrifft Llama",
+        "posts": "35.000 Beiträge"
       },
       {
         "category": "Technologie",
-        "title": "Eigene KI-Chips der Tech-Giganten",
+        "title": "Google Chrome Auto Browse mit Gemini KI",
+        "posts": "45.000 Beiträge"
+      },
+      {
+        "category": "Wissenschaft",
+        "title": "KI entdeckt 1.400 Anomalien in Hubble-Daten",
+        "posts": "28.000 Beiträge"
+      },
+      {
+        "category": "KI",
+        "title": "Moltbot: Lokaler KI-Agent wird zum Hit",
+        "posts": "32.000 Beiträge"
+      },
+      {
+        "category": "Technologie",
+        "title": "China importiert 400.000 Nvidia KI-Chips",
+        "posts": "40.000 Beiträge"
+      },
+      {
+        "category": "KI",
+        "title": "Figure AI Roboter räumt Geschirrspüler aus",
+        "posts": "30.000 Beiträge"
+      },
+      {
+        "category": "Wissenschaft",
+        "title": "OpenAI Prism: KI-Arbeitsbereich für Wissenschaft",
+        "posts": "25.000 Beiträge"
+      },
+      {
+        "category": "KI",
+        "title": "Grok Chatbot mit Antisemitismus-Vorwürfen",
+        "posts": "50.000 Beiträge"
+      },
+      {
+        "category": "Technologie",
+        "title": "Google Search KI-Übersichten werden schlauer",
         "posts": "38.000 Beiträge"
       },
       {
         "category": "Finanzen",
-        "title": "KI treibt Halbleiter-Boom an",
-        "posts": "52.000 Beiträge"
-      },
-      {
-        "category": "Wissenschaft",
-        "title": "KI-Workspaces für die Forschung",
-        "posts": "28.000 Beiträge"
-      },
-      {
-        "category": "Startups",
-        "title": "Mega-Finanzierungsrunden im KI-Bereich",
-        "posts": "41.000 Beiträge"
+        "title": "KI-Startups sammeln Milliarden an Finanzierung",
+        "posts": "42.000 Beiträge"
       }
     ],
     "en": [
       {
-        "category": "AI · Trending",
-        "title": "Record AI Startup Valuations",
-        "posts": "45K posts"
+        "category": "Startups",
+        "title": "Arcee AI's Trinity Outperforms Llama",
+        "posts": "35K posts"
       },
       {
         "category": "Technology",
-        "title": "Tech Giants' Custom AI Chips",
+        "title": "Google Chrome Auto Browse with Gemini AI",
+        "posts": "45K posts"
+      },
+      {
+        "category": "Science",
+        "title": "AI Discovers 1,400 Anomalies in Hubble Data",
+        "posts": "28K posts"
+      },
+      {
+        "category": "AI",
+        "title": "Moltbot: Local AI Agent Goes Viral",
+        "posts": "32K posts"
+      },
+      {
+        "category": "Technology",
+        "title": "China Imports 400K Nvidia AI Chips",
+        "posts": "40K posts"
+      },
+      {
+        "category": "AI",
+        "title": "Figure AI Robot Unloads Dishwasher",
+        "posts": "30K posts"
+      },
+      {
+        "category": "Science",
+        "title": "OpenAI Prism: AI Workspace for Science",
+        "posts": "25K posts"
+      },
+      {
+        "category": "AI",
+        "title": "Grok Chatbot Faces Antisemitism Allegations",
+        "posts": "50K posts"
+      },
+      {
+        "category": "Technology",
+        "title": "Google Search AI Overviews Get Smarter",
         "posts": "38K posts"
       },
       {
         "category": "Finance",
-        "title": "AI Fuels Semiconductor Boom",
-        "posts": "52K posts"
-      },
-      {
-        "category": "Science",
-        "title": "AI Workspaces for Researchers",
-        "posts": "28K posts"
-      },
-      {
-        "category": "Startups",
-        "title": "Mega Funding Rounds in AI",
-        "posts": "41K posts"
+        "title": "AI Startups Raise Billions in Funding",
+        "posts": "42K posts"
       }
     ]
   },

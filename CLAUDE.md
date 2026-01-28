@@ -1,6 +1,6 @@
 # DataCube AI Information Hub
 
-Bilingual (DE/EN) weekly AI news aggregator for internal teams — curates tech breakthroughs, investment news, and practical tips from RSS feeds via Claude AI. Built with Next.js 16 + React 19 + Tailwind CSS 4 + Shadcn/ui, deployed on Vercel.
+Bilingual (DE/EN) weekly AI news aggregator for internal teams — curates tech breakthroughs, investment news, and practical tips from RSS feeds via DeepSeek V3.2 (OpenRouter). Built with Next.js 16 + React 19 + Tailwind CSS 4 + Shadcn/ui, deployed on Vercel.
 
 **Status**: Core app complete (3 feed types, bilingual, week navigation, dark/light theme). Data pipeline automated via GitHub Actions.
 
@@ -9,9 +9,12 @@ Bilingual (DE/EN) weekly AI news aggregator for internal teams — curates tech 
 ```
 ┌─────────────────── Data Pipeline ───────────────────┐
 │                                                      │
-│  RSS Feeds (10 sources)                              │
+│  RSS Feeds (22 sources)                              │
 │       ↓                                              │
-│  scripts/collect.py  ──→  Claude Sonnet 4 (OpenRouter)│
+│  scripts/collect.py  ──→  DeepSeek V3.2 (OpenRouter) │
+│    1. Classify all articles (section + relevance)    │
+│    2. Shortlist candidates (batch if >40 articles)   │
+│    3. Generate bilingual content (top 20 per section)│
 │       ↓                                              │
 │  public/data/{weekId}/                               │
 │    ├── tech.json                                     │
@@ -85,7 +88,7 @@ public/data/
 scripts/
   collect.py              — RSS fetch + LLM processing → JSON
   regenerate.py           — Re-process with human feedback
-  sources.yaml            — RSS feed URLs by category
+  sources.yaml            — RSS feed URLs (22 sources across 3 categories)
   requirements.txt        — feedparser, openai, pyyaml, requests
 
 .github/workflows/
@@ -103,7 +106,7 @@ All data files use `{ "de": [...], "en": [...] }` at the top level (except `inve
 
 ### tech.json
 ```
-{ "de": [{ id, author, content, tags, category, iconType, impact, timestamp, metrics, source }], "en": [...] }
+{ "de": [{ id, author, content, tags, category, iconType, impact, timestamp, metrics, source, sourceUrl }], "en": [...] }
 ```
 - `iconType`: `"Brain"` (LLM) | `"Server"` (infra) | `"Zap"` (research) | `"Cpu"` (safety)
 - `impact`: `"critical"` | `"high"` | `"medium"` | `"low"`
@@ -111,15 +114,15 @@ All data files use `{ "de": [...], "en": [...] }` at the top level (except `inve
 ### investment.json
 ```
 {
-  "primaryMarket":   { "de": [{ company, amount, round, investors, valuation, ... }], "en": [...] },
-  "secondaryMarket": { "de": [{ ticker, price, change, direction, marketCap, ... }], "en": [...] },
-  "ma":              { "de": [{ acquirer, target, dealValue, dealType, ... }], "en": [...] }
+  "primaryMarket":   { "de": [{ company, amount, round, investors, valuation, sourceUrl, ... }], "en": [...] },
+  "secondaryMarket": { "de": [{ ticker, price, change, direction, marketCap, sourceUrl, ... }], "en": [...] },
+  "ma":              { "de": [{ acquirer, target, dealValue, dealType, sourceUrl, ... }], "en": [...] }
 }
 ```
 
 ### tips.json
 ```
-{ "de": [{ id, author, platform, content, tip, category, difficulty, timestamp, metrics }], "en": [...] }
+{ "de": [{ id, author, platform, content, tip, category, difficulty, timestamp, metrics, sourceUrl }], "en": [...] }
 ```
 - `difficulty` (de): `"Anfänger"` | `"Mittel"` | `"Fortgeschritten"`
 - `difficulty` (en): `"Beginner"` | `"Intermediate"` | `"Advanced"`
@@ -155,20 +158,20 @@ npm run lint             # ESLint
 ### Data Collection
 ```bash
 export OPENROUTER_API_KEY=...
-python scripts/collect.py                     # Current week
-python scripts/collect.py --week 2025-kw05    # Specific week
-python scripts/collect.py --dry-run           # RSS only, skip LLM
+python3 scripts/collect.py                    # Current week (requires Python 3.10+)
+python3 scripts/collect.py --week 2025-kw05   # Specific week
+python3 scripts/collect.py --dry-run          # RSS only, skip LLM
 ```
 
 ### Content Regeneration
 ```bash
-python scripts/regenerate.py --week 2025-kw04 --section tech \
+python3 scripts/regenerate.py --week 2025-kw04 --section tech \
     --feedback "Too technical, simplify"
 
-python scripts/regenerate.py --week 2025-kw04 --section investment \
+python3 scripts/regenerate.py --week 2025-kw04 --section investment \
     --id 3 --feedback "Not relevant"
 
-python scripts/regenerate.py --week 2025-kw04 --all \
+python3 scripts/regenerate.py --week 2025-kw04 --all \
     --feedback "More casual style"
 ```
 
@@ -182,7 +185,7 @@ python scripts/regenerate.py --week 2025-kw04 --all \
 ## Common Development Tasks
 
 ### Add a new week of data
-1. Run `python scripts/collect.py --week YYYY-kwWW`
+1. Run `python3 scripts/collect.py --week YYYY-kwWW`
 2. Outputs to `public/data/YYYY-kwWW/` (4 JSON files) and updates `public/data/weeks.json`
 3. No frontend changes needed — week navigation reads `weeks.json` dynamically
 

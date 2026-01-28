@@ -4,12 +4,85 @@
       {
         "id": 1,
         "author": {
-          "name": "Crunchbase News",
-          "handle": "@crunchbasenews",
+          "name": "TechCrunch",
+          "handle": "@TechCrunch",
           "avatar": "XX",
           "verified": true
         },
-        "content": "Ricursive Intelligence, ein Frontier-AI-Labor, hat nur zwei Monate nach seiner Gründung eine Serie-A-Finanzierungsrunde in Höhe von 300 Mio. USD zu einer Bewertung von 4 Mrd. USD abgeschlossen.",
+        "content": "Tesla investiert 2 Mrd. US-Dollar in Elon Musks KI-Unternehmen xAI, das kürzlich eine Finanzierungsrunde über 20 Mrd. US-Dollar bekannt gab.",
+        "company": "xAI",
+        "amount": "$2 Mrd.",
+        "round": "Strategische Investition",
+        "investors": [
+          "Tesla"
+        ],
+        "valuation": "N/A",
+        "timestamp": "2026-01-28",
+        "metrics": {
+          "comments": 0,
+          "retweets": 0,
+          "likes": 0,
+          "views": "0"
+        },
+        "sourceUrl": "https://techcrunch.com/2026/01/28/tesla-invested-2b-in-elon-musks-xai/"
+      },
+      {
+        "id": 2,
+        "author": {
+          "name": "TechCrunch",
+          "handle": "@TechCrunch",
+          "avatar": "XX",
+          "verified": true
+        },
+        "content": "Waabi sichert sich 750 Mio. US-Dollar in einer Serie-C-Runde für autonomes Fahren und weitere 250 Mio. US-Dollar von Uber für die Bereitstellung von 25.000 Robotaxis.",
+        "company": "Waabi",
+        "amount": "$1 Mrd.",
+        "round": "Serie C",
+        "investors": [
+          "Uber"
+        ],
+        "valuation": "N/A",
+        "timestamp": "2026-01-28",
+        "metrics": {
+          "comments": 0,
+          "retweets": 0,
+          "likes": 0,
+          "views": "0"
+        },
+        "sourceUrl": "https://techcrunch.com/2026/01/28/waabi-raises-1b-and-expands-into-robotaxis-with-uber/"
+      },
+      {
+        "id": 3,
+        "author": {
+          "name": "TechCrunch",
+          "handle": "@TechCrunch",
+          "avatar": "XX",
+          "verified": true
+        },
+        "content": "Anthropic plant Berichten zufolge, seine jüngste Finanzierungsrunde auf 20 Mrd. US-Dollar zu erhöhen, bei einer Bewertung von über 300 Mrd. US-Dollar.",
+        "company": "Anthropic",
+        "amount": "$20 Mrd.",
+        "round": "Späte Runde",
+        "investors": [],
+        "valuation": "$300 Mrd.",
+        "timestamp": "2026-01-27",
+        "metrics": {
+          "comments": 0,
+          "retweets": 0,
+          "likes": 0,
+          "views": "0"
+        },
+        "sourceUrl": "https://techcrunch.com/2026/01/27/anthropic-reportedly-upped-its-latest-raise-to-20b/"
+      },
+      {
+        "id": 4,
+        "author": {
+          "name": "Crunchbase News",
+          "handle": "@Crunchbase",
+          "avatar": "XX",
+          "verified": true
+        },
+        "content": "Ricursive Intelligence, ein Frontier-AI-Labor, sammelt nur zwei Monate nach dem Start 300 Mio. US-Dollar in einer Serie-A-Runde bei einer Bewertung von 4 Mrd. US-Dollar ein.",
         "company": "Ricursive Intelligence",
         "amount": "$300 Mio.",
         "round": "Serie A",
@@ -25,65 +98,164 @@
         "sourceUrl": "https://news.crunchbase.com/venture/startup-ai-lab-ricursive-seriesa-unicorn/"
       },
       {
-        "id": 2,
+        "id": 5,
         "author": {
-          "name": "TechCrunch Funding",
-          "handle": "@techcrunch",
+          "name": "Techmeme",
+          "handle": "@Techmeme",
           "avatar": "XX",
           "verified": true
         },
-        "content": "Zipline, ein Drohnenzustelldienst, hat 600 Mio. USD an neuer Finanzierung für seine Expansion gesammelt. Das Unternehmen hat kürzlich seinen 2-millionsten Lieferflug absolviert.",
-        "company": "Zipline",
-        "amount": "$600 Mio.",
-        "round": "Neue Finanzierung",
-        "investors": [],
-        "valuation": "",
-        "timestamp": "2026-01-21",
-        "metrics": {
-          "comments": 0,
-          "retweets": 0,
-          "likes": 0,
-          "views": "0"
-        },
-        "sourceUrl": "https://techcrunch.com/2026/01/21/zipline-charts-drone-delivery-expansion-with-600m-in-new-funding/"
-      },
-      {
-        "id": 3,
-        "author": {
-          "name": "Crunchbase News",
-          "handle": "@crunchbasenews",
-          "avatar": "XX",
-          "verified": true
-        },
-        "content": "Zocks, ein Anbieter eines KI-Assistenten für Finanzberater, hat eine Serie-B-Finanzierungsrunde in Höhe von 45 Mio. USD unter der Co-Führung von Lightspeed Venture Partners und QED Investors abgeschlossen.",
-        "company": "Zocks",
-        "amount": "$45 Mio.",
+        "content": "PaleBlueDot, ein Marktplatz für GPU-Kapazitäten, sichert sich 150 Mio. US-Dollar in einer Serie-B-Runde unter Führung von B Capital bei einer Bewertung von über 1 Mrd. US-Dollar.",
+        "company": "PaleBlueDot",
+        "amount": "$150 Mio.",
         "round": "Serie B",
         "investors": [
-          "Lightspeed Venture Partners",
-          "QED Investors"
+          "B Capital"
         ],
-        "valuation": "",
-        "timestamp": "2026-01-26",
+        "valuation": "$1 Mrd.",
+        "timestamp": "2026-01-28",
         "metrics": {
           "comments": 0,
           "retweets": 0,
           "likes": 0,
           "views": "0"
         },
-        "sourceUrl": "https://news.crunchbase.com/fintech/zocks-raises-seriesb-ai-assistant-financial-advisers/"
+        "sourceUrl": "http://www.techmeme.com/260128/p56#a260128p56"
+      },
+      {
+        "id": 6,
+        "author": {
+          "name": "SiliconANGLE",
+          "handle": "@SiliconANGLE",
+          "avatar": "XX",
+          "verified": true
+        },
+        "content": "Inferact startet mit 150 Mio. US-Dollar Seed-Finanzierung, um das Open-Source-Projekt vLLM zu kommerzialisieren. Geführt von Andreessen Horowitz und Lightspeed.",
+        "company": "Inferact",
+        "amount": "$150 Mio.",
+        "round": "Seed",
+        "investors": [
+          "Andreessen Horowitz",
+          "Lightspeed",
+          "Databricks Ventures"
+        ],
+        "valuation": "N/A",
+        "timestamp": "2026-01-23",
+        "metrics": {
+          "comments": 0,
+          "retweets": 0,
+          "likes": 0,
+          "views": "0"
+        },
+        "sourceUrl": "https://siliconangle.com/2026/01/22/inferact-launches-150m-funding-commercialize-vllm/"
+      },
+      {
+        "id": 7,
+        "author": {
+          "name": "SiliconANGLE",
+          "handle": "@SiliconANGLE",
+          "avatar": "XX",
+          "verified": true
+        },
+        "content": "LiveKit, eine Plattform für Echtzeit-KI und Medien, erhält 100 Mio. US-Dollar in neuer Finanzierung bei einer Bewertung von 1 Mrd. US-Dollar.",
+        "company": "LiveKit",
+        "amount": "$100 Mio.",
+        "round": "N/A",
+        "investors": [],
+        "valuation": "$1 Mrd.",
+        "timestamp": "2026-01-22",
+        "metrics": {
+          "comments": 0,
+          "retweets": 0,
+          "likes": 0,
+          "views": "0"
+        },
+        "sourceUrl": "https://siliconangle.com/2026/01/22/livekit-raises-100m-1b-valuation-scale-real-time-ai-media-platform/"
       }
     ],
     "en": [
       {
         "id": 1,
         "author": {
-          "name": "Crunchbase News",
-          "handle": "@crunchbasenews",
+          "name": "TechCrunch",
+          "handle": "@TechCrunch",
           "avatar": "XX",
           "verified": true
         },
-        "content": "Ricursive Intelligence, a frontier AI lab, has raised $300 million in a Series A funding round at a $4 billion valuation just two months after its launch.",
+        "content": "Tesla invested $2B in Elon Musk's AI company xAI, which recently disclosed a $20B funding round.",
+        "company": "xAI",
+        "amount": "$2B",
+        "round": "Strategic Investment",
+        "investors": [
+          "Tesla"
+        ],
+        "valuation": "N/A",
+        "timestamp": "2026-01-28",
+        "metrics": {
+          "comments": 0,
+          "retweets": 0,
+          "likes": 0,
+          "views": "0"
+        },
+        "sourceUrl": "https://techcrunch.com/2026/01/28/tesla-invested-2b-in-elon-musks-xai/"
+      },
+      {
+        "id": 2,
+        "author": {
+          "name": "TechCrunch",
+          "handle": "@TechCrunch",
+          "avatar": "XX",
+          "verified": true
+        },
+        "content": "Waabi secures a $750M Series C round for autonomous trucking and an additional ~$250M commitment from Uber to deploy 25,000 robotaxis.",
+        "company": "Waabi",
+        "amount": "$1B",
+        "round": "Series C",
+        "investors": [
+          "Uber"
+        ],
+        "valuation": "N/A",
+        "timestamp": "2026-01-28",
+        "metrics": {
+          "comments": 0,
+          "retweets": 0,
+          "likes": 0,
+          "views": "0"
+        },
+        "sourceUrl": "https://techcrunch.com/2026/01/28/waabi-raises-1b-and-expands-into-robotaxis-with-uber/"
+      },
+      {
+        "id": 3,
+        "author": {
+          "name": "TechCrunch",
+          "handle": "@TechCrunch",
+          "avatar": "XX",
+          "verified": true
+        },
+        "content": "Anthropic reportedly looks to raise $20B at a valuation exceeding $300B in its latest funding round.",
+        "company": "Anthropic",
+        "amount": "$20B",
+        "round": "Late Stage",
+        "investors": [],
+        "valuation": "$300B",
+        "timestamp": "2026-01-27",
+        "metrics": {
+          "comments": 0,
+          "retweets": 0,
+          "likes": 0,
+          "views": "0"
+        },
+        "sourceUrl": "https://techcrunch.com/2026/01/27/anthropic-reportedly-upped-its-latest-raise-to-20b/"
+      },
+      {
+        "id": 4,
+        "author": {
+          "name": "Crunchbase News",
+          "handle": "@Crunchbase",
+          "avatar": "XX",
+          "verified": true
+        },
+        "content": "Ricursive Intelligence, a frontier AI lab, raises $300M in a Series A round at a $4B valuation just two months after launch.",
         "company": "Ricursive Intelligence",
         "amount": "$300M",
         "round": "Series A",
@@ -99,53 +271,79 @@
         "sourceUrl": "https://news.crunchbase.com/venture/startup-ai-lab-ricursive-seriesa-unicorn/"
       },
       {
-        "id": 2,
+        "id": 5,
         "author": {
-          "name": "TechCrunch Funding",
-          "handle": "@techcrunch",
+          "name": "Techmeme",
+          "handle": "@Techmeme",
           "avatar": "XX",
           "verified": true
         },
-        "content": "Drone delivery service Zipline has secured $600 million in new funding for its expansion. The company recently completed its 2 millionth delivery flight.",
-        "company": "Zipline",
-        "amount": "$600M",
-        "round": "New Funding",
-        "investors": [],
-        "valuation": "",
-        "timestamp": "2026-01-21",
-        "metrics": {
-          "comments": 0,
-          "retweets": 0,
-          "likes": 0,
-          "views": "0"
-        },
-        "sourceUrl": "https://techcrunch.com/2026/01/21/zipline-charts-drone-delivery-expansion-with-600m-in-new-funding/"
-      },
-      {
-        "id": 3,
-        "author": {
-          "name": "Crunchbase News",
-          "handle": "@crunchbasenews",
-          "avatar": "XX",
-          "verified": true
-        },
-        "content": "Zocks, a builder of an AI assistant for financial advisers, has raised $45 million in a Series B funding round co-led by Lightspeed Venture Partners and QED Investors.",
-        "company": "Zocks",
-        "amount": "$45M",
+        "content": "PaleBlueDot, a GPU capacity marketplace, raised a $150M Series B led by B Capital at a $1B+ valuation.",
+        "company": "PaleBlueDot",
+        "amount": "$150M",
         "round": "Series B",
         "investors": [
-          "Lightspeed Venture Partners",
-          "QED Investors"
+          "B Capital"
         ],
-        "valuation": "",
-        "timestamp": "2026-01-26",
+        "valuation": "$1B",
+        "timestamp": "2026-01-28",
         "metrics": {
           "comments": 0,
           "retweets": 0,
           "likes": 0,
           "views": "0"
         },
-        "sourceUrl": "https://news.crunchbase.com/fintech/zocks-raises-seriesb-ai-assistant-financial-advisers/"
+        "sourceUrl": "http://www.techmeme.com/260128/p56#a260128p56"
+      },
+      {
+        "id": 6,
+        "author": {
+          "name": "SiliconANGLE",
+          "handle": "@SiliconANGLE",
+          "avatar": "XX",
+          "verified": true
+        },
+        "content": "Inferact launches with $150M in seed funding to commercialize the open-source vLLM project. Led by Andreessen Horowitz and Lightspeed.",
+        "company": "Inferact",
+        "amount": "$150M",
+        "round": "Seed",
+        "investors": [
+          "Andreessen Horowitz",
+          "Lightspeed",
+          "Databricks Ventures"
+        ],
+        "valuation": "N/A",
+        "timestamp": "2026-01-23",
+        "metrics": {
+          "comments": 0,
+          "retweets": 0,
+          "likes": 0,
+          "views": "0"
+        },
+        "sourceUrl": "https://siliconangle.com/2026/01/22/inferact-launches-150m-funding-commercialize-vllm/"
+      },
+      {
+        "id": 7,
+        "author": {
+          "name": "SiliconANGLE",
+          "handle": "@SiliconANGLE",
+          "avatar": "XX",
+          "verified": true
+        },
+        "content": "LiveKit raises $100M at a $1B valuation to scale its real-time AI and media developer platform.",
+        "company": "LiveKit",
+        "amount": "$100M",
+        "round": "N/A",
+        "investors": [],
+        "valuation": "$1B",
+        "timestamp": "2026-01-22",
+        "metrics": {
+          "comments": 0,
+          "retweets": 0,
+          "likes": 0,
+          "views": "0"
+        },
+        "sourceUrl": "https://siliconangle.com/2026/01/22/livekit-raises-100m-1b-valuation-scale-real-time-ai-media-platform/"
       }
     ]
   },
@@ -155,16 +353,16 @@
         "id": 1,
         "author": {
           "name": "Techmeme",
-          "handle": "@techmeme",
+          "handle": "@Techmeme",
           "avatar": "XX",
           "verified": true
         },
-        "content": "SK Hynix meldet Rekordquartal: Q4-Umsatz steigt um 66% auf 23 Mrd. USD, operativer Gewinn um 137% auf 13,3 Mrd. USD. Beide Zahlen übertreffen die Schätzungen, angetrieben durch die KI-Nachfrage nach HBM-Speicher.",
-        "ticker": "",
-        "price": "",
-        "change": "+66%",
+        "content": "Microsoft meldet für Q2 einen Umsatzanstieg von 39 % im Vergleich zum Vorjahr für Azure, übertrifft die Schätzungen von 38,8 %. Der gebuchte Auftragsbestand von Microsoft Cloud stieg um 110 % auf 625 Mrd. US-Dollar, wovon ~45 % auf OpenAI entfielen.",
+        "ticker": "MSFT",
+        "price": "N/A",
+        "change": "+39% YoY",
         "direction": "up",
-        "marketCap": "",
+        "marketCap": "N/A",
         "timestamp": "2026-01-28",
         "metrics": {
           "comments": 0,
@@ -172,22 +370,22 @@
           "likes": 0,
           "views": "0"
         },
-        "sourceUrl": "http://www.techmeme.com/260128/p13#a260128p13"
+        "sourceUrl": "http://www.techmeme.com/260128/p57#a260128p57"
       },
       {
         "id": 2,
         "author": {
           "name": "Techmeme",
-          "handle": "@techmeme",
+          "handle": "@Techmeme",
           "avatar": "XX",
           "verified": true
         },
-        "content": "ASML meldet Rekordauftragseingänge von 13,2 Mrd. Euro im Q4 und übertrifft damit die Erwartungen bei weitem. Das Unternehmen prognostiziert für 2026 einen Umsatz zwischen 34 und 39 Mrd. Euro, getrieben von der KI-Nachfrage nach Chipherstellungsmaschinen.",
-        "ticker": "",
-        "price": "",
-        "change": "",
-        "direction": "up",
-        "marketCap": "",
+        "content": "Microsofts Aktie fällt um über 4 % im After-Hours-Handel, nachdem das Unternehmen Kapitalausgaben von 37,5 Mrd. US-Dollar für Q2 meldet, was die Analystenschätzungen von 36,2 Mrd. US-Dollar übertrifft.",
+        "ticker": "MSFT",
+        "price": "N/A",
+        "change": "-4%+",
+        "direction": "down",
+        "marketCap": "N/A",
         "timestamp": "2026-01-28",
         "metrics": {
           "comments": 0,
@@ -195,7 +393,53 @@
           "likes": 0,
           "views": "0"
         },
-        "sourceUrl": "http://www.techmeme.com/260128/p6#a260128p6"
+        "sourceUrl": "http://www.techmeme.com/260128/p55#a260128p55"
+      },
+      {
+        "id": 3,
+        "author": {
+          "name": "Techmeme",
+          "handle": "@Techmeme",
+          "avatar": "XX",
+          "verified": true
+        },
+        "content": "Meta-Aktie steigt im After-Hours-Handel um über 9 %, nachdem das Unternehmen für Q4 einen Umsatz von 59,9 Mrd. US-Dollar (vs. 58,35 Mrd. US-Dollar erwartet) und einen Nettogewinn von 22,8 Mrd. US-Dollar meldet.",
+        "ticker": "META",
+        "price": "N/A",
+        "change": "+9%+",
+        "direction": "up",
+        "marketCap": "N/A",
+        "timestamp": "2026-01-28",
+        "metrics": {
+          "comments": 0,
+          "retweets": 0,
+          "likes": 0,
+          "views": "0"
+        },
+        "sourceUrl": "http://www.techmeme.com/260128/p49#a260128p49"
+      },
+      {
+        "id": 4,
+        "author": {
+          "name": "Techmeme",
+          "handle": "@Techmeme",
+          "avatar": "XX",
+          "verified": true
+        },
+        "content": "IBM-Aktie springt im After-Hours-Handel um über 8 %, nachdem das Unternehmen für Q4 einen Umsatz von 19,7 Mrd. US-Dollar (vs. 19,2 Mrd. US-Dollar erwartet) meldet und für 2026 ein Umsatzwachstum und Free Cash Flow über den Schätzungen prognostiziert.",
+        "ticker": "IBM",
+        "price": "N/A",
+        "change": "+8%+",
+        "direction": "up",
+        "marketCap": "N/A",
+        "timestamp": "2026-01-28",
+        "metrics": {
+          "comments": 0,
+          "retweets": 0,
+          "likes": 0,
+          "views": "0"
+        },
+        "sourceUrl": "http://www.techmeme.com/260128/p53#a260128p53"
       }
     ],
     "en": [
@@ -203,16 +447,16 @@
         "id": 1,
         "author": {
           "name": "Techmeme",
-          "handle": "@techmeme",
+          "handle": "@Techmeme",
           "avatar": "XX",
           "verified": true
         },
-        "content": "SK Hynix reports a record quarter: Q4 revenue up 66% to $23B, operating profit up 137% to $13.3B. Both figures beat estimates, driven by AI demand for HBM memory.",
-        "ticker": "",
-        "price": "",
-        "change": "+66%",
+        "content": "Microsoft reports Azure Q2 revenue up 39% YoY, beating 38.8% estimates. Microsoft Cloud's contracted backlog grew 110% to $625B, ~45% of which was driven by OpenAI.",
+        "ticker": "MSFT",
+        "price": "N/A",
+        "change": "+39% YoY",
         "direction": "up",
-        "marketCap": "",
+        "marketCap": "N/A",
         "timestamp": "2026-01-28",
         "metrics": {
           "comments": 0,
@@ -220,22 +464,22 @@
           "likes": 0,
           "views": "0"
         },
-        "sourceUrl": "http://www.techmeme.com/260128/p13#a260128p13"
+        "sourceUrl": "http://www.techmeme.com/260128/p57#a260128p57"
       },
       {
         "id": 2,
         "author": {
           "name": "Techmeme",
-          "handle": "@techmeme",
+          "handle": "@Techmeme",
           "avatar": "XX",
           "verified": true
         },
-        "content": "ASML reports record quarterly bookings of €13.2B in Q4, far exceeding expectations. The company projects 2026 sales between €34B and €39B, driven by AI demand for chipmaking equipment.",
-        "ticker": "",
-        "price": "",
-        "change": "",
-        "direction": "up",
-        "marketCap": "",
+        "content": "Microsoft stock drops 4%+ after hours after the company reports Q2 capital expenditures of $37.5B, exceeding analyst estimates of $36.2B.",
+        "ticker": "MSFT",
+        "price": "N/A",
+        "change": "-4%+",
+        "direction": "down",
+        "marketCap": "N/A",
         "timestamp": "2026-01-28",
         "metrics": {
           "comments": 0,
@@ -243,7 +487,53 @@
           "likes": 0,
           "views": "0"
         },
-        "sourceUrl": "http://www.techmeme.com/260128/p6#a260128p6"
+        "sourceUrl": "http://www.techmeme.com/260128/p55#a260128p55"
+      },
+      {
+        "id": 3,
+        "author": {
+          "name": "Techmeme",
+          "handle": "@Techmeme",
+          "avatar": "XX",
+          "verified": true
+        },
+        "content": "Meta stock up 9%+ after hours after reporting Q4 revenue of $59.9B (vs. $58.35B est.) and net income of $22.8B.",
+        "ticker": "META",
+        "price": "N/A",
+        "change": "+9%+",
+        "direction": "up",
+        "marketCap": "N/A",
+        "timestamp": "2026-01-28",
+        "metrics": {
+          "comments": 0,
+          "retweets": 0,
+          "likes": 0,
+          "views": "0"
+        },
+        "sourceUrl": "http://www.techmeme.com/260128/p49#a260128p49"
+      },
+      {
+        "id": 4,
+        "author": {
+          "name": "Techmeme",
+          "handle": "@Techmeme",
+          "avatar": "XX",
+          "verified": true
+        },
+        "content": "IBM stock jumps 8%+ after hours after reporting Q4 revenue of $19.7B (vs. $19.2B est.) and projecting 2026 revenue growth and free cash flow above estimates.",
+        "ticker": "IBM",
+        "price": "N/A",
+        "change": "+8%+",
+        "direction": "up",
+        "marketCap": "N/A",
+        "timestamp": "2026-01-28",
+        "metrics": {
+          "comments": 0,
+          "retweets": 0,
+          "likes": 0,
+          "views": "0"
+        },
+        "sourceUrl": "http://www.techmeme.com/260128/p53#a260128p53"
       }
     ]
   },
@@ -252,38 +542,16 @@
       {
         "id": 1,
         "author": {
-          "name": "Crunchbase News",
-          "handle": "@crunchbasenews",
+          "name": "TechCrunch",
+          "handle": "@TechCrunch",
           "avatar": "XX",
           "verified": true
         },
-        "content": "Die Bank Capital One kündigt an, das Fintech-Startup Brex für 5,15 Mrd. USD in einer Kombination aus Bargeld und Aktien zu übernehmen. Es wäre laut Brex der größte Bank-Fintech-Deal der Geschichte.",
-        "acquirer": "Capital One",
-        "target": "Brex",
-        "dealValue": "$5,15 Mrd.",
-        "dealType": "Akquisition",
-        "timestamp": "2026-01-23",
-        "metrics": {
-          "comments": 0,
-          "retweets": 0,
-          "likes": 0,
-          "views": "0"
-        },
-        "sourceUrl": "https://news.crunchbase.com/ma/capital-one-acquisition-fintech-startup-brex/"
-      },
-      {
-        "id": 2,
-        "author": {
-          "name": "Techmeme",
-          "handle": "@techmeme",
-          "avatar": "XX",
-          "verified": true
-        },
-        "content": "Berichten zufolge lehnte Hugging Face ein Investitionsangebot von Nvidia in Höhe von 500 Mio. USD zu einer Bewertung von 7 Mrd. USD Ende 2025 ab. Das KI-Startup will keinen einzelnen dominanten Investor.",
-        "acquirer": "Nvidia (Angebot abgelehnt)",
-        "target": "Hugging Face",
-        "dealValue": "$500 Mio.",
-        "dealType": "Investitionsangebot",
+        "content": "ServiceNow schließt eine weitere KI-Partnerschaft, dieses Mal mit Anthropic, nur eine Woche nach der Ankündigung einer Partnerschaft mit OpenAI.",
+        "acquirer": "ServiceNow",
+        "target": "Anthropic",
+        "dealValue": "N/A",
+        "dealType": "Partnerschaft",
         "timestamp": "2026-01-28",
         "metrics": {
           "comments": 0,
@@ -291,45 +559,67 @@
           "likes": 0,
           "views": "0"
         },
-        "sourceUrl": "http://www.techmeme.com/260128/p5#a260128p5"
+        "sourceUrl": "https://techcrunch.com/2026/01/28/servicenow-inks-another-ai-partnership-this-time-with-anthropic/"
+      },
+      {
+        "id": 2,
+        "author": {
+          "name": "SiliconANGLE",
+          "handle": "@SiliconANGLE",
+          "avatar": "XX",
+          "verified": true
+        },
+        "content": "Yelp kündigt an, das KI-gestützte Lead-Management-Startup Hatch für bis zu 300 Mio. US-Dollar zu erwerben. Die anfängliche Zahlung beträgt 270 Mio. US-Dollar in bar.",
+        "acquirer": "Yelp",
+        "target": "Hatch",
+        "dealValue": "$300 Mio.",
+        "dealType": "Akquisition",
+        "timestamp": "2026-01-22",
+        "metrics": {
+          "comments": 0,
+          "retweets": 0,
+          "likes": 0,
+          "views": "0"
+        },
+        "sourceUrl": "https://siliconangle.com/2026/01/22/yelp-acquire-ai-lead-management-startup-hatch-300m/"
+      },
+      {
+        "id": 3,
+        "author": {
+          "name": "TechCrunch",
+          "handle": "@TechCrunch",
+          "avatar": "XX",
+          "verified": true
+        },
+        "content": "Der KI-Datenlabeler Handshake übernimmt Cleanlab, ein Ziel mehrerer Übernahmeangebote, hauptsächlich um Talente zu gewinnen (Acqui-hire).",
+        "acquirer": "Handshake",
+        "target": "Cleanlab",
+        "dealValue": "N/A",
+        "dealType": "Akquisition (Acqui-hire)",
+        "timestamp": "2026-01-28",
+        "metrics": {
+          "comments": 0,
+          "retweets": 0,
+          "likes": 0,
+          "views": "0"
+        },
+        "sourceUrl": "https://techcrunch.com/2026/01/28/ai-data-labeler-handshake-buys-cleanlab-an-acquisition-target-of-multiple-others/"
       }
     ],
     "en": [
       {
         "id": 1,
         "author": {
-          "name": "Crunchbase News",
-          "handle": "@crunchbasenews",
+          "name": "TechCrunch",
+          "handle": "@TechCrunch",
           "avatar": "XX",
           "verified": true
         },
-        "content": "Banking giant Capital One announces it is acquiring fintech startup Brex for $5.15 billion in a cash and stock deal. Brex claims it would be the largest bank-fintech deal in history.",
-        "acquirer": "Capital One",
-        "target": "Brex",
-        "dealValue": "$5.15B",
-        "dealType": "Acquisition",
-        "timestamp": "2026-01-23",
-        "metrics": {
-          "comments": 0,
-          "retweets": 0,
-          "likes": 0,
-          "views": "0"
-        },
-        "sourceUrl": "https://news.crunchbase.com/ma/capital-one-acquisition-fintech-startup-brex/"
-      },
-      {
-        "id": 2,
-        "author": {
-          "name": "Techmeme",
-          "handle": "@techmeme",
-          "avatar": "XX",
-          "verified": true
-        },
-        "content": "Hugging Face reportedly declined Nvidia's $500 million investment offer at a $7 billion valuation in late 2025. The AI startup says it does not want a single dominant investor.",
-        "acquirer": "Nvidia (offer declined)",
-        "target": "Hugging Face",
-        "dealValue": "$500M",
-        "dealType": "Investment Offer",
+        "content": "ServiceNow inks another AI partnership, this time with Anthropic, just a week after announcing a partnership with OpenAI.",
+        "acquirer": "ServiceNow",
+        "target": "Anthropic",
+        "dealValue": "N/A",
+        "dealType": "Partnership",
         "timestamp": "2026-01-28",
         "metrics": {
           "comments": 0,
@@ -337,7 +627,51 @@
           "likes": 0,
           "views": "0"
         },
-        "sourceUrl": "http://www.techmeme.com/260128/p5#a260128p5"
+        "sourceUrl": "https://techcrunch.com/2026/01/28/servicenow-inks-another-ai-partnership-this-time-with-anthropic/"
+      },
+      {
+        "id": 2,
+        "author": {
+          "name": "SiliconANGLE",
+          "handle": "@SiliconANGLE",
+          "avatar": "XX",
+          "verified": true
+        },
+        "content": "Yelp to acquire AI lead management startup Hatch for up to $300M. The initial payment is $270M in cash.",
+        "acquirer": "Yelp",
+        "target": "Hatch",
+        "dealValue": "$300M",
+        "dealType": "Acquisition",
+        "timestamp": "2026-01-22",
+        "metrics": {
+          "comments": 0,
+          "retweets": 0,
+          "likes": 0,
+          "views": "0"
+        },
+        "sourceUrl": "https://siliconangle.com/2026/01/22/yelp-acquire-ai-lead-management-startup-hatch-300m/"
+      },
+      {
+        "id": 3,
+        "author": {
+          "name": "TechCrunch",
+          "handle": "@TechCrunch",
+          "avatar": "XX",
+          "verified": true
+        },
+        "content": "AI data labeler Handshake buys Cleanlab, an acquisition target of multiple others, primarily to acquire talent (acq-hire).",
+        "acquirer": "Handshake",
+        "target": "Cleanlab",
+        "dealValue": "N/A",
+        "dealType": "Acquisition (Acqui-hire)",
+        "timestamp": "2026-01-28",
+        "metrics": {
+          "comments": 0,
+          "retweets": 0,
+          "likes": 0,
+          "views": "0"
+        },
+        "sourceUrl": "https://techcrunch.com/2026/01/28/ai-data-labeler-handshake-buys-cleanlab-an-acquisition-target-of-multiple-others/"
       }
     ]
   }
