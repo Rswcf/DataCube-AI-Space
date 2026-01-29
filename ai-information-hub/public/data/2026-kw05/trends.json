@@ -3,105 +3,85 @@
     "de": [
       {
         "category": "Startups",
-        "title": "Arcee AIs Trinity übertrifft Llama",
-        "posts": "35.000 Beiträge"
+        "title": "Arcee AIs Trinity übertrifft Llama"
       },
       {
         "category": "Technologie",
-        "title": "Google Chrome Auto Browse mit Gemini KI",
-        "posts": "45.000 Beiträge"
+        "title": "Google Chrome Auto Browse mit Gemini KI"
       },
       {
         "category": "Wissenschaft",
-        "title": "KI entdeckt 1.400 Anomalien in Hubble-Daten",
-        "posts": "28.000 Beiträge"
+        "title": "KI entdeckt 1.400 Anomalien in Hubble-Daten"
       },
       {
         "category": "KI",
-        "title": "Moltbot: Lokaler KI-Agent wird zum Hit",
-        "posts": "32.000 Beiträge"
+        "title": "Moltbot: Lokaler KI-Agent wird zum Hit"
       },
       {
         "category": "Technologie",
-        "title": "China importiert 400.000 Nvidia KI-Chips",
-        "posts": "40.000 Beiträge"
+        "title": "China importiert 400.000 Nvidia KI-Chips"
       },
       {
         "category": "KI",
-        "title": "Figure AI Roboter räumt Geschirrspüler aus",
-        "posts": "30.000 Beiträge"
+        "title": "Figure AI Roboter räumt Geschirrspüler aus"
       },
       {
         "category": "Wissenschaft",
-        "title": "OpenAI Prism: KI-Arbeitsbereich für Wissenschaft",
-        "posts": "25.000 Beiträge"
+        "title": "OpenAI Prism: KI-Arbeitsbereich für Wissenschaft"
       },
       {
         "category": "KI",
-        "title": "Grok Chatbot mit Antisemitismus-Vorwürfen",
-        "posts": "50.000 Beiträge"
+        "title": "Grok Chatbot mit Antisemitismus-Vorwürfen"
       },
       {
         "category": "Technologie",
-        "title": "Google Search KI-Übersichten werden schlauer",
-        "posts": "38.000 Beiträge"
+        "title": "Google Search KI-Übersichten werden schlauer"
       },
       {
         "category": "Finanzen",
-        "title": "KI-Startups sammeln Milliarden an Finanzierung",
-        "posts": "42.000 Beiträge"
+        "title": "KI-Startups sammeln Milliarden an Finanzierung"
       }
     ],
     "en": [
       {
         "category": "Startups",
-        "title": "Arcee AI's Trinity Outperforms Llama",
-        "posts": "35K posts"
+        "title": "Arcee AI's Trinity Outperforms Llama"
       },
       {
         "category": "Technology",
-        "title": "Google Chrome Auto Browse with Gemini AI",
-        "posts": "45K posts"
+        "title": "Google Chrome Auto Browse with Gemini AI"
       },
       {
         "category": "Science",
-        "title": "AI Discovers 1,400 Anomalies in Hubble Data",
-        "posts": "28K posts"
+        "title": "AI Discovers 1,400 Anomalies in Hubble Data"
       },
       {
         "category": "AI",
-        "title": "Moltbot: Local AI Agent Goes Viral",
-        "posts": "32K posts"
+        "title": "Moltbot: Local AI Agent Goes Viral"
       },
       {
         "category": "Technology",
-        "title": "China Imports 400K Nvidia AI Chips",
-        "posts": "40K posts"
+        "title": "China Imports 400K Nvidia AI Chips"
       },
       {
         "category": "AI",
-        "title": "Figure AI Robot Unloads Dishwasher",
-        "posts": "30K posts"
+        "title": "Figure AI Robot Unloads Dishwasher"
       },
       {
         "category": "Science",
-        "title": "OpenAI Prism: AI Workspace for Science",
-        "posts": "25K posts"
+        "title": "OpenAI Prism: AI Workspace for Science"
       },
       {
         "category": "AI",
-        "title": "Grok Chatbot Faces Antisemitism Allegations",
-        "posts": "50K posts"
+        "title": "Grok Chatbot Faces Antisemitism Allegations"
       },
       {
         "category": "Technology",
-        "title": "Google Search AI Overviews Get Smarter",
-        "posts": "38K posts"
+        "title": "Google Search AI Overviews Get Smarter"
       },
       {
         "category": "Finance",
-        "title": "AI Startups Raise Billions in Funding",
-        "posts": "42K posts"
+        "title": "AI Startups Raise Billions in Funding"
       }
     ]
   },

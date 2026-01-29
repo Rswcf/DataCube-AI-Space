@@ -43,7 +43,7 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
   const navItems = getNavItems(t);
 
   return (
-    <aside className="sticky top-0 h-screen flex flex-col bg-background px-3 py-4 w-full">
+    <aside className="sticky top-0 h-screen flex flex-col bg-sidebar px-3 py-4 w-full">
       {/* Logo */}
       <div className="mb-6 px-3">
         <div className="flex items-center gap-3">

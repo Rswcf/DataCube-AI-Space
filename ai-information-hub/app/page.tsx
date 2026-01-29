@@ -40,7 +40,7 @@ export default function Home() {
         </div>
 
         {/* Main Feed - Flexible center column */}
-        <div className="flex-1 min-w-0 max-w-[600px] border-x border-border">
+        <div className="flex-1 min-w-0 max-w-[600px] border-x border-border dark:bg-content-surface">
           <Feed activeTab={activeTab} selectedWeekId={selectedWeekId} onWeekChange={setSelectedWeekId} searchQuery={searchQuery} />
         </div>
 

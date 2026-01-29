@@ -656,10 +656,10 @@ Output JSON:
 {{
   "trends": {{
     "de": [
-      {{"category": "KI · Trend", "title": "Topic Name", "posts": "XX.000 Beiträge"}}
+      {{"category": "KI · Trend", "title": "Topic Name"}}
     ],
     "en": [
-      {{"category": "AI · Trending", "title": "Topic Name", "posts": "XXK posts"}}
+      {{"category": "AI · Trending", "title": "Topic Name"}}
     ]
   }}
 }}

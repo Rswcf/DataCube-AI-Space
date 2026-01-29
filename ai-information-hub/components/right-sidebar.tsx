@@ -10,34 +10,33 @@ import { useSettings } from "@/lib/settings-context";
 interface TrendItem {
   category: string;
   title: string;
-  posts: string;
 }
 
 // Fallback data in case JSON fetch fails
 const fallbackTrends = {
   de: [
-    { category: "KI · Trend", title: "GPT-5", posts: "124.000 Beiträge" },
-    { category: "Technologie · Trend", title: "NVIDIA Blackwell", posts: "89.000 Beiträge" },
-    { category: "Finanzen · Trend", title: "KI-Aktien", posts: "67.000 Beiträge" },
-    { category: "Wissenschaft · Trend", title: "AlphaFold 3", posts: "45.000 Beiträge" },
-    { category: "Startups · Trend", title: "Anthropic", posts: "34.000 Beiträge" },
-    { category: "KI · Trend", title: "Open-Source LLMs", posts: "28.000 Beiträge" },
-    { category: "Technologie · Trend", title: "KI-Agenten", posts: "22.000 Beiträge" },
-    { category: "Finanzen · Trend", title: "KI-Infrastruktur", posts: "19.000 Beiträge" },
-    { category: "Wissenschaft · Trend", title: "Multimodale KI", posts: "15.000 Beiträge" },
-    { category: "Startups · Trend", title: "KI-Regulierung", posts: "12.000 Beiträge" },
+    { category: "KI · Trend", title: "GPT-5" },
+    { category: "Technologie · Trend", title: "NVIDIA Blackwell" },
+    { category: "Finanzen · Trend", title: "KI-Aktien" },
+    { category: "Wissenschaft · Trend", title: "AlphaFold 3" },
+    { category: "Startups · Trend", title: "Anthropic" },
+    { category: "KI · Trend", title: "Open-Source LLMs" },
+    { category: "Technologie · Trend", title: "KI-Agenten" },
+    { category: "Finanzen · Trend", title: "KI-Infrastruktur" },
+    { category: "Wissenschaft · Trend", title: "Multimodale KI" },
+    { category: "Startups · Trend", title: "KI-Regulierung" },
   ],
   en: [
-    { category: "AI · Trending", title: "GPT-5", posts: "124K posts" },
-    { category: "Technology · Trending", title: "NVIDIA Blackwell", posts: "89K posts" },
-    { category: "Finance · Trending", title: "AI Stocks", posts: "67K posts" },
-    { category: "Science · Trending", title: "AlphaFold 3", posts: "45K posts" },
-    { category: "Startups · Trending", title: "Anthropic", posts: "34K posts" },
-    { category: "AI · Trending", title: "Open-Source LLMs", posts: "28K posts" },
-    { category: "Technology · Trending", title: "AI Agents", posts: "22K posts" },
-    { category: "Finance · Trending", title: "AI Infrastructure", posts: "19K posts" },
-    { category: "Science · Trending", title: "Multimodal AI", posts: "15K posts" },
-    { category: "Startups · Trending", title: "AI Regulation", posts: "12K posts" },
+    { category: "AI · Trending", title: "GPT-5" },
+    { category: "Technology · Trending", title: "NVIDIA Blackwell" },
+    { category: "Finance · Trending", title: "AI Stocks" },
+    { category: "Science · Trending", title: "AlphaFold 3" },
+    { category: "Startups · Trending", title: "Anthropic" },
+    { category: "AI · Trending", title: "Open-Source LLMs" },
+    { category: "Technology · Trending", title: "AI Agents" },
+    { category: "Finance · Trending", title: "AI Infrastructure" },
+    { category: "Science · Trending", title: "Multimodal AI" },
+    { category: "Startups · Trending", title: "AI Regulation" },
   ],
 };
 
@@ -109,7 +108,7 @@ export function RightSidebar({ weekId, onSearchChange }: RightSidebarProps) {
   }, []);
 
   return (
-    <aside ref={sidebarRef} style={sidebarStyle} className="py-3 pl-6 pr-4">
+    <aside ref={sidebarRef} style={sidebarStyle} className="py-3 pl-6 pr-4 bg-sidebar">
       <div ref={contentRef}>
         {/* Search */}
         <div className="relative">
@@ -135,7 +134,6 @@ export function RightSidebar({ weekId, onSearchChange }: RightSidebarProps) {
                   <div>
                     <p className="text-xs text-muted-foreground">{trend.category}</p>
                     <p className="font-bold text-foreground group-hover:underline">{trend.title}</p>
-                    <p className="text-xs text-muted-foreground">{trend.posts}</p>
                   </div>
                   <button className="rounded-full p-1 opacity-0 group-hover:opacity-100 hover:bg-primary/10 transition-all">
                     <svg className="h-4 w-4 text-muted-foreground" viewBox="0 0 24 24" fill="currentColor">
