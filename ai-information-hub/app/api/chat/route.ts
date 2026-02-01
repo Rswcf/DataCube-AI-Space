@@ -37,7 +37,7 @@ ${weekContext || "No data available for this week."}`;
       }));
 
     const result = streamText({
-      model: openrouter.chat("deepseek/deepseek-v3.2"),
+      model: openrouter.chat("z-ai/glm-4.5-air:free"),
       system: systemPrompt,
       messages: coreMessages,
       maxOutputTokens: 500,
