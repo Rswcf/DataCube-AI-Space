@@ -15,6 +15,18 @@ interface SettingsContextType {
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
 
+/**
+ * Provides theme (dark/light) and language (de/en) settings to the app.
+ *
+ * Wraps the entire app in layout.tsx. Persists preferences to localStorage.
+ * Default: dark theme, German language.
+ *
+ * @example
+ * // In layout.tsx (already configured)
+ * <SettingsProvider>
+ *   {children}
+ * </SettingsProvider>
+ */
 export function SettingsProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>("dark");
   const [language, setLanguageState] = useState<Language>("de");
@@ -71,6 +83,22 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   );
 }
 
+/**
+ * Access theme, language, and translation function from any component.
+ *
+ * @returns {SettingsContextType} Settings context with theme, language, and t() function
+ * @throws Error if used outside SettingsProvider
+ *
+ * @example
+ * const { language, t } = useSettings();
+ * return <h1>{t("aiTechProgress")}</h1>; // Returns German or English string
+ *
+ * @example
+ * const { theme, setTheme } = useSettings();
+ * <button onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
+ *   Toggle theme
+ * </button>
+ */
 export function useSettings() {
   const context = useContext(SettingsContext);
   if (context === undefined) {

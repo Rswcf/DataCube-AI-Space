@@ -59,15 +59,36 @@ export function TipsFeed({ weekId, searchQuery }: TipsFeedProps) {
 
   useEffect(() => {
     setLoading(true);
-    fetch(`/data/${weekId}/tips.json`)
+
+    // Try API first if configured, fall back to static JSON
+    const apiBase = process.env.NEXT_PUBLIC_API_URL;
+    const fetchUrl = apiBase
+      ? `${apiBase}/tips/${weekId}`
+      : `/data/${weekId}/tips.json`;
+
+    fetch(fetchUrl)
       .then((res) => res.json())
       .then((data) => {
         setPosts(data[language] || data["de"] || []);
         setLoading(false);
       })
       .catch(() => {
-        setPosts([]);
-        setLoading(false);
+        // If API fails, try static JSON as fallback
+        if (apiBase) {
+          fetch(`/data/${weekId}/tips.json`)
+            .then((res) => res.json())
+            .then((data) => {
+              setPosts(data[language] || data["de"] || []);
+              setLoading(false);
+            })
+            .catch(() => {
+              setPosts([]);
+              setLoading(false);
+            });
+        } else {
+          setPosts([]);
+          setLoading(false);
+        }
       });
   }, [weekId, language]);
 

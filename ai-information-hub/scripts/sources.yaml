@@ -1,24 +1,18 @@
 tech:
-  - url: "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml"
-    name: "The Verge AI"
-  - url: "https://techcrunch.com/category/artificial-intelligence/feed/"
-    name: "TechCrunch"
-  - url: "https://venturebeat.com/feed"
-    name: "VentureBeat"
+  # Primary source - uses Algolia API enhanced version
   - url: "https://hnrss.org/newest?q=AI&points=50"
     name: "Hacker News"
-  - url: "https://arstechnica.com/ai/feed/"
-    name: "Ars Technica AI"
-  - url: "https://www.wired.com/feed/tag/ai/latest/rss"
-    name: "WIRED AI"
-  - url: "https://the-decoder.com/feed/"
-    name: "The Decoder"
-  - url: "https://www.artificialintelligence-news.com/feed/rss/"
-    name: "AI News"
-  - url: "https://www.technologyreview.com/topic/artificial-intelligence/feed"
-    name: "MIT Technology Review AI"
+    enhanced: true
+
+  # Supplementary sources - cover HN blind spots
   - url: "https://huggingface.co/blog/feed.xml"
-    name: "Hugging Face Blog"
+    name: "Hugging Face Blog"      # First-hand open source model releases
+
+  - url: "https://www.technologyreview.com/topic/artificial-intelligence/feed"
+    name: "MIT Technology Review"  # Academic deep analysis
+
+  - url: "https://the-decoder.com/feed/"
+    name: "The Decoder"            # European/German perspective
 
 investment:
   - url: "https://techcrunch.com/tag/funding/feed/"

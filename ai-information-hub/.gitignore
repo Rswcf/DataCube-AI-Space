@@ -29,3 +29,4 @@ next-env.d.ts
 # scripts cache
 scripts/.cache/*
 !scripts/.cache/.gitkeep
+.env*.local

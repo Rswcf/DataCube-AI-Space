@@ -2,86 +2,86 @@
   "trends": {
     "de": [
       {
-        "category": "Startups",
-        "title": "Arcee AIs Trinity übertrifft Llama"
+        "category": "KI",
+        "title": "Open-Source-KI-Assistenten für mehr Privatsphäre"
       },
       {
-        "category": "Technologie",
-        "title": "Google Chrome Auto Browse mit Gemini KI"
+        "category": "KI",
+        "title": "Große Open-Source-KI-Modelle fordern Big Tech heraus"
       },
       {
         "category": "Wissenschaft",
-        "title": "KI entdeckt 1.400 Anomalien in Hubble-Daten"
-      },
-      {
-        "category": "KI",
-        "title": "Moltbot: Lokaler KI-Agent wird zum Hit"
+        "title": "KI beschleunigt wissenschaftliche Forschung"
       },
       {
         "category": "Technologie",
-        "title": "China importiert 400.000 Nvidia KI-Chips"
+        "title": "Echtzeit-KI-generierte interaktive Welten"
       },
       {
         "category": "KI",
-        "title": "Figure AI Roboter räumt Geschirrspüler aus"
-      },
-      {
-        "category": "Wissenschaft",
-        "title": "OpenAI Prism: KI-Arbeitsbereich für Wissenschaft"
+        "title": "Leistungsabbau bei KI-Diensten bereitet Sorgen"
       },
       {
         "category": "KI",
-        "title": "Grok Chatbot mit Antisemitismus-Vorwürfen"
+        "title": "Chinesische KI-Modelle im globalen Wettbewerb"
       },
       {
         "category": "Technologie",
-        "title": "Google Search KI-Übersichten werden schlauer"
+        "title": "Open-Source-Coding-Agenten fördern Entwicklung"
+      },
+      {
+        "category": "Technologie",
+        "title": "KI erkennt kritische Software-Schwachstellen"
+      },
+      {
+        "category": "KI",
+        "title": "KI-Gedächtnis wirft Datenschutzfragen auf"
       },
       {
         "category": "Finanzen",
-        "title": "KI-Startups sammeln Milliarden an Finanzierung"
+        "title": "Rekordinvestitionen im KI-Sektor"
       }
     ],
     "en": [
       {
-        "category": "Startups",
-        "title": "Arcee AI's Trinity Outperforms Llama"
+        "category": "AI",
+        "title": "Open-Source AI Assistants for Enhanced Privacy"
       },
       {
-        "category": "Technology",
-        "title": "Google Chrome Auto Browse with Gemini AI"
+        "category": "AI",
+        "title": "Massive Open-Source AI Models Rival Big Tech"
       },
       {
         "category": "Science",
-        "title": "AI Discovers 1,400 Anomalies in Hubble Data"
-      },
-      {
-        "category": "AI",
-        "title": "Moltbot: Local AI Agent Goes Viral"
+        "title": "AI Drives Scientific Research Acceleration"
       },
       {
         "category": "Technology",
-        "title": "China Imports 400K Nvidia AI Chips"
+        "title": "Real-Time AI-Generated Interactive Worlds"
       },
       {
         "category": "AI",
-        "title": "Figure AI Robot Unloads Dishwasher"
-      },
-      {
-        "category": "Science",
-        "title": "OpenAI Prism: AI Workspace for Science"
+        "title": "AI Service Performance Degradation Concerns"
       },
       {
         "category": "AI",
-        "title": "Grok Chatbot Faces Antisemitism Allegations"
+        "title": "Chinese AI Models Compete Globally"
       },
       {
         "category": "Technology",
-        "title": "Google Search AI Overviews Get Smarter"
+        "title": "Open-Source Coding Agents Boost Development"
+      },
+      {
+        "category": "Technology",
+        "title": "AI Detects Critical Software Vulnerabilities"
+      },
+      {
+        "category": "AI",
+        "title": "AI Memory Raises Data Privacy Questions"
       },
       {
         "category": "Finance",
-        "title": "AI Startups Raise Billions in Funding"
+        "title": "Record Investments Flood AI Sector"
       }
     ]
   },

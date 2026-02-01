@@ -65,19 +65,40 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
 
   useEffect(() => {
     setLoading(true);
-    fetch(`/data/${weekId}/investment.json`)
+
+    const processData = (data: any) => {
+      setPrimaryPosts(data.primaryMarket?.[language] || data.primaryMarket?.["de"] || []);
+      setSecondaryPosts(data.secondaryMarket?.[language] || data.secondaryMarket?.["de"] || []);
+      setMaPosts(data.ma?.[language] || data.ma?.["de"] || []);
+      setLoading(false);
+    };
+
+    const clearData = () => {
+      setPrimaryPosts([]);
+      setSecondaryPosts([]);
+      setMaPosts([]);
+      setLoading(false);
+    };
+
+    // Try API first if configured, fall back to static JSON
+    const apiBase = process.env.NEXT_PUBLIC_API_URL;
+    const fetchUrl = apiBase
+      ? `${apiBase}/investment/${weekId}`
+      : `/data/${weekId}/investment.json`;
+
+    fetch(fetchUrl)
       .then((res) => res.json())
-      .then((data) => {
-        setPrimaryPosts(data.primaryMarket?.[language] || data.primaryMarket?.["de"] || []);
-        setSecondaryPosts(data.secondaryMarket?.[language] || data.secondaryMarket?.["de"] || []);
-        setMaPosts(data.ma?.[language] || data.ma?.["de"] || []);
-        setLoading(false);
-      })
+      .then(processData)
       .catch(() => {
-        setPrimaryPosts([]);
-        setSecondaryPosts([]);
-        setMaPosts([]);
-        setLoading(false);
+        // If API fails, try static JSON as fallback
+        if (apiBase) {
+          fetch(`/data/${weekId}/investment.json`)
+            .then((res) => res.json())
+            .then(processData)
+            .catch(clearData);
+        } else {
+          clearData();
+        }
       });
   }, [weekId, language]);
 

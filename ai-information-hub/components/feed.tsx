@@ -14,6 +14,25 @@ interface FeedProps {
   searchQuery: string;
 }
 
+/**
+ * Main feed container with tab switching and slide animations.
+ *
+ * Renders the appropriate feed component (Tech/Investment/Tips) based on activeTab.
+ * Handles week navigation and passes search query to child feeds.
+ *
+ * @param activeTab - Current tab: "tech" | "investment" | "tips"
+ * @param selectedWeekId - Week ID in format "YYYY-kwWW" (e.g., "2025-kw04")
+ * @param onWeekChange - Callback when user selects a different week
+ * @param searchQuery - Filter string passed to feed components
+ *
+ * @example
+ * <Feed
+ *   activeTab="tech"
+ *   selectedWeekId="2025-kw04"
+ *   onWeekChange={(id) => setWeekId(id)}
+ *   searchQuery=""
+ * />
+ */
 export function Feed({ activeTab, selectedWeekId, onWeekChange, searchQuery }: FeedProps) {
   const [direction, setDirection] = useState<"left" | "right">("left");
   const [isAnimating, setIsAnimating] = useState(false);

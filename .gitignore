@@ -30,5 +30,10 @@ next-env.d.ts
 scripts/.cache/*
 !scripts/.cache/.gitkeep
 
+# Python virtual environments
+.venv/
+venv/
+__pycache__/
+
 # OS
 .DS_Store

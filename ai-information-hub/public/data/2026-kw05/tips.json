@@ -9,33 +9,33 @@
         "verified": true
       },
       "platform": "X",
-      "content": "ChatGPTs Code Interpreter (Advanced Data Analysis) wurde massiv verbessert. Er kann nun Bash-Befehle ausführen, Pakete mit pip/npm installieren und Dateien herunterladen. Das eröffnet neue Möglichkeiten für Datenanalyse und Automatisierung direkt im Chat.",
-      "tip": "Nutze ChatGPT Code Interpreter für komplexe Datenaufgaben. Du kannst z.B. ein Python-Skript schreiben, das externe Bibliotheken installiert, Daten von einer URL lädt, analysiert und visualisiert – alles in einer sicheren Sandbox.",
-      "category": "ChatGPT Nutzung",
-      "difficulty": "Fortgeschritten",
-      "timestamp": "2026-01-26",
+      "content": "Lass KI-Coding-Agenten gute Python-Tests schreiben, indem du sie aufforderst, zuerst die Testlogik zu erklären, bevor sie Code generieren.",
+      "tip": "Bevor du Tests generieren lässt, bitte den Agenten, seinen Testplan zu beschreiben.",
+      "category": "Programmierung",
+      "difficulty": "Anfänger",
+      "timestamp": "2026-01-30",
       "metrics": {
         "comments": 0,
         "retweets": 0,
         "likes": 0,
         "views": "0"
       },
-      "sourceUrl": "https://simonwillison.net/2026/Jan/26/chatgpt-containers/#atom-everything"
+      "sourceUrl": "https://simonwillison.net/2026/Jan/26/tests/#atom-everything"
     },
     {
       "id": 2,
       "author": {
         "name": "Reddit r/ClaudeAI",
-        "handle": "@reddit",
+        "handle": "@ClaudeAI_Sub",
         "avatar": "XX",
-        "verified": true
+        "verified": false
       },
-      "platform": "Reddit",
-      "content": "API-Kosten für Claude können durch ein Datei-Tiering-System massiv gesenkt werden. Anstatt das gesamte Codebase in den Kontext zu laden, werden nur relevante Dateien basierend auf der Anfrage ausgewählt. Dies kann die Kosten pro Session um über 90% reduzieren.",
-      "tip": "Erstelle ein System, das deine Dokumente/Code in Tiers einteilt (z.B. Kern, unterstützend, archiviert). Bevor du Claude eine Frage stellst, durchsuche zuerst die Dateistruktur, um nur die relevanten Dateien in den Prompt zu laden.",
+      "platform": "X",
+      "content": "Reduziere Claude API-Kosten um bis zu 94.5%, indem du ein Datei-Tiering-System verwendest, das große Dateien nur bei Bedarf lädt.",
+      "tip": "Implementiere ein System, das Dateien nach Priorität und Zugriffshäufigkeit cached.",
       "category": "Kostenoptimierung",
       "difficulty": "Fortgeschritten",
-      "timestamp": "2026-01-28",
+      "timestamp": "2026-01-30",
       "metrics": {
         "comments": 0,
         "retweets": 0,
@@ -47,105 +47,105 @@
     {
       "id": 3,
       "author": {
-        "name": "Reddit r/PromptEngineering",
-        "handle": "@reddit",
+        "name": "Simon Willison",
+        "handle": "@simonw",
         "avatar": "XX",
         "verified": true
       },
-      "platform": "Reddit",
-      "content": "OpenAI hat eine Bibliothek mit über 300 offiziellen, rollenspezifischen Prompts veröffentlicht. Diese decken Bereiche wie Vertrieb, Personalwesen und IT ab und bieten eine solide Grundlage, um von generischen Prompts wegzukommen.",
-      "tip": "Suche in der OpenAI Prompt-Bibliothek nach Vorlagen für deine spezifische Job-Rolle (z.B. 'Product Manager' oder 'Sales Rep'). Passe diese dann mit deinem spezifischen Kontext an, anstatt bei Null anzufangen.",
-      "category": "Prompt Engineering",
-      "difficulty": "Anfänger",
-      "timestamp": "2026-01-23",
+      "platform": "X",
+      "content": "Nutze ChatGPT Container, um bash zu starten, Pakete mit pip/npm zu installieren und Dateien herunterzuladen – ideal für isolierte Entwicklungsumgebungen.",
+      "tip": "Verwende Container für sichere, sandboxed Ausführung von Code und Installationen.",
+      "category": "Tools & Infrastruktur",
+      "difficulty": "Mittel",
+      "timestamp": "2026-01-30",
       "metrics": {
         "comments": 0,
         "retweets": 0,
         "likes": 0,
         "views": "0"
       },
-      "sourceUrl": "https://www.reddit.com/r/PromptEngineering/comments/1qkd6pz/openai_releases_300_official_rolespecific_prompts/"
+      "sourceUrl": "https://simonwillison.net/2026/Jan/26/chatgpt-containers/#atom-everything"
     },
     {
       "id": 4,
       "author": {
         "name": "Reddit r/PromptEngineering",
-        "handle": "@reddit",
+        "handle": "@PromptEng",
         "avatar": "XX",
-        "verified": true
+        "verified": false
       },
-      "platform": "Reddit",
-      "content": "Dein ChatGPT-Datenexport ist eine Goldmine für die Personalisierung. Er enthält alle deine bisherigen Interaktionen, aus denen du Muster für Custom Instructions, Memories und Projekte extrahieren kannst.",
-      "tip": "Exportiere deine ChatGPT-Daten (Einstellungen > Datenschutz > Export). Analysiere die Export-Datei, um wiederkehrende Anfragen, bevorzugte Formate und Abneigungen zu identifizieren. Nutze diese Erkenntnisse, um deine globalen Custom Instructions zu verfeinern.",
-      "category": "Personalisierung",
+      "platform": "X",
+      "content": "Vermeide 'Meta-Prompting' (KI bittet, deinen Prompt zu schreiben) für komplexe Aufgaben, da es die Reasoning-Qualität senken kann.",
+      "tip": "Schreibe kritische Prompts selbst, anstatt sie von der KI schreiben zu lassen.",
+      "category": "Prompt Engineering",
       "difficulty": "Mittel",
-      "timestamp": "2026-01-23",
+      "timestamp": "2026-01-30",
       "metrics": {
         "comments": 0,
         "retweets": 0,
         "likes": 0,
         "views": "0"
       },
-      "sourceUrl": "https://www.reddit.com/r/PromptEngineering/comments/1ql0zf6/your_chatgpt_export_is_a_goldmine_for/"
+      "sourceUrl": "https://www.reddit.com/r/PromptEngineering/comments/1qr011z/is_metaprompting_asking_ai_to_write_your_prompt/"
     },
     {
       "id": 5,
       "author": {
-        "name": "Reddit r/PromptEngineering",
-        "handle": "@reddit",
+        "name": "Reddit r/ClaudeAI",
+        "handle": "@ClaudeAI_Sub",
         "avatar": "XX",
-        "verified": true
+        "verified": false
       },
-      "platform": "Reddit",
-      "content": "Rollenbasierte Prompts (z.B. 'Du bist ein Senior Marketing Manager') sind oft ineffektiv. Stattdessen sollte der Prompt den Lösungsraum klar definieren: Was ist das Ziel, welche Einschränkungen gibt es, welches Format wird erwartet?",
-      "tip": "Statt 'Du bist ein erfahrener Copywriter' zu schreiben, formuliere: 'Schreibe eine Marketing-E-Mail für [Produkt], die [Zielgruppe] anspricht. Der Tonfall sollte [Ton] sein. Die E-Mail muss [Anforderung 1] und [Anforderung 2] enthalten. Das Format sollte eine Betreffzeile, einen Haupttext und einen Call-to-Action-Button sein.'",
-      "category": "Prompt Engineering",
-      "difficulty": "Mittel",
-      "timestamp": "2026-01-22",
+      "platform": "X",
+      "content": "Für viele Nutzer sind Claude-Abonnements bis zu 36x günstiger als die API. Der 'Max 5x'-Modus ist oft der beste Kompromiss.",
+      "tip": "Vergleiche Abo- mit API-Kosten und nutze 'Max 5x' für beste Preis-Leistung.",
+      "category": "Kostenoptimierung",
+      "difficulty": "Anfänger",
+      "timestamp": "2026-01-30",
       "metrics": {
         "comments": 0,
         "retweets": 0,
         "likes": 0,
         "views": "0"
       },
-      "sourceUrl": "https://www.reddit.com/r/PromptEngineering/comments/1qjkyaj/role_based_prompts_dont_work_keep_reading_and_ill/"
+      "sourceUrl": "https://www.reddit.com/r/ClaudeAI/comments/1qpcj8q/claude_subscriptions_are_up_to_36x_cheaper_than/"
     },
     {
       "id": 6,
       "author": {
-        "name": "Reddit r/PromptEngineering",
-        "handle": "@reddit",
+        "name": "Reddit r/ClaudeAI",
+        "handle": "@ClaudeAI_Sub",
         "avatar": "XX",
-        "verified": true
+        "verified": false
       },
-      "platform": "Reddit",
-      "content": "Ein einfacher, aber wirkungsvoller Prompt-Framework beginnt mit 'Lass uns das anders betrachten'. Diese Phrase fordert das Modell auf, kreative Perspektiven zu generieren und mentale Blockaden zu überwinden.",
-      "tip": "Wenn du feststeckst, versuche: 'Lass uns das anders betrachten. Stell dir vor, wir hätten ein unbegrenztes Budget / keine zeitlichen Einschränkungen / Zugang zu allen Daten der Welt. Wie würden wir [Problem] dann angehen?'",
-      "category": "Kreativität",
-      "difficulty": "Anfänger",
-      "timestamp": "2026-01-26",
+      "platform": "X",
+      "content": "Implementiere ein KI-Gedächtnis, das wie menschliches verblasst, mit 29 MCP-Tools basierend auf kognitiver Wissenschaft (100% lokal).",
+      "tip": "Nutze Tools mit auslaufendem Gedächtnis für natürlich wirkende Konversationen.",
+      "category": "Agenten & Gedächtnis",
+      "difficulty": "Fortgeschritten",
+      "timestamp": "2026-01-30",
       "metrics": {
         "comments": 0,
         "retweets": 0,
         "likes": 0,
         "views": "0"
       },
-      "sourceUrl": "https://www.reddit.com/r/PromptEngineering/comments/1qng303/the_lets_think_about_this_differently_prompt/"
+      "sourceUrl": "https://www.reddit.com/r/ClaudeAI/comments/1qmuttr/i_gave_claude_the_one_thing_it_was_missing_memory/"
     },
     {
       "id": 7,
       "author": {
         "name": "Reddit r/PromptEngineering",
-        "handle": "@reddit",
+        "handle": "@PromptEng",
         "avatar": "XX",
-        "verified": true
+        "verified": false
       },
-      "platform": "Reddit",
-      "content": "Fünf einfache ChatGPT-Prompts können mehrere Apps und mentale Belastung ersetzen. Diese Prompts helfen bei der Wochenplanung, dem Aufräumen von Notizen und der schnellen Recherche.",
-      "tip": "1. Wochenplan: 'Ich arbeite 40 Stunden, möchte 3x ins Gym und habe am Sonntag Familienzeit. Hilf mir, einen realistischen Zeitplan zu erstellen, der auch Pausen beinhaltet.'\n2. Notizen aufräumen: 'Hier sind meine rohen Notizen von einem Meeting. Bitte strukturiere sie in klare Aktionspunkte, offene Fragen und wichtige Entscheidungen.'\n3. Schnelle Recherche: 'Erkläre mir [komplexes Thema] in maximal 3 Absätzen so, als wäre ich ein völliger Anfänger.'",
-      "category": "Produktivität",
+      "platform": "X",
+      "content": "Ersetze 5 Apps mit 5 spezifischen ChatGPT-Prompts für Aufgaben wie Planung, Recherche und Zusammenfassung.",
+      "tip": "Erstelle spezialisierte Prompts als Ersatz für einzelne Anwendungen.",
+      "category": "Prompt Engineering",
       "difficulty": "Anfänger",
-      "timestamp": "2026-01-25",
+      "timestamp": "2026-01-30",
       "metrics": {
         "comments": 0,
         "retweets": 0,
@@ -157,288 +157,68 @@
     {
       "id": 8,
       "author": {
-        "name": "Reddit r/PromptEngineering",
-        "handle": "@reddit",
+        "name": "Simon Willison",
+        "handle": "@simonw",
         "avatar": "XX",
         "verified": true
       },
-      "platform": "Reddit",
-      "content": "Prompt Engineering wird effektiver, wenn man Prompts nicht wie Chat-Nachrichten behandelt, sondern wie Spezifikationen. Klare Struktur, präzise Anweisungen und definierte Ausgabeformate sind entscheidend.",
-      "tip": "Strukturierte deinen Prompt wie ein Briefing: 1. ZIEL: Was soll erreicht werden? 2. KONTEXT: Welche Hintergrundinformationen sind relevant? 3. ANWEISUNGEN: Welche konkreten Schritte soll das Modell befolgen? 4. AUSGABE: Welches exakte Format (z.B. Tabelle, Liste, JSON) wird erwartet? 5. EINSCHRÄNKUNGEN: Was darf auf keinen Fall getan werden?",
-      "category": "Prompt Engineering",
+      "platform": "X",
+      "content": "Verstehe die 'Fünf Level' der KI-Entwicklung: von 'Spicy Autocomplete' bis zur 'Dark Factory' vollautomatisierter Systeme.",
+      "tip": "Klassifiziere deine KI-Nutzung nach diesen Levels, um realistische Erwartungen zu setzen.",
+      "category": "Konzepte & Theorie",
       "difficulty": "Mittel",
-      "timestamp": "2026-01-25",
+      "timestamp": "2026-01-30",
       "metrics": {
         "comments": 0,
         "retweets": 0,
         "likes": 0,
         "views": "0"
       },
-      "sourceUrl": "https://www.reddit.com/r/PromptEngineering/comments/1qmck3w/prompt_engineering_clicked_for_me_when_i_stopped/"
+      "sourceUrl": "https://simonwillison.net/2026/Jan/28/the-five-levels/#atom-everything"
     },
     {
       "id": 9,
       "author": {
-        "name": "Nate's Newsletter",
-        "handle": "@nate",
+        "name": "Reddit r/ClaudeAI",
+        "handle": "@ClaudeAI_Sub",
         "avatar": "XX",
-        "verified": true
+        "verified": false
       },
       "platform": "X",
-      "content": "Mit Claude können komplexe Finanzmodelle mit mehreren Tabellen in Minuten erstellt werden, anstatt Wochen zu dauern. Der Schlüssel liegt in einem systematischen Prompting-Guide, der die Schritte zur Modellerstellung klar vorgibt.",
-      "tip": "Um ein Finanzmodell zu erstellen, gib Claude eine strukturierte Vorlage: 'Erstelle ein 11-seitiges Finanzmodell für ein SaaS-Startup. Tab 1: Executive Summary. Tab 2: Annahmen (Umsatzwachstum, Churn, CAC...). Tab 3: P&L-Prognose. Tab 4: Cashflow... Verwende realistische Zahlen und formatiere es als klar lesbare Excel-Tabelle.'",
-      "category": "Finanzanalyse",
-      "difficulty": "Fortgeschritten",
-      "timestamp": "2026-01-27",
+      "content": "Nutze Claude Code V4 für 85% Kontext-Reduktion, Custom Agents und 'Session Teleportation' zwischen Gesprächen.",
+      "tip": "Aktualisiere auf die neueste Claude Code Version für verbesserte Effizienz und Features.",
+      "category": "Tools & Infrastruktur",
+      "difficulty": "Mittel",
+      "timestamp": "2026-01-30",
       "metrics": {
         "comments": 0,
         "retweets": 0,
         "likes": 0,
         "views": "0"
       },
-      "sourceUrl": "https://natesnewsletter.substack.com/p/anthropic-just-put-claude-inside"
+      "sourceUrl": "https://www.reddit.com/r/ClaudeAI/comments/1qquxle/the_complete_guide_to_claude_code_v4_the/"
     },
     {
       "id": 10,
       "author": {
-        "name": "The Verge AI",
-        "handle": "@verge",
+        "name": "Reddit r/PromptEngineering",
+        "handle": "@PromptEng",
         "avatar": "XX",
-        "verified": true
+        "verified": false
       },
       "platform": "X",
-      "content": "'Vibe-Coding' mit Claude ermöglicht es Nicht-Programmierern, komplexe Smart-Home-Automatisierungen zu erstellen. Man beschreibt einfach die gewünschte Logik in natürlicher Sprache, und Claude generiert den notwendigen Code.",
-      "tip": "Beschreibe dein Smart-Home-Szenario in einfachem Englisch/Deutsch: 'Wenn die Sonne untergeht und jemand zu Hause ist, dimme das Wohnzimmerlicht auf 30% und spiele entspannte Jazz-Musik über die Sonos-Lautsprecher. Wenn niemand zu Hause ist, schalte alle Lichter aus.' Claude kann daraus Code für Plattformen wie Home Assistant generieren.",
-      "category": "Automatisierung",
-      "difficulty": "Mittel",
-      "timestamp": "2026-01-28",
-      "metrics": {
-        "comments": 0,
-        "retweets": 0,
-        "likes": 0,
-        "views": "0"
-      },
-      "sourceUrl": "https://www.theverge.com/report/869318/claude-vibe-coding-home-assistant-smart-home"
-    },
-    {
-      "id": 11,
-      "author": {
-        "name": "Reddit r/PromptEngineering",
-        "handle": "@reddit",
-        "avatar": "XX",
-        "verified": true
-      },
-      "platform": "Reddit",
-      "content": "Ein Prompt, der ChatGPT anweist, ein 'brutal ehrlicher Geschäftspartner' zu sein, liefert konstruktive Kritik anstelle von wohlwollender Zustimmung. Dies hilft, Schwachstellen in Ideen und Plänen aufzudecken.",
-      "tip": "Prompt: 'Du bist mein brutal ehrlicher Geschäftspartner. Deine Aufgabe ist es, meine Ideen herauszufordern, Fehler aufzudecken, meine Annahmen in Frage zu stellen und mich zu mehr Präzision zu drängen. Regeln: • Validierte keine vagen Ziele – frage, was sie wirklich bedeuten. • Wenn etwas unrealistisch ist, sage warum. • Stelle immer die unbequemen Fragen, die ich mir selbst nicht stelle. • Sei direkt, aber konstruktiv.'",
-      "category": "Entscheidungsfindung",
-      "difficulty": "Mittel",
-      "timestamp": "2026-01-23",
-      "metrics": {
-        "comments": 0,
-        "retweets": 0,
-        "likes": 0,
-        "views": "0"
-      },
-      "sourceUrl": "https://www.reddit.com/r/PromptEngineering/comments/1qkjpkf/this_chatgpt_prompt_actually_tells_me_what_im/"
-    },
-    {
-      "id": 12,
-      "author": {
-        "name": "Reddit r/PromptEngineering",
-        "handle": "@reddit",
-        "avatar": "XX",
-        "verified": true
-      },
-      "platform": "Reddit",
-      "content": "Um die Qualität von Prompt-Änderungen objektiv zu bewerten, sollte man einen Testdatensatz aus realen Nutzeranfragen verwenden. Beide Prompt-Versionen werden gegen alle Testfälle geprüft, bevor eine Änderung live geht.",
-      "tip": "Sammle 40-50 echte Nachrichten/Kundenanfragen, die dein AI-System bearbeiten soll. Speichere sie in einer Textdatei. Wenn du einen neuen Prompt entwirfst, teste beide Versionen (alt und neu) gegen jede einzelne dieser Nachrichten. Vergleiche die Ergebnisse systematisch, um Regressionen oder Verbesserungen zu identifizieren.",
-      "category": "Prompt Testing",
-      "difficulty": "Fortgeschritten",
-      "timestamp": "2026-01-22",
-      "metrics": {
-        "comments": 0,
-        "retweets": 0,
-        "likes": 0,
-        "views": "0"
-      },
-      "sourceUrl": "https://www.reddit.com/r/PromptEngineering/comments/1qk4lly/how_do_you_guys_actually_know_if_your_prompt/"
-    },
-    {
-      "id": 13,
-      "author": {
-        "name": "Reddit r/ClaudeAI",
-        "handle": "@reddit",
-        "avatar": "XX",
-        "verified": true
-      },
-      "platform": "Reddit",
-      "content": "Ein persönlicher AI-Agent wie 'MARVIN', der auf Claude Code basiert, kann E-Mails, Kalender, Jira, Confluence und andere Tools integrieren. Solche Agenten automatisieren repetitive Aufgaben und fungieren als persönlicher Assistent.",
-      "tip": "Beginne mit einem einfachen Agenten, der eine Aufgabe erledigt (z.B. E-Mail-Zusammenfassung). Gib ihm Zugriff auf deine Tools (über APIs oder manuelle Inputs) und definiere klare Regeln: 'Überprüfe meinen Kalender jeden Morgen um 8 Uhr und sende mir eine E-Mail mit den Top-3 Prioritäten für den Tag, basierend auf meinen Meetings und offenen Jira-Tickets.'",
-      "category": "Persönlicher Agent",
-      "difficulty": "Fortgeschritten",
-      "timestamp": "2026-01-24",
-      "metrics": {
-        "comments": 0,
-        "retweets": 0,
-        "likes": 0,
-        "views": "0"
-      },
-      "sourceUrl": "https://www.reddit.com/r/ClaudeAI/comments/1qlurq6/i_built_marvin_my_personal_ai_agent_and_now_4_of/"
-    },
-    {
-      "id": 14,
-      "author": {
-        "name": "Reddit r/PromptEngineering",
-        "handle": "@reddit",
-        "avatar": "XX",
-        "verified": true
-      },
-      "platform": "Reddit",
-      "content": "Forschung zeigt, dass KI Menschen effektiver von Verschwörungstheorien überzeugen kann, weil sie emotionslos bleibt. Die KI stellt sachliche Fragen und fordert zur Erklärung von Widersprüchen auf, ohne defensiv zu werden.",
-      "tip": "Wenn du jemanden von einer fehlerhaften Überzeugung überzeugen musst, nutze einen Prompt, der die KI anweist, sokratische Fragen zu stellen: 'Stelle sachliche, neugierige Fragen, die die logischen Inkonsistenzen in der vorgebrachten Theorie aufdecken. Vermeide jede Form von Urteil oder Emotion. Konzentriere dich darauf, die Person dazu zu bringen, ihre eigenen Annahmen Schritt für Schritt zu erklären.'",
-      "category": "Kommunikation",
-      "difficulty": "Mittel",
-      "timestamp": "2026-01-23",
-      "metrics": {
-        "comments": 0,
-        "retweets": 0,
-        "likes": 0,
-        "views": "0"
-      },
-      "sourceUrl": "https://www.reddit.com/r/PromptEngineering/comments/1qkowpy/so_cornell_and_mit_researchers_got_an_ai_to/"
-    },
-    {
-      "id": 15,
-      "author": {
-        "name": "Reddit r/PromptEngineering",
-        "handle": "@reddit",
-        "avatar": "XX",
-        "verified": true
-      },
-      "platform": "Reddit",
-      "content": "Wenn die KI-Ausgabe technisch korrekt, aber unbrauchbar ist, helfen strengere Prompts, die wie Spezifikationen formuliert sind. Definiere exakte Struktur, Tonfall und erforderliche Details.",
-      "tip": "Statt 'Schreibe eine Produktbeschreibung' zu sagen, spezifiziere: 'Schreibe eine Produktbeschreibung für [Produktname] mit genau 150 Wörtern. Struktur: 1. Einleitung mit Hauptvorteil. 2. Drei Bullet Points mit Features. 3. Schluss mit Call-to-Action. Tonfall: Überzeugend und professionell, Zielgruppe sind IT-Manager. Füge die Keywords [Keyword1, Keyword2] ein.'",
+      "content": "Analysiere virale Prompts, um ein System-Prompt zu erstellen, das automatisch professionelle 'NanoBanana'-Prompts generiert.",
+      "tip": "Lerne von erfolgreichen Prompts und automatisiere ihre Erstellung.",
       "category": "Prompt Engineering",
-      "difficulty": "Mittel",
-      "timestamp": "2026-01-25",
-      "metrics": {
-        "comments": 0,
-        "retweets": 0,
-        "likes": 0,
-        "views": "0"
-      },
-      "sourceUrl": "https://www.reddit.com/r/PromptEngineering/comments/1qmcxo7/i_use_chatgpt_claude_daily_for_real_work_and_i/"
-    },
-    {
-      "id": 16,
-      "author": {
-        "name": "Simon Willison",
-        "handle": "@simonw",
-        "avatar": "XX",
-        "verified": true
-      },
-      "platform": "X",
-      "content": "Die Fähigkeit, KI-Agenten zu managen und zu orchestrieren, wird zur neuen Superpower. Es geht nicht darum, den Code selbst zu schreiben, sondern die Aufgabe klar zu definieren, den Fortschritt zu überwachen und Korrekturen vorzunehmen.",
-      "tip": "Behandle KI-Agenten wie Teammitglieder. Gib ihnen klare, messbare Ziele und regelmäßiges Feedback. Unterteile große Projekte in kleine, überprüfbare Aufgaben. Anstatt zu versuchen, einen ganzen Bericht auf einmal zu generieren, lasse zuerst eine Gliederung erstellen, dann jeden Abschnitt, dann eine Zusammenfassung. Überprüfe jeden Schritt.",
-      "category": "Agenten-Management",
       "difficulty": "Fortgeschritten",
-      "timestamp": "2026-01-27",
+      "timestamp": "2026-01-30",
       "metrics": {
         "comments": 0,
         "retweets": 0,
         "likes": 0,
         "views": "0"
       },
-      "sourceUrl": "https://www.oneusefulthing.org/p/management-as-ai-superpower"
-    },
-    {
-      "id": 17,
-      "author": {
-        "name": "Nate's Newsletter",
-        "handle": "@nate",
-        "avatar": "XX",
-        "verified": true
-      },
-      "platform": "X",
-      "content": "Beim Skalieren von Agenten ist 'mehr' nicht gleich 'besser'. Zu viele Agenten führen zu Chaos und Ineffizienz. Erfolgreiche Teams setzen auf intelligente Orchestrierung mit klaren Regeln, anstatt Agenten-Schwärme einzusetzen.",
-      "tip": "Begrenze die Anzahl der parallel laufenden Agenten. Definiere klare Hand-off-Punkte und Verantwortlichkeiten. Ein Agent sollte eine abgeschlossene Aufgabe liefern, bevor der nächste übernimmt. Nutze einen 'Orchestrator'-Prompt, der den Gesamtprozess steuert und die Ausgaben der einzelnen Agenten zusammenführt.",
-      "category": "Agenten-Orchestrierung",
-      "difficulty": "Fortgeschritten",
-      "timestamp": "2026-01-26",
-      "metrics": {
-        "comments": 0,
-        "retweets": 0,
-        "likes": 0,
-        "views": "0"
-      },
-      "sourceUrl": "https://natesnewsletter.substack.com/p/why-dumb-agents-mean-smart-orchestration"
-    },
-    {
-      "id": 18,
-      "author": {
-        "name": "Simon Willison",
-        "handle": "@simonw",
-        "avatar": "XX",
-        "verified": true
-      },
-      "platform": "X",
-      "content": "Der Webbrowser ist die ideale Sandbox für Coding-Agenten. Er bietet eine sichere, isolierte Umgebung mit Zugriff auf APIs, die für viele Automatisierungsaufgaben ausreichen, ohne dass lokale Software installiert werden muss.",
-      "tip": "Für Automatisierungsaufgaben, die Web-Interaktionen beinhalten (z.B. Daten von einer Website scrapen, Formulare ausfüllen), weise deinen Coding-Agenten an, Code zu schreiben, der in einem Browser-Kontext läuft (z.B. mit Puppeteer oder Playwright). Das ist sicherer als direkten Systemzugriff zu gewähren.",
-      "category": "Sicherheit",
-      "difficulty": "Fortgeschritten",
-      "timestamp": "2026-01-25",
-      "metrics": {
-        "comments": 0,
-        "retweets": 0,
-        "likes": 0,
-        "views": "0"
-      },
-      "sourceUrl": "https://simonwillison.net/2026/Jan/25/the-browser-is-the-sandbox/#atom-everything"
-    },
-    {
-      "id": 19,
-      "author": {
-        "name": "Reddit r/ClaudeAI",
-        "handle": "@reddit",
-        "avatar": "XX",
-        "verified": true
-      },
-      "platform": "Reddit",
-      "content": "Die Qualität von Claude Opus 4.5 kann durch einfache Prompt-Anpassungen verbessert werden. Nutzer berichten, dass die Anweisung 'Take a deep breath' oder die Aufforderung, Schritt für Schritt zu denken, deutlich bessere Ergebnisse liefert.",
-      "tip": "Füge zu Beginn deines Prompts eine der folgenden Anweisungen hinzu, um die Antwortqualität zu steigern: 'Take a deep breath and think step by step.' oder 'Let's work this out in a step by step way to be sure we have the right answer.'",
-      "category": "Prompt Engineering",
-      "difficulty": "Anfänger",
-      "timestamp": "2026-01-23",
-      "metrics": {
-        "comments": 0,
-        "retweets": 0,
-        "likes": 0,
-        "views": "0"
-      },
-      "sourceUrl": "https://www.reddit.com/r/ClaudeAI/comments/1qkprzp/did_that_and_the_quality_of_claudes_responses/"
-    },
-    {
-      "id": 20,
-      "author": {
-        "name": "Nate's Newsletter",
-        "handle": "@nate",
-        "avatar": "XX",
-        "verified": true
-      },
-      "platform": "X",
-      "content": "In einer Welt, in der reine Fachkenntnis durch KI ergänzt wird, wird 'High Agency' – die Fähigkeit, proaktiv Probleme zu identifizieren und Lösungen voranzutreiben – zur entscheidenden Karrierekompetenz, besonders für Berufseinsteiger.",
-      "tip": "Nutze KI, um deine 'Agency' zu steigern. Prompt-Beispiele: 'Identifiziere die drei größten Ineffizienzen in [meinem Arbeitsbereich] und schlage konkrete Lösungen vor, die ich nächste Woche umsetzen kann.' oder 'Analysiere den Markttrend [X] und erstelle eine einseitige Zusammenfassung mit drei Handlungsempfehlungen für mein Team.'",
-      "category": "Karriere",
-      "difficulty": "Mittel",
-      "timestamp": "2026-01-22",
-      "metrics": {
-        "comments": 0,
-        "retweets": 0,
-        "likes": 0,
-        "views": "0"
-      },
-      "sourceUrl": "https://natesnewsletter.substack.com/p/the-career-ladder-collapsed-heres"
+      "sourceUrl": "https://www.reddit.com/r/PromptEngineering/comments/1qq4tet/after_analyzing_1000_viral_prompts_i_made_a/"
     }
   ],
   "en": [
@@ -451,33 +231,33 @@
         "verified": true
       },
       "platform": "X",
-      "content": "ChatGPT's Code Interpreter (Advanced Data Analysis) has been massively upgraded. It can now run bash commands, install packages with pip/npm, and download files. This opens new possibilities for data analysis and automation directly in the chat.",
-      "tip": "Use ChatGPT Code Interpreter for complex data tasks. You can, for example, write a Python script that installs external libraries, loads data from a URL, analyzes it, and visualizes it – all in a secure sandbox.",
-      "category": "ChatGPT Usage",
-      "difficulty": "Advanced",
-      "timestamp": "2026-01-26",
+      "content": "Get coding agents to write good Python tests by asking them to explain the test logic before generating code.",
+      "tip": "Before generating tests, ask the agent to describe its testing plan.",
+      "category": "Programming",
+      "difficulty": "Beginner",
+      "timestamp": "2026-01-30",
       "metrics": {
         "comments": 0,
         "retweets": 0,
         "likes": 0,
         "views": "0"
       },
-      "sourceUrl": "https://simonwillison.net/2026/Jan/26/chatgpt-containers/#atom-everything"
+      "sourceUrl": "https://simonwillison.net/2026/Jan/26/tests/#atom-everything"
     },
     {
       "id": 2,
       "author": {
         "name": "Reddit r/ClaudeAI",
-        "handle": "@reddit",
+        "handle": "@ClaudeAI_Sub",
         "avatar": "XX",
-        "verified": true
+        "verified": false
       },
-      "platform": "Reddit",
-      "content": "Claude API costs can be drastically reduced using a file tiering system. Instead of loading the entire codebase into the context, only relevant files are selected based on the query. This can reduce costs per session by over 90%.",
-      "tip": "Create a system that tiers your documents/code (e.g., core, supporting, archived). Before asking Claude a question, first search the file structure to load only the relevant files into the prompt.",
+      "platform": "X",
+      "content": "Reduce Claude API costs by up to 94.5% using a file tiering system that loads large files only when needed.",
+      "tip": "Implement a system that caches files by priority and access frequency.",
       "category": "Cost Optimization",
       "difficulty": "Advanced",
-      "timestamp": "2026-01-28",
+      "timestamp": "2026-01-30",
       "metrics": {
         "comments": 0,
         "retweets": 0,
@@ -489,105 +269,105 @@
     {
       "id": 3,
       "author": {
-        "name": "Reddit r/PromptEngineering",
-        "handle": "@reddit",
+        "name": "Simon Willison",
+        "handle": "@simonw",
         "avatar": "XX",
         "verified": true
       },
-      "platform": "Reddit",
-      "content": "OpenAI has released a library of over 300 official, role-specific prompts. These cover areas like Sales, HR, and IT and provide a solid foundation to move away from generic prompts.",
-      "tip": "Search the OpenAI Prompt Library for templates matching your specific job role (e.g., 'Product Manager' or 'Sales Rep'). Then adapt these with your specific context instead of starting from scratch.",
-      "category": "Prompt Engineering",
-      "difficulty": "Beginner",
-      "timestamp": "2026-01-23",
+      "platform": "X",
+      "content": "Use ChatGPT Containers to run bash, install packages with pip/npm, and download files – ideal for isolated development environments.",
+      "tip": "Use containers for safe, sandboxed execution of code and installations.",
+      "category": "Tools & Infrastructure",
+      "difficulty": "Intermediate",
+      "timestamp": "2026-01-30",
       "metrics": {
         "comments": 0,
         "retweets": 0,
         "likes": 0,
         "views": "0"
       },
-      "sourceUrl": "https://www.reddit.com/r/PromptEngineering/comments/1qkd6pz/openai_releases_300_official_rolespecific_prompts/"
+      "sourceUrl": "https://simonwillison.net/2026/Jan/26/chatgpt-containers/#atom-everything"
     },
     {
       "id": 4,
       "author": {
         "name": "Reddit r/PromptEngineering",
-        "handle": "@reddit",
+        "handle": "@PromptEng",
         "avatar": "XX",
-        "verified": true
+        "verified": false
       },
-      "platform": "Reddit",
-      "content": "Your ChatGPT data export is a goldmine for personalization. It contains all your past interactions, from which you can extract patterns for Custom Instructions, Memories, and Projects.",
-      "tip": "Export your ChatGPT data (Settings > Privacy > Export). Analyze the export file to identify recurring requests, preferred formats, and dislikes. Use these insights to refine your global Custom Instructions.",
-      "category": "Personalization",
+      "platform": "X",
+      "content": "Avoid 'Meta-Prompting' (asking AI to write your prompt) for complex tasks as it can reduce reasoning quality.",
+      "tip": "Write critical prompts yourself instead of having the AI write them.",
+      "category": "Prompt Engineering",
       "difficulty": "Intermediate",
-      "timestamp": "2026-01-23",
+      "timestamp": "2026-01-30",
       "metrics": {
         "comments": 0,
         "retweets": 0,
         "likes": 0,
         "views": "0"
       },
-      "sourceUrl": "https://www.reddit.com/r/PromptEngineering/comments/1ql0zf6/your_chatgpt_export_is_a_goldmine_for/"
+      "sourceUrl": "https://www.reddit.com/r/PromptEngineering/comments/1qr011z/is_metaprompting_asking_ai_to_write_your_prompt/"
     },
     {
       "id": 5,
       "author": {
-        "name": "Reddit r/PromptEngineering",
-        "handle": "@reddit",
+        "name": "Reddit r/ClaudeAI",
+        "handle": "@ClaudeAI_Sub",
         "avatar": "XX",
-        "verified": true
+        "verified": false
       },
-      "platform": "Reddit",
-      "content": "Role-based prompts (e.g., 'You are a Senior Marketing Manager') are often ineffective. Instead, the prompt should clearly define the solution space: What is the goal, what are the constraints, what format is expected?",
-      "tip": "Instead of writing 'You are an experienced copywriter,' formulate: 'Write a marketing email for [product] targeting [audience]. The tone should be [tone]. The email must include [requirement 1] and [requirement 2]. The format should be a subject line, body text, and a call-to-action button.'",
-      "category": "Prompt Engineering",
-      "difficulty": "Intermediate",
-      "timestamp": "2026-01-22",
+      "platform": "X",
+      "content": "For many users, Claude subscriptions are up to 36x cheaper than the API. 'Max 5x' mode is often the best compromise.",
+      "tip": "Compare subscription vs. API costs and use 'Max 5x' for best value.",
+      "category": "Cost Optimization",
+      "difficulty": "Beginner",
+      "timestamp": "2026-01-30",
       "metrics": {
         "comments": 0,
         "retweets": 0,
         "likes": 0,
         "views": "0"
       },
-      "sourceUrl": "https://www.reddit.com/r/PromptEngineering/comments/1qjkyaj/role_based_prompts_dont_work_keep_reading_and_ill/"
+      "sourceUrl": "https://www.reddit.com/r/ClaudeAI/comments/1qpcj8q/claude_subscriptions_are_up_to_36x_cheaper_than/"
     },
     {
       "id": 6,
       "author": {
-        "name": "Reddit r/PromptEngineering",
-        "handle": "@reddit",
+        "name": "Reddit r/ClaudeAI",
+        "handle": "@ClaudeAI_Sub",
         "avatar": "XX",
-        "verified": true
+        "verified": false
       },
-      "platform": "Reddit",
-      "content": "A simple yet effective prompt framework starts with 'Let's think about this differently.' This phrase prompts the model to generate creative perspectives and overcome mental blocks.",
-      "tip": "When you're stuck, try: 'Let's think about this differently. Imagine we had an unlimited budget / no time constraints / access to all the world's data. How would we approach [problem] then?'",
-      "category": "Creativity",
-      "difficulty": "Beginner",
-      "timestamp": "2026-01-26",
+      "platform": "X",
+      "content": "Implement AI memory that fades like human memory, with 29 MCP tools based on cognitive science (100% local).",
+      "tip": "Use tools with decaying memory for more natural-seeming conversations.",
+      "category": "Agents & Memory",
+      "difficulty": "Advanced",
+      "timestamp": "2026-01-30",
       "metrics": {
         "comments": 0,
         "retweets": 0,
         "likes": 0,
         "views": "0"
       },
-      "sourceUrl": "https://www.reddit.com/r/PromptEngineering/comments/1qng303/the_lets_think_about_this_differently_prompt/"
+      "sourceUrl": "https://www.reddit.com/r/ClaudeAI/comments/1qmuttr/i_gave_claude_the_one_thing_it_was_missing_memory/"
     },
     {
       "id": 7,
       "author": {
         "name": "Reddit r/PromptEngineering",
-        "handle": "@reddit",
+        "handle": "@PromptEng",
         "avatar": "XX",
-        "verified": true
+        "verified": false
       },
-      "platform": "Reddit",
-      "content": "Five simple ChatGPT prompts can replace multiple apps and mental clutter. These prompts help with weekly planning, cleaning up notes, and quick research.",
-      "tip": "1. Week Plan: 'I work 40 hours, want 3 gym sessions, and have family stuff on Sunday. Help me build a realistic schedule that includes downtime.'\n2. Clean Notes: 'Here are my rough notes from a meeting. Please structure them into clear action items, open questions, and key decisions.'\n3. Quick Research: 'Explain [complex topic] to me in max 3 paragraphs as if I'm a complete beginner.'",
-      "category": "Productivity",
+      "platform": "X",
+      "content": "Replace 5 apps with 5 specific ChatGPT prompts for tasks like planning, research, and summarization.",
+      "tip": "Create specialized prompts as replacements for individual applications.",
+      "category": "Prompt Engineering",
       "difficulty": "Beginner",
-      "timestamp": "2026-01-25",
+      "timestamp": "2026-01-30",
       "metrics": {
         "comments": 0,
         "retweets": 0,
@@ -599,288 +379,68 @@
     {
       "id": 8,
       "author": {
-        "name": "Reddit r/PromptEngineering",
-        "handle": "@reddit",
+        "name": "Simon Willison",
+        "handle": "@simonw",
         "avatar": "XX",
         "verified": true
       },
-      "platform": "Reddit",
-      "content": "Prompt engineering becomes more effective when you treat prompts not like chat messages but like specifications. Clear structure, precise instructions, and defined output formats are key.",
-      "tip": "Structure your prompt like a briefing: 1. GOAL: What should be achieved? 2. CONTEXT: What background info is relevant? 3. INSTRUCTIONS: What concrete steps should the model follow? 4. OUTPUT: What exact format (e.g., table, list, JSON) is expected? 5. CONSTRAINTS: What must absolutely not be done?",
-      "category": "Prompt Engineering",
+      "platform": "X",
+      "content": "Understand the 'Five Levels' of AI development: from 'Spicy Autocomplete' to the 'Dark Factory' of fully automated systems.",
+      "tip": "Classify your AI usage by these levels to set realistic expectations.",
+      "category": "Concepts & Theory",
       "difficulty": "Intermediate",
-      "timestamp": "2026-01-25",
+      "timestamp": "2026-01-30",
       "metrics": {
         "comments": 0,
         "retweets": 0,
         "likes": 0,
         "views": "0"
       },
-      "sourceUrl": "https://www.reddit.com/r/PromptEngineering/comments/1qmck3w/prompt_engineering_clicked_for_me_when_i_stopped/"
+      "sourceUrl": "https://simonwillison.net/2026/Jan/28/the-five-levels/#atom-everything"
     },
     {
       "id": 9,
       "author": {
-        "name": "Nate's Newsletter",
-        "handle": "@nate",
+        "name": "Reddit r/ClaudeAI",
+        "handle": "@ClaudeAI_Sub",
         "avatar": "XX",
-        "verified": true
+        "verified": false
       },
       "platform": "X",
-      "content": "With Claude, complex financial models with multiple tabs can be built in minutes instead of weeks. The key is a systematic prompting guide that clearly outlines the steps for model creation.",
-      "tip": "To create a financial model, give Claude a structured template: 'Create an 11-tab financial model for a SaaS startup. Tab 1: Executive Summary. Tab 2: Assumptions (Revenue growth, churn, CAC...). Tab 3: P&L Forecast. Tab 4: Cashflow... Use realistic numbers and format it as a clearly readable Excel spreadsheet.'",
-      "category": "Financial Analysis",
-      "difficulty": "Advanced",
-      "timestamp": "2026-01-27",
+      "content": "Use Claude Code V4 for 85% context reduction, custom agents, and 'session teleportation' between conversations.",
+      "tip": "Update to the latest Claude Code version for improved efficiency and features.",
+      "category": "Tools & Infrastructure",
+      "difficulty": "Intermediate",
+      "timestamp": "2026-01-30",
       "metrics": {
         "comments": 0,
         "retweets": 0,
         "likes": 0,
         "views": "0"
       },
-      "sourceUrl": "https://natesnewsletter.substack.com/p/anthropic-just-put-claude-inside"
+      "sourceUrl": "https://www.reddit.com/r/ClaudeAI/comments/1qquxle/the_complete_guide_to_claude_code_v4_the/"
     },
     {
       "id": 10,
       "author": {
-        "name": "The Verge AI",
-        "handle": "@verge",
+        "name": "Reddit r/PromptEngineering",
+        "handle": "@PromptEng",
         "avatar": "XX",
-        "verified": true
+        "verified": false
       },
       "platform": "X",
-      "content": "'Vibe-coding' with Claude enables non-coders to create complex smart home automations. You simply describe the desired logic in natural language, and Claude generates the necessary code.",
-      "tip": "Describe your smart home scenario in plain English: 'When the sun sets and someone is home, dim the living room lights to 30% and play relaxing jazz on the Sonos speakers. When no one is home, turn all lights off.' Claude can generate code for platforms like Home Assistant from this.",
-      "category": "Automation",
-      "difficulty": "Intermediate",
-      "timestamp": "2026-01-28",
-      "metrics": {
-        "comments": 0,
-        "retweets": 0,
-        "likes": 0,
-        "views": "0"
-      },
-      "sourceUrl": "https://www.theverge.com/report/869318/claude-vibe-coding-home-assistant-smart-home"
-    },
-    {
-      "id": 11,
-      "author": {
-        "name": "Reddit r/PromptEngineering",
-        "handle": "@reddit",
-        "avatar": "XX",
-        "verified": true
-      },
-      "platform": "Reddit",
-      "content": "A prompt that instructs ChatGPT to be a 'brutally honest business partner' delivers constructive criticism instead of agreeable validation. This helps uncover weaknesses in ideas and plans.",
-      "tip": "Prompt: 'You are my Brutally Honest Business Mirror. Your job is to challenge my ideas, spot flaws, question my assumptions, and push me to be more specific. Rules: • No validating vague goals — ask what they really mean • If something is unrealistic, say why • Always ask the uncomfortable questions I'm not asking myself • Be direct but constructive.'",
-      "category": "Decision Making",
-      "difficulty": "Intermediate",
-      "timestamp": "2026-01-23",
-      "metrics": {
-        "comments": 0,
-        "retweets": 0,
-        "likes": 0,
-        "views": "0"
-      },
-      "sourceUrl": "https://www.reddit.com/r/PromptEngineering/comments/1qkjpkf/this_chatgpt_prompt_actually_tells_me_what_im/"
-    },
-    {
-      "id": 12,
-      "author": {
-        "name": "Reddit r/PromptEngineering",
-        "handle": "@reddit",
-        "avatar": "XX",
-        "verified": true
-      },
-      "platform": "Reddit",
-      "content": "To objectively evaluate the quality of prompt changes, use a test dataset of real user queries. Both prompt versions are tested against all cases before a change goes live.",
-      "tip": "Collect 40-50 real messages/customer queries your AI system should handle. Save them in a text file. When you design a new prompt, test both versions (old and new) against every single one of these messages. Compare the results systematically to identify regressions or improvements.",
-      "category": "Prompt Testing",
-      "difficulty": "Advanced",
-      "timestamp": "2026-01-22",
-      "metrics": {
-        "comments": 0,
-        "retweets": 0,
-        "likes": 0,
-        "views": "0"
-      },
-      "sourceUrl": "https://www.reddit.com/r/PromptEngineering/comments/1qk4lly/how_do_you_guys_actually_know_if_your_prompt/"
-    },
-    {
-      "id": 13,
-      "author": {
-        "name": "Reddit r/ClaudeAI",
-        "handle": "@reddit",
-        "avatar": "XX",
-        "verified": true
-      },
-      "platform": "Reddit",
-      "content": "A personal AI agent like 'MARVIN', built on Claude Code, can integrate emails, calendars, Jira, Confluence, and other tools. Such agents automate repetitive tasks and act as a personal assistant.",
-      "tip": "Start with a simple agent that handles one task (e.g., email summarization). Give it access to your tools (via APIs or manual inputs) and define clear rules: 'Check my calendar every morning at 8 AM and send me an email with the top 3 priorities for the day, based on my meetings and open Jira tickets.'",
-      "category": "Personal Agent",
-      "difficulty": "Advanced",
-      "timestamp": "2026-01-24",
-      "metrics": {
-        "comments": 0,
-        "retweets": 0,
-        "likes": 0,
-        "views": "0"
-      },
-      "sourceUrl": "https://www.reddit.com/r/ClaudeAI/comments/1qlurq6/i_built_marvin_my_personal_ai_agent_and_now_4_of/"
-    },
-    {
-      "id": 14,
-      "author": {
-        "name": "Reddit r/PromptEngineering",
-        "handle": "@reddit",
-        "avatar": "XX",
-        "verified": true
-      },
-      "platform": "Reddit",
-      "content": "Research shows AI can more effectively persuade people out of conspiracy theories because it remains emotionless. The AI asks factual questions and prompts explanations of contradictions without becoming defensive.",
-      "tip": "When you need to persuade someone of a faulty belief, use a prompt that instructs the AI to ask Socratic questions: 'Ask factual, curious questions that expose the logical inconsistencies in the presented theory. Avoid any judgment or emotion. Focus on getting the person to explain their own assumptions step by step.'",
-      "category": "Communication",
-      "difficulty": "Intermediate",
-      "timestamp": "2026-01-23",
-      "metrics": {
-        "comments": 0,
-        "retweets": 0,
-        "likes": 0,
-        "views": "0"
-      },
-      "sourceUrl": "https://www.reddit.com/r/PromptEngineering/comments/1qkowpy/so_cornell_and_mit_researchers_got_an_ai_to/"
-    },
-    {
-      "id": 15,
-      "author": {
-        "name": "Reddit r/PromptEngineering",
-        "handle": "@reddit",
-        "avatar": "XX",
-        "verified": true
-      },
-      "platform": "Reddit",
-      "content": "When the AI output is technically correct but unusable, stricter prompts formulated like specifications help. Define exact structure, tone, and required details.",
-      "tip": "Instead of saying 'Write a product description,' specify: 'Write a product description for [product name] with exactly 150 words. Structure: 1. Intro with main benefit. 2. Three bullet points with features. 3. Conclusion with call-to-action. Tone: Persuasive and professional, target audience is IT managers. Include the keywords [keyword1, keyword2].'",
+      "content": "Analyze viral prompts to create a system prompt that automatically generates professional 'NanoBanana' prompts.",
+      "tip": "Learn from successful prompts and automate their creation.",
       "category": "Prompt Engineering",
-      "difficulty": "Intermediate",
-      "timestamp": "2026-01-25",
-      "metrics": {
-        "comments": 0,
-        "retweets": 0,
-        "likes": 0,
-        "views": "0"
-      },
-      "sourceUrl": "https://www.reddit.com/r/PromptEngineering/comments/1qmcxo7/i_use_chatgpt_claude_daily_for_real_work_and_i/"
-    },
-    {
-      "id": 16,
-      "author": {
-        "name": "Simon Willison",
-        "handle": "@simonw",
-        "avatar": "XX",
-        "verified": true
-      },
-      "platform": "X",
-      "content": "The ability to manage and orchestrate AI agents is becoming the new superpower. It's not about writing the code yourself, but clearly defining the task, monitoring progress, and making corrections.",
-      "tip": "Treat AI agents like team members. Give them clear, measurable goals and regular feedback. Break large projects into small, verifiable tasks. Instead of trying to generate a whole report at once, have it create an outline first, then each section, then a summary. Review each step.",
-      "category": "Agent Management",
       "difficulty": "Advanced",
-      "timestamp": "2026-01-27",
+      "timestamp": "2026-01-30",
       "metrics": {
         "comments": 0,
         "retweets": 0,
         "likes": 0,
         "views": "0"
       },
-      "sourceUrl": "https://www.oneusefulthing.org/p/management-as-ai-superpower"
-    },
-    {
-      "id": 17,
-      "author": {
-        "name": "Nate's Newsletter",
-        "handle": "@nate",
-        "avatar": "XX",
-        "verified": true
-      },
-      "platform": "X",
-      "content": "When scaling agents, 'more' does not mean 'better'. Too many agents lead to chaos and inefficiency. Successful teams rely on intelligent orchestration with clear rules, rather than deploying agent swarms.",
-      "tip": "Limit the number of parallel agents. Define clear hand-off points and responsibilities. One agent should deliver a completed task before the next one takes over. Use an 'Orchestrator' prompt that controls the overall process and merges the outputs of individual agents.",
-      "category": "Agent Orchestration",
-      "difficulty": "Advanced",
-      "timestamp": "2026-01-26",
-      "metrics": {
-        "comments": 0,
-        "retweets": 0,
-        "likes": 0,
-        "views": "0"
-      },
-      "sourceUrl": "https://natesnewsletter.substack.com/p/why-dumb-agents-mean-smart-orchestration"
-    },
-    {
-      "id": 18,
-      "author": {
-        "name": "Simon Willison",
-        "handle": "@simonw",
-        "avatar": "XX",
-        "verified": true
-      },
-      "platform": "X",
-      "content": "The web browser is the ideal sandbox for coding agents. It provides a secure, isolated environment with access to APIs sufficient for many automation tasks, without needing to install local software.",
-      "tip": "For automation tasks involving web interactions (e.g., scraping data from a website, filling forms), instruct your coding agent to write code that runs in a browser context (e.g., using Puppeteer or Playwright). This is safer than granting direct system access.",
-      "category": "Security",
-      "difficulty": "Advanced",
-      "timestamp": "2026-01-25",
-      "metrics": {
-        "comments": 0,
-        "retweets": 0,
-        "likes": 0,
-        "views": "0"
-      },
-      "sourceUrl": "https://simonwillison.net/2026/Jan/25/the-browser-is-the-sandbox/#atom-everything"
-    },
-    {
-      "id": 19,
-      "author": {
-        "name": "Reddit r/ClaudeAI",
-        "handle": "@reddit",
-        "avatar": "XX",
-        "verified": true
-      },
-      "platform": "Reddit",
-      "content": "The quality of Claude Opus 4.5 can be improved with simple prompt adjustments. Users report that the instruction 'Take a deep breath' or prompting step-by-step thinking yields significantly better results.",
-      "tip": "Add one of the following instructions to the beginning of your prompt to boost response quality: 'Take a deep breath and think step by step.' or 'Let's work this out in a step by step way to be sure we have the right answer.'",
-      "category": "Prompt Engineering",
-      "difficulty": "Beginner",
-      "timestamp": "2026-01-23",
-      "metrics": {
-        "comments": 0,
-        "retweets": 0,
-        "likes": 0,
-        "views": "0"
-      },
-      "sourceUrl": "https://www.reddit.com/r/ClaudeAI/comments/1qkprzp/did_that_and_the_quality_of_claudes_responses/"
-    },
-    {
-      "id": 20,
-      "author": {
-        "name": "Nate's Newsletter",
-        "handle": "@nate",
-        "avatar": "XX",
-        "verified": true
-      },
-      "platform": "X",
-      "content": "In a world where pure expertise is augmented by AI, 'High Agency' – the ability to proactively identify problems and drive solutions – becomes the critical career competency, especially for entry-level professionals.",
-      "tip": "Use AI to boost your 'agency'. Prompt examples: 'Identify the three biggest inefficiencies in [my work area] and propose concrete solutions I can implement next week.' or 'Analyze market trend [X] and create a one-page summary with three actionable recommendations for my team.'",
-      "category": "Career",
-      "difficulty": "Intermediate",
-      "timestamp": "2026-01-22",
-      "metrics": {
-        "comments": 0,
-        "retweets": 0,
-        "likes": 0,
-        "views": "0"
-      },
-      "sourceUrl": "https://natesnewsletter.substack.com/p/the-career-ladder-collapsed-heres"
+      "sourceUrl": "https://www.reddit.com/r/PromptEngineering/comments/1qq4tet/after_analyzing_1000_viral_prompts_i_made_a/"
     }
   ]
 }

@@ -25,10 +25,24 @@ export function WeekNavigation({ selectedWeekId, onWeekChange }: WeekNavigationP
   const [weeks, setWeeks] = useState<WeekData[]>([]);
 
   useEffect(() => {
-    fetch("/data/weeks.json")
+    const processData = (data: any) => setWeeks(data.weeks || []);
+
+    // Try API first if configured, fall back to static JSON
+    const apiBase = process.env.NEXT_PUBLIC_API_URL;
+    const fetchUrl = apiBase ? `${apiBase}/weeks` : "/data/weeks.json";
+
+    fetch(fetchUrl)
       .then((res) => res.json())
-      .then((data) => setWeeks(data.weeks))
-      .catch(() => {});
+      .then(processData)
+      .catch(() => {
+        // If API fails, try static JSON as fallback
+        if (apiBase) {
+          fetch("/data/weeks.json")
+            .then((res) => res.json())
+            .then(processData)
+            .catch(() => {});
+        }
+      });
   }, []);
 
   const currentIndex = weeks.findIndex((w) => w.id === selectedWeekId);

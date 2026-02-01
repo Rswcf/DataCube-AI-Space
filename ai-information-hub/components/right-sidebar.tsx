@@ -58,15 +58,31 @@ export function RightSidebar({ weekId, onSearchChange }: RightSidebarProps) {
   const [trends, setTrends] = useState<TrendItem[]>(fallbackTrends[language]);
 
   useEffect(() => {
-    fetch(`/data/${weekId}/trends.json`)
+    const processData = (data: any) => {
+      if (data.trends) {
+        setTrends(data.trends[language] || data.trends["de"] || fallbackTrends[language]);
+      }
+    };
+
+    // Try API first if configured, fall back to static JSON
+    const apiBase = process.env.NEXT_PUBLIC_API_URL;
+    const fetchUrl = apiBase
+      ? `${apiBase}/trends/${weekId}`
+      : `/data/${weekId}/trends.json`;
+
+    fetch(fetchUrl)
       .then((res) => res.json())
-      .then((data) => {
-        if (data.trends) {
-          setTrends(data.trends[language] || data.trends["de"] || fallbackTrends[language]);
-        }
-      })
+      .then(processData)
       .catch(() => {
-        setTrends(fallbackTrends[language]);
+        // If API fails, try static JSON as fallback
+        if (apiBase) {
+          fetch(`/data/${weekId}/trends.json`)
+            .then((res) => res.json())
+            .then(processData)
+            .catch(() => setTrends(fallbackTrends[language]));
+        } else {
+          setTrends(fallbackTrends[language]);
+        }
       });
   }, [weekId, language]);
 

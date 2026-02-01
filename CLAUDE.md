@@ -1,205 +1,151 @@
-# DataCube AI Information Hub
+# DataCube AI Space
 
-Bilingual (DE/EN) weekly AI news aggregator for internal teams — curates tech breakthroughs, investment news, and practical tips from RSS feeds via DeepSeek V3.2 (OpenRouter). Built with Next.js 16 + React 19 + Tailwind CSS 4 + Shadcn/ui, deployed on Vercel.
+This repository contains multiple projects:
 
-**Status**: Core app complete (3 feed types, bilingual, week navigation, dark/light theme). Data pipeline automated via GitHub Actions.
+- **[ai-information-hub/CLAUDE.md](./ai-information-hub/CLAUDE.md)** - Frontend (Next.js + Vercel)
+- **[ai-hub-backend/README.md](./ai-hub-backend/README.md)** - Backend API (FastAPI + Railway)
+
+---
+
+## AI Information Hub (Quick Reference)
+
+Bilingual (DE/EN) weekly AI news aggregator with **YouTube video integration**. Curates tech breakthroughs, investment news, practical tips, and videos from RSS feeds + Hacker News + YouTube via DeepSeek V3.2 (OpenRouter).
+
+**Stack**: Next.js 16 + React 19 + Tailwind CSS 4 + Shadcn/ui (Frontend) | FastAPI + PostgreSQL (Backend)
+
+**Status**: Full-stack implementation complete with Railway backend.
+
+---
 
 ## Architecture
 
 ```
-┌─────────────────── Data Pipeline ───────────────────┐
-│                                                      │
-│  RSS Feeds (22 sources)                              │
-│       ↓                                              │
-│  scripts/collect.py  ──→  DeepSeek V3.2 (OpenRouter) │
-│    1. Classify all articles (section + relevance)    │
-│    2. Shortlist candidates (batch if >40 articles)   │
-│    3. Generate bilingual content (top 20 per section)│
-│       ↓                                              │
-│  public/data/{weekId}/                               │
-│    ├── tech.json                                     │
-│    ├── investment.json                               │
-│    ├── tips.json                                     │
-│    └── trends.json                                   │
-│                                                      │
-└──────────────────────────────────────────────────────┘
-
-┌─────────────────── Frontend ────────────────────────┐
-│                                                      │
-│  useEffect + fetch(/data/{weekId}/xxx.json)          │
-│       ↓                                              │
-│  React components (all "use client")                 │
-│       ↓                                              │
-│  Bilingual render via useSettings().t("key")         │
-│                                                      │
-└──────────────────────────────────────────────────────┘
-
-┌─────────────────── Deployment ──────────────────────┐
-│                                                      │
-│  weekly-collect.yml (Mon 08:00 UTC)                  │
-│       ↓                                              │
-│  Creates PR "AI Weekly: 2025-kwXX"                   │
-│       ↓                                              │
-│  Review + optional /regenerate comments              │
-│       ↓                                              │
-│  Merge → Vercel auto-deploy                          │
-│                                                      │
-└──────────────────────────────────────────────────────┘
+┌─────────────────── Backend (Railway) ───────────────────┐
+│                                                          │
+│  ai-hub-backend/ (FastAPI + PostgreSQL)                  │
+│       ↓                                                  │
+│  Data Sources:                                           │
+│    • RSS Feeds (22 sources)                              │
+│    • Hacker News (Algolia API)                           │
+│    • YouTube (Data API v3)                               │
+│       ↓                                                  │
+│  DeepSeek V3.2 (OpenRouter) → PostgreSQL                 │
+│       ↓                                                  │
+│  REST API: /api/tech, /api/investment, /api/videos...    │
+│                                                          │
+└──────────────────────────────────────────────────────────┘
+                           ↓
+┌─────────────────── Frontend (Vercel) ───────────────────┐
+│                                                          │
+│  ai-information-hub/ (Next.js)                           │
+│       ↓                                                  │
+│  API fetch (with static JSON fallback)                   │
+│       ↓                                                  │
+│  Tech Feed: 20 posts + 5 YouTube videos (interspersed)   │
+│                                                          │
+└──────────────────────────────────────────────────────────┘
 ```
+
+---
 
 ## Directory Structure
 
 ```
-app/
-  layout.tsx              — Root layout (SettingsProvider, fonts, metadata)
-  page.tsx                — Home page (3-column responsive layout, tab switching)
-  globals.css             — Global styles
-
-components/
-  feeds/
-    tech-feed.tsx         — AI tech progress feed
-    investment-feed.tsx   — Investment/funding/M&A feed
-    tips-feed.tsx         — Practical tips feed
-  feed.tsx                — Main feed container (tab state, animations)
-  sidebar.tsx             — Left nav (logo, tabs, theme/language toggles)
-  right-sidebar.tsx       — Right column (trends, team, search)
-  week-navigation.tsx     — Week selector dropdown
-  header.tsx / footer.tsx
-  theme-provider.tsx      — next-themes wrapper
-  ui/                     — 60+ Shadcn/ui components (Radix-based)
-
-lib/
-  settings-context.tsx    — Theme + language context, t() translation fn
-  translations.ts         — 80+ bilingual translation keys (DE/EN)
-  utils.ts                — cn() class merger (clsx + tailwind-merge)
-
-hooks/
-  use-mobile.ts           — Mobile detection
-  use-toast.ts            — Toast notifications
-
-public/data/
-  weeks.json              — Index of available weeks
-  {YYYY-kwWW}/            — Per-week data folder
-    tech.json
-    investment.json
-    tips.json
-    trends.json
-
-scripts/
-  collect.py              — RSS fetch + LLM processing → JSON
-  regenerate.py           — Re-process with human feedback
-  sources.yaml            — RSS feed URLs (22 sources across 3 categories)
-  requirements.txt        — feedparser, openai, pyyaml, requests
-
-.github/workflows/
-  weekly-collect.yml      — Automated Monday collection → PR
-  regenerate.yml          — PR comment /regenerate trigger
+DataCube_AI_Space/
+├── ai-information-hub/       # Frontend (Next.js)
+│   ├── app/                  # Pages
+│   ├── components/           # React components
+│   │   ├── feeds/            # Feed components
+│   │   └── video-embed.tsx   # YouTube player
+│   ├── lib/                  # Utils, types, API client
+│   ├── public/data/          # Static JSON fallback
+│   └── .env.local            # API keys
+│
+└── ai-hub-backend/           # Backend (FastAPI)
+    ├── app/
+    │   ├── models/           # SQLAlchemy models
+    │   ├── routers/          # API endpoints
+    │   └── services/         # Business logic
+    │       ├── collector.py
+    │       ├── youtube_fetcher.py
+    │       └── llm_processor.py
+    ├── alembic/              # DB migrations
+    ├── scripts/              # CLI tools
+    ├── Dockerfile
+    └── railway.toml
 ```
 
-## Core Data Contracts
+---
 
-### Week ID Format
-`YYYY-kwWW` (e.g., `2025-kw04`)
-
-### JSON Bilingual Structure
-All data files use `{ "de": [...], "en": [...] }` at the top level (except `investment.json` which nests by market type first).
-
-### tech.json
-```
-{ "de": [{ id, author, content, tags, category, iconType, impact, timestamp, metrics, source, sourceUrl }], "en": [...] }
-```
-- `iconType`: `"Brain"` (LLM) | `"Server"` (infra) | `"Zap"` (research) | `"Cpu"` (safety)
-- `impact`: `"critical"` | `"high"` | `"medium"` | `"low"`
-
-### investment.json
-```
-{
-  "primaryMarket":   { "de": [{ company, amount, round, investors, valuation, sourceUrl, ... }], "en": [...] },
-  "secondaryMarket": { "de": [{ ticker, price, change, direction, marketCap, sourceUrl, ... }], "en": [...] },
-  "ma":              { "de": [{ acquirer, target, dealValue, dealType, sourceUrl, ... }], "en": [...] }
-}
-```
-
-### tips.json
-```
-{ "de": [{ id, author, platform, content, tip, category, difficulty, timestamp, metrics, sourceUrl }], "en": [...] }
-```
-- `difficulty` (de): `"Anfänger"` | `"Mittel"` | `"Fortgeschritten"`
-- `difficulty` (en): `"Beginner"` | `"Intermediate"` | `"Advanced"`
-- `platform`: `"X"` | `"Reddit"`
-
-### trends.json
-```
-{
-  "trends":      { "de": [{ category, title, posts }], "en": [...] },
-  "teamMembers": { "de": [{ name, role, handle, avatar }], "en": [...] }
-}
-```
-
-## Key Conventions
-
-- **All components are `"use client"`** — pure client-side rendering
-- **Data loading pattern**: `useEffect` + `fetch(/data/{weekId}/xxx.json)` + language fallback
-- **Translation**: `useSettings()` → `t("key")`, definitions in `lib/translations.ts`
-- **Theme**: dark/light via `next-themes`, persisted to localStorage, default dark
-- **Language**: DE default, stored in localStorage, accessed via `useSettings().language`
-- **Path alias**: `@/*` → project root (e.g., `@/components/ui/button`)
-- **Build config**: `images.unoptimized: true` (static-friendly)
-
-## Commands
+## Quick Commands
 
 ### Frontend
 ```bash
-npm run dev              # Dev server at localhost:3000
-npm run build            # Production build
-npm run lint             # ESLint
+cd ai-information-hub
+npm run dev                   # Dev server :3000
+```
+
+### Backend (Local)
+```bash
+cd ai-hub-backend
+python -m venv venv && source venv/bin/activate
+pip install -r requirements.txt
+python -m scripts.init_db --migrate-all
+uvicorn app.main:app --reload   # API docs: :8000/docs
 ```
 
 ### Data Collection
 ```bash
-export OPENROUTER_API_KEY=...
-python3 scripts/collect.py                    # Current week (requires Python 3.10+)
-python3 scripts/collect.py --week 2025-kw05   # Specific week
-python3 scripts/collect.py --dry-run          # RSS only, skip LLM
+# Backend script
+python -m scripts.weekly_collect --week 2025-kw05
+
+# Via API
+curl -X POST https://api.railway.app/api/admin/collect \
+  -H "X-API-Key: your-key"
 ```
 
-### Content Regeneration
+---
+
+## Environment Variables
+
+### Frontend (.env.local)
 ```bash
-python3 scripts/regenerate.py --week 2025-kw04 --section tech \
-    --feedback "Too technical, simplify"
-
-python3 scripts/regenerate.py --week 2025-kw04 --section investment \
-    --id 3 --feedback "Not relevant"
-
-python3 scripts/regenerate.py --week 2025-kw04 --all \
-    --feedback "More casual style"
+OPENROUTER_API_KEY=sk-or-v1-...
+YOUTUBE_API_KEY=AIza...
+NEXT_PUBLIC_API_URL=https://your-api.railway.app/api  # Optional
 ```
 
-### GitHub PR Comment (triggers regenerate.yml)
+### Backend (.env)
+```bash
+DATABASE_URL=postgresql://...
+OPENROUTER_API_KEY=sk-or-v1-...
+YOUTUBE_API_KEY=AIza...
+ADMIN_API_KEY=your-secret-key
 ```
-/regenerate tech --feedback "simplify language"
-/regenerate investment 3 --feedback "not relevant"
-/regenerate all --feedback "more casual"
+
+---
+
+## API Endpoints
+
+| Endpoint | Description |
+|----------|-------------|
+| `GET /api/weeks` | List weeks |
+| `GET /api/tech/{weekId}` | Tech + videos |
+| `GET /api/investment/{weekId}` | Investment |
+| `GET /api/tips/{weekId}` | Tips |
+| `GET /api/videos/{weekId}` | Videos only |
+| `POST /api/admin/collect` | Trigger collection |
+
+---
+
+## Deployment
+
+**Frontend**: Vercel (auto-deploy from main branch)
+
+**Backend**: Railway
+```bash
+cd ai-hub-backend
+railway login && railway init
+# Add PostgreSQL, set env vars
+railway up
 ```
-
-## Common Development Tasks
-
-### Add a new week of data
-1. Run `python3 scripts/collect.py --week YYYY-kwWW`
-2. Outputs to `public/data/YYYY-kwWW/` (4 JSON files) and updates `public/data/weeks.json`
-3. No frontend changes needed — week navigation reads `weeks.json` dynamically
-
-### Add a new RSS source
-1. Edit `scripts/sources.yaml` — add URL under `tech`, `investment`, or `tips`
-2. Run `collect.py` to verify the feed parses correctly
-
-### Add a new feed type (e.g., "regulation")
-1. Create `components/feeds/regulation-feed.tsx` (follow `tech-feed.tsx` pattern)
-2. Add tab in `components/feed.tsx` and `components/sidebar.tsx`
-3. Add mobile tab in `app/page.tsx`
-4. Add LLM prompt function in `scripts/collect.py` (follow `process_tech_articles()`)
-5. Add translation keys in `lib/translations.ts`
-
-### Modify translations
-1. Edit `lib/translations.ts` — add/change keys in both `de` and `en` objects
-2. Use in components via `const { t } = useSettings(); t("yourKey")`

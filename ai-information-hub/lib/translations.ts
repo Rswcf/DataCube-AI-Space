@@ -95,6 +95,12 @@ export const translations = {
     chatError: "Fehler beim Laden. Bitte versuche es erneut.",
     chatTimeout: "Zeitüberschreitung. Bitte versuche es erneut.",
     chatClear: "Neues Gespräch",
+
+    // Video
+    video: "Video",
+    playVideo: "Video abspielen",
+    views: "Aufrufe",
+    duration: "Dauer",
   },
   en: {
     // Navigation
@@ -190,6 +196,12 @@ export const translations = {
     chatError: "Failed to load. Please try again.",
     chatTimeout: "Request timed out. Please try again.",
     chatClear: "New chat",
+
+    // Video
+    video: "Video",
+    playVideo: "Play video",
+    views: "views",
+    duration: "Duration",
   },
 } as const;
 

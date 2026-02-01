@@ -2,16 +2,35 @@
 """
 AI Weekly Content Collector
 
-Fetches RSS feeds, processes articles with LLM (via OpenRouter),
-and outputs JSON files for the frontend.
+Fetches RSS feeds and Hacker News stories, processes articles with LLM
+(DeepSeek V3.2 via OpenRouter), and outputs bilingual JSON files for the frontend.
 
 Usage:
-    python scripts/collect.py
-    python scripts/collect.py --week 2025-kw05
-    python scripts/collect.py --dry-run  # Skip LLM, output raw articles
+    python scripts/collect.py                    # Current week, full pipeline
+    python scripts/collect.py --week 2025-kw05   # Specific week
+    python scripts/collect.py --dry-run          # RSS only, skip LLM processing
+    python scripts/collect.py --no-enhance-hn    # Disable HN content scraping
 
 Environment:
     OPENROUTER_API_KEY  - Required (unless --dry-run)
+
+Pipeline stages:
+    1. Fetch all RSS feeds + HN stories (via Algolia API if enhanced)
+    2. For HN stories: scrape article content (YouTube transcripts, web pages)
+       and fetch top HN comments
+    3. LLM Pass 1: Classify all articles into tech/investment/tips
+    4. LLM Pass 2: Shortlist top candidates if >40 per section
+    5. LLM Pass 3: Generate bilingual (DE/EN) content for top 20 per section
+    6. Output to public/data/{weekId}/ and update weeks.json
+
+HN Enhancement (enabled by default):
+    - Uses HN Algolia API for better filtering (points > 100, last 7 days)
+    - Fetches YouTube transcripts via youtube-transcript-api
+    - Scrapes article body from web pages via BeautifulSoup
+    - Fetches top 3 HN comments for discussion context
+    - Disable with --no-enhance-hn for faster but less rich content
+
+Python compatibility: 3.9+ (uses typing features available in 3.9)
 """
 
 import argparse
@@ -21,6 +40,7 @@ import re
 import sys
 from datetime import datetime, timedelta
 from pathlib import Path
+from typing import Optional
 
 import feedparser
 import yaml
@@ -165,16 +185,312 @@ def fetch_all_feeds(sources: dict, section: str) -> list[dict]:
     return all_articles
 
 
-def fetch_all_sources(sources: dict) -> list[dict]:
+# ---------------------------------------------------------------------------
+# Hacker News Enhanced Fetching
+# ---------------------------------------------------------------------------
+
+
+def fetch_hn_top_stories(
+    query: str = "AI",
+    min_points: int = 100,
+    days: int = 7,
+    limit: int = 50,
+) -> list[dict]:
+    """Fetch top HN stories from Algolia API.
+
+    Uses search_by_date endpoint to get recent stories sorted by date,
+    then filters and sorts by points.
+    """
+    import requests
+
+    # Use search_by_date for recent stories, filter by points
+    url = "https://hn.algolia.com/api/v1/search_by_date"
+    params = {
+        "query": query,
+        "tags": "story",
+        "numericFilters": f"points>{min_points}",
+        "hitsPerPage": limit * 2,  # Fetch more to filter
+    }
+
+    resp = requests.get(url, params=params, timeout=30)
+    resp.raise_for_status()
+    data = resp.json()
+
+    # Filter by date (last N days) on client side
+    cutoff = datetime.now() - timedelta(days=days)
+
+    stories = []
+    for hit in data.get("hits", []):
+        created_at_i = hit.get("created_at_i", 0)
+        created_at = datetime.fromtimestamp(created_at_i) if created_at_i else None
+
+        # Skip if outside date range
+        if created_at and created_at < cutoff:
+            continue
+
+        stories.append(
+            {
+                "title": hit.get("title", ""),
+                "link": hit.get("url", ""),
+                "hn_url": f"https://news.ycombinator.com/item?id={hit['objectID']}",
+                "hn_id": hit.get("objectID"),
+                "points": hit.get("points", 0),
+                "num_comments": hit.get("num_comments", 0),
+                "summary": "",  # Will be filled by content fetching
+                "published": created_at.isoformat() if created_at else "",
+                "source": "Hacker News",
+            }
+        )
+
+        if len(stories) >= limit:
+            break
+
+    # Sort by points descending
+    stories.sort(key=lambda x: x["points"], reverse=True)
+    return stories
+
+
+def fetch_hn_comments(story_id: str, limit: int = 5) -> list[str]:
+    """Fetch top comments from an HN post."""
+    import requests
+    from bs4 import BeautifulSoup
+
+    url = f"https://hn.algolia.com/api/v1/items/{story_id}"
+    try:
+        resp = requests.get(url, timeout=30)
+        resp.raise_for_status()
+        data = resp.json()
+
+        comments = []
+        for child in data.get("children", [])[:limit]:
+            text = child.get("text", "")
+            if text and len(text) > 50:  # Filter short comments
+                # Clean HTML tags
+                clean_text = BeautifulSoup(text, "lxml").get_text()
+                comments.append(clean_text[:500])  # Limit length
+
+        return comments
+    except Exception as e:
+        print(f"    HN comments error: {e}")
+        return []
+
+
+def detect_content_type(url: str) -> str:
+    """Detect URL content type."""
+    if not url:
+        return "empty"
+
+    url_lower = url.lower()
+
+    # YouTube
+    if "youtube.com" in url_lower or "youtu.be" in url_lower:
+        return "youtube"
+
+    # PDF
+    if url_lower.endswith(".pdf"):
+        return "pdf"
+
+    # Podcast platforms (skip for now)
+    podcast_domains = ["spotify.com/episode", "podcasts.apple.com", "anchor.fm"]
+    if any(d in url_lower for d in podcast_domains):
+        return "podcast"
+
+    # Twitter/X (special handling)
+    if "twitter.com" in url_lower or "x.com" in url_lower:
+        return "twitter"
+
+    # Default to webpage
+    return "webpage"
+
+
+def fetch_youtube_transcript(url: str) -> Optional[str]:
+    """Fetch YouTube video transcript."""
+    try:
+        from youtube_transcript_api import YouTubeTranscriptApi
+        from youtube_transcript_api._errors import TranscriptsDisabled, NoTranscriptFound
+    except ImportError:
+        print("    Warning: youtube-transcript-api not installed")
+        return None
+
+    # Extract video ID
+    patterns = [
+        r"(?:v=|/v/|youtu\.be/)([a-zA-Z0-9_-]{11})",
+        r"(?:embed/)([a-zA-Z0-9_-]{11})",
+    ]
+
+    video_id = None
+    for pattern in patterns:
+        match = re.search(pattern, url)
+        if match:
+            video_id = match.group(1)
+            break
+
+    if not video_id:
+        return None
+
+    try:
+        transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
+
+        # Prefer English, then German, then auto-generated
+        for lang in ["en", "de"]:
+            try:
+                transcript = transcript_list.find_transcript([lang])
+                entries = transcript.fetch()
+                text = " ".join(e["text"] for e in entries)
+                return text[:5000]  # Limit length
+            except Exception:
+                continue
+
+        # Try auto-generated transcripts
+        for transcript in transcript_list:
+            if transcript.is_generated:
+                entries = transcript.fetch()
+                text = " ".join(e["text"] for e in entries)
+                return text[:5000]
+
+        return None
+    except (TranscriptsDisabled, NoTranscriptFound):
+        return None
+    except Exception as e:
+        print(f"    YouTube transcript error: {e}")
+        return None
+
+
+def fetch_webpage_content(url: str) -> Optional[str]:
+    """Fetch webpage main content."""
+    import requests
+    from bs4 import BeautifulSoup
+
+    try:
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
+        }
+        resp = requests.get(url, headers=headers, timeout=15)
+        resp.raise_for_status()
+
+        soup = BeautifulSoup(resp.text, "lxml")
+
+        # Remove irrelevant elements
+        for tag in soup(["script", "style", "nav", "header", "footer", "aside", "ads"]):
+            tag.decompose()
+
+        # Try to find article body
+        article = soup.find("article") or soup.find("main") or soup.find("body")
+
+        if article:
+            # Extract paragraph text
+            paragraphs = article.find_all("p")
+            text = "\n".join(p.get_text().strip() for p in paragraphs if p.get_text().strip())
+            return text[:5000] if text else None
+
+        return None
+    except Exception as e:
+        print(f"    Webpage fetch error for {url}: {e}")
+        return None
+
+
+def enhance_hn_articles(stories: list[dict], max_items: int = 30) -> list[dict]:
+    """Add full content and comments to HN articles."""
+    enhanced = []
+
+    for i, story in enumerate(stories[:max_items]):
+        print(f"  [{i+1}/{min(len(stories), max_items)}] Processing: {story['title'][:50]}...")
+
+        content_type = detect_content_type(story["link"])
+        content = None
+
+        if content_type == "youtube":
+            content = fetch_youtube_transcript(story["link"])
+            if content:
+                print(f"    ✓ YouTube transcript: {len(content)} chars")
+
+        elif content_type == "webpage":
+            content = fetch_webpage_content(story["link"])
+            if content:
+                print(f"    ✓ Webpage content: {len(content)} chars")
+
+        elif content_type == "podcast":
+            print("    ⊘ Skipping podcast")
+
+        elif content_type == "pdf":
+            print("    ⊘ Skipping PDF (TODO)")
+
+        elif content_type == "twitter":
+            print("    ⊘ Skipping Twitter/X")
+
+        elif content_type == "empty":
+            print("    ⊘ No URL")
+
+        # Fetch HN comments
+        comments = []
+        if story.get("hn_id"):
+            comments = fetch_hn_comments(story["hn_id"], limit=3)
+            if comments:
+                print(f"    ✓ HN comments: {len(comments)} top comments")
+
+        # Combine content
+        full_content = []
+        if content:
+            full_content.append(f"[Article Content]\n{content}")
+        if comments:
+            full_content.append(f"[HN Discussion Highlights]\n" + "\n---\n".join(comments))
+
+        story["summary"] = "\n\n".join(full_content) if full_content else story["title"]
+        story["content_type"] = content_type
+        story["has_full_content"] = bool(content)
+
+        enhanced.append(story)
+
+    return enhanced
+
+
+def fetch_all_sources(sources: dict, enhance_hn: bool = True) -> list[dict]:
     """Fetch ALL feeds from ALL sections, deduplicate by URL.
 
     Each article is tagged with its source name and the original section
     hint from sources.yaml (used as a hint for LLM classification).
+
+    If enhance_hn is True, uses Algolia API for HN with deep content fetching.
     """
     all_articles = []
     seen_urls = set()
+
+    # First, handle HN with enhancement if enabled
+    if enhance_hn:
+        print("\n=== Fetching Hacker News (Enhanced) ===")
+        hn_stories = fetch_hn_top_stories(
+            query="AI",  # Simple query works better with Algolia
+            min_points=100,
+            days=7,
+            limit=50,
+        )
+        print(f"  Found {len(hn_stories)} top HN stories")
+
+        hn_enhanced = enhance_hn_articles(hn_stories, max_items=30)
+
+        for story in hn_enhanced:
+            if story["link"] and story["link"] not in seen_urls:
+                seen_urls.add(story["link"])
+                story["original_section"] = "tech"  # HN is primarily tech content
+                all_articles.append(story)
+            elif story.get("hn_url"):
+                # For stories without external links (Ask HN, etc.), use HN URL
+                if story["hn_url"] not in seen_urls:
+                    seen_urls.add(story["hn_url"])
+                    story["link"] = story["hn_url"]
+                    story["original_section"] = "tech"
+                    all_articles.append(story)
+
+        print(f"  Added {len([a for a in all_articles if a.get('source') == 'Hacker News'])} HN articles")
+
+    # Then process other RSS sources (skip plain HN if enhanced)
     for section in sources:
         for source in sources[section]:
+            # Skip plain HN RSS if using enhanced version
+            if source["name"] == "Hacker News" and enhance_hn:
+                print(f"  [{section}] Skipping {source['name']} (using enhanced version)")
+                continue
+
             print(f"  [{section}] Fetching {source['name']}...")
             try:
                 articles = fetch_feed(source["url"])
@@ -189,6 +505,7 @@ def fetch_all_sources(sources: dict) -> list[dict]:
                 print(f"    -> {len(articles)} fetched, {added} new (after dedup)")
             except Exception as e:
                 print(f"    -> Error: {e}")
+
     return all_articles
 
 
@@ -315,7 +632,7 @@ Output ONLY the JSON array, no markdown fences or explanation."""
     return classified
 
 
-def _build_cross_section_context(other_sections: dict[str, list[dict]] | None) -> str:
+def _build_cross_section_context(other_sections: Optional[dict]) -> str:
     """Build a context string listing articles assigned to other sections."""
     if not other_sections:
         return ""
@@ -382,7 +699,7 @@ Output ONLY valid JSON, no explanation."""
     return all_selected
 
 
-def process_tech_articles(client, articles: list[dict], other_sections: dict[str, list[dict]] | None = None) -> dict:
+def process_tech_articles(client, articles: list[dict], other_sections: Optional[dict] = None) -> dict:
     """Use LLM to process tech articles into bilingual feed format."""
     if not articles:
         return {"de": [], "en": []}
@@ -444,7 +761,7 @@ Rules:
     return result
 
 
-def process_investment_articles(client, articles: list[dict], other_sections: dict[str, list[dict]] | None = None) -> dict:
+def process_investment_articles(client, articles: list[dict], other_sections: Optional[dict] = None) -> dict:
     """Use LLM to process investment articles into bilingual feed format."""
     if not articles:
         return {"primaryMarket": {"de": [], "en": []}, "secondaryMarket": {"de": [], "en": []}, "ma": {"de": [], "en": []}}
@@ -544,7 +861,7 @@ Rules:
     return parse_llm_json(response.choices[0].message.content, fallback=fallback)
 
 
-def process_tips_articles(client, articles: list[dict], other_sections: dict[str, list[dict]] | None = None) -> dict:
+def process_tips_articles(client, articles: list[dict], other_sections: Optional[dict] = None) -> dict:
     """Use LLM to process tips articles into bilingual feed format."""
     if not articles:
         return {"de": [], "en": []}
@@ -754,6 +1071,7 @@ def main():
     parser = argparse.ArgumentParser(description="AI Weekly Content Collector")
     parser.add_argument("--week", type=str, default=None, help="Week ID (e.g., 2025-kw05). Default: current week")
     parser.add_argument("--dry-run", action="store_true", help="Fetch RSS only, skip LLM processing")
+    parser.add_argument("--no-enhance-hn", action="store_true", help="Disable HN Algolia API enhancement (use plain RSS)")
     args = parser.parse_args()
 
     week_id = args.week or current_week_id()
@@ -764,7 +1082,8 @@ def main():
 
     # Stage 0: Unified fetch + dedup
     print("\n--- Stage 0: Fetching all feeds (unified) ---")
-    all_articles = fetch_all_sources(sources)
+    enhance_hn = not args.no_enhance_hn
+    all_articles = fetch_all_sources(sources, enhance_hn=enhance_hn)
     print(f"\nTotal unique articles: {len(all_articles)}")
 
     # Cache raw data

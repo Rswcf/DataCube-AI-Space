@@ -4,89 +4,45 @@
       {
         "id": 1,
         "author": {
-          "name": "TechCrunch",
-          "handle": "@TechCrunch",
+          "name": "The Decoder",
+          "handle": "@thedecoder",
           "avatar": "XX",
           "verified": true
         },
-        "content": "Tesla investiert 2 Mrd. US-Dollar in Elon Musks KI-Unternehmen xAI, das kürzlich eine Finanzierungsrunde über 20 Mrd. US-Dollar bekannt gab.",
-        "company": "xAI",
-        "amount": "$2 Mrd.",
-        "round": "Strategische Investition",
+        "content": "Nvidia, Amazon und Microsoft könnten OpenAI mit bis zu 60 Milliarden Dollar finanzieren. Die Runde würde die Abhängigkeit des KI-Riesen von seinen Infrastrukturanbietern weiter vertiefen.",
+        "company": "OpenAI",
+        "amount": "$60 Mrd.",
+        "round": "Späte Finanzierungsrunde",
         "investors": [
-          "Tesla"
+          "Nvidia",
+          "Amazon",
+          "Microsoft"
         ],
-        "valuation": "N/A",
-        "timestamp": "2026-01-28",
+        "valuation": "Nicht angegeben",
+        "timestamp": "2026-01-29",
         "metrics": {
           "comments": 0,
           "retweets": 0,
           "likes": 0,
           "views": "0"
         },
-        "sourceUrl": "https://techcrunch.com/2026/01/28/tesla-invested-2b-in-elon-musks-xai/"
+        "sourceUrl": "https://the-decoder.com/nvidia-amazon-and-microsoft-could-invest-up-to-60-billion-in-openai/"
       },
       {
         "id": 2,
         "author": {
-          "name": "TechCrunch",
-          "handle": "@TechCrunch",
-          "avatar": "XX",
-          "verified": true
-        },
-        "content": "Waabi sichert sich 750 Mio. US-Dollar in einer Serie-C-Runde für autonomes Fahren und weitere 250 Mio. US-Dollar von Uber für die Bereitstellung von 25.000 Robotaxis.",
-        "company": "Waabi",
-        "amount": "$1 Mrd.",
-        "round": "Serie C",
-        "investors": [
-          "Uber"
-        ],
-        "valuation": "N/A",
-        "timestamp": "2026-01-28",
-        "metrics": {
-          "comments": 0,
-          "retweets": 0,
-          "likes": 0,
-          "views": "0"
-        },
-        "sourceUrl": "https://techcrunch.com/2026/01/28/waabi-raises-1b-and-expands-into-robotaxis-with-uber/"
-      },
-      {
-        "id": 3,
-        "author": {
-          "name": "TechCrunch",
-          "handle": "@TechCrunch",
-          "avatar": "XX",
-          "verified": true
-        },
-        "content": "Anthropic plant Berichten zufolge, seine jüngste Finanzierungsrunde auf 20 Mrd. US-Dollar zu erhöhen, bei einer Bewertung von über 300 Mrd. US-Dollar.",
-        "company": "Anthropic",
-        "amount": "$20 Mrd.",
-        "round": "Späte Runde",
-        "investors": [],
-        "valuation": "$300 Mrd.",
-        "timestamp": "2026-01-27",
-        "metrics": {
-          "comments": 0,
-          "retweets": 0,
-          "likes": 0,
-          "views": "0"
-        },
-        "sourceUrl": "https://techcrunch.com/2026/01/27/anthropic-reportedly-upped-its-latest-raise-to-20b/"
-      },
-      {
-        "id": 4,
-        "author": {
           "name": "Crunchbase News",
-          "handle": "@Crunchbase",
+          "handle": "@crunchbase",
           "avatar": "XX",
           "verified": true
         },
-        "content": "Ricursive Intelligence, ein Frontier-AI-Labor, sammelt nur zwei Monate nach dem Start 300 Mio. US-Dollar in einer Serie-A-Runde bei einer Bewertung von 4 Mrd. US-Dollar ein.",
+        "content": "Ricursive Intelligence, ein Frontier-AI-Labor, hat nur zwei Monate nach der Gründung eine Series-A-Finanzierung in Höhe von 300 Millionen Dollar zu einer Bewertung von 4 Milliarden Dollar erhalten.",
         "company": "Ricursive Intelligence",
         "amount": "$300 Mio.",
         "round": "Serie A",
-        "investors": [],
+        "investors": [
+          "Nicht angegeben"
+        ],
         "valuation": "$4 Mrd.",
         "timestamp": "2026-01-26",
         "metrics": {
@@ -98,48 +54,97 @@
         "sourceUrl": "https://news.crunchbase.com/venture/startup-ai-lab-ricursive-seriesa-unicorn/"
       },
       {
-        "id": 5,
+        "id": 3,
         "author": {
-          "name": "Techmeme",
-          "handle": "@Techmeme",
+          "name": "The Decoder",
+          "handle": "@thedecoder",
           "avatar": "XX",
           "verified": true
         },
-        "content": "PaleBlueDot, ein Marktplatz für GPU-Kapazitäten, sichert sich 150 Mio. US-Dollar in einer Serie-B-Runde unter Führung von B Capital bei einer Bewertung von über 1 Mrd. US-Dollar.",
-        "company": "PaleBlueDot",
-        "amount": "$150 Mio.",
-        "round": "Serie B",
+        "content": "Zwei neue KI-Labore, Flapping Airplanes und Core Automation, wollen die Grundlagen der KI-Entwicklung neu erfinden. Eines hat 180 Millionen Dollar eingesammelt, das andere sucht bis zu einer Milliarde.",
+        "company": "Flapping Airplanes, Core Automation",
+        "amount": "$180 Mio. / Bis zu $1 Mrd.",
+        "round": "Finanzierungsrunde / Geplante Runde",
         "investors": [
-          "B Capital"
+          "Nicht angegeben"
         ],
-        "valuation": "$1 Mrd.",
-        "timestamp": "2026-01-28",
+        "valuation": "Nicht angegeben",
+        "timestamp": "2026-01-29",
         "metrics": {
           "comments": 0,
           "retweets": 0,
           "likes": 0,
           "views": "0"
         },
-        "sourceUrl": "http://www.techmeme.com/260128/p56#a260128p56"
+        "sourceUrl": "https://the-decoder.com/two-startups-want-to-replace-how-ai-learns-one-just-raised-180m-another-is-seeking-up-to-1b/"
+      },
+      {
+        "id": 4,
+        "author": {
+          "name": "Crunchbase News",
+          "handle": "@crunchbase",
+          "avatar": "XX",
+          "verified": true
+        },
+        "content": "Zocks, ein Anbieter eines KI-Assistenten für Finanzberater, hat eine Series-B-Finanzierung in Höhe von 45 Millionen Dollar unter Führung von Lightspeed Venture Partners und QED Investors abgeschlossen.",
+        "company": "Zocks",
+        "amount": "$45 Mio.",
+        "round": "Serie B",
+        "investors": [
+          "Lightspeed Venture Partners",
+          "QED Investors"
+        ],
+        "valuation": "Nicht angegeben",
+        "timestamp": "2026-01-26",
+        "metrics": {
+          "comments": 0,
+          "retweets": 0,
+          "likes": 0,
+          "views": "0"
+        },
+        "sourceUrl": "https://news.crunchbase.com/fintech/zocks-raises-seriesb-ai-assistant-financial-advisers/"
+      },
+      {
+        "id": 5,
+        "author": {
+          "name": "Techmeme",
+          "handle": "@techmeme",
+          "avatar": "XX",
+          "verified": true
+        },
+        "content": "Granola, Hersteller einer KI-basierten Notizen-App, plant eine Finanzierungsrunde von über 100 Millionen Dollar unter Führung von Index Ventures. Die Bewertung könnte auf über 1 Milliarde Dollar steigen.",
+        "company": "Granola",
+        "amount": ">$100 Mio.",
+        "round": "Finanzierungsrunde",
+        "investors": [
+          "Index Ventures (geplant)"
+        ],
+        "valuation": ">$1 Mrd.",
+        "timestamp": "2026-01-30",
+        "metrics": {
+          "comments": 0,
+          "retweets": 0,
+          "likes": 0,
+          "views": "0"
+        },
+        "sourceUrl": "http://www.techmeme.com/260130/p11#a260130p11"
       },
       {
         "id": 6,
         "author": {
           "name": "SiliconANGLE",
-          "handle": "@SiliconANGLE",
+          "handle": "@siliconangle",
           "avatar": "XX",
           "verified": true
         },
-        "content": "Inferact startet mit 150 Mio. US-Dollar Seed-Finanzierung, um das Open-Source-Projekt vLLM zu kommerzialisieren. Geführt von Andreessen Horowitz und Lightspeed.",
-        "company": "Inferact",
-        "amount": "$150 Mio.",
-        "round": "Seed",
+        "content": "Fei-Fei Lis KI-Startup World Labs verhandelt angeblich über eine Finanzierungsrunde von bis zu 500 Millionen Dollar, die das Unternehmen mit 5 Milliarden Dollar bewerten würde.",
+        "company": "World Labs",
+        "amount": "Bis zu $500 Mio.",
+        "round": "Finanzierungsrunde",
         "investors": [
-          "Andreessen Horowitz",
-          "Lightspeed",
-          "Databricks Ventures"
+          "Nicht angegeben"
         ],
-        "valuation": "N/A",
+        "valuation": "$5 Mrd.",
         "timestamp": "2026-01-23",
         "metrics": {
           "comments": 0,
@@ -147,119 +152,77 @@
           "likes": 0,
           "views": "0"
         },
-        "sourceUrl": "https://siliconangle.com/2026/01/22/inferact-launches-150m-funding-commercialize-vllm/"
+        "sourceUrl": "https://siliconangle.com/2026/01/23/fei-fei-lis-world-labs-reportedly-raising-funding-5b-valuation/"
       },
       {
         "id": 7,
         "author": {
-          "name": "SiliconANGLE",
-          "handle": "@SiliconANGLE",
+          "name": "Techmeme",
+          "handle": "@techmeme",
           "avatar": "XX",
           "verified": true
         },
-        "content": "LiveKit, eine Plattform für Echtzeit-KI und Medien, erhält 100 Mio. US-Dollar in neuer Finanzierung bei einer Bewertung von 1 Mrd. US-Dollar.",
-        "company": "LiveKit",
-        "amount": "$100 Mio.",
-        "round": "N/A",
-        "investors": [],
-        "valuation": "$1 Mrd.",
-        "timestamp": "2026-01-22",
+        "content": "Checkbox, ein KI-Startup zur Automatisierung von Rechtsprozessen, hat eine Series-A-Finanzierung in Höhe von 23 Millionen Dollar unter Führung von Touring Capital gesichert.",
+        "company": "Checkbox",
+        "amount": "$23 Mio.",
+        "round": "Serie A",
+        "investors": [
+          "Touring Capital"
+        ],
+        "valuation": "Nicht angegeben",
+        "timestamp": "2026-01-30",
         "metrics": {
           "comments": 0,
           "retweets": 0,
           "likes": 0,
           "views": "0"
         },
-        "sourceUrl": "https://siliconangle.com/2026/01/22/livekit-raises-100m-1b-valuation-scale-real-time-ai-media-platform/"
+        "sourceUrl": "http://www.techmeme.com/260130/p8#a260130p8"
       }
     ],
     "en": [
       {
         "id": 1,
         "author": {
-          "name": "TechCrunch",
-          "handle": "@TechCrunch",
+          "name": "The Decoder",
+          "handle": "@thedecoder",
           "avatar": "XX",
           "verified": true
         },
-        "content": "Tesla invested $2B in Elon Musk's AI company xAI, which recently disclosed a $20B funding round.",
-        "company": "xAI",
-        "amount": "$2B",
-        "round": "Strategic Investment",
+        "content": "Nvidia, Amazon, and Microsoft could invest up to $60 billion in OpenAI. The round would further deepen the AI giant's dependence on its infrastructure providers.",
+        "company": "OpenAI",
+        "amount": "$60B",
+        "round": "Late-stage Funding Round",
         "investors": [
-          "Tesla"
+          "Nvidia",
+          "Amazon",
+          "Microsoft"
         ],
-        "valuation": "N/A",
-        "timestamp": "2026-01-28",
+        "valuation": "Not disclosed",
+        "timestamp": "2026-01-29",
         "metrics": {
           "comments": 0,
           "retweets": 0,
           "likes": 0,
           "views": "0"
         },
-        "sourceUrl": "https://techcrunch.com/2026/01/28/tesla-invested-2b-in-elon-musks-xai/"
+        "sourceUrl": "https://the-decoder.com/nvidia-amazon-and-microsoft-could-invest-up-to-60-billion-in-openai/"
       },
       {
         "id": 2,
         "author": {
-          "name": "TechCrunch",
-          "handle": "@TechCrunch",
-          "avatar": "XX",
-          "verified": true
-        },
-        "content": "Waabi secures a $750M Series C round for autonomous trucking and an additional ~$250M commitment from Uber to deploy 25,000 robotaxis.",
-        "company": "Waabi",
-        "amount": "$1B",
-        "round": "Series C",
-        "investors": [
-          "Uber"
-        ],
-        "valuation": "N/A",
-        "timestamp": "2026-01-28",
-        "metrics": {
-          "comments": 0,
-          "retweets": 0,
-          "likes": 0,
-          "views": "0"
-        },
-        "sourceUrl": "https://techcrunch.com/2026/01/28/waabi-raises-1b-and-expands-into-robotaxis-with-uber/"
-      },
-      {
-        "id": 3,
-        "author": {
-          "name": "TechCrunch",
-          "handle": "@TechCrunch",
-          "avatar": "XX",
-          "verified": true
-        },
-        "content": "Anthropic reportedly looks to raise $20B at a valuation exceeding $300B in its latest funding round.",
-        "company": "Anthropic",
-        "amount": "$20B",
-        "round": "Late Stage",
-        "investors": [],
-        "valuation": "$300B",
-        "timestamp": "2026-01-27",
-        "metrics": {
-          "comments": 0,
-          "retweets": 0,
-          "likes": 0,
-          "views": "0"
-        },
-        "sourceUrl": "https://techcrunch.com/2026/01/27/anthropic-reportedly-upped-its-latest-raise-to-20b/"
-      },
-      {
-        "id": 4,
-        "author": {
           "name": "Crunchbase News",
-          "handle": "@Crunchbase",
+          "handle": "@crunchbase",
           "avatar": "XX",
           "verified": true
         },
-        "content": "Ricursive Intelligence, a frontier AI lab, raises $300M in a Series A round at a $4B valuation just two months after launch.",
+        "content": "Ricursive Intelligence, a frontier AI lab, has raised a $300 million Series A at a $4 billion valuation just two months after its launch.",
         "company": "Ricursive Intelligence",
         "amount": "$300M",
         "round": "Series A",
-        "investors": [],
+        "investors": [
+          "Not disclosed"
+        ],
         "valuation": "$4B",
         "timestamp": "2026-01-26",
         "metrics": {
@@ -271,48 +234,97 @@
         "sourceUrl": "https://news.crunchbase.com/venture/startup-ai-lab-ricursive-seriesa-unicorn/"
       },
       {
-        "id": 5,
+        "id": 3,
         "author": {
-          "name": "Techmeme",
-          "handle": "@Techmeme",
+          "name": "The Decoder",
+          "handle": "@thedecoder",
           "avatar": "XX",
           "verified": true
         },
-        "content": "PaleBlueDot, a GPU capacity marketplace, raised a $150M Series B led by B Capital at a $1B+ valuation.",
-        "company": "PaleBlueDot",
-        "amount": "$150M",
-        "round": "Series B",
+        "content": "Two new AI labs, Flapping Airplanes and Core Automation, aim to reinvent the foundations of AI development. One just raised $180M, the other is seeking up to $1B.",
+        "company": "Flapping Airplanes, Core Automation",
+        "amount": "$180M / Up to $1B",
+        "round": "Funding Round / Planned Round",
         "investors": [
-          "B Capital"
+          "Not disclosed"
         ],
-        "valuation": "$1B",
-        "timestamp": "2026-01-28",
+        "valuation": "Not disclosed",
+        "timestamp": "2026-01-29",
         "metrics": {
           "comments": 0,
           "retweets": 0,
           "likes": 0,
           "views": "0"
         },
-        "sourceUrl": "http://www.techmeme.com/260128/p56#a260128p56"
+        "sourceUrl": "https://the-decoder.com/two-startups-want-to-replace-how-ai-learns-one-just-raised-180m-another-is-seeking-up-to-1b/"
+      },
+      {
+        "id": 4,
+        "author": {
+          "name": "Crunchbase News",
+          "handle": "@crunchbase",
+          "avatar": "XX",
+          "verified": true
+        },
+        "content": "Zocks, a builder of an AI assistant for financial advisers, has raised a $45 million Series B co-led by Lightspeed Venture Partners and QED Investors.",
+        "company": "Zocks",
+        "amount": "$45M",
+        "round": "Series B",
+        "investors": [
+          "Lightspeed Venture Partners",
+          "QED Investors"
+        ],
+        "valuation": "Not disclosed",
+        "timestamp": "2026-01-26",
+        "metrics": {
+          "comments": 0,
+          "retweets": 0,
+          "likes": 0,
+          "views": "0"
+        },
+        "sourceUrl": "https://news.crunchbase.com/fintech/zocks-raises-seriesb-ai-assistant-financial-advisers/"
+      },
+      {
+        "id": 5,
+        "author": {
+          "name": "Techmeme",
+          "handle": "@techmeme",
+          "avatar": "XX",
+          "verified": true
+        },
+        "content": "Granola, which makes an AI-based note-taking app, aims to raise over $100M led by Index Ventures at a valuation that could exceed $1 billion.",
+        "company": "Granola",
+        "amount": ">$100M",
+        "round": "Funding Round",
+        "investors": [
+          "Index Ventures (planned)"
+        ],
+        "valuation": ">$1B",
+        "timestamp": "2026-01-30",
+        "metrics": {
+          "comments": 0,
+          "retweets": 0,
+          "likes": 0,
+          "views": "0"
+        },
+        "sourceUrl": "http://www.techmeme.com/260130/p11#a260130p11"
       },
       {
         "id": 6,
         "author": {
           "name": "SiliconANGLE",
-          "handle": "@SiliconANGLE",
+          "handle": "@siliconangle",
           "avatar": "XX",
           "verified": true
         },
-        "content": "Inferact launches with $150M in seed funding to commercialize the open-source vLLM project. Led by Andreessen Horowitz and Lightspeed.",
-        "company": "Inferact",
-        "amount": "$150M",
-        "round": "Seed",
+        "content": "Fei-Fei Li's AI startup World Labs is reportedly in talks to raise up to $500 million from investors at a $5 billion valuation.",
+        "company": "World Labs",
+        "amount": "Up to $500M",
+        "round": "Funding Round",
         "investors": [
-          "Andreessen Horowitz",
-          "Lightspeed",
-          "Databricks Ventures"
+          "Not disclosed"
         ],
-        "valuation": "N/A",
+        "valuation": "$5B",
         "timestamp": "2026-01-23",
         "metrics": {
           "comments": 0,
@@ -320,30 +332,32 @@
           "likes": 0,
           "views": "0"
         },
-        "sourceUrl": "https://siliconangle.com/2026/01/22/inferact-launches-150m-funding-commercialize-vllm/"
+        "sourceUrl": "https://siliconangle.com/2026/01/23/fei-fei-lis-world-labs-reportedly-raising-funding-5b-valuation/"
       },
       {
         "id": 7,
         "author": {
-          "name": "SiliconANGLE",
-          "handle": "@SiliconANGLE",
+          "name": "Techmeme",
+          "handle": "@techmeme",
           "avatar": "XX",
           "verified": true
         },
-        "content": "LiveKit raises $100M at a $1B valuation to scale its real-time AI and media developer platform.",
-        "company": "LiveKit",
-        "amount": "$100M",
-        "round": "N/A",
-        "investors": [],
-        "valuation": "$1B",
-        "timestamp": "2026-01-22",
+        "content": "Checkbox, an AI startup that aims to automate legal intake, raised a $23M Series A led by Touring Capital.",
+        "company": "Checkbox",
+        "amount": "$23M",
+        "round": "Series A",
+        "investors": [
+          "Touring Capital"
+        ],
+        "valuation": "Not disclosed",
+        "timestamp": "2026-01-30",
         "metrics": {
           "comments": 0,
           "retweets": 0,
           "likes": 0,
           "views": "0"
         },
-        "sourceUrl": "https://siliconangle.com/2026/01/22/livekit-raises-100m-1b-valuation-scale-real-time-ai-media-platform/"
+        "sourceUrl": "http://www.techmeme.com/260130/p8#a260130p8"
       }
     ]
   },
@@ -352,188 +366,142 @@
       {
         "id": 1,
         "author": {
-          "name": "Techmeme",
-          "handle": "@Techmeme",
+          "name": "The Decoder",
+          "handle": "@thedecoder",
           "avatar": "XX",
           "verified": true
         },
-        "content": "Microsoft meldet für Q2 einen Umsatzanstieg von 39 % im Vergleich zum Vorjahr für Azure, übertrifft die Schätzungen von 38,8 %. Der gebuchte Auftragsbestand von Microsoft Cloud stieg um 110 % auf 625 Mrd. US-Dollar, wovon ~45 % auf OpenAI entfielen.",
+        "content": "Microsoft-Aktien fallen zweistellig, obwohl Cloud-Umsatz Rekorde bricht. Fast die Hälfte des kommerziellen Vertragsbestands ist an OpenAI gebunden, was Bedenken hinsichtlich der Konzentration aufweckt.",
         "ticker": "MSFT",
-        "price": "N/A",
-        "change": "+39% YoY",
-        "direction": "up",
-        "marketCap": "N/A",
-        "timestamp": "2026-01-28",
+        "price": "Nicht angegeben",
+        "change": "Zweistelliger Rückgang",
+        "direction": "down",
+        "marketCap": "Nicht angegeben",
+        "timestamp": "2026-01-29",
         "metrics": {
           "comments": 0,
           "retweets": 0,
           "likes": 0,
           "views": "0"
         },
-        "sourceUrl": "http://www.techmeme.com/260128/p57#a260128p57"
+        "sourceUrl": "https://the-decoder.com/nearly-half-of-microsofts-commercial-contract-backlog-is-tied-to-openai/"
       },
       {
         "id": 2,
         "author": {
           "name": "Techmeme",
-          "handle": "@Techmeme",
+          "handle": "@techmeme",
           "avatar": "XX",
           "verified": true
         },
-        "content": "Microsofts Aktie fällt um über 4 % im After-Hours-Handel, nachdem das Unternehmen Kapitalausgaben von 37,5 Mrd. US-Dollar für Q2 meldet, was die Analystenschätzungen von 36,2 Mrd. US-Dollar übertrifft.",
-        "ticker": "MSFT",
-        "price": "N/A",
-        "change": "-4%+",
+        "content": "Die Versicherungstechnologie-Firma Ethos ging mit einem Börsengang an die Börse, bei dem sie 10,5 Millionen Aktien zu je 19 Dollar verkaufte. Die Marktkapitalisierung erreichte 1,1 Milliarden Dollar, deutlich unter der Bewertung von 2,7 Milliarden Dollar aus dem Jahr 2021.",
+        "ticker": "Nicht angegeben",
+        "price": "$19",
+        "change": "IPO",
         "direction": "down",
-        "marketCap": "N/A",
-        "timestamp": "2026-01-28",
+        "marketCap": "$1,1 Mrd.",
+        "timestamp": "2026-01-30",
         "metrics": {
           "comments": 0,
           "retweets": 0,
           "likes": 0,
           "views": "0"
         },
-        "sourceUrl": "http://www.techmeme.com/260128/p55#a260128p55"
+        "sourceUrl": "http://www.techmeme.com/260130/p7#a260130p7"
       },
       {
         "id": 3,
         "author": {
           "name": "Techmeme",
-          "handle": "@Techmeme",
+          "handle": "@techmeme",
           "avatar": "XX",
           "verified": true
         },
-        "content": "Meta-Aktie steigt im After-Hours-Handel um über 9 %, nachdem das Unternehmen für Q4 einen Umsatz von 59,9 Mrd. US-Dollar (vs. 58,35 Mrd. US-Dollar erwartet) und einen Nettogewinn von 22,8 Mrd. US-Dollar meldet.",
-        "ticker": "META",
-        "price": "N/A",
-        "change": "+9%+",
+        "content": "Der chinesische KI-Chip-Hersteller Axera Semiconductor plant einen Börsengang in Hongkong, bei dem bis zu 379,2 Millionen Dollar eingesammelt werden sollen. Das Unternehmen konzentriert sich auf KI-Inferenz-Chips für On-Device- und Edge-Computing.",
+        "ticker": "Nicht angegeben",
+        "price": "IPO",
+        "change": "IPO",
         "direction": "up",
-        "marketCap": "N/A",
-        "timestamp": "2026-01-28",
+        "marketCap": "Nicht angegeben",
+        "timestamp": "2026-01-30",
         "metrics": {
           "comments": 0,
           "retweets": 0,
           "likes": 0,
           "views": "0"
         },
-        "sourceUrl": "http://www.techmeme.com/260128/p49#a260128p49"
-      },
-      {
-        "id": 4,
-        "author": {
-          "name": "Techmeme",
-          "handle": "@Techmeme",
-          "avatar": "XX",
-          "verified": true
-        },
-        "content": "IBM-Aktie springt im After-Hours-Handel um über 8 %, nachdem das Unternehmen für Q4 einen Umsatz von 19,7 Mrd. US-Dollar (vs. 19,2 Mrd. US-Dollar erwartet) meldet und für 2026 ein Umsatzwachstum und Free Cash Flow über den Schätzungen prognostiziert.",
-        "ticker": "IBM",
-        "price": "N/A",
-        "change": "+8%+",
-        "direction": "up",
-        "marketCap": "N/A",
-        "timestamp": "2026-01-28",
-        "metrics": {
-          "comments": 0,
-          "retweets": 0,
-          "likes": 0,
-          "views": "0"
-        },
-        "sourceUrl": "http://www.techmeme.com/260128/p53#a260128p53"
+        "sourceUrl": "http://www.techmeme.com/260129/p61#a260129p61"
       }
     ],
     "en": [
       {
         "id": 1,
         "author": {
-          "name": "Techmeme",
-          "handle": "@Techmeme",
+          "name": "The Decoder",
+          "handle": "@thedecoder",
           "avatar": "XX",
           "verified": true
         },
-        "content": "Microsoft reports Azure Q2 revenue up 39% YoY, beating 38.8% estimates. Microsoft Cloud's contracted backlog grew 110% to $625B, ~45% of which was driven by OpenAI.",
+        "content": "Microsoft stock is down double digits despite record cloud revenue. Nearly half of its commercial contract backlog is tied to OpenAI, raising concentration concerns.",
         "ticker": "MSFT",
-        "price": "N/A",
-        "change": "+39% YoY",
-        "direction": "up",
-        "marketCap": "N/A",
-        "timestamp": "2026-01-28",
+        "price": "Not specified",
+        "change": "Double-digit decline",
+        "direction": "down",
+        "marketCap": "Not specified",
+        "timestamp": "2026-01-29",
         "metrics": {
           "comments": 0,
           "retweets": 0,
           "likes": 0,
           "views": "0"
         },
-        "sourceUrl": "http://www.techmeme.com/260128/p57#a260128p57"
+        "sourceUrl": "https://the-decoder.com/nearly-half-of-microsofts-commercial-contract-backlog-is-tied-to-openai/"
       },
       {
         "id": 2,
         "author": {
           "name": "Techmeme",
-          "handle": "@Techmeme",
+          "handle": "@techmeme",
           "avatar": "XX",
           "verified": true
         },
-        "content": "Microsoft stock drops 4%+ after hours after the company reports Q2 capital expenditures of $37.5B, exceeding analyst estimates of $36.2B.",
-        "ticker": "MSFT",
-        "price": "N/A",
-        "change": "-4%+",
+        "content": "Insurance tech company Ethos raised ~$200M in its IPO, selling 10.5M shares at $19 each. It reached a $1.1B market cap, below its 2021 $2.7B valuation.",
+        "ticker": "Not specified",
+        "price": "$19",
+        "change": "IPO",
         "direction": "down",
-        "marketCap": "N/A",
-        "timestamp": "2026-01-28",
+        "marketCap": "$1.1B",
+        "timestamp": "2026-01-30",
         "metrics": {
           "comments": 0,
           "retweets": 0,
           "likes": 0,
           "views": "0"
         },
-        "sourceUrl": "http://www.techmeme.com/260128/p55#a260128p55"
+        "sourceUrl": "http://www.techmeme.com/260130/p7#a260130p7"
       },
       {
         "id": 3,
         "author": {
           "name": "Techmeme",
-          "handle": "@Techmeme",
+          "handle": "@techmeme",
           "avatar": "XX",
           "verified": true
         },
-        "content": "Meta stock up 9%+ after hours after reporting Q4 revenue of $59.9B (vs. $58.35B est.) and net income of $22.8B.",
-        "ticker": "META",
-        "price": "N/A",
-        "change": "+9%+",
+        "content": "Chinese AI chipmaker Axera Semiconductor aims to raise up to ~$379.2M in a Hong Kong IPO. The company focuses on AI inference SoCs for on-device and edge computing.",
+        "ticker": "Not specified",
+        "price": "IPO",
+        "change": "IPO",
         "direction": "up",
-        "marketCap": "N/A",
-        "timestamp": "2026-01-28",
+        "marketCap": "Not specified",
+        "timestamp": "2026-01-30",
         "metrics": {
           "comments": 0,
           "retweets": 0,
           "likes": 0,
           "views": "0"
         },
-        "sourceUrl": "http://www.techmeme.com/260128/p49#a260128p49"
-      },
-      {
-        "id": 4,
-        "author": {
-          "name": "Techmeme",
-          "handle": "@Techmeme",
-          "avatar": "XX",
-          "verified": true
-        },
-        "content": "IBM stock jumps 8%+ after hours after reporting Q4 revenue of $19.7B (vs. $19.2B est.) and projecting 2026 revenue growth and free cash flow above estimates.",
-        "ticker": "IBM",
-        "price": "N/A",
-        "change": "+8%+",
-        "direction": "up",
-        "marketCap": "N/A",
-        "timestamp": "2026-01-28",
-        "metrics": {
-          "comments": 0,
-          "retweets": 0,
-          "likes": 0,
-          "views": "0"
-        },
-        "sourceUrl": "http://www.techmeme.com/260128/p53#a260128p53"
+        "sourceUrl": "http://www.techmeme.com/260129/p61#a260129p61"
       }
     ]
   },
@@ -542,136 +510,224 @@
       {
         "id": 1,
         "author": {
-          "name": "TechCrunch",
-          "handle": "@TechCrunch",
+          "name": "The Decoder",
+          "handle": "@thedecoder",
           "avatar": "XX",
           "verified": true
         },
-        "content": "ServiceNow schließt eine weitere KI-Partnerschaft, dieses Mal mit Anthropic, nur eine Woche nach der Ankündigung einer Partnerschaft mit OpenAI.",
-        "acquirer": "ServiceNow",
-        "target": "Anthropic",
-        "dealValue": "N/A",
-        "dealType": "Partnerschaft",
-        "timestamp": "2026-01-28",
+        "content": "SpaceX verhandelt über eine Fusion mit Elon Musks KI-Unternehmen xAI. Die Vereinigung würde Grok, Starlink und X unter einem Dach zusammenführen und vor einem geplanten Börsengang stattfinden.",
+        "acquirer": "SpaceX",
+        "target": "xAI",
+        "dealValue": "Nicht angegeben",
+        "dealType": "Fusion",
+        "timestamp": "2026-01-30",
         "metrics": {
           "comments": 0,
           "retweets": 0,
           "likes": 0,
           "views": "0"
         },
-        "sourceUrl": "https://techcrunch.com/2026/01/28/servicenow-inks-another-ai-partnership-this-time-with-anthropic/"
+        "sourceUrl": "https://the-decoder.com/spacex-eyes-merger-with-xai-that-would-unite-grok-starlink-and-x-under-one-roof/"
       },
       {
         "id": 2,
         "author": {
-          "name": "SiliconANGLE",
-          "handle": "@SiliconANGLE",
+          "name": "Techmeme",
+          "handle": "@techmeme",
           "avatar": "XX",
           "verified": true
         },
-        "content": "Yelp kündigt an, das KI-gestützte Lead-Management-Startup Hatch für bis zu 300 Mio. US-Dollar zu erwerben. Die anfängliche Zahlung beträgt 270 Mio. US-Dollar in bar.",
-        "acquirer": "Yelp",
-        "target": "Hatch",
-        "dealValue": "$300 Mio.",
-        "dealType": "Akquisition",
-        "timestamp": "2026-01-22",
+        "content": "China hat DeepSeek die Genehmigung für den Kauf von Nvidias H200-KI-Chips erteilt, stellt aber regulatorische Auflagen. Die Bedingungen werden noch finalisiert.",
+        "acquirer": "DeepSeek",
+        "target": "Nvidia H200 Chips (Einkauf)",
+        "dealValue": "Nicht angegeben",
+        "dealType": "Partnerschaft/Einkauf",
+        "timestamp": "2026-01-30",
         "metrics": {
           "comments": 0,
           "retweets": 0,
           "likes": 0,
           "views": "0"
         },
-        "sourceUrl": "https://siliconangle.com/2026/01/22/yelp-acquire-ai-lead-management-startup-hatch-300m/"
+        "sourceUrl": "http://www.techmeme.com/260130/p3#a260130p3"
       },
       {
         "id": 3,
         "author": {
-          "name": "TechCrunch",
-          "handle": "@TechCrunch",
+          "name": "EU-Startups",
+          "handle": "@eustartups",
           "avatar": "XX",
           "verified": true
         },
-        "content": "Der KI-Datenlabeler Handshake übernimmt Cleanlab, ein Ziel mehrerer Übernahmeangebote, hauptsächlich um Talente zu gewinnen (Acqui-hire).",
-        "acquirer": "Handshake",
-        "target": "Cleanlab",
-        "dealValue": "N/A",
-        "dealType": "Akquisition (Acqui-hire)",
-        "timestamp": "2026-01-28",
+        "content": "GuestReady, ein Schweizer Unternehmen für die Verwaltung von Ferienwohnungen, übernimmt Lightbooking und erweitert damit sein spanisches Portfolio um mehr als 200 Einheiten. Das globale Portfolio übersteigt nun 4.000 Einheiten.",
+        "acquirer": "GuestReady",
+        "target": "Lightbooking",
+        "dealValue": "Nicht angegeben",
+        "dealType": "Akquisition",
+        "timestamp": "2026-01-30",
         "metrics": {
           "comments": 0,
           "retweets": 0,
           "likes": 0,
           "views": "0"
         },
-        "sourceUrl": "https://techcrunch.com/2026/01/28/ai-data-labeler-handshake-buys-cleanlab-an-acquisition-target-of-multiple-others/"
+        "sourceUrl": "https://www.eu-startups.com/2026/01/guestreadys-acquisition-of-lightbooking-lifts-spanish-portfolio-by-200-units-taking-global-total-beyond-4000/"
+      },
+      {
+        "id": 4,
+        "author": {
+          "name": "Techmeme",
+          "handle": "@techmeme",
+          "avatar": "XX",
+          "verified": true
+        },
+        "content": "Frankreich blockiert den Verkauf des Bodennetzwerkgeschäfts von Eutelsat an EQT für etwa 550 Millionen Euro. Frankreich bezeichnet es als Europas einzigen Konkurrenten zu Starlink und hält eine 29,6%ige Beteiligung.",
+        "acquirer": "EQT (geplant)",
+        "target": "Eutelsat (Bodennetzwerkgeschäft)",
+        "dealValue": "~€550 Mio.",
+        "dealType": "Blockierte Akquisition",
+        "timestamp": "2026-01-30",
+        "metrics": {
+          "comments": 0,
+          "retweets": 0,
+          "likes": 0,
+          "views": "0"
+        },
+        "sourceUrl": "http://www.techmeme.com/260130/p6#a260130p6"
+      },
+      {
+        "id": 5,
+        "author": {
+          "name": "Techmeme",
+          "handle": "@techmeme",
+          "avatar": "XX",
+          "verified": true
+        },
+        "content": "Costco wird Instacarts White-Label-E-Commerce-Dienst nutzen, um Lebensmittellieferungen in Spanien und Frankreich anzubieten. Die Partnerschaft wird über Nordamerika hinaus erweitert.",
+        "acquirer": "Costco",
+        "target": "Instacart (Partnerschaft)",
+        "dealValue": "Nicht angegeben",
+        "dealType": "Partnerschaft",
+        "timestamp": "2026-01-30",
+        "metrics": {
+          "comments": 0,
+          "retweets": 0,
+          "likes": 0,
+          "views": "0"
+        },
+        "sourceUrl": "http://www.techmeme.com/260130/p10#a260130p10"
       }
     ],
     "en": [
       {
         "id": 1,
         "author": {
-          "name": "TechCrunch",
-          "handle": "@TechCrunch",
+          "name": "The Decoder",
+          "handle": "@thedecoder",
           "avatar": "XX",
           "verified": true
         },
-        "content": "ServiceNow inks another AI partnership, this time with Anthropic, just a week after announcing a partnership with OpenAI.",
-        "acquirer": "ServiceNow",
-        "target": "Anthropic",
-        "dealValue": "N/A",
-        "dealType": "Partnership",
-        "timestamp": "2026-01-28",
+        "content": "SpaceX is negotiating a merger with Elon Musk's AI company xAI. The union would bring Grok, Starlink, and X under one roof ahead of a planned IPO.",
+        "acquirer": "SpaceX",
+        "target": "xAI",
+        "dealValue": "Not disclosed",
+        "dealType": "Merger",
+        "timestamp": "2026-01-30",
         "metrics": {
           "comments": 0,
           "retweets": 0,
           "likes": 0,
           "views": "0"
         },
-        "sourceUrl": "https://techcrunch.com/2026/01/28/servicenow-inks-another-ai-partnership-this-time-with-anthropic/"
+        "sourceUrl": "https://the-decoder.com/spacex-eyes-merger-with-xai-that-would-unite-grok-starlink-and-x-under-one-roof/"
       },
       {
         "id": 2,
         "author": {
-          "name": "SiliconANGLE",
-          "handle": "@SiliconANGLE",
+          "name": "Techmeme",
+          "handle": "@techmeme",
           "avatar": "XX",
           "verified": true
         },
-        "content": "Yelp to acquire AI lead management startup Hatch for up to $300M. The initial payment is $270M in cash.",
-        "acquirer": "Yelp",
-        "target": "Hatch",
-        "dealValue": "$300M",
-        "dealType": "Acquisition",
-        "timestamp": "2026-01-22",
+        "content": "China has given DeepSeek approval to buy Nvidia's H200 AI chips but imposes regulatory conditions, which are still being finalized.",
+        "acquirer": "DeepSeek",
+        "target": "Nvidia H200 Chips (Purchase)",
+        "dealValue": "Not disclosed",
+        "dealType": "Partnership/Purchase",
+        "timestamp": "2026-01-30",
         "metrics": {
           "comments": 0,
           "retweets": 0,
           "likes": 0,
           "views": "0"
         },
-        "sourceUrl": "https://siliconangle.com/2026/01/22/yelp-acquire-ai-lead-management-startup-hatch-300m/"
+        "sourceUrl": "http://www.techmeme.com/260130/p3#a260130p3"
       },
       {
         "id": 3,
         "author": {
-          "name": "TechCrunch",
-          "handle": "@TechCrunch",
+          "name": "EU-Startups",
+          "handle": "@eustartups",
           "avatar": "XX",
           "verified": true
         },
-        "content": "AI data labeler Handshake buys Cleanlab, an acquisition target of multiple others, primarily to acquire talent (acq-hire).",
-        "acquirer": "Handshake",
-        "target": "Cleanlab",
-        "dealValue": "N/A",
-        "dealType": "Acquisition (Acqui-hire)",
-        "timestamp": "2026-01-28",
+        "content": "GuestReady, a Swiss short-term rental management company, is acquiring Lightbooking, expanding its Spanish portfolio by over 200 units and taking its global total beyond 4,000.",
+        "acquirer": "GuestReady",
+        "target": "Lightbooking",
+        "dealValue": "Not disclosed",
+        "dealType": "Acquisition",
+        "timestamp": "2026-01-30",
         "metrics": {
           "comments": 0,
           "retweets": 0,
           "likes": 0,
           "views": "0"
         },
-        "sourceUrl": "https://techcrunch.com/2026/01/28/ai-data-labeler-handshake-buys-cleanlab-an-acquisition-target-of-multiple-others/"
+        "sourceUrl": "https://www.eu-startups.com/2026/01/guestreadys-acquisition-of-lightbooking-lifts-spanish-portfolio-by-200-units-taking-global-total-beyond-4000/"
+      },
+      {
+        "id": 4,
+        "author": {
+          "name": "Techmeme",
+          "handle": "@techmeme",
+          "avatar": "XX",
+          "verified": true
+        },
+        "content": "France blocks Eutelsat's ~€550M sale of its ground antenna business to EQT, calling it Europe's only Starlink competitor. France has a 29.6% stake in Eutelsat.",
+        "acquirer": "EQT (planned)",
+        "target": "Eutelsat (ground antenna business)",
+        "dealValue": "~€550M",
+        "dealType": "Blocked Acquisition",
+        "timestamp": "2026-01-30",
+        "metrics": {
+          "comments": 0,
+          "retweets": 0,
+          "likes": 0,
+          "views": "0"
+        },
+        "sourceUrl": "http://www.techmeme.com/260130/p6#a260130p6"
+      },
+      {
+        "id": 5,
+        "author": {
+          "name": "Techmeme",
+          "handle": "@techmeme",
+          "avatar": "XX",
+          "verified": true
+        },
+        "content": "Costco will use Instacart's white-label e-commerce service to offer grocery delivery in Spain and France, extending their partnership beyond North America.",
+        "acquirer": "Costco",
+        "target": "Instacart (Partnership)",
+        "dealValue": "Not disclosed",
+        "dealType": "Partnership",
+        "timestamp": "2026-01-30",
+        "metrics": {
+          "comments": 0,
+          "retweets": 0,
+          "likes": 0,
+          "views": "0"
+        },
+        "sourceUrl": "http://www.techmeme.com/260130/p10#a260130p10"
       }
     ]
   }
