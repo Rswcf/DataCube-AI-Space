@@ -79,12 +79,44 @@ def fetch_youtube_videos(
         return []
 
     if queries is None:
+        # Business-oriented queries for consultants and analytics teams
         queries = [
-            "AI news",
-            "artificial intelligence tutorial",
-            "ChatGPT tips",
-            "machine learning explained",
-            "AI technology",
+            # AI News (general)
+            "AI news this week",
+            "AI business news",
+
+            # Major Tool Tutorials
+            "ChatGPT tutorial",
+            "ChatGPT for business",
+            "Claude AI tutorial",
+            "Gemini tutorial",
+            "Perplexity AI tutorial",
+            "NotebookLM tutorial",
+
+            # Workplace Productivity (core category)
+            "AI productivity tips",
+            "AI tools for work",
+            "best AI tools",
+            "AI for Excel",
+            "AI presentation",
+            "AI automation workflow",
+            "prompt engineering guide",
+
+            # Image & Video (marketing use)
+            "Midjourney tips",
+            "AI image generation",
+            "Sora tutorial",
+
+            # Business & Strategy
+            "AI in finance",
+            "AI for consulting",
+            "AI strategy business",
+            "AI transformation",
+
+            # German Content
+            "KI News deutsch",
+            "ChatGPT Tutorial deutsch",
+            "KI Tools deutsch",
         ]
 
     try:

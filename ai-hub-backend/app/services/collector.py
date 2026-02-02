@@ -38,6 +38,82 @@ def week_date_range(year: int, week: int) -> str:
     return f"{start.day:02d}.{start.month:02d} - {end.day:02d}.{end.month:02d}"
 
 
+def get_week_boundaries(week_id: str) -> tuple[datetime, datetime]:
+    """
+    Return the start and end datetime for a given ISO week.
+
+    Args:
+        week_id: Week ID in format '2026-kw06'
+
+    Returns:
+        Tuple of (start, end) where:
+        - start: Monday 00:00:00 of the week
+        - end: Monday 00:00:00 of the next week (exclusive)
+    """
+    parts = week_id.split("-kw")
+    year = int(parts[0])
+    week_num = int(parts[1])
+
+    # ISO week: Jan 4 is always in week 1
+    jan4 = datetime(year, 1, 4)
+    start = jan4 + timedelta(weeks=week_num - 1, days=-jan4.weekday())
+    end = start + timedelta(days=7)  # Next Monday 00:00
+
+    return start, end
+
+
+def parse_article_date(date_str: Optional[str]) -> Optional[datetime]:
+    """
+    Parse article published date from various formats.
+
+    Args:
+        date_str: Date string in various formats (RSS, ISO, etc.)
+
+    Returns:
+        datetime object or None if parsing fails
+    """
+    if not date_str:
+        return None
+
+    from dateutil import parser as dateutil_parser
+
+    try:
+        # dateutil.parser handles most formats automatically
+        dt = dateutil_parser.parse(date_str)
+        # Remove timezone info for comparison (treat all as local/UTC)
+        if dt.tzinfo:
+            dt = dt.replace(tzinfo=None)
+        return dt
+    except (ValueError, TypeError):
+        pass
+
+    return None
+
+
+def is_article_in_week(article: dict, week_start: datetime, week_end: datetime) -> bool:
+    """
+    Check if an article belongs to the target week.
+
+    Uses lenient matching: articles without parseable dates are included.
+
+    Args:
+        article: Article dict with 'published' field
+        week_start: Start of target week (Monday 00:00)
+        week_end: End of target week (next Monday 00:00, exclusive)
+
+    Returns:
+        True if article should be included in this week
+    """
+    pub_date = parse_article_date(article.get("published"))
+
+    if pub_date:
+        # Has parseable date: strict week boundary check
+        return week_start <= pub_date < week_end
+    else:
+        # No parseable date: lenient - include article
+        return True
+
+
 def load_sources() -> dict:
     """Load RSS sources from YAML config (if available)."""
     # Default sources if no config file
@@ -52,11 +128,46 @@ def load_sources() -> dict:
             {"url": "https://techcrunch.com/tag/funding/feed/", "name": "TechCrunch Funding"},
             {"url": "https://news.crunchbase.com/feed/", "name": "Crunchbase News"},
             {"url": "https://www.techmeme.com/feed.xml", "name": "Techmeme"},
+            # New investment sources
+            {"url": "https://sifted.eu/feed", "name": "Sifted"},
+            {"url": "https://www.pehub.com/feed/", "name": "PEHub"},
+            {"url": "https://nvca.org/feed/", "name": "NVCA"},
+            {"url": "https://venturebeat.com/feed/", "name": "VentureBeat"},
+            # Chinese investment source
+            {"url": "https://36kr.com/feed", "name": "36Kr", "lang": "zh"},
+            # Phase 2: Additional sources
+            {"url": "https://tech.eu/feed", "name": "Tech.eu"},
+            {"url": "https://technode.com/feed/", "name": "TechNode"},
+            {"url": "https://pandaily.com/feed/", "name": "Pandaily"},
         ],
         "tips": [
+            # Blogs (business-oriented)
             {"url": "https://simonwillison.net/atom/everything/", "name": "Simon Willison"},
+            {"url": "https://www.oneusefulthing.org/feed", "name": "One Useful Thing (Ethan Mollick)"},
+
+            # Reddit - LLM & Chat Tools
             {"url": "https://www.reddit.com/r/ChatGPT/top/.rss?t=week", "name": "Reddit r/ChatGPT"},
             {"url": "https://www.reddit.com/r/ClaudeAI/top/.rss?t=week", "name": "Reddit r/ClaudeAI"},
+            {"url": "https://www.reddit.com/r/OpenAI/top/.rss?t=week", "name": "Reddit r/OpenAI"},
+            {"url": "https://www.reddit.com/r/PromptEngineering/top/.rss?t=week", "name": "Reddit r/PromptEngineering"},
+
+            # Reddit - Image Generation (marketing use)
+            {"url": "https://www.reddit.com/r/midjourney/top/.rss?t=week", "name": "Reddit r/Midjourney"},
+
+            # Reddit - AI Search & Research Tools
+            {"url": "https://www.reddit.com/r/perplexity_ai/top/.rss?t=week", "name": "Reddit r/perplexity_ai"},
+            {"url": "https://www.reddit.com/r/NotebookLM/top/.rss?t=week", "name": "Reddit r/NotebookLM"},
+
+            # Reddit - General AI Discussion
+            {"url": "https://www.reddit.com/r/artificial/top/.rss?t=week", "name": "Reddit r/artificial"},
+            {"url": "https://www.reddit.com/r/singularity/top/.rss?t=week", "name": "Reddit r/singularity"},
+
+            # Reddit - Video/Audio Generation (content creation)
+            {"url": "https://www.reddit.com/r/aivideo/top/.rss?t=week", "name": "Reddit r/aivideo"},
+            {"url": "https://www.reddit.com/r/ElevenLabs/top/.rss?t=week", "name": "Reddit r/ElevenLabs"},
+
+            # Reddit - Pro Users
+            {"url": "https://www.reddit.com/r/ChatGPTPro/top/.rss?t=week", "name": "Reddit r/ChatGPTPro"},
         ],
     }
 
@@ -156,6 +267,9 @@ def stage1_fetch_and_store(db: Session, week_id: str) -> dict:
     """
     Stage 1: Fetch all content from sources and store raw data.
 
+    Articles are filtered to only include those published within the target week's
+    ISO boundaries. Articles without parseable dates are included (lenient matching).
+
     Args:
         db: Database session
         week_id: Week ID
@@ -167,6 +281,10 @@ def stage1_fetch_and_store(db: Session, week_id: str) -> dict:
 
     logger.info("=== Stage 1: Fetching & Storing Raw Data ===")
 
+    # Get week boundaries for filtering
+    week_start, week_end = get_week_boundaries(week_id)
+    logger.info(f"Week boundaries: {week_start.strftime('%Y-%m-%d')} to {week_end.strftime('%Y-%m-%d')} (exclusive)")
+
     # Ensure week exists and clear old raw data
     ensure_week(db, week_id)
     clear_raw_data(db, week_id)
@@ -174,10 +292,9 @@ def stage1_fetch_and_store(db: Session, week_id: str) -> dict:
     # Load sources
     sources = load_sources()
 
-    # Fetch HN with enhancement
+    # Fetch HN with enhancement (uses default HN_DEFAULT_QUERIES for comprehensive coverage)
     logger.info("Fetching Hacker News stories...")
     hn_articles = fetch_hn_stories(
-        query="AI",
         min_points=settings.hn_min_points,
         days=settings.hn_days,
         limit=settings.hn_limit,
@@ -205,8 +322,13 @@ def stage1_fetch_and_store(db: Session, week_id: str) -> dict:
         transcript = fetch_video_transcript(video["video_id"])
         video["transcript"] = transcript
 
-    all_articles = hn_articles + rss_articles
-    logger.info(f"Total articles: {len(all_articles)}, YouTube videos: {len(youtube_videos)}")
+    # Filter articles by week boundary
+    all_articles_raw = hn_articles + rss_articles
+    all_articles = [a for a in all_articles_raw if is_article_in_week(a, week_start, week_end)]
+    filtered_count = len(all_articles_raw) - len(all_articles)
+    if filtered_count > 0:
+        logger.info(f"Filtered out {filtered_count} articles outside week boundary")
+    logger.info(f"Total articles after filtering: {len(all_articles)}, YouTube videos: {len(youtube_videos)}")
 
     # Store raw articles
     for article in all_articles:
@@ -570,6 +692,7 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
                     amount_de=de_p.get("amount", "N/A"),
                     amount_en=en_p.get("amount", "N/A"),
                     round=de_p.get("round", ""),
+                    round_category=de_p.get("roundCategory") or en_p.get("roundCategory"),
                     investors=de_p.get("investors", []),
                     valuation_de=de_p.get("valuation"),
                     valuation_en=en_p.get("valuation"),
@@ -605,6 +728,7 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
                     deal_value_en=en_p.get("dealValue"),
                     deal_type_de=de_p.get("dealType", ""),
                     deal_type_en=en_p.get("dealType", ""),
+                    industry=de_p.get("industry") or en_p.get("industry"),
                     author=de_p.get("author", {}),
                     timestamp=de_p.get("timestamp", ""),
                     source_url=de_p.get("sourceUrl"),

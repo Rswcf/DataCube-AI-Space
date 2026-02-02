@@ -12,14 +12,47 @@ import re
 logger = logging.getLogger(__name__)
 
 
-def fetch_hn_top_stories(
-    query: str = "AI",
-    min_points: int = 100,
-    days: int = 7,
-    limit: int = 50,
+# Default HN search queries for business-oriented AI coverage
+# Optimized for consultants and analytics teams (non-developers)
+HN_DEFAULT_QUERIES = [
+    # General AI
+    "AI",                  # General AI news
+    "LLM",                 # Large Language Models
+    "generative AI",       # Generative AI (business term)
+
+    # Major Products & Companies
+    "ChatGPT",             # OpenAI's ChatGPT
+    "Claude",              # Anthropic's Claude
+    "Gemini",              # Google's Gemini
+    "OpenAI",              # Company news
+    "Anthropic",           # Company news
+    "Perplexity",          # AI search tool (research utility)
+
+    # Emerging Models (free/low-cost options)
+    "DeepSeek",            # High-quality free model
+    "Grok",                # xAI model
+
+    # Image & Video Generation (marketing use)
+    "Sora",                # Video generation
+    "Midjourney",          # Image generation
+    "Stable Diffusion",    # Open-source image generation
+
+    # Business Applications
+    "AI startup",          # Startup news
+    "AI funding",          # Investment news
+    "AI acquisition",      # M&A news
+    "AI enterprise",       # Enterprise applications
+]
+
+
+def _fetch_single_query(
+    query: str,
+    min_points: int,
+    days: int,
+    limit: int,
 ) -> list[dict]:
     """
-    Fetch top HN stories from Algolia API.
+    Fetch HN stories for a single query from Algolia API.
 
     Args:
         query: Search query
@@ -43,7 +76,7 @@ def fetch_hn_top_stories(
         resp.raise_for_status()
         data = resp.json()
     except Exception as e:
-        logger.error(f"Error fetching HN stories: {e}")
+        logger.error(f"Error fetching HN stories for query '{query}': {e}")
         return []
 
     cutoff = datetime.now() - timedelta(days=days)
@@ -71,8 +104,52 @@ def fetch_hn_top_stories(
         if len(stories) >= limit:
             break
 
-    stories.sort(key=lambda x: x["points"], reverse=True)
     return stories
+
+
+def fetch_hn_top_stories(
+    queries: list[str] = None,
+    min_points: int = 100,
+    days: int = 7,
+    limit: int = 50,
+) -> list[dict]:
+    """
+    Fetch top HN stories from Algolia API using multiple queries.
+
+    Searches for multiple AI-related keywords and merges results,
+    deduplicating by HN story ID and sorting by points.
+
+    Args:
+        queries: List of search queries (default: HN_DEFAULT_QUERIES)
+        min_points: Minimum points filter
+        days: Look back period
+        limit: Maximum number of stories to return
+
+    Returns:
+        List of HN stories with metadata, sorted by points
+    """
+    if queries is None:
+        queries = HN_DEFAULT_QUERIES
+
+    all_stories = []
+    seen_ids = set()
+
+    # Fetch stories for each query
+    for query in queries:
+        logger.debug(f"Fetching HN stories for query: {query}")
+        stories = _fetch_single_query(query, min_points, days, limit)
+
+        for story in stories:
+            hn_id = story.get("hn_id")
+            if hn_id and hn_id not in seen_ids:
+                seen_ids.add(hn_id)
+                all_stories.append(story)
+
+    # Sort by points and limit results
+    all_stories.sort(key=lambda x: x["points"], reverse=True)
+    logger.info(f"Found {len(all_stories)} unique HN stories across {len(queries)} queries")
+
+    return all_stories[:limit]
 
 
 def fetch_hn_comments(story_id: str, limit: int = 5) -> list[str]:
@@ -246,7 +323,7 @@ def enhance_hn_articles(stories: list[dict], max_items: int = 30) -> list[dict]:
 
 
 def fetch_hn_stories(
-    query: str = "AI",
+    queries: list[str] = None,
     min_points: int = 100,
     days: int = 7,
     limit: int = 50,
@@ -257,7 +334,7 @@ def fetch_hn_stories(
     Main entry point for fetching HN stories.
 
     Args:
-        query: Search query
+        queries: List of search queries (default: HN_DEFAULT_QUERIES)
         min_points: Minimum points filter
         days: Look back period
         limit: Maximum stories to fetch
@@ -268,7 +345,7 @@ def fetch_hn_stories(
         List of HN stories with optional full content
     """
     logger.info("Fetching HN stories...")
-    stories = fetch_hn_top_stories(query, min_points, days, limit)
+    stories = fetch_hn_top_stories(queries, min_points, days, limit)
     logger.info(f"Found {len(stories)} HN stories")
 
     if enhance and stories:
