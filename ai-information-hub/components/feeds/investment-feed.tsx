@@ -133,7 +133,7 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
 
   const SourceLink = ({ sourceUrl }: { sourceUrl?: string }) =>
     sourceUrl ? (
-      <div className="mt-2 flex items-center gap-1 text-sm text-muted-foreground">
+      <div className="mt-2 flex items-center gap-1 text-xs sm:text-sm text-muted-foreground">
         <ExternalLink className="h-3 w-3" />
         <a
           href={sourceUrl}
@@ -151,15 +151,15 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
   return (
     <div className="divide-y divide-border">
       {/* Section Header */}
-      <div className="bg-secondary/30 px-4 py-3">
+      <div className="bg-secondary/30 px-3 py-2 sm:px-4 sm:py-3">
         <div className="flex items-center gap-2">
           <TrendingUp className="h-5 w-5 text-accent" />
-          <h3 className="font-semibold text-foreground">{t("aiInvestments")}</h3>
+          <h3 className="text-sm sm:text-base font-semibold text-foreground">{t("aiInvestments")}</h3>
           <Badge variant="secondary" className="ml-auto">
             {t("week")} {weekNum}
           </Badge>
         </div>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <p className="mt-0.5 sm:mt-1 text-xs sm:text-sm text-muted-foreground">
           {t("fundingNewsMA")}
         </p>
       </div>
@@ -199,18 +199,18 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
             </div>
           )}
           {filteredPrimary.map((post) => (
-            <article key={post.id} className="px-4 py-4 transition-colors hover:bg-secondary/30 cursor-pointer">
-              <div className="flex gap-3">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-accent/20 text-accent font-bold">
+            <article key={post.id} className="px-3 py-3 sm:px-4 sm:py-4 transition-colors hover:bg-secondary/30 cursor-pointer">
+              <div className="flex gap-2 sm:gap-3">
+                <div className="flex h-10 w-10 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-full bg-accent/20 text-accent font-bold text-sm sm:text-base">
                   {post.author.avatar}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-bold text-foreground">{post.author.name}</span>
+                  <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                    <span className="font-bold text-sm sm:text-base text-foreground">{post.author.name}</span>
                     {post.author.verified && <VerifiedBadge />}
-                    <span className="text-muted-foreground">{post.author.handle}</span>
-                    <span className="text-muted-foreground">·</span>
-                    <span className="text-muted-foreground">{post.timestamp}</span>
+                    <span className="text-xs sm:text-sm text-muted-foreground">{post.author.handle}</span>
+                    <span className="text-xs sm:text-sm text-muted-foreground">·</span>
+                    <span className="text-xs sm:text-sm text-muted-foreground">{post.timestamp}</span>
                   </div>
 
                   {/* Deal Info Card */}
@@ -239,7 +239,7 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
                     </div>
                   </div>
 
-                  <p className="mt-2 text-foreground leading-relaxed">{post.content}</p>
+                  <p className="mt-2 text-[15px] sm:text-base text-foreground leading-relaxed">{post.content}</p>
                   <SourceLink sourceUrl={post.sourceUrl} />
                   <div className="mt-3">
                     <ShareButton title={post.company} text={post.content} url={post.sourceUrl} />
@@ -260,18 +260,18 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
             </div>
           )}
           {filteredSecondary.map((post) => (
-            <article key={post.id} className="px-4 py-4 transition-colors hover:bg-secondary/30 cursor-pointer">
-              <div className="flex gap-3">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-chart-3/20 text-chart-3 font-bold">
+            <article key={post.id} className="px-3 py-3 sm:px-4 sm:py-4 transition-colors hover:bg-secondary/30 cursor-pointer">
+              <div className="flex gap-2 sm:gap-3">
+                <div className="flex h-10 w-10 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-full bg-chart-3/20 text-chart-3 font-bold text-sm sm:text-base">
                   {post.author.avatar}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-bold text-foreground">{post.author.name}</span>
+                  <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                    <span className="font-bold text-sm sm:text-base text-foreground">{post.author.name}</span>
                     {post.author.verified && <VerifiedBadge />}
-                    <span className="text-muted-foreground">{post.author.handle}</span>
-                    <span className="text-muted-foreground">·</span>
-                    <span className="text-muted-foreground">{post.timestamp}</span>
+                    <span className="text-xs sm:text-sm text-muted-foreground">{post.author.handle}</span>
+                    <span className="text-xs sm:text-sm text-muted-foreground">·</span>
+                    <span className="text-xs sm:text-sm text-muted-foreground">{post.timestamp}</span>
                   </div>
 
                   {/* Stock Info Card */}
@@ -298,7 +298,7 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
                     </div>
                   </div>
 
-                  <p className="mt-2 text-foreground leading-relaxed">{post.content}</p>
+                  <p className="mt-2 text-[15px] sm:text-base text-foreground leading-relaxed">{post.content}</p>
                   <SourceLink sourceUrl={post.sourceUrl} />
                   <div className="mt-3">
                     <ShareButton title={post.ticker} text={post.content} url={post.sourceUrl} />
@@ -319,18 +319,18 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
             </div>
           )}
           {filteredMa.map((post) => (
-            <article key={post.id} className="px-4 py-4 transition-colors hover:bg-secondary/30 cursor-pointer">
-              <div className="flex gap-3">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-chart-5/20 text-chart-5 font-bold">
+            <article key={post.id} className="px-3 py-3 sm:px-4 sm:py-4 transition-colors hover:bg-secondary/30 cursor-pointer">
+              <div className="flex gap-2 sm:gap-3">
+                <div className="flex h-10 w-10 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-full bg-chart-5/20 text-chart-5 font-bold text-sm sm:text-base">
                   {post.author.avatar}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-bold text-foreground">{post.author.name}</span>
+                  <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                    <span className="font-bold text-sm sm:text-base text-foreground">{post.author.name}</span>
                     {post.author.verified && <VerifiedBadge />}
-                    <span className="text-muted-foreground">{post.author.handle}</span>
-                    <span className="text-muted-foreground">·</span>
-                    <span className="text-muted-foreground">{post.timestamp}</span>
+                    <span className="text-xs sm:text-sm text-muted-foreground">{post.author.handle}</span>
+                    <span className="text-xs sm:text-sm text-muted-foreground">·</span>
+                    <span className="text-xs sm:text-sm text-muted-foreground">{post.timestamp}</span>
                   </div>
 
                   {/* M&A Info Card */}
@@ -354,7 +354,7 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
                     </div>
                   </div>
 
-                  <p className="mt-2 text-foreground leading-relaxed">{post.content}</p>
+                  <p className="mt-2 text-[15px] sm:text-base text-foreground leading-relaxed">{post.content}</p>
                   <SourceLink sourceUrl={post.sourceUrl} />
                   <div className="mt-3">
                     <ShareButton title={`${post.acquirer} → ${post.target}`} text={post.content} url={post.sourceUrl} />
