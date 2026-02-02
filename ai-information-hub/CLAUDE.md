@@ -1,8 +1,8 @@
 # DataCube AI Information Hub
 
-Bilingual (DE/EN) weekly AI news aggregator for internal teams — curates tech breakthroughs, investment news, practical tips, and **YouTube videos** from RSS feeds + Hacker News + YouTube via DeepSeek V3.2 (OpenRouter). Built with Next.js 16 + React 19 + Tailwind CSS 4 + Shadcn/ui, deployed on Vercel.
+Bilingual (DE/EN) weekly AI news aggregator for internal teams — curates tech breakthroughs, investment news, practical tips, and **YouTube videos** from RSS feeds + Hacker News + YouTube. Built with Next.js 16 + React 19 + Tailwind CSS 4 + Shadcn/ui, deployed on Vercel.
 
-**Status**: Core app complete with Railway backend integration. Supports 3 feed types + YouTube videos, bilingual, week navigation, dark/light theme.
+**Status**: Core app complete with Railway backend integration. Supports 3 feed types + YouTube videos, bilingual, week navigation, dark/light theme. **No authentication required**.
 
 ---
 
@@ -17,35 +17,36 @@ Bilingual (DE/EN) weekly AI news aggregator for internal teams — curates tech 
 | `lib/settings-context.tsx` | Theme + language state, `t()` translation function |
 | `components/feeds/tech-feed.tsx` | Reference implementation (API + video support) |
 | `components/video-embed.tsx` | YouTube embed component |
+| `app/api/chat/route.ts` | Chat assistant API (uses glm-4.5-air:free) |
+| `middleware.ts` | Auth middleware (currently disabled) |
 | `../ai-hub-backend/` | FastAPI backend (Railway deployment) |
 
 **Key patterns:**
 - All components use `"use client"` — pure client-side rendering
 - Data loading: API first (`NEXT_PUBLIC_API_URL`), fallback to static JSON
 - Translation: `const { t } = useSettings(); t("keyName")`
-- Week ID format: `YYYY-kwWW` (e.g., `2025-kw04`)
+- Week ID format: `YYYY-kwWW` (e.g., `2026-kw05`)
+- **Authentication is disabled** — all routes are public
 
 ---
 
 ## Architecture
 
 ```
-┌─────────────────── NEW: Railway Backend ────────────────┐
+┌─────────────────── Railway Backend ─────────────────────┐
 │                                                          │
 │  ai-hub-backend/ (FastAPI + PostgreSQL)                  │
-│       ↓                                                  │
-│  Railway Cron (Mon 08:00 UTC)                            │
 │       ↓                                                  │
 │  Data Sources:                                           │
 │    • RSS Feeds (22 sources)                              │
 │    • Hacker News (Algolia API)                           │
-│    • YouTube (Data API v3) ← NEW                         │
+│    • YouTube (Data API v3)                               │
 │       ↓                                                  │
-│  DeepSeek V3.2 (OpenRouter)                              │
+│  LLM Processing (OpenRouter):                            │
+│    • Classifier: glm-4.5-air:free                        │
+│    • Processor: deepseek-v3.2                            │
 │       ↓                                                  │
-│  PostgreSQL Database                                     │
-│       ↓                                                  │
-│  REST API: /api/tech/{weekId}, /api/videos/{weekId}...   │
+│  REST API: /api/tech/{weekId}, /api/tips/{weekId}...     │
 │                                                          │
 └──────────────────────────────────────────────────────────┘
 
@@ -57,20 +58,20 @@ Bilingual (DE/EN) weekly AI news aggregator for internal teams — curates tech 
 │       ↓                                                  │
 │  React components (all "use client")                     │
 │       ↓                                                  │
+│  Chat API: /api/chat (glm-4.5-air:free)                  │
+│       ↓                                                  │
 │  Tech Feed: 20 posts + 5 videos (interspersed)           │
 │                                                          │
 └──────────────────────────────────────────────────────────┘
 ```
 
-### Tech Feed Content Distribution
+### Content Distribution
 
-| Source | Type | Per Week |
-|--------|------|----------|
-| **Hacker News** | Algolia API | ~15-20 posts |
-| **RSS Feeds** | Various sources | ~10 posts |
-| **YouTube** | Data API v3 | **5 videos** |
-
-**Display**: Videos at positions 3, 8, 13, 18, 23 (every 5 posts)
+| Section | Source | Per Week |
+|---------|--------|----------|
+| **Tech** | HN + RSS | ~20-25 posts + 5 videos |
+| **Investment** | RSS feeds | Primary/Secondary/M&A |
+| **Tips** | Reddit + Simon Willison | 10 DE + 10 EN |
 
 ---
 
@@ -79,6 +80,11 @@ Bilingual (DE/EN) weekly AI news aggregator for internal teams — curates tech 
 ```
 ai-information-hub/           # Frontend (Next.js)
 ├── app/
+│   ├── api/
+│   │   ├── auth/             # Auth API (disabled)
+│   │   └── chat/             # Chat assistant (glm-4.5-air:free)
+│   ├── login/                # Login page (disabled)
+│   └── page.tsx              # Main page
 ├── components/
 │   ├── feeds/
 │   │   ├── tech-feed.tsx     # With video support
@@ -90,6 +96,7 @@ ai-information-hub/           # Frontend (Next.js)
 │   ├── api.ts                # API client with fallback
 │   ├── types.ts              # Includes video fields
 │   └── ...
+├── middleware.ts             # Auth (disabled - allows all)
 ├── public/data/              # Static JSON fallback
 └── .env.local                # API keys
 
@@ -99,15 +106,15 @@ ai-hub-backend/               # Backend (FastAPI)
 │   ├── config.py             # Environment config
 │   ├── database.py           # PostgreSQL
 │   ├── models/               # SQLAlchemy models
-│   ├── schemas/              # Pydantic schemas
+│   │   └── raw.py            # Raw article/video storage
 │   ├── routers/              # API endpoints
+│   │   └── admin.py          # Collection triggers
 │   └── services/
-│       ├── collector.py      # Main orchestrator
+│       ├── collector.py      # 4-stage pipeline
 │       ├── rss_fetcher.py
 │       ├── hn_fetcher.py
 │       ├── youtube_fetcher.py
-│       ├── llm_processor.py
-│       └── migrator.py
+│       └── llm_processor.py  # Two-model approach
 ├── alembic/                  # DB migrations
 ├── scripts/
 │   ├── init_db.py            # Database setup
@@ -119,38 +126,35 @@ ai-hub-backend/               # Backend (FastAPI)
 
 ---
 
-## Core Data Contracts
+## LLM Models
 
-### tech.json (with video fields)
-```json
-{
-  "de": [{
-    "id": 1,
-    "author": { "name": "...", "handle": "...", "avatar": "XX", "verified": true },
-    "content": "...",
-    "tags": ["..."],
-    "category": "...",
-    "iconType": "Brain|Server|Zap|Cpu",
-    "impact": "critical|high|medium|low",
-    "timestamp": "YYYY-MM-DD",
-    "metrics": { "comments": 0, "retweets": 0, "likes": 0, "views": "0" },
-    "source": "...",
-    "sourceUrl": "...",
-    "isVideo": false,
-    "videoId": null,
-    "videoDuration": null,
-    "videoViewCount": null,
-    "videoThumbnailUrl": null
-  }],
-  "en": [...]
-}
+| Purpose | Model | Notes |
+|---------|-------|-------|
+| **Classification** | `z-ai/glm-4.5-air:free` | Free tier, classifies articles |
+| **Content Processing** | `deepseek/deepseek-v3.2` | Tech, investment, tips, videos |
+| **Chat Assistant** | `z-ai/glm-4.5-air:free` | Same as classifier (free) |
+
+---
+
+## Data Collection Pipeline
+
+The backend uses a 4-stage pipeline:
+
 ```
-
-**Video post fields** (when `isVideo: true`):
-- `videoId`: YouTube video ID (e.g., "dQw4w9WgXcQ")
-- `videoDuration`: Formatted duration ("12:34")
-- `videoViewCount`: Formatted views ("1.2M")
-- `videoThumbnailUrl`: Thumbnail URL
+Stage 1: Fetch raw data (RSS, HN, YouTube)
+    ↓
+Stage 2: Classify articles
+    • Tips sources (Reddit, Simon Willison) → skip classification
+    • Tech/Investment sources → LLM classification
+    ↓
+Stage 3: Parallel LLM processing
+    • Tech articles → tech posts
+    • Investment articles → primary/secondary/M&A
+    • Tips articles → 10 tips per language
+    • Videos → video summaries
+    ↓
+Stage 4: Save to PostgreSQL
+```
 
 ---
 
@@ -164,13 +168,12 @@ ai-hub-backend/               # Backend (FastAPI)
 | `/api/weeks/current` | GET | Current week |
 | `/api/tech/{weekId}` | GET | Tech feed (with videos) |
 | `/api/investment/{weekId}` | GET | Investment feed |
-| `/api/tips/{weekId}` | GET | Tips feed |
+| `/api/tips/{weekId}` | GET | Tips feed (10 DE + 10 EN) |
 | `/api/trends/{weekId}` | GET | Trends |
 | `/api/videos/{weekId}` | GET | Videos only |
-| `/api/admin/init-db` | POST | Initialize database tables |
-| `/api/admin/import-week` | POST | Import week data via JSON |
-| `/api/admin/collect` | POST | Trigger data collection |
-| `/api/admin/migrate` | POST | Migrate local JSON data |
+| `/api/admin/collect` | POST | Full collection (requires API key) |
+| `/api/admin/collect/fetch` | POST | Stage 1 only |
+| `/api/admin/collect/process` | POST | Stages 2-4 only |
 
 ---
 
@@ -180,6 +183,7 @@ ai-hub-backend/               # Backend (FastAPI)
 ```bash
 npm run dev              # Dev server at localhost:3000
 npm run build            # Production build
+vercel --prod            # Deploy to Vercel
 ```
 
 ### Backend (Local Development)
@@ -197,16 +201,13 @@ uvicorn app.main:app --reload   # http://localhost:8000/docs
 
 ### Data Collection
 ```bash
-# Via backend script (local)
-python -m scripts.weekly_collect
-python -m scripts.weekly_collect --week 2026-kw05
-
-# Via API (requires ADMIN_API_KEY)
-curl -X POST https://api-production-3ee5.up.railway.app/api/admin/collect \
+# Full collection
+curl -X POST "https://api-production-3ee5.up.railway.app/api/admin/collect?week_id=2026-kw05" \
   -H "X-API-Key: REDACTED_ADMIN_KEY"
 
-# Upload local data to Railway
-python3 scripts/upload_data.py --data-path ../ai-information-hub/public/data --all
+# Process only (reuse existing raw data)
+curl -X POST "https://api-production-3ee5.up.railway.app/api/admin/collect/process?week_id=2026-kw05" \
+  -H "X-API-Key: REDACTED_ADMIN_KEY"
 ```
 
 ---
@@ -215,19 +216,18 @@ python3 scripts/upload_data.py --data-path ../ai-information-hub/public/data --a
 
 ### Frontend (.env.local)
 ```bash
-ACCESS_PASSWORD=REDACTED_PASSWORD
 OPENROUTER_API_KEY=sk-or-v1-...
 YOUTUBE_API_KEY=AIza...
 NEXT_PUBLIC_API_URL=https://api-production-3ee5.up.railway.app/api
 ```
 
-### Backend (Railway Environment Variables)
+### Backend (Railway)
 ```bash
 DATABASE_URL=postgresql://...  # Set by Railway
 OPENROUTER_API_KEY=sk-or-v1-...
 YOUTUBE_API_KEY=AIza...
 ADMIN_API_KEY=REDACTED_ADMIN_KEY
-CORS_ORIGINS=["http://localhost:3000","https://ai-information-hub.vercel.app"]
+CORS_ORIGINS=["http://localhost:3000","https://www.datacubeai.space","https://ai-information-hub.vercel.app"]
 PORT=8080
 ```
 
@@ -244,19 +244,14 @@ PORT=8080
 1. Set `NEXT_PUBLIC_API_URL` environment variable
 2. Components automatically use API with fallback
 
-### Deploy backend to Railway
+### Deploy to production
 ```bash
-cd ai-hub-backend
-railway login
-railway init --name ai-hub-backend
-# Add PostgreSQL in Railway Dashboard: + New → Database → PostgreSQL
-railway service link api
-railway variables set OPENROUTER_API_KEY=... YOUTUBE_API_KEY=... ADMIN_API_KEY=...
-railway up
+# Frontend (Vercel)
+vercel --prod
 
-# Initialize database via API
-curl -X POST "https://api-production-3ee5.up.railway.app/api/admin/init-db" \
-  -H "X-API-Key: REDACTED_ADMIN_KEY"
+# Backend (Railway)
+cd ../ai-hub-backend
+railway up
 ```
 
 ---
@@ -268,3 +263,14 @@ The frontend works in two modes:
 2. **Without API**: Falls back to static `/data/{weekId}/*.json`
 
 Video posts only appear when using the new backend (static JSON doesn't include videos).
+
+---
+
+## Authentication
+
+**Authentication is currently disabled.** The middleware allows all requests without password.
+
+To re-enable authentication:
+1. Update `middleware.ts` to check for auth cookie
+2. Set `ACCESS_PASSWORD` in `.env.local`
+3. Redeploy to Vercel

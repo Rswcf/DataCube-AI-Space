@@ -71,12 +71,22 @@ class LLMProcessor:
             base_url="https://openrouter.ai/api/v1",
             api_key=settings.openrouter_api_key,
         )
-        self.model = "deepseek/deepseek-v3.2"
+        # Free model for classification (simple task)
+        self.classifier_model = "z-ai/glm-4.5-air:free"
+        # High-quality model for content processing
+        self.processor_model = "deepseek/deepseek-v3.2"
 
-    def _call_llm(self, prompt: str, temperature: float = 0.3) -> str:
-        """Make an LLM API call."""
+    def _call_llm(self, prompt: str, temperature: float = 0.3, use_classifier: bool = False) -> str:
+        """Make an LLM API call.
+
+        Args:
+            prompt: The prompt to send
+            temperature: Sampling temperature
+            use_classifier: If True, use free classifier model; otherwise use processor model
+        """
+        model = self.classifier_model if use_classifier else self.processor_model
         response = self.client.chat.completions.create(
-            model=self.model,
+            model=model,
             messages=[{"role": "user", "content": prompt}],
             temperature=temperature,
         )
@@ -119,7 +129,7 @@ Fields:
 
 Output ONLY the JSON array, no markdown fences."""
 
-        response = self._call_llm(prompt, temperature=0.1)
+        response = self._call_llm(prompt, temperature=0.1, use_classifier=True)
         classifications = parse_llm_json(response, fallback=None)
 
         if classifications is None:
@@ -197,7 +207,8 @@ Output a JSON object with this structure:
 Rules:
 - iconType: Brain (LLM/AI models), Server (infrastructure), Zap (research), Cpu (safety/technical)
 - impact: critical (industry-changing), high (significant), medium (notable), low (informational)
-- sourceUrl: copy the exact Link URL from the original article
+- source: Copy the original source name from the article (e.g., "MIT Technology Review", "The Decoder")
+- sourceUrl: Copy the exact Link URL from the original article
 - Output ONLY valid JSON"""
 
         response = self._call_llm(prompt, temperature=0.3)
@@ -276,20 +287,120 @@ Output ONLY valid JSON."""
         prompt = f"""You are a financial news editor for a German/English bilingual AI investment newsletter.
 
 Categorize these articles into:
-1. Primary Market (funding rounds)
-2. Secondary Market (stock movements)
-3. M&A (mergers, acquisitions)
+1. Primary Market (funding rounds, venture capital investments)
+2. Secondary Market (stock price movements, IPOs, public company news)
+3. M&A (mergers, acquisitions, buyouts)
 
 ARTICLES:
 {articles_text}
 
-Output JSON with structure for primaryMarket, secondaryMarket, and ma.
-Each category has "de" and "en" arrays with appropriate fields.
+Output a JSON object with this EXACT structure:
+{{
+  "primaryMarket": {{
+    "de": [
+      {{
+        "id": 1,
+        "company": "Company Name",
+        "amount": "$50 Mio.",
+        "round": "Series B",
+        "investors": ["Investor 1", "Investor 2"],
+        "valuation": "$500 Mio.",
+        "content": "German description (2-3 sentences)",
+        "author": {{"name": "Source Name", "handle": "@source", "avatar": "XX", "verified": true}},
+        "timestamp": "YYYY-MM-DD",
+        "sourceUrl": "https://...",
+        "metrics": {{"comments": 0, "retweets": 0, "likes": 0, "views": "0"}}
+      }}
+    ],
+    "en": [
+      {{
+        "id": 1,
+        "company": "Company Name",
+        "amount": "$50M",
+        "round": "Series B",
+        "investors": ["Investor 1", "Investor 2"],
+        "valuation": "$500M",
+        "content": "English description (2-3 sentences)",
+        "author": {{"name": "Source Name", "handle": "@source", "avatar": "XX", "verified": true}},
+        "timestamp": "YYYY-MM-DD",
+        "sourceUrl": "https://...",
+        "metrics": {{"comments": 0, "retweets": 0, "likes": 0, "views": "0"}}
+      }}
+    ]
+  }},
+  "secondaryMarket": {{
+    "de": [
+      {{
+        "id": 1,
+        "ticker": "NVDA",
+        "price": "$850",
+        "change": "+5.2%",
+        "direction": "up",
+        "marketCap": "$2,1 Bio.",
+        "content": "German description",
+        "author": {{"name": "Source Name", "handle": "@source", "avatar": "XX", "verified": true}},
+        "timestamp": "YYYY-MM-DD",
+        "sourceUrl": "https://...",
+        "metrics": {{"comments": 0, "retweets": 0, "likes": 0, "views": "0"}}
+      }}
+    ],
+    "en": [
+      {{
+        "id": 1,
+        "ticker": "NVDA",
+        "price": "$850",
+        "change": "+5.2%",
+        "direction": "up",
+        "marketCap": "$2.1T",
+        "content": "English description",
+        "author": {{"name": "Source Name", "handle": "@source", "avatar": "XX", "verified": true}},
+        "timestamp": "YYYY-MM-DD",
+        "sourceUrl": "https://...",
+        "metrics": {{"comments": 0, "retweets": 0, "likes": 0, "views": "0"}}
+      }}
+    ]
+  }},
+  "ma": {{
+    "de": [
+      {{
+        "id": 1,
+        "acquirer": "Acquiring Company",
+        "target": "Target Company",
+        "dealValue": "$1,5 Mrd.",
+        "dealType": "Akquisition",
+        "content": "German description",
+        "author": {{"name": "Source Name", "handle": "@source", "avatar": "XX", "verified": true}},
+        "timestamp": "YYYY-MM-DD",
+        "sourceUrl": "https://...",
+        "metrics": {{"comments": 0, "retweets": 0, "likes": 0, "views": "0"}}
+      }}
+    ],
+    "en": [
+      {{
+        "id": 1,
+        "acquirer": "Acquiring Company",
+        "target": "Target Company",
+        "dealValue": "$1.5B",
+        "dealType": "Acquisition",
+        "content": "English description",
+        "author": {{"name": "Source Name", "handle": "@source", "avatar": "XX", "verified": true}},
+        "timestamp": "YYYY-MM-DD",
+        "sourceUrl": "https://...",
+        "metrics": {{"comments": 0, "retweets": 0, "likes": 0, "views": "0"}}
+      }}
+    ]
+  }}
+}}
 
-Include up to 7 items per category.
-Use German number formatting for 'de' (e.g., $2,75 Mrd.)
-Use English number formatting for 'en' (e.g., $2.75B)
-sourceUrl: copy the exact Link URL
+Rules:
+- Include up to 7 items per category
+- Use German number formatting for 'de' (e.g., $2,75 Mrd., $500 Mio.)
+- Use English number formatting for 'en' (e.g., $2.75B, $500M)
+- direction: "up" or "down" based on price change
+- dealType German: "Akquisition", "Fusion", "Übernahme"
+- dealType English: "Acquisition", "Merger", "Buyout"
+- sourceUrl: copy the exact Link URL from the article
+- IMPORTANT: Each category MUST have both "de" and "en" arrays, even if empty
 
 Output ONLY valid JSON."""
 
@@ -301,49 +412,57 @@ Output ONLY valid JSON."""
         }
         return parse_llm_json(response, fallback=fallback)
 
-    def process_tips_articles(self, articles: list[dict], count: int = 20) -> dict:
+    def process_tips_articles(self, articles: list[dict], count: int = 10) -> dict:
         """Process tips articles into bilingual feed format."""
         if not articles:
             return {"de": [], "en": []}
 
-        articles_text = "\n\n".join(
-            f"Source: {a['source']}\nTitle: {a['title']}\nLink: {a['link']}\nSummary: {a['summary'][:500]}\nDate: {a['published']}"
-            for a in articles[:40]
-        )
+        def sanitize(text: str) -> str:
+            """Remove characters that might break JSON output."""
+            if not text:
+                return ""
+            # Remove control characters, quotes, and backslashes
+            text = re.sub(r'[\x00-\x1f\x7f"\\]', ' ', text)
+            return ' '.join(text.split())[:200]
 
-        prompt = f"""You are an AI tips editor for a German/English bilingual newsletter.
-Target audience: Non-technical professionals wanting practical AI tips.
+        # Build simple article list
+        article_lines = []
+        for i, a in enumerate(articles[:15]):
+            article_lines.append(
+                f"{i+1}. [{a['source']}] {sanitize(a['title'])} - {sanitize(a['summary'][:100])}"
+            )
+        articles_text = "\n".join(article_lines)
 
-Extract EXACTLY {count} useful, practical AI tips from these articles.
-Focus on: ChatGPT/Claude/Gemini usage, prompt techniques, productivity workflows.
+        prompt = f"""Extract {count} AI tips from these articles. Output JSON only.
 
 ARTICLES:
 {articles_text}
 
-Output JSON:
-{{
-  "de": [
-    {{
-      "id": 1,
-      "author": {{"name": "Source", "handle": "@source", "avatar": "XX", "verified": true}},
-      "platform": "X|Reddit",
-      "content": "German description (2-3 sentences)",
-      "tip": "The actual tip/prompt template",
-      "category": "Category in German",
-      "difficulty": "Anfänger|Mittel|Fortgeschritten",
-      "timestamp": "YYYY-MM-DD",
-      "metrics": {{"comments": 0, "retweets": 0, "likes": 0, "views": "0"}},
-      "sourceUrl": "https://original-url"
-    }}
-  ],
-  "en": [/* same but English, difficulty: Beginner|Intermediate|Advanced */]
-}}
+Output format:
+{{"de":[{{"id":1,"content":"German tip description","tip":"The tip in German","category":"Produktivität","platform":"Reddit","sourceUrl":"url"}}],"en":[{{"id":1,"content":"English tip description","tip":"The tip in English","category":"Productivity","platform":"Reddit","sourceUrl":"url"}}]}}
 
-Tips should be immediately actionable (no coding required).
-Output ONLY valid JSON."""
+Rules:
+- {count} items in both de and en arrays
+- category: Produktivität/Productivity, Prompt-Tipps/Prompt Tips, Kreativität/Creativity
+- platform: Reddit, Blog, or X
+- Keep tips short and actionable
+- No special characters in strings
 
-        response = self._call_llm(prompt, temperature=0.3)
-        return parse_llm_json(response, fallback={"de": [], "en": []})
+JSON:"""
+
+        response = self._call_llm(prompt, temperature=0.2)
+        result = parse_llm_json(response, fallback={"de": [], "en": []})
+
+        # Add missing fields with defaults
+        for lang in ["de", "en"]:
+            for i, tip in enumerate(result.get(lang, [])):
+                tip.setdefault("id", i + 1)
+                tip.setdefault("author", {"name": "AI Tips", "handle": "@tips", "avatar": "TI", "verified": True})
+                tip.setdefault("difficulty", "Mittel" if lang == "de" else "Intermediate")
+                tip.setdefault("timestamp", "2026-02-01")
+                tip.setdefault("metrics", {"comments": 0, "retweets": 0, "likes": 0, "views": "0"})
+
+        return result
 
     def generate_trends(self, tech_data: dict, investment_data: dict) -> dict:
         """Generate trending topics from the week's content."""

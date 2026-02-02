@@ -2,12 +2,15 @@
 Admin endpoints for triggering data collection.
 """
 
+import logging
 from fastapi import APIRouter, Depends, HTTPException, Header, BackgroundTasks
 from sqlalchemy.orm import Session
 from typing import Optional
 
-from app.database import get_db, init_db
+from app.database import get_db, init_db, get_session_local
 from app.config import get_settings
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -22,27 +25,126 @@ def verify_api_key(x_api_key: str = Header(...)):
     return True
 
 
+def _run_collection_with_new_session(week_id: Optional[str] = None):
+    """Background task wrapper that creates its own database session."""
+    from app.services.collector import run_collection
+
+    db = get_session_local()()
+    try:
+        logger.info(f"Starting background collection for {week_id or 'current week'}")
+        run_collection(db, week_id)
+        logger.info(f"Background collection completed for {week_id or 'current week'}")
+    except Exception as e:
+        logger.error(f"Background collection failed: {e}")
+        raise
+    finally:
+        db.close()
+
+
 @router.post("/collect")
 async def trigger_collection(
     background_tasks: BackgroundTasks,
     week_id: Optional[str] = None,
-    db: Session = Depends(get_db),
     _: bool = Depends(verify_api_key),
 ):
     """
-    Trigger data collection for a specific week (or current week if not specified).
+    Trigger full data collection for a specific week (or current week if not specified).
+
+    This runs all stages:
+    - Stage 1: Fetch raw data from sources
+    - Stage 2: LLM classification
+    - Stage 3: Parallel LLM processing
+    - Stage 4: Save to database
 
     Requires X-API-Key header.
     """
-    from app.services.collector import run_collection
-
-    # Run collection in background
-    background_tasks.add_task(run_collection, db, week_id)
+    # Run collection in background with its own session
+    background_tasks.add_task(_run_collection_with_new_session, week_id)
 
     return {
         "status": "started",
         "week_id": week_id or "current",
-        "message": "Collection started in background",
+        "message": "Full collection started in background (fetch + process)",
+    }
+
+
+def _run_fetch_only_with_new_session(week_id: Optional[str] = None):
+    """Background task wrapper that creates its own database session."""
+    from app.services.collector import run_fetch_only
+
+    db = get_session_local()()
+    try:
+        logger.info(f"Starting background fetch for {week_id or 'current week'}")
+        run_fetch_only(db, week_id)
+        logger.info(f"Background fetch completed for {week_id or 'current week'}")
+    except Exception as e:
+        logger.error(f"Background fetch failed: {e}")
+        raise
+    finally:
+        db.close()
+
+
+@router.post("/collect/fetch")
+async def trigger_fetch_only(
+    background_tasks: BackgroundTasks,
+    week_id: Optional[str] = None,
+    _: bool = Depends(verify_api_key),
+):
+    """
+    Trigger Stage 1 only: Fetch and store raw data.
+
+    Use this to collect raw data without LLM processing.
+    Useful for debugging or when you want to process later.
+
+    Requires X-API-Key header.
+    """
+    # Run fetch in background with its own session
+    background_tasks.add_task(_run_fetch_only_with_new_session, week_id)
+
+    return {
+        "status": "started",
+        "week_id": week_id or "current",
+        "message": "Fetch-only started in background (Stage 1)",
+    }
+
+
+def _run_process_only_with_new_session(week_id: Optional[str] = None):
+    """Background task wrapper that creates its own database session."""
+    from app.services.collector import run_process_only
+
+    db = get_session_local()()
+    try:
+        logger.info(f"Starting background processing for {week_id or 'current week'}")
+        run_process_only(db, week_id)
+        logger.info(f"Background processing completed for {week_id or 'current week'}")
+    except Exception as e:
+        logger.error(f"Background processing failed: {e}")
+        raise
+    finally:
+        db.close()
+
+
+@router.post("/collect/process")
+async def trigger_process_only(
+    background_tasks: BackgroundTasks,
+    week_id: Optional[str] = None,
+    _: bool = Depends(verify_api_key),
+):
+    """
+    Trigger Stages 2-4: Process existing raw data.
+
+    Requires raw data to exist (run /collect/fetch first).
+    Use this to reprocess data after LLM improvements.
+
+    Requires X-API-Key header.
+    """
+    # Run processing in background with its own session
+    background_tasks.add_task(_run_process_only_with_new_session, week_id)
+
+    return {
+        "status": "started",
+        "week_id": week_id or "current",
+        "message": "Process-only started in background (Stages 2-4)",
     }
 
 

@@ -1,20 +1,32 @@
 # DataCube AI Information Hub
 
-Bilingual (DE/EN) weekly AI news aggregator. See [CLAUDE.md](./CLAUDE.md) for full documentation.
+Bilingual (DE/EN) weekly AI news aggregator with YouTube video integration. See [CLAUDE.md](./CLAUDE.md) for full documentation.
+
+**Live**: https://www.datacubeai.space (no login required)
 
 ## Quick Start
 
 ```bash
-# Frontend
-npm install && npm run dev     # localhost:3000
+# Install and run
+npm install
+npm run dev     # localhost:3000
 
-# Data pipeline (requires OPENROUTER_API_KEY)
-pip install -r scripts/requirements.txt
-python scripts/collect.py --dry-run  # Test RSS fetching
+# Deploy to Vercel
+vercel --prod
 ```
 
 ## Tech Stack
 
 - **Frontend**: Next.js 16, React 19, Tailwind CSS 4, Shadcn/ui
-- **Data**: DeepSeek V3.2 via OpenRouter, RSS feeds, HN Algolia API
-- **Deploy**: Vercel (auto-deploy on merge)
+- **Backend**: FastAPI + PostgreSQL on Railway
+- **LLM**: OpenRouter (glm-4.5-air for chat, deepseek-v3.2 for processing)
+- **Data**: RSS feeds, Hacker News, YouTube
+
+## Features
+
+- 3 feed types: Tech, Investment, Tips
+- YouTube video integration (5 videos/week)
+- Bilingual content (DE/EN)
+- Dark/light theme
+- AI chat assistant
+- No authentication required

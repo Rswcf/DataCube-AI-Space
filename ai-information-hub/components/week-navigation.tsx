@@ -90,29 +90,38 @@ export function WeekNavigation({ selectedWeekId, onWeekChange }: WeekNavigationP
         </div>
       </div>
 
-      <div className="flex gap-1 overflow-x-auto px-4 pb-3 scrollbar-hide">
-        {weeks.map((week) => (
-          <button
-            key={week.id}
-            onClick={() => onWeekChange(week.id)}
-            className={cn(
-              "flex shrink-0 flex-col items-center rounded-lg px-4 py-2 transition-all duration-200",
-              selectedWeekId === week.id
-                ? "bg-primary text-primary-foreground"
-                : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
-            )}
-          >
-            <span className="text-sm font-semibold">
-              {weekLabel} {String(week.weekNum).padStart(2, "0")}
-            </span>
-            <span className="text-xs opacity-80">{week.dateRange}</span>
-            {week.current && (
-              <span className="mt-1 rounded-full bg-accent px-2 py-0.5 text-[10px] font-medium text-accent-foreground">
-                {t("current")}
+      {/* Week pills with gradient hints for scrollability */}
+      <div className="relative">
+        {/* Left gradient hint */}
+        <div className="absolute left-0 top-0 bottom-3 w-8 bg-gradient-to-r from-background to-transparent pointer-events-none z-10 md:hidden" />
+
+        <div className="flex gap-1 overflow-x-auto px-4 pb-3 scrollbar-hide">
+          {weeks.map((week) => (
+            <button
+              key={week.id}
+              onClick={() => onWeekChange(week.id)}
+              className={cn(
+                "flex shrink-0 flex-col items-center rounded-lg px-4 py-2 transition-all duration-200",
+                selectedWeekId === week.id
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+              )}
+            >
+              <span className="text-sm font-semibold">
+                {weekLabel} {String(week.weekNum).padStart(2, "0")}
               </span>
-            )}
-          </button>
-        ))}
+              <span className="text-xs opacity-80">{week.dateRange}</span>
+              {week.current && (
+                <span className="mt-1 rounded-full bg-accent px-2 py-0.5 text-[10px] font-medium text-accent-foreground">
+                  {t("current")}
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
+
+        {/* Right gradient hint */}
+        <div className="absolute right-0 top-0 bottom-3 w-8 bg-gradient-to-l from-background to-transparent pointer-events-none z-10 md:hidden" />
       </div>
     </div>
   );

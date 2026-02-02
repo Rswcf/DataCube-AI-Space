@@ -13,12 +13,22 @@ from app.schemas.common import Author, Metrics
 router = APIRouter(prefix="/investment", tags=["investment"])
 
 
+def safe_author(author_dict: dict) -> Author:
+    """Create Author with fallback values for missing fields."""
+    return Author(
+        name=author_dict.get("name", "Unknown"),
+        handle=author_dict.get("handle", "@unknown"),
+        avatar=author_dict.get("avatar", "??"),
+        verified=author_dict.get("verified", False),
+    )
+
+
 def primary_to_response(post: PrimaryMarketPost, language: str) -> PrimaryMarketResponse:
     """Convert primary market post to API response."""
     is_german = language == "de"
     return PrimaryMarketResponse(
         id=post.id,
-        author=Author(**post.author),
+        author=safe_author(post.author),
         content=post.content_de if is_german else post.content_en,
         company=post.company,
         amount=post.amount_de if is_german else post.amount_en,
@@ -36,7 +46,7 @@ def secondary_to_response(post: SecondaryMarketPost, language: str) -> Secondary
     is_german = language == "de"
     return SecondaryMarketResponse(
         id=post.id,
-        author=Author(**post.author),
+        author=safe_author(post.author),
         content=post.content_de if is_german else post.content_en,
         ticker=post.ticker,
         price=post.price,
@@ -54,7 +64,7 @@ def ma_to_response(post: MAPost, language: str) -> MAResponse:
     is_german = language == "de"
     return MAResponse(
         id=post.id,
-        author=Author(**post.author),
+        author=safe_author(post.author),
         content=post.content_de if is_german else post.content_en,
         acquirer=post.acquirer,
         target=post.target,

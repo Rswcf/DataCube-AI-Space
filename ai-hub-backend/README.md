@@ -7,9 +7,38 @@ FastAPI backend for the AI Information Hub - bilingual AI news aggregator with Y
 - RESTful API for tech news, investment data, tips, trends
 - YouTube video integration (5 videos/week interspersed in tech feed)
 - PostgreSQL database with SQLAlchemy ORM
-- Automated weekly data collection via Railway cron
-- Data migration from existing JSON files
+- 4-stage data collection pipeline
+- Two-model LLM approach (classifier + processor)
+- Tips sources bypass classification (Reddit, Simon Willison)
 - Bilingual content support (DE/EN)
+
+## LLM Models
+
+| Purpose | Model | Notes |
+|---------|-------|-------|
+| **Classification** | `z-ai/glm-4.5-air:free` | Free tier, classifies tech/investment |
+| **Content Processing** | `deepseek/deepseek-v3.2` | Generates bilingual content |
+
+## Data Collection Pipeline
+
+```
+Stage 1: Fetch raw data
+    • RSS Feeds (22 sources)
+    • Hacker News (Algolia API)
+    • YouTube (Data API v3)
+    ↓
+Stage 2: Classify articles
+    • Tips sources → skip classification (direct to tips)
+    • Other sources → LLM classification (tech/investment)
+    ↓
+Stage 3: Parallel LLM processing
+    • Tech: 20-25 posts
+    • Investment: primary/secondary/M&A
+    • Tips: 10 per language
+    • Videos: 5 summaries
+    ↓
+Stage 4: Save to PostgreSQL
+```
 
 ## Setup
 
@@ -18,7 +47,7 @@ FastAPI backend for the AI Information Hub - bilingual AI news aggregator with Y
 - Python 3.11+
 - PostgreSQL database
 - API keys:
-  - OpenRouter (for DeepSeek LLM)
+  - OpenRouter (for LLM)
   - YouTube Data API v3
 
 ### Local Development
@@ -42,10 +71,6 @@ cp .env.example .env
 
 4. Initialize database:
 ```bash
-# Create tables and insert default team members
-python -m scripts.init_db
-
-# Optionally migrate all existing JSON data
 python -m scripts.init_db --migrate-all
 ```
 
@@ -77,14 +102,15 @@ alembic downgrade -1
 |----------|--------|-------------|
 | `/api/weeks` | GET | List all available weeks |
 | `/api/weeks/current` | GET | Get current week |
-| `/api/weeks/{weekId}` | GET | Get specific week |
 | `/api/tech/{weekId}` | GET | Tech feed (with videos) |
 | `/api/investment/{weekId}` | GET | Investment feed |
-| `/api/tips/{weekId}` | GET | Tips feed |
+| `/api/tips/{weekId}` | GET | Tips feed (10 DE + 10 EN) |
 | `/api/trends/{weekId}` | GET | Trends feed |
 | `/api/videos/{weekId}` | GET | YouTube videos only |
-| `/api/admin/collect` | POST | Trigger collection (requires API key) |
-| `/api/admin/migrate` | POST | Migrate JSON data (requires API key) |
+| `/api/admin/collect` | POST | Full collection (all stages) |
+| `/api/admin/collect/fetch` | POST | Stage 1 only |
+| `/api/admin/collect/process` | POST | Stages 2-4 only |
+| `/api/admin/migrate` | POST | Migrate JSON data |
 | `/health` | GET | Health check |
 
 ## Deployment to Railway
@@ -106,8 +132,8 @@ In Railway dashboard: **Add Service** → **PostgreSQL**
 railway variables set DATABASE_URL=$RAILWAY_DATABASE_URL
 railway variables set OPENROUTER_API_KEY=sk-or-v1-xxxxx
 railway variables set YOUTUBE_API_KEY=AIzaSyxxxxx
-railway variables set ADMIN_API_KEY=your-secure-key
-railway variables set CORS_ORIGINS='["https://your-frontend.vercel.app"]'
+railway variables set ADMIN_API_KEY=REDACTED_ADMIN_KEY
+railway variables set CORS_ORIGINS='["http://localhost:3000","https://www.datacubeai.space","https://ai-information-hub.vercel.app"]'
 ```
 
 ### 4. Deploy
@@ -120,50 +146,48 @@ railway up
 
 After first deployment:
 ```bash
-# SSH into Railway or use Railway CLI
 railway run python -m scripts.init_db --migrate-all
 ```
 
 ## Data Collection
 
-### Automated (Cron)
-
-The cron job runs every Monday at 08:00 UTC:
-- Fetches RSS feeds + Hacker News
-- Fetches YouTube videos
-- Processes with DeepSeek LLM
-- Saves to PostgreSQL
-
-### Manual Trigger
+### Full Collection (All Stages)
 
 ```bash
-curl -X POST https://your-api.railway.app/api/admin/collect \
-  -H "X-API-Key: your-admin-key"
+curl -X POST "https://api-production-3ee5.up.railway.app/api/admin/collect?week_id=2026-kw05" \
+  -H "X-API-Key: REDACTED_ADMIN_KEY"
+```
 
-# Specific week
-curl -X POST "https://your-api.railway.app/api/admin/collect?week_id=2025-kw05" \
-  -H "X-API-Key: your-admin-key"
+### Process Only (Reuse Raw Data)
+
+Useful when you want to re-run LLM processing without re-fetching data:
+
+```bash
+curl -X POST "https://api-production-3ee5.up.railway.app/api/admin/collect/process?week_id=2026-kw05" \
+  -H "X-API-Key: REDACTED_ADMIN_KEY"
+```
+
+### Fetch Only (No LLM Processing)
+
+```bash
+curl -X POST "https://api-production-3ee5.up.railway.app/api/admin/collect/fetch?week_id=2026-kw05" \
+  -H "X-API-Key: REDACTED_ADMIN_KEY"
 ```
 
 ### Local Collection
 
 ```bash
 python -m scripts.weekly_collect
-python -m scripts.weekly_collect --week 2025-kw05
+python -m scripts.weekly_collect --week 2026-kw05
 ```
 
-## Migrating Existing Data
+## Tips Processing
 
-To migrate existing JSON data from the frontend:
+Tips sources (Reddit r/ChatGPT, Reddit r/ClaudeAI, Simon Willison) bypass LLM classification in Stage 2:
 
-```bash
-# Via API
-curl -X POST "https://your-api.railway.app/api/admin/migrate?week_id=2025-kw04" \
-  -H "X-API-Key: your-admin-key"
-
-# Via script
-python -m scripts.init_db --migrate-all --data-path /path/to/public/data
-```
+- These sources are inherently tips content
+- They skip classification and retain `section="tips"`
+- This ensures tips appear in the Tips feed
 
 ## Project Structure
 
@@ -174,14 +198,18 @@ ai-hub-backend/
 │   ├── config.py            # Environment config
 │   ├── database.py          # DB connection
 │   ├── models/              # SQLAlchemy models
+│   │   ├── __init__.py      # All models
+│   │   └── raw.py           # Raw article/video storage
 │   ├── schemas/             # Pydantic schemas
 │   ├── routers/             # API routes
+│   │   ├── admin.py         # Collection endpoints
+│   │   └── ...
 │   └── services/            # Business logic
-│       ├── collector.py     # Main orchestrator
+│       ├── collector.py     # 4-stage pipeline
 │       ├── rss_fetcher.py   # RSS feeds
 │       ├── hn_fetcher.py    # Hacker News
 │       ├── youtube_fetcher.py  # YouTube API
-│       ├── llm_processor.py # DeepSeek LLM
+│       ├── llm_processor.py # Two-model LLM
 │       └── migrator.py      # JSON migration
 ├── alembic/                 # DB migrations
 ├── scripts/                 # CLI scripts
@@ -195,7 +223,7 @@ ai-hub-backend/
 Set environment variable in Vercel:
 
 ```
-NEXT_PUBLIC_API_URL=https://your-api.railway.app/api
+NEXT_PUBLIC_API_URL=https://api-production-3ee5.up.railway.app/api
 ```
 
 The frontend will automatically use the API when configured, with fallback to static JSON files.

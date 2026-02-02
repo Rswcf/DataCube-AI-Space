@@ -5,7 +5,7 @@ import { Sidebar } from "@/components/sidebar";
 import { Feed } from "@/components/feed";
 import { RightSidebar } from "@/components/right-sidebar";
 import { ChatWidget } from "@/components/chat-widget";
-import { Cpu, TrendingUp, Lightbulb } from "lucide-react";
+import { Cpu, TrendingUp, Lightbulb, Search, X, Settings, Sun, Moon, Languages } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSettings } from "@/lib/settings-context";
 
@@ -13,6 +13,8 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState("tech");
   const [selectedWeekId, setSelectedWeekId] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [showMobileSearch, setShowMobileSearch] = useState(false);
+  const [showMobileSettings, setShowMobileSettings] = useState(false);
 
   useEffect(() => {
     fetch("/data/weeks.json")
@@ -51,7 +53,26 @@ export default function Home() {
       </div>
 
       {/* Mobile Bottom Navigation */}
-      <MobileNav activeTab={activeTab} onTabChange={setActiveTab} />
+      <MobileNav
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        onSearchClick={() => setShowMobileSearch(true)}
+        onSettingsClick={() => setShowMobileSettings(true)}
+      />
+
+      {/* Mobile Search Drawer */}
+      <MobileSearchDrawer
+        isOpen={showMobileSearch}
+        onClose={() => setShowMobileSearch(false)}
+        weekId={selectedWeekId}
+        onSearchChange={setSearchQuery}
+      />
+
+      {/* Mobile Settings Drawer */}
+      <MobileSettingsDrawer
+        isOpen={showMobileSettings}
+        onClose={() => setShowMobileSettings(false)}
+      />
 
       {/* AI Chat Widget */}
       {selectedWeekId && <ChatWidget weekId={selectedWeekId} />}
@@ -59,7 +80,17 @@ export default function Home() {
   );
 }
 
-function MobileNav({ activeTab, onTabChange }: { activeTab: string; onTabChange: (tab: string) => void }) {
+function MobileNav({
+  activeTab,
+  onTabChange,
+  onSearchClick,
+  onSettingsClick,
+}: {
+  activeTab: string;
+  onTabChange: (tab: string) => void;
+  onSearchClick: () => void;
+  onSettingsClick: () => void;
+}) {
   const { t } = useSettings();
   const tabs = [
     { id: "tech", label: t("technology"), icon: Cpu },
@@ -74,14 +105,227 @@ function MobileNav({ activeTab, onTabChange }: { activeTab: string; onTabChange:
           key={tab.id}
           onClick={() => onTabChange(tab.id)}
           className={cn(
-            "flex flex-col items-center gap-1 px-4 py-2 transition-colors",
+            "flex flex-col items-center gap-1 px-2 py-2 transition-colors",
             activeTab === tab.id ? "text-primary" : "text-muted-foreground"
           )}
         >
-          <tab.icon className="h-6 w-6" />
-          <span className="text-xs font-medium">{tab.label}</span>
+          <tab.icon className="h-5 w-5" />
+          <span className="text-[10px] font-medium">{tab.label}</span>
         </button>
       ))}
+      <button
+        onClick={onSearchClick}
+        className="flex flex-col items-center gap-1 px-2 py-2 transition-colors text-muted-foreground"
+      >
+        <Search className="h-5 w-5" />
+        <span className="text-[10px] font-medium">{t("search")}</span>
+      </button>
+      <button
+        onClick={onSettingsClick}
+        className="flex flex-col items-center gap-1 px-2 py-2 transition-colors text-muted-foreground"
+      >
+        <Settings className="h-5 w-5" />
+        <span className="text-[10px] font-medium">{t("settings")}</span>
+      </button>
     </nav>
+  );
+}
+
+// Fallback trends data
+const fallbackTrends = {
+  de: [
+    { category: "KI · Trend", title: "GPT-5" },
+    { category: "Technologie · Trend", title: "NVIDIA Blackwell" },
+    { category: "Finanzen · Trend", title: "KI-Aktien" },
+    { category: "Wissenschaft · Trend", title: "AlphaFold 3" },
+    { category: "Startups · Trend", title: "Anthropic" },
+  ],
+  en: [
+    { category: "AI · Trending", title: "GPT-5" },
+    { category: "Technology · Trending", title: "NVIDIA Blackwell" },
+    { category: "Finance · Trending", title: "AI Stocks" },
+    { category: "Science · Trending", title: "AlphaFold 3" },
+    { category: "Startups · Trending", title: "Anthropic" },
+  ],
+};
+
+function MobileSearchDrawer({
+  isOpen,
+  onClose,
+  weekId,
+  onSearchChange,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  weekId: string;
+  onSearchChange: (query: string) => void;
+}) {
+  const { language, t } = useSettings();
+  const [searchValue, setSearchValue] = useState("");
+  const [trends, setTrends] = useState<{ category: string; title: string }[]>(fallbackTrends[language]);
+
+  useEffect(() => {
+    if (!weekId) return;
+
+    const processData = (data: { trends?: Record<string, { category: string; title: string }[]> }) => {
+      if (data.trends) {
+        setTrends(data.trends[language] || data.trends["de"] || fallbackTrends[language]);
+      }
+    };
+
+    const apiBase = process.env.NEXT_PUBLIC_API_URL;
+    const fetchUrl = apiBase ? `${apiBase}/trends/${weekId}` : `/data/${weekId}/trends.json`;
+
+    fetch(fetchUrl)
+      .then((res) => res.json())
+      .then(processData)
+      .catch(() => setTrends(fallbackTrends[language]));
+  }, [weekId, language]);
+
+  const handleSearch = (value: string) => {
+    setSearchValue(value);
+    onSearchChange(value);
+  };
+
+  const handleTrendClick = (title: string) => {
+    handleSearch(title);
+    onClose();
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-[60] md:hidden">
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
+
+      {/* Drawer */}
+      <div className="absolute bottom-0 left-0 right-0 max-h-[85vh] rounded-t-2xl bg-background animate-in slide-in-from-bottom duration-300">
+        {/* Handle */}
+        <div className="flex justify-center py-3">
+          <div className="h-1 w-12 rounded-full bg-muted-foreground/30" />
+        </div>
+
+        {/* Header */}
+        <div className="flex items-center justify-between px-4 pb-3">
+          <h2 className="text-lg font-bold">{t("search")}</h2>
+          <button
+            onClick={onClose}
+            className="rounded-full p-2 hover:bg-secondary transition-colors"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        {/* Search Input */}
+        <div className="px-4 pb-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <input
+              type="text"
+              placeholder={t("search")}
+              value={searchValue}
+              onChange={(e) => handleSearch(e.target.value)}
+              className="w-full rounded-full border border-input bg-secondary pl-10 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              autoFocus
+            />
+          </div>
+        </div>
+
+        {/* Trends */}
+        <div className="px-4 pb-6 overflow-y-auto max-h-[50vh]">
+          <h3 className="text-sm font-semibold text-muted-foreground mb-3">{t("whatsNew")}</h3>
+          <div className="space-y-3">
+            {trends.map((trend, index) => (
+              <button
+                key={index}
+                onClick={() => handleTrendClick(trend.title)}
+                className="w-full text-left p-3 rounded-lg hover:bg-secondary transition-colors"
+              >
+                <p className="text-xs text-muted-foreground">{trend.category}</p>
+                <p className="font-semibold">{trend.title}</p>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MobileSettingsDrawer({
+  isOpen,
+  onClose,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+}) {
+  const { theme, setTheme, language, setLanguage, t } = useSettings();
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-[60] md:hidden">
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
+
+      {/* Drawer */}
+      <div className="absolute bottom-0 left-0 right-0 rounded-t-2xl bg-background animate-in slide-in-from-bottom duration-300">
+        {/* Handle */}
+        <div className="flex justify-center py-3">
+          <div className="h-1 w-12 rounded-full bg-muted-foreground/30" />
+        </div>
+
+        {/* Header */}
+        <div className="flex items-center justify-between px-4 pb-3">
+          <h2 className="text-lg font-bold">{t("settings")}</h2>
+          <button
+            onClick={onClose}
+            className="rounded-full p-2 hover:bg-secondary transition-colors"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        {/* Settings Options */}
+        <div className="px-4 pb-8 space-y-2">
+          {/* Theme Toggle */}
+          <button
+            onClick={() => {
+              setTheme(theme === "dark" ? "light" : "dark");
+            }}
+            className="flex w-full items-center gap-4 rounded-xl p-4 hover:bg-secondary transition-colors"
+          >
+            {theme === "dark" ? (
+              <Sun className="h-6 w-6 text-primary" />
+            ) : (
+              <Moon className="h-6 w-6 text-primary" />
+            )}
+            <div className="flex-1 text-left">
+              <p className="font-semibold">{theme === "dark" ? t("lightMode") : t("darkMode")}</p>
+              <p className="text-sm text-muted-foreground">
+                {theme === "dark" ? t("switchToLight") : t("switchToDark")}
+              </p>
+            </div>
+          </button>
+
+          {/* Language Toggle */}
+          <button
+            onClick={() => {
+              setLanguage(language === "de" ? "en" : "de");
+            }}
+            className="flex w-full items-center gap-4 rounded-xl p-4 hover:bg-secondary transition-colors"
+          >
+            <Languages className="h-6 w-6 text-primary" />
+            <div className="flex-1 text-left">
+              <p className="font-semibold">{language === "de" ? "English" : "Deutsch"}</p>
+              <p className="text-sm text-muted-foreground">
+                {language === "de" ? t("switchToEnglish") : t("switchToGerman")}
+              </p>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }

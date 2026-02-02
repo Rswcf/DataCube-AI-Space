@@ -21,7 +21,12 @@ class Settings(BaseSettings):
     admin_api_key: str = ""
 
     # CORS
-    cors_origins: list[str] = ["http://localhost:3000", "https://ai-hub.vercel.app"]
+    cors_origins: list[str] = [
+        "http://localhost:3000",
+        "http://localhost:3002",
+        "https://www.datacubeai.space",
+        "https://ai-information-hub.vercel.app",
+    ]
 
     # Collection settings
     hn_min_points: int = 100

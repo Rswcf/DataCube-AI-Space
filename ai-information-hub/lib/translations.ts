@@ -74,9 +74,13 @@ export const translations = {
     // Settings
     darkMode: "Dunkelmodus",
     lightMode: "Hellmodus",
+    switchToDark: "Zum Dunkelmodus wechseln",
+    switchToLight: "Zum Hellmodus wechseln",
     language: "Sprache",
     german: "Deutsch",
     english: "English",
+    switchToGerman: "Zu Deutsch wechseln",
+    switchToEnglish: "Zu Englisch wechseln",
     
     // Share
     share: "Teilen",
@@ -175,9 +179,13 @@ export const translations = {
     // Settings
     darkMode: "Dark Mode",
     lightMode: "Light Mode",
+    switchToDark: "Switch to dark mode",
+    switchToLight: "Switch to light mode",
     language: "Language",
     german: "Deutsch",
     english: "English",
+    switchToGerman: "Switch to German",
+    switchToEnglish: "Switch to English",
     
     // Share
     share: "Share",

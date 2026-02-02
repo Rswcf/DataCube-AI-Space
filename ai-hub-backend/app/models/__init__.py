@@ -8,6 +8,7 @@ from app.models.video import Video
 from app.models.investment import PrimaryMarketPost, SecondaryMarketPost, MAPost
 from app.models.tip import TipPost
 from app.models.trend import Trend, TeamMember
+from app.models.raw import RawArticle, RawVideo
 
 __all__ = [
     "Week",
@@ -19,4 +20,6 @@ __all__ = [
     "TipPost",
     "Trend",
     "TeamMember",
+    "RawArticle",
+    "RawVideo",
 ]

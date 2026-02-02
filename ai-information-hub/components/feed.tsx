@@ -74,7 +74,7 @@ export function Feed({ activeTab, selectedWeekId, onWeekChange, searchQuery }: F
   }
 
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen pb-20 md:pb-0">
       <WeekNavigation selectedWeekId={selectedWeekId} onWeekChange={onWeekChange} />
 
       <div className="overflow-hidden">

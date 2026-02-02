@@ -1,8 +1,9 @@
 """
-Main data collection orchestrator.
+Main data collection orchestrator with two-stage processing and parallel LLM calls.
 """
 
 import logging
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta
 from typing import Optional
 
@@ -12,7 +13,7 @@ from sqlalchemy.orm import Session
 from app.config import get_settings
 from app.models import (
     Week, TechPost, Video, PrimaryMarketPost, SecondaryMarketPost, MAPost,
-    TipPost, Trend, TeamMember,
+    TipPost, Trend, TeamMember, RawArticle, RawVideo,
 )
 from app.services.rss_fetcher import fetch_rss_feeds
 from app.services.hn_fetcher import fetch_hn_stories
@@ -111,6 +112,14 @@ def clear_week_data(db: Session, week_id: str):
     logger.info(f"Cleared existing data for {week_id}")
 
 
+def clear_raw_data(db: Session, week_id: str):
+    """Clear raw data for a week."""
+    db.query(RawArticle).filter(RawArticle.week_id == week_id).delete()
+    db.query(RawVideo).filter(RawVideo.week_id == week_id).delete()
+    db.commit()
+    logger.info(f"Cleared raw data for {week_id}")
+
+
 def intersperse_videos(posts: list, videos: list, interval: int = 5, start: int = 3) -> list:
     """
     Intersperse video posts among regular posts.
@@ -143,30 +152,30 @@ def intersperse_videos(posts: list, videos: list, interval: int = 5, start: int 
     return result
 
 
-def run_collection(db: Session, week_id: Optional[str] = None):
+def stage1_fetch_and_store(db: Session, week_id: str) -> dict:
     """
-    Run the full data collection pipeline.
+    Stage 1: Fetch all content from sources and store raw data.
 
     Args:
         db: Database session
-        week_id: Week ID or None for current week
+        week_id: Week ID
+
+    Returns:
+        dict with counts of fetched items
     """
     settings = get_settings()
-    week_id = week_id or current_week_id()
 
-    logger.info(f"Starting collection for {week_id}")
+    logger.info("=== Stage 1: Fetching & Storing Raw Data ===")
 
-    # Ensure week exists and clear old data
+    # Ensure week exists and clear old raw data
     ensure_week(db, week_id)
-    clear_week_data(db, week_id)
+    clear_raw_data(db, week_id)
 
     # Load sources
     sources = load_sources()
 
-    # Stage 1: Fetch all content
-    logger.info("=== Stage 1: Fetching content ===")
-
     # Fetch HN with enhancement
+    logger.info("Fetching Hacker News stories...")
     hn_articles = fetch_hn_stories(
         query="AI",
         min_points=settings.hn_min_points,
@@ -180,15 +189,18 @@ def run_collection(db: Session, week_id: Optional[str] = None):
         article["original_section"] = "tech"
 
     # Fetch RSS feeds (excluding HN since we use enhanced version)
+    logger.info("Fetching RSS feeds...")
     rss_articles = fetch_rss_feeds(sources, exclude_names={"Hacker News"})
 
     # Fetch YouTube videos
+    logger.info("Fetching YouTube videos...")
     youtube_videos = fetch_youtube_videos(
         max_results=settings.youtube_max_results,
         days=settings.hn_days,
     )
 
     # Fetch transcripts for top videos
+    logger.info("Fetching video transcripts...")
     for video in youtube_videos[:15]:
         transcript = fetch_video_transcript(video["video_id"])
         video["transcript"] = transcript
@@ -196,35 +208,253 @@ def run_collection(db: Session, week_id: Optional[str] = None):
     all_articles = hn_articles + rss_articles
     logger.info(f"Total articles: {len(all_articles)}, YouTube videos: {len(youtube_videos)}")
 
-    # Stage 2: LLM Processing
-    logger.info("=== Stage 2: LLM Processing ===")
+    # Store raw articles
+    for article in all_articles:
+        raw_article = RawArticle(
+            week_id=week_id,
+            source=article.get("source", "Unknown"),
+            title=article.get("title", ""),
+            link=article.get("link", ""),
+            summary=article.get("summary", ""),
+            published=article.get("published", ""),
+            original_section=article.get("original_section", "tech"),
+            raw_data={
+                "points": article.get("points"),
+                "comments": article.get("comments"),
+                "hn_url": article.get("hn_url"),
+            },
+        )
+        db.add(raw_article)
 
-    processor = LLMProcessor()
+    # Store raw videos
+    for video in youtube_videos:
+        raw_video = RawVideo(
+            week_id=week_id,
+            video_id=video.get("video_id", ""),
+            title=video.get("original_title", ""),
+            channel_name=video.get("channel_name", ""),
+            channel_id=video.get("channel_id"),
+            description=video.get("description"),
+            transcript=video.get("transcript"),
+            thumbnail_url=video.get("thumbnail_url"),
+            published_at=video.get("published_at"),
+            duration_seconds=video.get("duration_seconds"),
+            duration_formatted=video.get("duration_formatted"),
+            view_count=video.get("view_count"),
+            like_count=video.get("like_count"),
+            raw_data=video,  # Store full original data
+        )
+        db.add(raw_video)
 
-    # Classify articles
-    classified = processor.classify_articles(all_articles)
+    db.commit()
+    logger.info(f"Stored {len(all_articles)} raw articles and {len(youtube_videos)} raw videos")
 
-    tech_articles = [a for a in classified if a.get("section") == "tech"]
-    investment_articles = [a for a in classified if a.get("section") == "investment"]
-    tips_articles = [a for a in classified if a.get("section") == "tips"]
+    return {
+        "articles": len(all_articles),
+        "videos": len(youtube_videos),
+    }
 
-    logger.info(f"Classified: tech={len(tech_articles)}, investment={len(investment_articles)}, tips={len(tips_articles)}")
 
-    # Process content
-    tech_data = processor.process_tech_articles(tech_articles, count=settings.tech_output_count)
-    video_data = processor.process_youtube_videos(youtube_videos, count=settings.video_output_count)
-    investment_data = processor.process_investment_articles(investment_articles)
-    tips_data = processor.process_tips_articles(tips_articles)
-    trends_data = processor.generate_trends(tech_data, investment_data)
+def stage2_classify_articles(db: Session, week_id: str, processor: LLMProcessor) -> None:
+    """
+    Stage 2: Classify articles using LLM (skip tips sources).
 
-    # Debug: Log LLM processed video counts
-    logger.info(f"LLM processed videos: DE={len(video_data.get('de', []))}, EN={len(video_data.get('en', []))}")
+    Tips sources (Reddit, Simon Willison) are inherently tips content,
+    so they skip LLM classification and use original_section directly.
 
-    # Stage 3: Save to database
-    logger.info("=== Stage 3: Saving to database ===")
+    Args:
+        db: Database session
+        week_id: Week ID
+        processor: LLM processor instance
+    """
+    logger.info("=== Stage 2: LLM Classification ===")
+
+    # Load raw articles
+    raw_articles = db.query(RawArticle).filter(RawArticle.week_id == week_id).all()
+
+    if not raw_articles:
+        logger.warning("No raw articles found for classification")
+        return
+
+    # Separate tips articles from articles that need classification
+    tips_articles = []
+    articles_to_classify = []
+
+    for a in raw_articles:
+        if a.original_section == "tips":
+            # Tips sources skip classification - use original_section directly
+            a.section = "tips"
+            a.relevance = 0.8  # Default high relevance for tips sources
+            tips_articles.append(a)
+        else:
+            articles_to_classify.append(a)
+
+    logger.info(f"Tips articles (skip classification): {len(tips_articles)}")
+    logger.info(f"Articles to classify: {len(articles_to_classify)}")
+
+    # Only classify non-tips articles
+    if articles_to_classify:
+        articles_for_llm = [
+            {
+                "source": a.source,
+                "title": a.title,
+                "summary": a.summary,
+                "link": a.link,
+                "published": a.published,
+                "original_section": a.original_section,
+            }
+            for a in articles_to_classify
+        ]
+
+        # Classify articles
+        classified = processor.classify_articles(articles_for_llm)
+
+        # Update database with classification results
+        classification_map = {a["title"]: a for a in classified}
+
+        for raw_article in articles_to_classify:
+            classification = classification_map.get(raw_article.title)
+            if classification:
+                raw_article.section = classification.get("section", raw_article.original_section)
+                raw_article.relevance = classification.get("relevance", 0.5)
+
+    db.commit()
+    logger.info(f"Classification complete: {len(tips_articles)} tips preserved, "
+                f"{len(articles_to_classify)} articles classified")
+
+
+def stage3_parallel_processing(db: Session, week_id: str, processor: LLMProcessor) -> dict:
+    """
+    Stage 3: Process content in parallel using ThreadPoolExecutor.
+
+    Args:
+        db: Database session
+        week_id: Week ID
+        processor: LLM processor instance
+
+    Returns:
+        dict with processed data for each section
+    """
+    logger.info("=== Stage 3: Parallel LLM Processing ===")
+
+    settings = get_settings()
+
+    # Load classified articles
+    raw_articles = db.query(RawArticle).filter(RawArticle.week_id == week_id).all()
+
+    # Group by section
+    tech_articles = [
+        {
+            "source": a.source,
+            "title": a.title,
+            "summary": a.summary,
+            "link": a.link,
+            "published": a.published,
+        }
+        for a in raw_articles if a.section == "tech"
+    ]
+    investment_articles = [
+        {
+            "source": a.source,
+            "title": a.title,
+            "summary": a.summary,
+            "link": a.link,
+            "published": a.published,
+        }
+        for a in raw_articles if a.section == "investment"
+    ]
+    tips_articles = [
+        {
+            "source": a.source,
+            "title": a.title,
+            "summary": a.summary,
+            "link": a.link,
+            "published": a.published,
+        }
+        for a in raw_articles if a.section == "tips"
+    ]
+
+    # Load raw videos
+    raw_videos = db.query(RawVideo).filter(RawVideo.week_id == week_id).all()
+    videos_for_llm = [v.raw_data for v in raw_videos if v.raw_data]
+
+    logger.info(f"Processing: tech={len(tech_articles)}, investment={len(investment_articles)}, "
+                f"tips={len(tips_articles)}, videos={len(videos_for_llm)}")
+
+    results = {}
+
+    # Define processing tasks
+    def process_tech():
+        return processor.process_tech_articles(tech_articles, count=settings.tech_output_count)
+
+    def process_investment():
+        return processor.process_investment_articles(investment_articles)
+
+    def process_tips():
+        return processor.process_tips_articles(tips_articles)
+
+    def process_videos():
+        return processor.process_youtube_videos(videos_for_llm, count=settings.video_output_count)
+
+    # Run in parallel with ThreadPoolExecutor
+    with ThreadPoolExecutor(max_workers=4) as executor:
+        futures = {
+            executor.submit(process_tech): "tech",
+            executor.submit(process_investment): "investment",
+            executor.submit(process_tips): "tips",
+            executor.submit(process_videos): "videos",
+        }
+
+        for future in as_completed(futures):
+            task_name = futures[future]
+            try:
+                results[task_name] = future.result()
+                logger.info(f"Completed: {task_name}")
+            except Exception as e:
+                logger.error(f"Error processing {task_name}: {e}")
+                # Provide fallback empty results
+                if task_name == "investment":
+                    results[task_name] = {
+                        "primaryMarket": {"de": [], "en": []},
+                        "secondaryMarket": {"de": [], "en": []},
+                        "ma": {"de": [], "en": []},
+                    }
+                else:
+                    results[task_name] = {"de": [], "en": []}
+
+    # Generate trends (depends on tech and investment results)
+    logger.info("Generating trends...")
+    results["trends"] = processor.generate_trends(
+        results.get("tech", {"de": [], "en": []}),
+        results.get("investment", {})
+    )
+
+    return results
+
+
+def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos: list) -> None:
+    """
+    Stage 4: Save processed data to database.
+
+    Args:
+        db: Database session
+        week_id: Week ID
+        results: Processed data from stage 3
+        raw_videos: List of RawVideo objects for metadata lookup
+    """
+    logger.info("=== Stage 4: Saving to Database ===")
+
+    # Clear existing processed data
+    clear_week_data(db, week_id)
+
+    tech_data = results.get("tech", {"de": [], "en": []})
+    video_data = results.get("videos", {"de": [], "en": []})
+    investment_data = results.get("investment", {})
+    tips_data = results.get("tips", {"de": [], "en": []})
+    trends_data = results.get("trends", {"trends": {"de": [], "en": []}})
 
     # Build video lookup for metadata
-    video_lookup = {v["video_id"]: v for v in youtube_videos}
+    video_lookup = {v.video_id: v for v in raw_videos}
 
     # Save videos
     video_posts = []
@@ -234,7 +464,8 @@ def run_collection(db: Session, week_id: Optional[str] = None):
         if not vid:
             continue
 
-        meta = video_lookup.get(vid, {})
+        raw_video = video_lookup.get(vid)
+        meta = raw_video.raw_data if raw_video else {}
 
         video = Video(
             week_id=week_id,
@@ -252,7 +483,7 @@ def run_collection(db: Session, week_id: Optional[str] = None):
             duration_formatted=meta.get("duration_formatted", "0:00"),
             view_count=meta.get("view_count", 0),
             like_count=meta.get("like_count", 0),
-            transcript=meta.get("transcript"),
+            transcript=raw_video.transcript if raw_video else None,
             category=de_v.get("category") or en_v.get("category"),
         )
         db.add(video)
@@ -330,13 +561,14 @@ def run_collection(db: Session, week_id: Optional[str] = None):
 
         for de_p, en_p in zip(de_posts, en_posts):
             if model_class == PrimaryMarketPost:
+                # Use default values instead of skipping entries without amount
                 post = PrimaryMarketPost(
                     week_id=week_id,
                     content_de=de_p.get("content", ""),
                     content_en=en_p.get("content", ""),
                     company=de_p.get("company", ""),
-                    amount_de=de_p.get("amount", ""),
-                    amount_en=en_p.get("amount", ""),
+                    amount_de=de_p.get("amount", "N/A"),
+                    amount_en=en_p.get("amount", "N/A"),
                     round=de_p.get("round", ""),
                     investors=de_p.get("investors", []),
                     valuation_de=de_p.get("valuation"),
@@ -444,4 +676,96 @@ def run_collection(db: Session, week_id: Optional[str] = None):
             db.add(member)
 
     db.commit()
+    logger.info(f"Saved processed data for {week_id}")
+
+
+def run_fetch_only(db: Session, week_id: Optional[str] = None) -> dict:
+    """
+    Run only Stage 1: Fetch and store raw data.
+
+    Args:
+        db: Database session
+        week_id: Week ID or None for current week
+
+    Returns:
+        dict with fetch statistics
+    """
+    week_id = week_id or current_week_id()
+    logger.info(f"Starting fetch-only for {week_id}")
+
+    return stage1_fetch_and_store(db, week_id)
+
+
+def run_process_only(db: Session, week_id: Optional[str] = None) -> dict:
+    """
+    Run Stages 2-4: Process raw data (requires raw data to exist).
+
+    Args:
+        db: Database session
+        week_id: Week ID or None for current week
+
+    Returns:
+        dict with processing statistics
+    """
+    week_id = week_id or current_week_id()
+    logger.info(f"Starting process-only for {week_id}")
+
+    # Check if raw data exists
+    raw_count = db.query(RawArticle).filter(RawArticle.week_id == week_id).count()
+    if raw_count == 0:
+        raise ValueError(f"No raw data found for {week_id}. Run fetch first.")
+
+    processor = LLMProcessor()
+
+    # Stage 2: Classification
+    stage2_classify_articles(db, week_id, processor)
+
+    # Stage 3: Parallel processing
+    results = stage3_parallel_processing(db, week_id, processor)
+
+    # Load raw videos for metadata
+    raw_videos = db.query(RawVideo).filter(RawVideo.week_id == week_id).all()
+
+    # Stage 4: Save to database
+    stage4_save_to_database(db, week_id, results, raw_videos)
+
+    return {
+        "week_id": week_id,
+        "tech_count": len(results.get("tech", {}).get("de", [])),
+        "investment_categories": list(results.get("investment", {}).keys()),
+        "tips_count": len(results.get("tips", {}).get("de", [])),
+        "videos_count": len(results.get("videos", {}).get("de", [])),
+    }
+
+
+def run_collection(db: Session, week_id: Optional[str] = None):
+    """
+    Run the full data collection pipeline (all stages).
+
+    Args:
+        db: Database session
+        week_id: Week ID or None for current week
+    """
+    week_id = week_id or current_week_id()
+
+    logger.info(f"Starting full collection for {week_id}")
+
+    # Stage 1: Fetch and store raw data
+    fetch_stats = stage1_fetch_and_store(db, week_id)
+
+    # Initialize LLM processor
+    processor = LLMProcessor()
+
+    # Stage 2: Classification
+    stage2_classify_articles(db, week_id, processor)
+
+    # Stage 3: Parallel processing
+    results = stage3_parallel_processing(db, week_id, processor)
+
+    # Load raw videos for metadata
+    raw_videos = db.query(RawVideo).filter(RawVideo.week_id == week_id).all()
+
+    # Stage 4: Save to database
+    stage4_save_to_database(db, week_id, results, raw_videos)
+
     logger.info(f"Collection complete for {week_id}")

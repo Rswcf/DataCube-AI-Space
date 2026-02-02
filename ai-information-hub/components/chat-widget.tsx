@@ -264,7 +264,8 @@ export function ChatWidget({ weekId }: ChatWidgetProps) {
         <div
           className={cn(
             "fixed z-40 flex flex-col overflow-hidden rounded-2xl border border-border bg-background shadow-2xl",
-            "bottom-36 right-4 h-[500px] w-[380px] max-w-[calc(100vw-2rem)]",
+            "bottom-36 right-4 w-[380px] max-w-[calc(100vw-2rem)]",
+            "h-[calc(100vh-160px)] max-h-[500px] md:h-[500px]",
             "md:bottom-24 md:right-6"
           )}
         >
