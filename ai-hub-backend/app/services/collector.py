@@ -578,12 +578,19 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
     # Build video lookup for metadata
     video_lookup = {v.video_id: v for v in raw_videos}
 
-    # Save videos
+    # Save videos (skip duplicates due to global unique constraint on video_id)
     video_posts = []
+    skipped_videos = 0
     logger.info(f"Saving {len(video_data.get('de', []))} video posts to database")
     for i, (de_v, en_v) in enumerate(zip(video_data.get("de", []), video_data.get("en", []))):
         vid = de_v.get("video_id") or en_v.get("video_id")
         if not vid:
+            continue
+
+        # Check if video already exists (from another week)
+        existing_video = db.query(Video).filter(Video.video_id == vid).first()
+        if existing_video:
+            skipped_videos += 1
             continue
 
         raw_video = video_lookup.get(vid)
@@ -634,6 +641,8 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
         )
         video_posts.append(video_post)
 
+    if skipped_videos > 0:
+        logger.info(f"Skipped {skipped_videos} videos (already exist in other weeks)")
     logger.info(f"Created {len(video_posts)} video TechPost entries")
 
     # Save tech posts with interspersed videos
