@@ -90,12 +90,14 @@ The backend uses a 4-stage pipeline:
 
 | Stage | Description |
 |-------|-------------|
-| **Stage 1** | Fetch raw data (RSS, HN, YouTube) |
+| **Stage 1** | Fetch raw data (RSS, HN, YouTube) + ISO week boundary filter |
 | **Stage 2** | Classify articles (tips sources skip classification) |
 | **Stage 3** | Parallel LLM processing (tech, investment, tips, videos) |
 | **Stage 4** | Save to PostgreSQL |
 
-**Tips sources** (Reddit, Simon Willison) bypass LLM classification and are processed directly as tips.
+**Tips sources** (14 Reddit communities + 2 blogs) bypass LLM classification and are processed directly as tips.
+
+> 📖 **For detailed data pipeline documentation with complete flow diagrams**, see [ai-hub-backend/README.md](./ai-hub-backend/README.md#complete-data-pipeline-deep-dive)
 
 ---
 
