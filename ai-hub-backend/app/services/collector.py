@@ -15,7 +15,7 @@ from app.models import (
     Week, TechPost, Video, PrimaryMarketPost, SecondaryMarketPost, MAPost,
     TipPost, Trend, TeamMember, RawArticle, RawVideo,
 )
-from app.services.rss_fetcher import fetch_rss_feeds
+from app.services.rss_fetcher import fetch_rss_feeds, fetch_rss_feeds_parallel
 from app.services.hn_fetcher import fetch_hn_stories
 from app.services.youtube_fetcher import fetch_youtube_videos, fetch_video_transcript
 from app.services.llm_processor import LLMProcessor
@@ -139,6 +139,12 @@ def load_sources() -> dict:
             {"url": "https://tech.eu/feed", "name": "Tech.eu"},
             {"url": "https://technode.com/feed/", "name": "TechNode"},
             {"url": "https://pandaily.com/feed/", "name": "Pandaily"},
+        ],
+        "ma": [
+            # Mergers & Acquisitions specific sources
+            {"url": "https://www.reuters.com/markets/deals/rss", "name": "Reuters Deals"},
+            {"url": "https://techcrunch.com/tag/mergers-and-acquisitions/feed/", "name": "TechCrunch M&A"},
+            {"url": "https://www.marketwatch.com/rss/markets/deals", "name": "MarketWatch Deals"},
         ],
         "tips": [
             # Blogs (business-oriented)
@@ -294,40 +300,66 @@ def stage1_fetch_and_store(db: Session, week_id: str) -> dict:
 
     # Fetch HN with enhancement (uses default HN_DEFAULT_QUERIES for comprehensive coverage)
     # BUG-H2: Wrap external fetchers in try/except with partial fallbacks
-    hn_articles = []
-    rss_articles = []
-    youtube_videos = []
+    hn_articles: list[dict] = []
+    rss_articles: list[dict] = []
+    youtube_videos: list[dict] = []
 
-    try:
-        logger.info("Fetching Hacker News stories...")
-        hn_articles = fetch_hn_stories(
-            min_points=settings.hn_min_points,
-            days=settings.hn_days,
-            limit=settings.hn_limit,
-            enhance=True,
-            max_enhance=30,
-        )
-        for article in hn_articles:
-            article["original_section"] = "tech"
-    except Exception as e:
-        logger.error(f"Failed to fetch HN stories: {e}")
+    def _fetch_hn():
+        try:
+            logger.info("Fetching Hacker News stories (parallel)...")
+            items = fetch_hn_stories(
+                min_points=settings.hn_min_points,
+                days=settings.hn_days,
+                limit=settings.hn_limit,
+                enhance=True,
+                max_enhance=30,
+            )
+            for article in items:
+                article["original_section"] = "tech"
+            return items
+        except Exception as e:
+            logger.error(f"Failed to fetch HN stories: {e}")
+            return []
 
-    try:
-        # Fetch RSS feeds (excluding HN since we use enhanced version)
-        logger.info("Fetching RSS feeds...")
-        rss_articles = fetch_rss_feeds(sources, exclude_names={"Hacker News"})
-    except Exception as e:
-        logger.error(f"Failed to fetch RSS feeds: {e}")
+    def _fetch_rss():
+        try:
+            # Exclude HN since we use enhanced version
+            logger.info("Fetching RSS feeds (parallel)...")
+            return fetch_rss_feeds_parallel(sources, exclude_names={"Hacker News"})
+        except Exception as e:
+            logger.error(f"Failed to fetch RSS feeds: {e}")
+            return []
 
-    try:
-        # Fetch YouTube videos
-        logger.info("Fetching YouTube videos...")
-        youtube_videos = fetch_youtube_videos(
-            max_results=settings.youtube_max_results,
-            days=settings.hn_days,
-        )
-    except Exception as e:
-        logger.error(f"Failed to fetch YouTube videos: {e}")
+    def _fetch_youtube():
+        try:
+            logger.info("Fetching YouTube videos...")
+            return fetch_youtube_videos(
+                max_results=settings.youtube_max_results,
+                days=settings.hn_days,
+            )
+        except Exception as e:
+            logger.error(f"Failed to fetch YouTube videos: {e}")
+            return []
+
+    with ThreadPoolExecutor(max_workers=3) as executor:
+        futures = {
+            executor.submit(_fetch_hn): "hn",
+            executor.submit(_fetch_rss): "rss",
+            executor.submit(_fetch_youtube): "yt",
+        }
+        for future in as_completed(futures):
+            tag = futures[future]
+            try:
+                data = future.result()
+            except Exception as e:
+                logger.error(f"Stage 1 subtask {tag} failed: {e}")
+                data = []
+            if tag == "hn":
+                hn_articles = data
+            elif tag == "rss":
+                rss_articles = data
+            else:
+                youtube_videos = data
 
     # Fetch transcripts for top videos
     # BUG-H1: Add video_id existence check before accessing
@@ -535,18 +567,24 @@ def stage3_parallel_processing(db: Session, week_id: str, processor: LLMProcesso
 
     def process_investment():
         thread_processor = LLMProcessor()
-        return thread_processor.process_investment_articles(investment_articles)
+        return thread_processor.process_investment_articles(
+            investment_articles,
+            count=settings.investment_output_count,
+        )
 
     def process_tips():
         thread_processor = LLMProcessor()
-        return thread_processor.process_tips_articles(tips_articles)
+        return thread_processor.process_tips_articles(
+            tips_articles,
+            count=settings.tips_output_count,
+        )
 
     def process_videos():
         thread_processor = LLMProcessor()
         return thread_processor.process_youtube_videos(videos_for_llm, count=settings.video_output_count)
 
     # Run in parallel with ThreadPoolExecutor
-    with ThreadPoolExecutor(max_workers=4) as executor:
+    with ThreadPoolExecutor(max_workers=settings.llm_max_workers) as executor:
         futures = {
             executor.submit(process_tech): "tech",
             executor.submit(process_investment): "investment",
@@ -940,3 +978,110 @@ def run_collection(db: Session, week_id: Optional[str] = None):
     stage4_save_to_database(db, week_id, results, raw_videos)
 
     logger.info(f"Collection complete for {week_id}")
+
+
+def stage4_save_ma_to_database(db: Session, week_id: str, investment_data: dict) -> None:
+    """Save only M&A posts to database (does not touch other sections)."""
+    logger.info("=== Stage 4 (M&A only): Saving to Database ===")
+
+    # Clear existing M&A posts for the week
+    db.query(MAPost).filter(MAPost.week_id == week_id).delete()
+
+    ma_data = investment_data.get("ma", {}) if isinstance(investment_data, dict) else {}
+    de_posts = ma_data.get("de", []) if isinstance(ma_data, dict) else []
+    en_posts = ma_data.get("en", []) if isinstance(ma_data, dict) else []
+
+    for de_p, en_p in zip(de_posts, en_posts):
+        post = MAPost(
+            week_id=week_id,
+            content_de=de_p.get("content", ""),
+            content_en=en_p.get("content", ""),
+            acquirer=de_p.get("acquirer", ""),
+            target=de_p.get("target", ""),
+            deal_value_de=de_p.get("dealValue"),
+            deal_value_en=en_p.get("dealValue"),
+            deal_type_de=de_p.get("dealType", ""),
+            deal_type_en=en_p.get("dealType", ""),
+            industry=de_p.get("industry") or en_p.get("industry"),
+            author=de_p.get("author", {}),
+            timestamp=de_p.get("timestamp", ""),
+            source_url=de_p.get("sourceUrl"),
+            metrics=de_p.get("metrics", {}),
+        )
+        db.add(post)
+
+    try:
+        db.commit()
+        logger.info(f"Saved M&A data for {week_id}")
+    except Exception as e:
+        logger.error(f"Failed to save M&A data for {week_id}, rolling back: {e}")
+        db.rollback()
+        raise
+
+
+def run_ma_collection(db: Session, week_id: Optional[str] = None):
+    """
+    Run a lightweight collection that only updates M&A posts.
+
+    - Fetch M&A RSS sources in parallel
+    - Process with dedicated LLM prompt
+    - Save only M&A posts (does not clear other sections)
+    """
+    settings = get_settings()
+    week_id = week_id or current_week_id()
+    logger.info(f"Starting M&A-only collection for {week_id}")
+
+    # Ensure week exists but do not clear everything
+    ensure_week(db, week_id)
+
+    # Load only M&A sources
+    sources = load_sources()
+    ma_sources = {"ma": sources.get("ma", [])}
+
+    # Fetch M&A articles in parallel
+    try:
+        rss_articles = fetch_rss_feeds_parallel(ma_sources)
+    except Exception as e:
+        logger.error(f"Failed to fetch M&A RSS feeds: {e}")
+        rss_articles = []
+
+    # Filter by week boundaries and store raw articles (original_section='investment' for compatibility)
+    week_start, week_end = get_week_boundaries(week_id)
+    filtered = [a for a in rss_articles if is_article_in_week(a, week_start, week_end)]
+    for article in filtered:
+        raw_article = RawArticle(
+            week_id=week_id,
+            source=article.get("source", "Unknown"),
+            title=article.get("title", ""),
+            link=article.get("link", ""),
+            summary=article.get("summary", ""),
+            published=article.get("published", ""),
+            original_section="investment",
+            raw_data={},
+        )
+        db.add(raw_article)
+    db.commit()
+
+    # Build minimal article list for LLM
+    articles = [
+        {
+            "source": a.get("source", "Unknown"),
+            "title": a.get("title", ""),
+            "summary": a.get("summary", ""),
+            "link": a.get("link", ""),
+            "published": a.get("published", ""),
+        }
+        for a in filtered
+    ]
+
+    # Process with LLM (M&A only)
+    processor = LLMProcessor()
+    investment_result = processor.process_ma_articles(
+        articles,
+        count=settings.investment_output_count,
+    )
+
+    # Save only M&A results
+    stage4_save_ma_to_database(db, week_id, investment_result)
+
+    logger.info(f"M&A-only collection complete for {week_id}")

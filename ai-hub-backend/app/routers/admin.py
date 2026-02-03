@@ -41,6 +41,22 @@ def _run_collection_with_new_session(week_id: Optional[str] = None):
         db.close()
 
 
+def _run_ma_collection_with_new_session(week_id: Optional[str] = None):
+    """Background task wrapper for M&A-only collection with its own session."""
+    from app.services.collector import run_ma_collection
+
+    db = get_session_local()()
+    try:
+        logger.info(f"Starting background M&A collection for {week_id or 'current week'}")
+        run_ma_collection(db, week_id)
+        logger.info(f"Background M&A collection completed for {week_id or 'current week'}")
+    except Exception as e:
+        logger.error(f"Background M&A collection failed: {e}")
+        raise
+    finally:
+        db.close()
+
+
 @router.post("/collect")
 async def trigger_collection(
     background_tasks: BackgroundTasks,
@@ -65,6 +81,27 @@ async def trigger_collection(
         "status": "started",
         "week_id": week_id or "current",
         "message": "Full collection started in background (fetch + process)",
+    }
+
+
+@router.post("/collect/ma")
+async def trigger_ma_collection(
+    background_tasks: BackgroundTasks,
+    week_id: Optional[str] = None,
+    _: bool = Depends(verify_api_key),
+):
+    """
+    Trigger M&A-only collection for a specific week (or current week).
+
+    Only fetches M&A sources and updates M&A posts, leaving other sections untouched.
+    Requires X-API-Key header.
+    """
+    background_tasks.add_task(_run_ma_collection_with_new_session, week_id)
+
+    return {
+        "status": "started",
+        "week_id": week_id or "current",
+        "message": "M&A collection started in background",
     }
 
 

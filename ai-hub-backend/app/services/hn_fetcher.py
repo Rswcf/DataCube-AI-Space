@@ -8,6 +8,9 @@ from typing import Optional
 from bs4 import BeautifulSoup
 import logging
 import re
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+from app.config import get_settings
 
 logger = logging.getLogger(__name__)
 
@@ -71,8 +74,13 @@ def _fetch_single_query(
         "hitsPerPage": limit * 2,
     }
 
+    settings = get_settings()
     try:
-        resp = requests.get(url, params=params, timeout=30)
+        resp = requests.get(
+            url,
+            params=params,
+            timeout=settings.hn_request_timeout_seconds,
+        )
         resp.raise_for_status()
         data = resp.json()
     except Exception as e:
@@ -131,19 +139,31 @@ def fetch_hn_top_stories(
     if queries is None:
         queries = HN_DEFAULT_QUERIES
 
-    all_stories = []
-    seen_ids = set()
+    settings = get_settings()
+    all_stories: list[dict] = []
+    seen_ids: set[str] = set()
 
-    # Fetch stories for each query
-    for query in queries:
-        logger.debug(f"Fetching HN stories for query: {query}")
-        stories = _fetch_single_query(query, min_points, days, limit)
+    # Fetch stories for each query in parallel
+    logger.info(f"HN parallel query fetch: {len(queries)} queries, workers={settings.hn_max_workers}")
+    with ThreadPoolExecutor(max_workers=settings.hn_max_workers) as executor:
+        futures = {
+            executor.submit(_fetch_single_query, query, min_points, days, limit): query
+            for query in queries
+        }
 
-        for story in stories:
-            hn_id = story.get("hn_id")
-            if hn_id and hn_id not in seen_ids:
-                seen_ids.add(hn_id)
-                all_stories.append(story)
+        for future in as_completed(futures):
+            query = futures[future]
+            try:
+                stories = future.result() or []
+            except Exception as e:
+                logger.error(f"HN query failed for '{query}': {e}")
+                stories = []
+
+            for story in stories:
+                hn_id = story.get("hn_id")
+                if hn_id and hn_id not in seen_ids:
+                    seen_ids.add(hn_id)
+                    all_stories.append(story)
 
     # Sort by points and limit results
     all_stories.sort(key=lambda x: x["points"], reverse=True)
@@ -156,8 +176,9 @@ def fetch_hn_comments(story_id: str, limit: int = 5) -> list[str]:
     """Fetch top comments from an HN post."""
     url = f"https://hn.algolia.com/api/v1/items/{story_id}"
 
+    settings = get_settings()
     try:
-        resp = requests.get(url, timeout=30)
+        resp = requests.get(url, timeout=settings.hn_request_timeout_seconds)
         resp.raise_for_status()
         data = resp.json()
 
@@ -254,7 +275,8 @@ def fetch_webpage_content(url: str) -> Optional[str]:
         headers = {
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
         }
-        resp = requests.get(url, headers=headers, timeout=15)
+        settings = get_settings()
+        resp = requests.get(url, headers=headers, timeout=min(15, settings.hn_request_timeout_seconds))
         resp.raise_for_status()
 
         soup = BeautifulSoup(resp.text, "lxml")
@@ -322,6 +344,57 @@ def enhance_hn_articles(stories: list[dict], max_items: int = 30) -> list[dict]:
     return enhanced
 
 
+def _enhance_single_story(story: dict) -> dict:
+    """Enhance a single HN story with content and comments."""
+    content_type = detect_content_type(story.get("link"))
+    content = None
+
+    if content_type == "youtube":
+        content = fetch_youtube_transcript(story.get("link", ""))
+    elif content_type == "webpage":
+        content = fetch_webpage_content(story.get("link", ""))
+
+    comments = []
+    if story.get("hn_id"):
+        comments = fetch_hn_comments(story["hn_id"], limit=3)
+
+    full_content = []
+    if content:
+        full_content.append(f"[Article Content]\n{content}")
+    if comments:
+        full_content.append(f"[HN Discussion Highlights]\n" + "\n---\n".join(comments))
+
+    story["summary"] = "\n\n".join(full_content) if full_content else story.get("title", "")
+    story["content_type"] = content_type
+    story["has_full_content"] = bool(content)
+    return story
+
+
+def enhance_hn_articles_parallel(stories: list[dict], max_items: int = 30) -> list[dict]:
+    """Enhance HN stories in parallel using a thread pool."""
+    settings = get_settings()
+    if not stories:
+        return []
+
+    tasks = [s for s in stories[:max_items]]
+    enhanced: list[dict] = []
+
+    logger.info(
+        f"HN parallel enhance: {len(tasks)} stories, workers={settings.hn_enhance_max_workers}"
+    )
+    with ThreadPoolExecutor(max_workers=settings.hn_enhance_max_workers) as executor:
+        futures = {executor.submit(_enhance_single_story, story): story for story in tasks}
+        for future in as_completed(futures):
+            try:
+                enhanced_story = future.result()
+                enhanced.append(enhanced_story)
+            except Exception as e:
+                s = futures[future]
+                logger.error(f"Failed to enhance story '{s.get('title','')[:40]}...': {e}")
+
+    return enhanced
+
+
 def fetch_hn_stories(
     queries: list[str] = None,
     min_points: int = 100,
@@ -349,7 +422,7 @@ def fetch_hn_stories(
     logger.info(f"Found {len(stories)} HN stories")
 
     if enhance and stories:
-        logger.info("Enhancing HN articles with content...")
-        stories = enhance_hn_articles(stories, max_enhance)
+        logger.info("Enhancing HN articles with content (parallel)...")
+        stories = enhance_hn_articles_parallel(stories, max_enhance)
 
     return stories

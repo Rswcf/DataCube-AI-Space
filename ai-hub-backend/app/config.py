@@ -34,8 +34,22 @@ class Settings(BaseSettings):
     hn_days: int = 7
     hn_limit: int = 50
     youtube_max_results: int = 10
-    tech_output_count: int = 20
+
+    # Output counts
+    tech_output_count: int = 30
+    tips_output_count: int = 15
+    investment_output_count: int = 10
     video_output_count: int = 5
+
+    # Thread pool and timeout settings
+    rss_max_workers: int = 8
+    hn_max_workers: int = 8
+    hn_enhance_max_workers: int = 6
+    llm_max_workers: int = 4
+
+    # HTTP timeouts (seconds)
+    rss_request_timeout_seconds: int = 20
+    hn_request_timeout_seconds: int = 30
 
     class Config:
         env_file = ".env"

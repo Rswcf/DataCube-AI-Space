@@ -305,7 +305,7 @@ Output ONLY valid JSON."""
         response = self._call_llm(prompt, temperature=0.3)
         return parse_llm_json(response, fallback={"de": [], "en": []})
 
-    def process_investment_articles(self, articles: list[dict]) -> dict:
+    def process_investment_articles(self, articles: list[dict], count: int = 10) -> dict:
         """Process investment articles into bilingual feed format."""
         if not articles:
             return {
@@ -425,7 +425,7 @@ Output a JSON object with this EXACT structure:
 }}
 
 Rules:
-- Include up to 7 items per category
+- Include up to {count} items per category
 - Use German number formatting for 'de' (e.g., $2,75 Mrd., $500 Mio.)
 - Use English number formatting for 'en' (e.g., $2.75B, $500M)
 - dealType German: "Akquisition", "Fusion", "Übernahme"
@@ -442,12 +442,29 @@ ROUND CATEGORY CLASSIFICATION (for Primary Market):
 - "Late/PE": Growth, Pre-IPO, Buyout, LBO (keywords: growth, pre-ipo, buyout, lbo, 成长轮, 上市前, 收购)
 - "Unknown": If round cannot be determined
 
-INDUSTRY CLASSIFICATION (for M&A):
-- "Healthcare": healthcare, biotech, medical, pharma, life sciences (keywords: healthcare, biotech, medical, pharma, 医疗, 生物)
-- "FinTech": fintech, banking, payments, insurance tech (keywords: fintech, banking, payments, 金融, 支付)
-- "Enterprise": enterprise software, SaaS, B2B, cloud (keywords: enterprise, saas, b2b, cloud, 企业服务)
-- "Consumer": consumer tech, retail, e-commerce, social (keywords: consumer, retail, e-commerce, 消费, 零售)
-- "Other": default if no clear match
+AI APPLICATION DOMAIN CLASSIFICATION (for M&A):
+IMPORTANT: Only classify deals involving AI companies or AI technology. Return null for industry if the deal is NOT AI-related.
+
+- "AI Healthcare": Medical AI, biotech AI, drug discovery AI, clinical AI, diagnostics AI
+  (keywords: medical AI, biotech AI, drug discovery, clinical AI, diagnostics, 医疗AI, 生物AI, AI制药)
+- "AI Finance": FinTech AI, algorithmic trading, risk assessment AI, fraud detection AI
+  (keywords: fintech AI, trading AI, risk AI, fraud detection, 金融AI, 交易AI, 风控AI)
+- "AI Enterprise": Enterprise AI, SaaS AI, workflow automation, document AI, B2B AI
+  (keywords: enterprise AI, saas AI, automation, document AI, 企业AI, 自动化)
+- "AI Consumer": Consumer AI, recommendation systems, voice assistants, smart home AI
+  (keywords: consumer AI, recommendation, voice assistant, smart home, 消费AI, 语音助手)
+- "AI Infrastructure": GPU, cloud AI, ML platforms, data infrastructure, AI chips
+  (keywords: gpu, cloud AI, ml platform, infrastructure, 算力, 云AI, 平台, AI芯片)
+- "AI Robotics": Industrial robots, autonomous vehicles, drones, robotic manipulation
+  (keywords: robot, autonomous, drone, manipulation, 机器人, 自动驾驶, 无人机)
+- "AI Security": Cybersecurity AI, identity verification AI, threat detection AI
+  (keywords: security AI, identity, threat, cyber, 安全AI, 身份验证)
+- "AI Creative": Generative AI, content generation, design AI, music AI, video AI
+  (keywords: generative AI, content, design AI, music AI, AIGC, 生成AI, 内容创作)
+- "AI Education": EdTech AI, AI tutoring, learning platforms, assessment AI
+  (keywords: edtech, tutoring, learning, assessment, 教育AI, 学习平台)
+- "Other AI": AI-related but doesn't fit above categories
+- null: NOT AI-related at all (e.g., traditional media, non-tech acquisitions)
 
 Output ONLY valid JSON."""
 
@@ -457,7 +474,89 @@ Output ONLY valid JSON."""
             "secondaryMarket": {"de": [], "en": []},
             "ma": {"de": [], "en": []},
         }
-        return parse_llm_json(response, fallback=fallback)
+        result = parse_llm_json(response, fallback=fallback)
+        if isinstance(result, dict):
+            for key in ["primaryMarket", "secondaryMarket", "ma"]:
+                section = result.get(key)
+                if isinstance(section, dict):
+                    for lang in ["de", "en"]:
+                        arr = section.get(lang)
+                        if isinstance(arr, list) and len(arr) > count:
+                            section[lang] = arr[:count]
+        return result
+
+    def process_ma_articles(self, articles: list[dict], count: int = 10) -> dict:
+        """Process only M&A articles into bilingual feed format."""
+        if not articles:
+            return {"ma": {"de": [], "en": []}}
+
+        articles_text = "\n\n".join(
+            f"Source: {a['source']}\nTitle: {a['title']}\nLink: {a['link']}\nSummary: {a['summary'][:500]}\nDate: {a['published']}"
+            for a in articles[:40]
+        )
+
+        prompt = f"""You are a financial news editor for a German/English bilingual AI newsletter.
+Your task: extract up to {count} notable M&A deals (mergers, acquisitions, buyouts) from the articles below.
+
+ARTICLES:
+{articles_text}
+
+Output a JSON object with EXACTLY this structure:
+{{
+  "ma": {{
+    "de": [
+      {{
+        "id": 1,
+        "acquirer": "Käufer",
+        "target": "Zielunternehmen",
+        "dealValue": "€1,2 Mrd.",
+        "dealType": "Akquisition|Fusion|Übernahme",
+        "industry": "AI Infrastructure|AI Healthcare|AI Finance|AI Enterprise|AI Consumer|AI Robotics|AI Security|AI Creative|AI Education|Other AI|null",
+        "content": "Deutsche Zusammenfassung (2-3 Sätze, geschäftsrelevant)",
+        "author": {{"name": "Quelle", "handle": "@source", "avatar": "XX", "verified": true}},
+        "timestamp": "YYYY-MM-DD",
+        "sourceUrl": "https://...",
+        "metrics": {{"comments": 0, "retweets": 0, "likes": 0, "views": "0"}}
+      }}
+    ],
+    "en": [
+      {{
+        "id": 1,
+        "acquirer": "Acquirer",
+        "target": "Target",
+        "dealValue": "$1.2B",
+        "dealType": "Acquisition|Merger|Buyout",
+        "industry": "AI Infrastructure|AI Healthcare|AI Finance|AI Enterprise|AI Consumer|AI Robotics|AI Security|AI Creative|AI Education|Other AI|null",
+        "content": "English summary (2-3 sentences, business-relevant)",
+        "author": {{"name": "Source", "handle": "@source", "avatar": "XX", "verified": true}},
+        "timestamp": "YYYY-MM-DD",
+        "sourceUrl": "https://...",
+        "metrics": {{"comments": 0, "retweets": 0, "likes": 0, "views": "0"}}
+      }}
+    ]
+  }}
+}}
+
+Rules:
+- Only include genuine M&A deals (exclude partnerships or minor investments)
+- industry: use the AI industry taxonomy below; return null if not AI-related at all
+- Limit to at most {count} items per language
+
+AI INDUSTRY TAXONOMY:
+- AI Healthcare, AI Finance, AI Enterprise, AI Consumer, AI Infrastructure, AI Robotics, AI Security, AI Creative, AI Education, Other AI, null
+
+Output ONLY valid JSON."""
+
+        response = self._call_llm(prompt, temperature=0.3)
+        result = parse_llm_json(response, fallback={"ma": {"de": [], "en": []}})
+        if isinstance(result, dict):
+            ma = result.get("ma")
+            if isinstance(ma, dict):
+                for lang in ["de", "en"]:
+                    arr = ma.get(lang)
+                    if isinstance(arr, list) and len(arr) > count:
+                        ma[lang] = arr[:count]
+        return result
 
     def process_tips_articles(self, articles: list[dict], count: int = 10) -> dict:
         """Process tips articles into bilingual feed format."""
