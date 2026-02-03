@@ -17,6 +17,8 @@ class PrimaryMarketResponse(BaseModel):
     company: str
     amount: str
     round: str
+    # Round category for filtering: Early, Series A, Series B, Series C+, Late/PE, Unknown
+    roundCategory: Optional[str] = None
     investors: list[str]
     valuation: Optional[str] = None
     timestamp: str
@@ -56,6 +58,8 @@ class MAResponse(BaseModel):
     target: str
     dealValue: Optional[str] = None
     dealType: str
+    # Industry category for filtering: Healthcare, FinTech, Enterprise, Consumer, Other
+    industry: Optional[str] = None
     timestamp: str
     metrics: Metrics
     sourceUrl: Optional[str] = None

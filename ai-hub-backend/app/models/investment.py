@@ -26,6 +26,8 @@ class PrimaryMarketPost(Base):
     amount_de: Mapped[str] = mapped_column(String(50))  # "$2,75 Mrd."
     amount_en: Mapped[str] = mapped_column(String(50))  # "$2.75B"
     round: Mapped[str] = mapped_column(String(50))  # "Series D"
+    # Funding round category for filtering: Early, Series A, Series B, Series C+, Late/PE, Unknown
+    round_category: Mapped[str | None] = mapped_column(String(20), nullable=True)
     investors: Mapped[list[str]] = mapped_column(ARRAY(String), default=list)
     valuation_de: Mapped[str | None] = mapped_column(String(50), nullable=True)
     valuation_en: Mapped[str | None] = mapped_column(String(50), nullable=True)
@@ -89,6 +91,8 @@ class MAPost(Base):
     deal_value_en: Mapped[str | None] = mapped_column(String(50), nullable=True)
     deal_type_de: Mapped[str] = mapped_column(String(50))  # "Akquisition"
     deal_type_en: Mapped[str] = mapped_column(String(50))  # "Acquisition"
+    # Industry category for filtering: Healthcare, FinTech, Enterprise, Consumer, Other
+    industry: Mapped[str | None] = mapped_column(String(20), nullable=True)
 
     # Metadata
     author: Mapped[dict] = mapped_column(JSONB)

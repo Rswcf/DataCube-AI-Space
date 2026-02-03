@@ -14,6 +14,8 @@ interface InvestmentFeedProps {
 
 type MarketTab = "primary" | "secondary" | "ma";
 
+type RoundCategory = "Early" | "Series A" | "Series B" | "Series C+" | "Late/PE" | "Unknown";
+
 interface PrimaryMarketPost {
   id: number;
   author: { name: string; handle: string; avatar: string; verified: boolean };
@@ -21,6 +23,7 @@ interface PrimaryMarketPost {
   company: string;
   amount: string;
   round: string;
+  roundCategory?: RoundCategory;
   investors: string[];
   valuation: string;
   timestamp: string;
@@ -42,6 +45,8 @@ interface SecondaryMarketPost {
   sourceUrl?: string;
 }
 
+type IndustryCategory = "Healthcare" | "FinTech" | "Enterprise" | "Consumer" | "Other";
+
 interface MAPost {
   id: number;
   author: { name: string; handle: string; avatar: string; verified: boolean };
@@ -50,6 +55,7 @@ interface MAPost {
   target: string;
   dealValue: string;
   dealType: string;
+  industry?: IndustryCategory;
   timestamp: string;
   metrics: { comments: number; retweets: number; likes: number; views: string };
   sourceUrl?: string;
@@ -62,6 +68,40 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
   const [secondaryPosts, setSecondaryPosts] = useState<SecondaryMarketPost[]>([]);
   const [maPosts, setMaPosts] = useState<MAPost[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Filter states
+  const [selectedRound, setSelectedRound] = useState<RoundCategory | "All">("All");
+  const [selectedIndustry, setSelectedIndustry] = useState<IndustryCategory | "All">("All");
+
+  // Filter options
+  const roundFilters: (RoundCategory | "All")[] = ["All", "Early", "Series A", "Series B", "Series C+", "Late/PE"];
+  const industryFilters: (IndustryCategory | "All")[] = ["All", "Healthcare", "FinTech", "Enterprise", "Consumer"];
+
+  // Translations for filter labels
+  const getRoundLabel = (round: RoundCategory | "All"): string => {
+    const labels: Record<RoundCategory | "All", string> = {
+      "All": t("filterAll"),
+      "Early": t("filterEarly"),
+      "Series A": t("filterSeriesA"),
+      "Series B": t("filterSeriesB"),
+      "Series C+": t("filterSeriesCPlus"),
+      "Late/PE": t("filterLatePE"),
+      "Unknown": "Unknown",
+    };
+    return labels[round] || round;
+  };
+
+  const getIndustryLabel = (industry: IndustryCategory | "All"): string => {
+    const labels: Record<IndustryCategory | "All", string> = {
+      "All": t("filterAll"),
+      "Healthcare": t("filterHealthcare"),
+      "FinTech": t("filterFinTech"),
+      "Enterprise": t("filterEnterprise"),
+      "Consumer": t("filterConsumer"),
+      "Other": "Other",
+    };
+    return labels[industry] || industry;
+  };
 
   useEffect(() => {
     setLoading(true);
@@ -109,15 +149,24 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
     return text.toLowerCase().includes(searchQuery.toLowerCase());
   };
 
-  const filteredPrimary = primaryPosts.filter((p) =>
-    !searchQuery || filterByQuery(p.content) || filterByQuery(p.company) || filterByQuery(p.round) || p.investors.some((i) => filterByQuery(i))
-  );
+  // Primary market posts - filter by search and round category
+  const filteredPrimary = primaryPosts.filter((p) => {
+    const matchesSearch = !searchQuery || filterByQuery(p.content) || filterByQuery(p.company) || filterByQuery(p.round) || p.investors.some((i) => filterByQuery(i));
+    const matchesRound = selectedRound === "All" || p.roundCategory === selectedRound;
+    return matchesSearch && matchesRound;
+  });
+
+  // Secondary market posts - filter by search only
   const filteredSecondary = secondaryPosts.filter((p) =>
     !searchQuery || filterByQuery(p.content) || filterByQuery(p.ticker)
   );
-  const filteredMa = maPosts.filter((p) =>
-    !searchQuery || filterByQuery(p.content) || filterByQuery(p.acquirer) || filterByQuery(p.target) || filterByQuery(p.dealType)
-  );
+
+  // M&A posts - filter by search and industry category
+  const filteredMa = maPosts.filter((p) => {
+    const matchesSearch = !searchQuery || filterByQuery(p.content) || filterByQuery(p.acquirer) || filterByQuery(p.target) || filterByQuery(p.dealType);
+    const matchesIndustry = selectedIndustry === "All" || p.industry === selectedIndustry;
+    return matchesSearch && matchesIndustry;
+  });
 
   const tabs = [
     { id: "primary" as const, label: t("primaryMarket"), icon: Briefcase },
@@ -182,6 +231,50 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
           </button>
         ))}
       </div>
+
+      {/* Filter Chips - Primary Market (Round Filter) */}
+      {activeTab === "primary" && (
+        <div className="px-3 py-2 sm:px-4 sm:py-3 bg-secondary/10 border-b border-border">
+          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+            {roundFilters.map((round) => (
+              <button
+                key={round}
+                onClick={() => setSelectedRound(round)}
+                className={cn(
+                  "px-3 py-1.5 text-xs font-medium rounded-full whitespace-nowrap transition-colors",
+                  selectedRound === round
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                )}
+              >
+                {getRoundLabel(round)}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Filter Chips - M&A (Industry Filter) */}
+      {activeTab === "ma" && (
+        <div className="px-3 py-2 sm:px-4 sm:py-3 bg-secondary/10 border-b border-border">
+          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+            {industryFilters.map((industry) => (
+              <button
+                key={industry}
+                onClick={() => setSelectedIndustry(industry)}
+                className={cn(
+                  "px-3 py-1.5 text-xs font-medium rounded-full whitespace-nowrap transition-colors",
+                  selectedIndustry === industry
+                    ? "bg-chart-5 text-white"
+                    : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                )}
+              >
+                {getIndustryLabel(industry)}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Loading State */}
       {loading && (

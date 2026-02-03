@@ -41,3 +41,11 @@ __pycache__/
 # Claude Code instructions (not for public)
 CLAUDE.md
 **/CLAUDE.md
+
+# Code review files (not for public)
+CODEX_REVIEW.md
+REVIEW_FINDINGS.md
+
+# AI collaboration platform (not for public)
+.ai-collab/
+venv312/
