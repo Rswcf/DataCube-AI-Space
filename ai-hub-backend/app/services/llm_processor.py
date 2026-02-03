@@ -538,13 +538,14 @@ Output a JSON object with EXACTLY this structure:
 }}
 
 Rules:
-- Include M&A deals (mergers, acquisitions, buyouts) AND significant investments/partnerships
-- Prioritize deals with clear financial terms or strategic importance
-- industry: use the AI industry taxonomy below; return null if not AI-related at all
+- ONLY include AI-related M&A deals and investments (companies developing, using, or investing in AI technology)
+- Skip deals that have no clear AI connection
+- industry: MUST be one of the AI categories below (do NOT use null)
+- Prioritize deals with clear financial terms or strategic AI importance
 - Limit to at most {count} items per language
 
-AI INDUSTRY TAXONOMY:
-- AI Healthcare, AI Finance, AI Enterprise, AI Consumer, AI Infrastructure, AI Robotics, AI Security, AI Creative, AI Education, Other AI, null
+AI INDUSTRY TAXONOMY (required - skip deal if none apply):
+- AI Infrastructure, AI Healthcare, AI Finance, AI Enterprise, AI Consumer, AI Robotics, AI Security, AI Creative, AI Education, Other AI
 
 Output ONLY valid JSON."""
 
