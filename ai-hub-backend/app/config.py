@@ -16,6 +16,7 @@ class Settings(BaseSettings):
     # API Keys
     openrouter_api_key: str = ""
     youtube_api_key: str = ""
+    polygon_api_key: str = ""  # Polygon.io (Massive.com) API for stock data
 
     # Admin
     admin_api_key: str = ""

@@ -9,6 +9,7 @@ from app.routers.tips import router as tips_router
 from app.routers.trends import router as trends_router
 from app.routers.videos import router as videos_router
 from app.routers.admin import router as admin_router
+from app.routers.stock import router as stock_router
 
 __all__ = [
     "weeks_router",
@@ -18,4 +19,5 @@ __all__ = [
     "trends_router",
     "videos_router",
     "admin_router",
+    "stock_router",
 ]

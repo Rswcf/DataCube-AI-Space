@@ -371,11 +371,7 @@ Output a JSON object with this EXACT structure:
       {{
         "id": 1,
         "ticker": "NVDA",
-        "price": "$850",
-        "change": "+5.2%",
-        "direction": "up",
-        "marketCap": "$2,1 Bio.",
-        "content": "German description",
+        "content": "German description of stock news/movement (2-3 sentences)",
         "author": {{"name": "Source Name", "handle": "@source", "avatar": "XX", "verified": true}},
         "timestamp": "YYYY-MM-DD",
         "sourceUrl": "https://...",
@@ -386,11 +382,7 @@ Output a JSON object with this EXACT structure:
       {{
         "id": 1,
         "ticker": "NVDA",
-        "price": "$850",
-        "change": "+5.2%",
-        "direction": "up",
-        "marketCap": "$2.1T",
-        "content": "English description",
+        "content": "English description of stock news/movement (2-3 sentences)",
         "author": {{"name": "Source Name", "handle": "@source", "avatar": "XX", "verified": true}},
         "timestamp": "YYYY-MM-DD",
         "sourceUrl": "https://...",
@@ -436,11 +428,11 @@ Rules:
 - Include up to 7 items per category
 - Use German number formatting for 'de' (e.g., $2,75 Mrd., $500 Mio.)
 - Use English number formatting for 'en' (e.g., $2.75B, $500M)
-- direction: "up" or "down" based on price change
 - dealType German: "Akquisition", "Fusion", "Übernahme"
 - dealType English: "Acquisition", "Merger", "Buyout"
 - sourceUrl: copy the exact Link URL from the article
 - IMPORTANT: Each category MUST have both "de" and "en" arrays, even if empty
+- For secondaryMarket: ONLY include ticker and content. Price/change/marketCap will be fetched from real-time API.
 
 ROUND CATEGORY CLASSIFICATION (for Primary Market):
 - "Early": Pre-Seed, Seed, Angel, Accelerator (keywords: seed, angel, pre-seed, accelerator, 种子, 天使, 孵化)

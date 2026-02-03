@@ -103,6 +103,9 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
     return labels[industry] || industry;
   };
 
+  // State for real-time stock data loading
+  const [stockDataLoading, setStockDataLoading] = useState(false);
+
   useEffect(() => {
     setLoading(true);
 
@@ -141,6 +144,53 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
         }
       });
   }, [weekId, language]);
+
+  // Fetch real-time stock data for secondary market posts
+  useEffect(() => {
+    const fetchRealTimeStockData = async () => {
+      const apiBase = process.env.NEXT_PUBLIC_API_URL;
+      if (!apiBase || secondaryPosts.length === 0) return;
+
+      // Get unique tickers from secondary posts
+      const tickers = [...new Set(secondaryPosts.map((p) => p.ticker).filter(Boolean))];
+      if (tickers.length === 0) return;
+
+      setStockDataLoading(true);
+
+      try {
+        const response = await fetch(
+          `${apiBase}/stock/formatted/batch/?tickers=${tickers.join(",")}&language=${language}`
+        );
+        if (!response.ok) throw new Error("Failed to fetch stock data");
+
+        const stockData = await response.json();
+
+        // Merge real-time data into secondary posts
+        setSecondaryPosts((posts) =>
+          posts.map((post) => {
+            const realTimeData = stockData[post.ticker];
+            if (realTimeData && !realTimeData.error) {
+              return {
+                ...post,
+                price: realTimeData.price || post.price,
+                change: realTimeData.change || post.change,
+                direction: realTimeData.direction || post.direction,
+                marketCap: realTimeData.marketCap || post.marketCap,
+              };
+            }
+            return post;
+          })
+        );
+      } catch (error) {
+        console.error("Failed to fetch real-time stock data:", error);
+        // Keep existing data on error
+      } finally {
+        setStockDataLoading(false);
+      }
+    };
+
+    fetchRealTimeStockData();
+  }, [secondaryPosts.length, language]); // Only re-fetch when posts change or language changes
 
   const weekNum = weekId.split("-kw")[1];
 
@@ -347,6 +397,13 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
       {/* Secondary Market Posts */}
       {!loading && activeTab === "secondary" && (
         <div className="divide-y divide-border">
+          {/* Real-time data indicator */}
+          {stockDataLoading && (
+            <div className="px-4 py-2 bg-chart-3/10 border-b border-border flex items-center gap-2 text-sm text-chart-3">
+              <div className="h-3 w-3 animate-spin rounded-full border-2 border-chart-3 border-t-transparent" />
+              {language === "de" ? "Lade Echtzeit-Kursdaten..." : "Loading real-time stock data..."}
+            </div>
+          )}
           {filteredSecondary.length === 0 && (
             <div className="px-4 py-12 text-center text-muted-foreground">
               {language === "de" ? "Keine Daten für diese Woche verfügbar." : "No data available for this week."}
@@ -372,23 +429,41 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <span className="text-lg font-bold text-foreground">{post.ticker}</span>
-                        <span className="text-xl font-semibold text-foreground">{post.price}</span>
-                      </div>
-                      <div
-                        className={cn(
-                          "flex items-center gap-1 rounded-full px-3 py-1 text-sm font-semibold",
-                          post.direction === "up"
-                            ? "bg-accent/20 text-accent"
-                            : "bg-destructive/20 text-destructive"
+                        {post.price && post.price !== "N/A" && (
+                          <span className="text-xl font-semibold text-foreground">{post.price}</span>
                         )}
-                      >
-                        {post.direction === "up" ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
-                        {post.change}
+                        {/* Live indicator for real-time data */}
+                        {post.price && post.price !== "N/A" && !stockDataLoading && (
+                          <Badge variant="outline" className="text-xs text-chart-3 border-chart-3/50 bg-chart-3/10">
+                            {language === "de" ? "Live" : "Live"}
+                          </Badge>
+                        )}
                       </div>
+                      {post.change && post.change !== "N/A" && (
+                        <div
+                          className={cn(
+                            "flex items-center gap-1 rounded-full px-3 py-1 text-sm font-semibold",
+                            post.direction === "up"
+                              ? "bg-accent/20 text-accent"
+                              : "bg-destructive/20 text-destructive"
+                          )}
+                        >
+                          {post.direction === "up" ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
+                          {post.change}
+                        </div>
+                      )}
+                      {(!post.change || post.change === "N/A") && stockDataLoading && (
+                        <div className="h-6 w-16 bg-secondary/50 animate-pulse rounded-full" />
+                      )}
                     </div>
-                    <div className="mt-2 text-sm text-muted-foreground">
-                      {t("marketCap")}: <span className="text-foreground">{post.marketCap}</span>
-                    </div>
+                    {post.marketCap && post.marketCap !== "N/A" && (
+                      <div className="mt-2 text-sm text-muted-foreground">
+                        {t("marketCap")}: <span className="text-foreground">{post.marketCap}</span>
+                      </div>
+                    )}
+                    {(!post.marketCap || post.marketCap === "N/A") && stockDataLoading && (
+                      <div className="mt-2 h-4 w-32 bg-secondary/50 animate-pulse rounded" />
+                    )}
                   </div>
 
                   <p className="mt-2 text-[15px] sm:text-base text-foreground leading-relaxed">{post.content}</p>

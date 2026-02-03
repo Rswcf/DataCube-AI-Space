@@ -19,6 +19,7 @@ from app.routers import (
     trends_router,
     videos_router,
     admin_router,
+    stock_router,
 )
 
 # Configure logging
@@ -63,6 +64,7 @@ app.include_router(tips_router, prefix="/api")
 app.include_router(trends_router, prefix="/api")
 app.include_router(videos_router, prefix="/api")
 app.include_router(admin_router, prefix="/api")
+app.include_router(stock_router, prefix="/api")
 
 
 @app.get("/")
@@ -79,6 +81,8 @@ async def root():
             "tips": "/api/tips/{weekId}",
             "trends": "/api/trends/{weekId}",
             "videos": "/api/videos/{weekId}",
+            "stock": "/api/stock/{ticker}",
+            "stockBatch": "/api/stock/batch/?tickers=AAPL,NVDA",
         },
     }
 

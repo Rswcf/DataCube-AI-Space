@@ -741,16 +741,18 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
                     metrics=de_p.get("metrics", {}),
                 )
             elif model_class == SecondaryMarketPost:
+                # Note: price, change, marketCap are now fetched from real-time API
+                # We only store ticker and content from LLM processing
                 post = SecondaryMarketPost(
                     week_id=week_id,
                     content_de=de_p.get("content", ""),
                     content_en=en_p.get("content", ""),
                     ticker=de_p.get("ticker", ""),
-                    price=de_p.get("price", ""),
-                    change=de_p.get("change", ""),
-                    direction=de_p.get("direction", "up"),
-                    market_cap_de=de_p.get("marketCap"),
-                    market_cap_en=en_p.get("marketCap"),
+                    price="",  # Fetched from real-time API
+                    change="",  # Fetched from real-time API
+                    direction="up",  # Determined by real-time API
+                    market_cap_de=None,  # Fetched from real-time API
+                    market_cap_en=None,  # Fetched from real-time API
                     author=de_p.get("author", {}),
                     timestamp=de_p.get("timestamp", ""),
                     source_url=de_p.get("sourceUrl"),

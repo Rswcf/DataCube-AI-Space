@@ -6,6 +6,7 @@ FastAPI backend for the AI Information Hub - bilingual AI news aggregator with Y
 
 - RESTful API for tech news, investment data, tips, trends
 - YouTube video integration (5 videos/week interspersed in tech feed)
+- **Real-time stock data** via Polygon.io API (Secondary Market)
 - PostgreSQL database with SQLAlchemy ORM
 - 4-stage data collection pipeline
 - Two-model LLM approach (classifier + processor)
@@ -381,6 +382,70 @@ The following were intentionally excluded as they target developers rather than 
 
 ---
 
+## Stock API (Polygon.io Integration)
+
+The Secondary Market section now fetches **real-time stock data** from Polygon.io API instead of relying on LLM-generated prices.
+
+### How It Works
+
+```
+Frontend (investment-feed.tsx)
+    │
+    │ 1. Load secondary market posts (ticker + content only)
+    │
+    ▼
+Backend Proxy (/api/stock/formatted/batch/)
+    │
+    │ 2. Fetch real-time data from Polygon.io
+    │
+    ▼
+Polygon.io API
+    │
+    │ 3. Return: price, change%, marketCap
+    │
+    ▼
+Frontend merges data + displays with "Live" badge
+```
+
+### API Endpoints
+
+| Endpoint | Description |
+|----------|-------------|
+| `GET /api/stock/{ticker}` | Single stock (raw data) |
+| `GET /api/stock/batch/?tickers=AAPL,NVDA` | Batch stocks (raw data) |
+| `GET /api/stock/formatted/{ticker}?language=en` | Pre-formatted for display |
+| `GET /api/stock/formatted/batch/?tickers=...&language=de` | Batch formatted |
+
+### Example Response
+
+```json
+// GET /api/stock/formatted/NVDA?language=en
+{
+  "ticker": "NVDA",
+  "price": "$180.06",
+  "change": "-2.98%",
+  "direction": "down",
+  "marketCap": "$4.5T",
+  "name": "Nvidia Corp"
+}
+
+// GET /api/stock/formatted/NVDA?language=de
+{
+  "ticker": "NVDA",
+  "price": "$180.06",
+  "change": "-2.98%",
+  "direction": "down",
+  "marketCap": "$4,5 Bio.",
+  "name": "Nvidia Corp"
+}
+```
+
+### Configuration
+
+Requires `POLYGON_API_KEY` environment variable (Polygon.io Starter Plan: $29/month, 15-min delayed data).
+
+---
+
 ## Setup
 
 ### Prerequisites
@@ -448,6 +513,10 @@ alembic downgrade -1
 | `/api/tips/{weekId}` | GET | Tips feed (10 DE + 10 EN) |
 | `/api/trends/{weekId}` | GET | Trends feed |
 | `/api/videos/{weekId}` | GET | YouTube videos only |
+| `/api/stock/{ticker}` | GET | Real-time stock data |
+| `/api/stock/batch/?tickers=...` | GET | Batch stock data |
+| `/api/stock/formatted/{ticker}` | GET | Pre-formatted stock data |
+| `/api/stock/formatted/batch/` | GET | Batch formatted stock data |
 | `/api/admin/collect` | POST | Full collection (all stages) |
 | `/api/admin/collect/fetch` | POST | Stage 1 only |
 | `/api/admin/collect/process` | POST | Stages 2-4 only |
@@ -473,6 +542,7 @@ In Railway dashboard: **Add Service** → **PostgreSQL**
 railway variables set DATABASE_URL=$RAILWAY_DATABASE_URL
 railway variables set OPENROUTER_API_KEY=sk-or-v1-xxxxx
 railway variables set YOUTUBE_API_KEY=AIzaSyxxxxx
+railway variables set POLYGON_API_KEY=xxxxx              # For real-time stock data
 railway variables set ADMIN_API_KEY=REDACTED_ADMIN_KEY
 railway variables set CORS_ORIGINS='["http://localhost:3000","https://www.datacubeai.space","https://ai-information-hub.vercel.app"]'
 ```
@@ -557,6 +627,7 @@ ai-hub-backend/
 │   ├── schemas/             # Pydantic schemas
 │   ├── routers/             # API routes
 │   │   ├── admin.py         # Collection endpoints
+│   │   ├── stock.py         # Real-time stock data (Polygon.io)
 │   │   └── ...
 │   └── services/            # Business logic
 │       ├── collector.py     # 4-stage pipeline
