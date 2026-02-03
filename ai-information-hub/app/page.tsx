@@ -17,18 +17,32 @@ export default function Home() {
   const [showMobileSettings, setShowMobileSettings] = useState(false);
 
   useEffect(() => {
-    fetch("/data/weeks.json")
+    const processData = (data: { weeks?: { id: string; current?: boolean }[] }) => {
+      const weeks = data.weeks || [];
+      const current = weeks.find((w: { current?: boolean }) => w.current);
+      if (current) {
+        setSelectedWeekId(current.id);
+      } else if (weeks.length > 0) {
+        setSelectedWeekId(weeks[0].id);
+      }
+    };
+
+    // Try API first if configured, fall back to static JSON
+    const apiBase = process.env.NEXT_PUBLIC_API_URL;
+    const fetchUrl = apiBase ? `${apiBase}/weeks` : "/data/weeks.json";
+
+    fetch(fetchUrl)
       .then((res) => res.json())
-      .then((data) => {
-        const weeks = data.weeks || [];
-        const current = weeks.find((w: { current?: boolean }) => w.current);
-        if (current) {
-          setSelectedWeekId(current.id);
-        } else if (weeks.length > 0) {
-          setSelectedWeekId(weeks[0].id);
+      .then(processData)
+      .catch(() => {
+        // If API fails, try static JSON as fallback
+        if (apiBase) {
+          fetch("/data/weeks.json")
+            .then((res) => res.json())
+            .then(processData)
+            .catch(() => {});
         }
-      })
-      .catch(() => {});
+      });
   }, []);
 
   return (
