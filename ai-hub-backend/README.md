@@ -75,6 +75,9 @@ This section provides a comprehensive overview of the entire data flow from sour
 │ • Sifted, VentureBeat │                 │ • Perplexity, DeepSeek│                 │ • Channel info        │
 │ • 36Kr (Chinese)      │                 │ • AI startup/funding  │                 │ • Transcripts         │
 │                       │                 │                       │                 │                       │
+│ M&A Sources (7):      │                 │                       │                 │                       │
+│ • See M&A section     │                 │                       │                 │                       │
+│                       │                 │                       │                 │                       │
 │ Tips Sources (14):    │                 │                       │                 │                       │
 │ • Simon Willison Blog │                 │                       │                 │                       │
 │ • One Useful Thing    │                 │                       │                 │                       │
@@ -615,6 +618,49 @@ These sources:
 - Ensure tips appear in the Tips feed
 
 ## M&A Processing
+
+### M&A Data Sources (7 feeds)
+
+M&A news is collected from dedicated financial and business news sources:
+
+| Source | Type | URL |
+|--------|------|-----|
+| TechCrunch M&A | Tech M&A | `techcrunch.com/tag/mergers-and-acquisitions/feed/` |
+| SEC EDGAR 8-K | Regulatory | `sec.gov/cgi-bin/browse-edgar?action=getcurrent&type=8-K&output=atom` |
+| Financial Times M&A | Financial | `ft.com/mergers-acquisitions?format=rss` |
+| Yahoo Finance | General | `finance.yahoo.com/rss/topstories` |
+| GlobeNewswire M&A | PR | `globenewswire.com/.../Mergers%20and%20Acquisitions/...` |
+| PR Newswire | PR | `prnewswire.com/rss/news-releases-list.rss` |
+| Google News M&A | Aggregator | `news.google.com/rss/search?q=mergers+acquisitions+AI` |
+
+These sources are fetched as part of the investment RSS collection but processed separately for M&A extraction.
+
+### M&A Processing Flow
+
+M&A data has two collection paths:
+
+**Full Collection** (4-stage pipeline):
+```
+RSS Fetch (all sources) → Classification → LLM Processing → Database
+                                              ↓
+                               process_investment_articles()
+                               internally splits articles into:
+                               • Primary Market (funding)
+                               • Secondary Market (stocks)
+                               • M&A (mergers & acquisitions)
+```
+
+**M&A-Only Collection** (3-stage fast path):
+```
+M&A RSS Fetch → process_ma_articles() → ma_posts table
+     ↓
+(Skips classification, doesn't touch other sections)
+```
+
+Use M&A-only collection when you want to refresh M&A data without reprocessing tech/tips:
+```bash
+curl -X POST ".../api/admin/collect/ma?week_id=2026-kw06" -H "X-API-Key: ..."
+```
 
 ### AI Industry Taxonomy
 
