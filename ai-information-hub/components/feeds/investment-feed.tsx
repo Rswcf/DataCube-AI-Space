@@ -45,7 +45,17 @@ interface SecondaryMarketPost {
   sourceUrl?: string;
 }
 
-type IndustryCategory = "Healthcare" | "FinTech" | "Enterprise" | "Consumer" | "Other";
+type IndustryCategory =
+  | "AI Healthcare"
+  | "AI Finance"
+  | "AI Enterprise"
+  | "AI Consumer"
+  | "AI Infrastructure"
+  | "AI Robotics"
+  | "AI Security"
+  | "AI Creative"
+  | "AI Education"
+  | "Other AI";
 
 interface MAPost {
   id: number;
@@ -71,11 +81,9 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
 
   // Filter states
   const [selectedRound, setSelectedRound] = useState<RoundCategory | "All">("All");
-  const [selectedIndustry, setSelectedIndustry] = useState<IndustryCategory | "All">("All");
 
   // Filter options
   const roundFilters: (RoundCategory | "All")[] = ["All", "Early", "Series A", "Series B", "Series C+", "Late/PE"];
-  const industryFilters: (IndustryCategory | "All")[] = ["All", "Healthcare", "FinTech", "Enterprise", "Consumer"];
 
   // Translations for filter labels
   const getRoundLabel = (round: RoundCategory | "All"): string => {
@@ -91,16 +99,21 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
     return labels[round] || round;
   };
 
-  const getIndustryLabel = (industry: IndustryCategory | "All"): string => {
-    const labels: Record<IndustryCategory | "All", string> = {
-      "All": t("filterAll"),
-      "Healthcare": t("filterHealthcare"),
-      "FinTech": t("filterFinTech"),
-      "Enterprise": t("filterEnterprise"),
-      "Consumer": t("filterConsumer"),
-      "Other": "Other",
+  // Get display name for AI application domain (shown on M&A cards)
+  const getIndustryDisplayName = (industry: string): string => {
+    const names: Record<string, { de: string; en: string }> = {
+      "AI Healthcare": { de: "AI Gesundheit", en: "AI Healthcare" },
+      "AI Finance": { de: "AI Finanzen", en: "AI Finance" },
+      "AI Enterprise": { de: "AI Enterprise", en: "AI Enterprise" },
+      "AI Consumer": { de: "AI Consumer", en: "AI Consumer" },
+      "AI Infrastructure": { de: "AI Infrastruktur", en: "AI Infrastructure" },
+      "AI Robotics": { de: "AI Robotik", en: "AI Robotics" },
+      "AI Security": { de: "AI Sicherheit", en: "AI Security" },
+      "AI Creative": { de: "AI Kreativ", en: "AI Creative" },
+      "AI Education": { de: "AI Bildung", en: "AI Education" },
+      "Other AI": { de: "Sonstige AI", en: "Other AI" },
     };
-    return labels[industry] || industry;
+    return names[industry]?.[language] || industry;
   };
 
   // State for real-time stock data loading
@@ -211,12 +224,10 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
     !searchQuery || filterByQuery(p.content) || filterByQuery(p.ticker)
   );
 
-  // M&A posts - filter by search and industry category
-  const filteredMa = maPosts.filter((p) => {
-    const matchesSearch = !searchQuery || filterByQuery(p.content) || filterByQuery(p.acquirer) || filterByQuery(p.target) || filterByQuery(p.dealType);
-    const matchesIndustry = selectedIndustry === "All" || p.industry === selectedIndustry;
-    return matchesSearch && matchesIndustry;
-  });
+  // M&A posts - filter by search only (industry badge shown on cards instead of filter)
+  const filteredMa = maPosts.filter((p) =>
+    !searchQuery || filterByQuery(p.content) || filterByQuery(p.acquirer) || filterByQuery(p.target) || filterByQuery(p.dealType)
+  );
 
   const tabs = [
     { id: "primary" as const, label: t("primaryMarket"), icon: Briefcase },
@@ -298,28 +309,6 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
                 )}
               >
                 {getRoundLabel(round)}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Filter Chips - M&A (Industry Filter) */}
-      {activeTab === "ma" && (
-        <div className="px-3 py-2 sm:px-4 sm:py-3 bg-secondary/10 border-b border-border">
-          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-            {industryFilters.map((industry) => (
-              <button
-                key={industry}
-                onClick={() => setSelectedIndustry(industry)}
-                className={cn(
-                  "px-3 py-1.5 text-xs font-medium rounded-full whitespace-nowrap transition-colors",
-                  selectedIndustry === industry
-                    ? "bg-chart-5 text-white"
-                    : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
-                )}
-              >
-                {getIndustryLabel(industry)}
               </button>
             ))}
           </div>
@@ -514,10 +503,15 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
                         <p className="font-semibold text-foreground">{post.target}</p>
                       </div>
                     </div>
-                    <div className="mt-3 flex items-center justify-center gap-4">
+                    <div className="mt-3 flex items-center justify-center gap-2 flex-wrap">
                       <Badge className="bg-chart-5/20 text-chart-5 border-chart-5/30">
                         {post.dealType}
                       </Badge>
+                      {post.industry && (
+                        <Badge className="bg-primary/20 text-primary border-primary/30">
+                          {getIndustryDisplayName(post.industry)}
+                        </Badge>
+                      )}
                       <span className="text-lg font-bold text-chart-5">{post.dealValue}</span>
                     </div>
                   </div>

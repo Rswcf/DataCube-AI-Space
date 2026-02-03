@@ -97,8 +97,18 @@ export interface SecondaryMarketPost {
   sourceUrl?: string;
 }
 
-/** Industry category for M&A filtering */
-export type IndustryCategory = "Healthcare" | "FinTech" | "Enterprise" | "Consumer" | "Other";
+/** AI application domain for M&A classification */
+export type IndustryCategory =
+  | "AI Healthcare"
+  | "AI Finance"
+  | "AI Enterprise"
+  | "AI Consumer"
+  | "AI Infrastructure"
+  | "AI Robotics"
+  | "AI Security"
+  | "AI Creative"
+  | "AI Education"
+  | "Other AI";
 
 /** M&A deal post */
 export interface MAPost {
@@ -109,7 +119,7 @@ export interface MAPost {
   target: string;
   dealValue: string;
   dealType: string; // e.g., "Acquisition" or "Akquisition"
-  /** Industry category for filtering: Healthcare, FinTech, Enterprise, Consumer, Other */
+  /** AI application domain: AI Healthcare, AI Finance, AI Enterprise, etc. Null if not AI-related. */
   industry?: IndustryCategory;
   timestamp: string;
   metrics: Metrics;

@@ -49,19 +49,14 @@ export const translations = {
     target: "Ziel",
     dealValue: "Dealwert",
 
-    // Investment Filters
+    // Investment Filters (Primary Market round filters)
     filterAll: "Alle",
     filterEarly: "Früh",
     filterSeriesA: "Serie A",
     filterSeriesB: "Serie B",
     filterSeriesCPlus: "Serie C+",
     filterLatePE: "Spät/PE",
-    filterHealthcare: "Healthcare",
-    filterFinTech: "FinTech",
-    filterEnterprise: "Enterprise",
-    filterConsumer: "Consumer",
     filterByRound: "Nach Runde filtern",
-    filterByIndustry: "Nach Branche filtern",
     
     // Tips Feed
     practicalTipsTitle: "Praxis-Tipps",
@@ -168,19 +163,14 @@ export const translations = {
     target: "Target",
     dealValue: "Deal Value",
 
-    // Investment Filters
+    // Investment Filters (Primary Market round filters)
     filterAll: "All",
     filterEarly: "Early",
     filterSeriesA: "Series A",
     filterSeriesB: "Series B",
     filterSeriesCPlus: "Series C+",
     filterLatePE: "Late/PE",
-    filterHealthcare: "Healthcare",
-    filterFinTech: "FinTech",
-    filterEnterprise: "Enterprise",
-    filterConsumer: "Consumer",
     filterByRound: "Filter by round",
-    filterByIndustry: "Filter by industry",
     
     // Tips Feed
     practicalTipsTitle: "Practical Tips",
