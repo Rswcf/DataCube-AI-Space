@@ -6,6 +6,13 @@ const openrouter = createOpenAI({
   apiKey: process.env.OPENROUTER_API_KEY,
 });
 
+// SEC-H2: Rate limiting note - For production, consider adding rate limiting
+// via Vercel Edge Config, middleware, or a service like Upstash Redis.
+// This is currently not implemented as this is an internal tool.
+
+// SEC-H3: Allowed message roles - filter out any other roles (e.g., "system")
+const ALLOWED_ROLES = new Set(["user", "assistant"]);
+
 export async function POST(req: Request) {
   try {
     const { messages, weekContext, language } = await req.json();
@@ -29,11 +36,13 @@ CONTEXT — This week's AI data:
 ${weekContext || "No data available for this week."}`;
 
     // Cap message history to last 10 messages for token budget
+    // SEC-H3: Filter message roles to only allow "user" and "assistant"
     const coreMessages = (messages || [])
+      .filter((msg: { role: string }) => ALLOWED_ROLES.has(msg.role))
       .slice(-10)
       .map((msg: { role: string; content: string }) => ({
         role: msg.role as "user" | "assistant",
-        content: msg.content,
+        content: typeof msg.content === "string" ? msg.content.slice(0, 10000) : "", // SEC-H2: Limit content size
       }));
 
     const result = streamText({

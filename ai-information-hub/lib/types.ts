@@ -60,6 +60,9 @@ export interface TechPost {
 // Investment Feed Types (investment.json)
 // =============================================================================
 
+/** Funding round category for filtering */
+export type RoundCategory = "Early" | "Series A" | "Series B" | "Series C+" | "Late/PE" | "Unknown";
+
 /** Primary market funding round post */
 export interface PrimaryMarketPost {
   id: number;
@@ -68,8 +71,11 @@ export interface PrimaryMarketPost {
   company: string;
   amount: string; // e.g., "$2.75B" or "$2,75 Mrd."
   round: string; // e.g., "Series D"
+  /** Round category for filtering: Early (Pre-Seed/Seed/Angel), Series A, B, C+, Late/PE (Growth/Pre-IPO) */
+  roundCategory?: RoundCategory;
   investors: string[];
-  valuation: string;
+  /** TYPE-H1: Valuation is optional as not all funding announcements include valuation */
+  valuation?: string;
   timestamp: string;
   metrics: Metrics;
   sourceUrl?: string;
@@ -84,11 +90,15 @@ export interface SecondaryMarketPost {
   price: string;
   change: string; // e.g., "+5.2%"
   direction: "up" | "down";
-  marketCap: string;
+  /** TYPE-H2: Market cap is optional as not all stock news includes this data */
+  marketCap?: string;
   timestamp: string;
   metrics: Metrics;
   sourceUrl?: string;
 }
+
+/** Industry category for M&A filtering */
+export type IndustryCategory = "Healthcare" | "FinTech" | "Enterprise" | "Consumer" | "Other";
 
 /** M&A deal post */
 export interface MAPost {
@@ -99,6 +109,8 @@ export interface MAPost {
   target: string;
   dealValue: string;
   dealType: string; // e.g., "Acquisition" or "Akquisition"
+  /** Industry category for filtering: Healthcare, FinTech, Enterprise, Consumer, Other */
+  industry?: IndustryCategory;
   timestamp: string;
   metrics: Metrics;
   sourceUrl?: string;

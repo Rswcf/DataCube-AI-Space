@@ -206,19 +206,32 @@ async def initialize_database(
 
     Args:
         drop: If True, drop all tables first (WARNING: data loss!)
+              Only allowed when ALLOW_DB_DROP=true environment variable is set.
 
     Requires X-API-Key header.
     """
     from app.database import Base, get_engine
+    import os
 
     try:
         engine = get_engine()
+        # SEC-H1: Gate drop=True behind environment check to prevent accidental data destruction
         if drop:
+            allow_drop = os.environ.get("ALLOW_DB_DROP", "").lower() == "true"
+            if not allow_drop:
+                raise HTTPException(
+                    status_code=403,
+                    detail="Database drop not allowed. Set ALLOW_DB_DROP=true environment variable to enable."
+                )
+            logger.warning("Dropping all database tables (ALLOW_DB_DROP=true)")
             Base.metadata.drop_all(bind=engine)
         Base.metadata.create_all(bind=engine)
         return {"status": "success", "message": "Database tables created", "dropped": drop}
+    except HTTPException:
+        raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"Database initialization failed: {e}")
+        raise HTTPException(status_code=500, detail="Database initialization failed")
 
 
 @router.get("/health")

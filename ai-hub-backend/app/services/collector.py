@@ -293,34 +293,56 @@ def stage1_fetch_and_store(db: Session, week_id: str) -> dict:
     sources = load_sources()
 
     # Fetch HN with enhancement (uses default HN_DEFAULT_QUERIES for comprehensive coverage)
-    logger.info("Fetching Hacker News stories...")
-    hn_articles = fetch_hn_stories(
-        min_points=settings.hn_min_points,
-        days=settings.hn_days,
-        limit=settings.hn_limit,
-        enhance=True,
-        max_enhance=30,
-    )
+    # BUG-H2: Wrap external fetchers in try/except with partial fallbacks
+    hn_articles = []
+    rss_articles = []
+    youtube_videos = []
 
-    for article in hn_articles:
-        article["original_section"] = "tech"
+    try:
+        logger.info("Fetching Hacker News stories...")
+        hn_articles = fetch_hn_stories(
+            min_points=settings.hn_min_points,
+            days=settings.hn_days,
+            limit=settings.hn_limit,
+            enhance=True,
+            max_enhance=30,
+        )
+        for article in hn_articles:
+            article["original_section"] = "tech"
+    except Exception as e:
+        logger.error(f"Failed to fetch HN stories: {e}")
 
-    # Fetch RSS feeds (excluding HN since we use enhanced version)
-    logger.info("Fetching RSS feeds...")
-    rss_articles = fetch_rss_feeds(sources, exclude_names={"Hacker News"})
+    try:
+        # Fetch RSS feeds (excluding HN since we use enhanced version)
+        logger.info("Fetching RSS feeds...")
+        rss_articles = fetch_rss_feeds(sources, exclude_names={"Hacker News"})
+    except Exception as e:
+        logger.error(f"Failed to fetch RSS feeds: {e}")
 
-    # Fetch YouTube videos
-    logger.info("Fetching YouTube videos...")
-    youtube_videos = fetch_youtube_videos(
-        max_results=settings.youtube_max_results,
-        days=settings.hn_days,
-    )
+    try:
+        # Fetch YouTube videos
+        logger.info("Fetching YouTube videos...")
+        youtube_videos = fetch_youtube_videos(
+            max_results=settings.youtube_max_results,
+            days=settings.hn_days,
+        )
+    except Exception as e:
+        logger.error(f"Failed to fetch YouTube videos: {e}")
 
     # Fetch transcripts for top videos
+    # BUG-H1: Add video_id existence check before accessing
     logger.info("Fetching video transcripts...")
     for video in youtube_videos[:15]:
-        transcript = fetch_video_transcript(video["video_id"])
-        video["transcript"] = transcript
+        video_id = video.get("video_id")
+        if not video_id:
+            logger.warning(f"Video missing video_id, skipping transcript fetch: {video.get('original_title', 'Unknown')}")
+            continue
+        try:
+            transcript = fetch_video_transcript(video_id)
+            video["transcript"] = transcript
+        except Exception as e:
+            logger.warning(f"Failed to fetch transcript for video {video_id}: {e}")
+            video["transcript"] = None
 
     # Filter articles by week boundary
     all_articles_raw = hn_articles + rss_articles
@@ -505,18 +527,23 @@ def stage3_parallel_processing(db: Session, week_id: str, processor: LLMProcesso
 
     results = {}
 
-    # Define processing tasks
+    # BUG-H3: Create per-thread LLMProcessor instances to avoid thread-safety issues
+    # The OpenAI client may not be thread-safe, so each thread gets its own instance
     def process_tech():
-        return processor.process_tech_articles(tech_articles, count=settings.tech_output_count)
+        thread_processor = LLMProcessor()
+        return thread_processor.process_tech_articles(tech_articles, count=settings.tech_output_count)
 
     def process_investment():
-        return processor.process_investment_articles(investment_articles)
+        thread_processor = LLMProcessor()
+        return thread_processor.process_investment_articles(investment_articles)
 
     def process_tips():
-        return processor.process_tips_articles(tips_articles)
+        thread_processor = LLMProcessor()
+        return thread_processor.process_tips_articles(tips_articles)
 
     def process_videos():
-        return processor.process_youtube_videos(videos_for_llm, count=settings.video_output_count)
+        thread_processor = LLMProcessor()
+        return thread_processor.process_youtube_videos(videos_for_llm, count=settings.video_output_count)
 
     # Run in parallel with ThreadPoolExecutor
     with ThreadPoolExecutor(max_workers=4) as executor:
@@ -563,6 +590,9 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
         week_id: Week ID
         results: Processed data from stage 3
         raw_videos: List of RawVideo objects for metadata lookup
+
+    Raises:
+        Exception: Re-raises any exception after rolling back the transaction
     """
     logger.info("=== Stage 4: Saving to Database ===")
 
@@ -808,8 +838,14 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
             )
             db.add(member)
 
-    db.commit()
-    logger.info(f"Saved processed data for {week_id}")
+    # BUG-H4: Add transaction rollback handling
+    try:
+        db.commit()
+        logger.info(f"Saved processed data for {week_id}")
+    except Exception as e:
+        logger.error(f"Failed to save data for {week_id}, rolling back: {e}")
+        db.rollback()
+        raise
 
 
 def run_fetch_only(db: Session, week_id: Optional[str] = None) -> dict:

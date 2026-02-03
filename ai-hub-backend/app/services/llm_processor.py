@@ -49,7 +49,10 @@ def parse_llm_json(text: str, fallback=None):
     except json.JSONDecodeError:
         pass
 
-    cleaned = re.sub(r'(?<!")//[^\n]*', "", extracted)
+    # BUG-H5: Fixed regex to avoid corrupting URLs
+    # Only remove // comments that start after whitespace at beginning of line or after certain JSON tokens
+    # This preserves URLs like https:// while removing actual comments
+    cleaned = re.sub(r'^\s*//[^\n]*', "", extracted, flags=re.MULTILINE)
     cleaned = re.sub(r",\s*([}\]])", r"\1", cleaned)
 
     try:
@@ -76,21 +79,38 @@ class LLMProcessor:
         # High-quality model for content processing
         self.processor_model = "deepseek/deepseek-v3.2"
 
-    def _call_llm(self, prompt: str, temperature: float = 0.3, use_classifier: bool = False) -> str:
+    def _call_llm(self, prompt: str, temperature: float = 0.3, use_classifier: bool = False, timeout: float = 120.0) -> str:
         """Make an LLM API call.
 
         Args:
             prompt: The prompt to send
             temperature: Sampling temperature
             use_classifier: If True, use free classifier model; otherwise use processor model
+            timeout: Request timeout in seconds (default 120s)
+
+        Returns:
+            LLM response content string
+
+        Raises:
+            Exception: Re-raises after logging if API call fails
         """
         model = self.classifier_model if use_classifier else self.processor_model
-        response = self.client.chat.completions.create(
-            model=model,
-            messages=[{"role": "user", "content": prompt}],
-            temperature=temperature,
-        )
-        return response.choices[0].message.content
+        # BUG-H6: Add try/except and timeout to LLM API calls
+        try:
+            response = self.client.chat.completions.create(
+                model=model,
+                messages=[{"role": "user", "content": prompt}],
+                temperature=temperature,
+                timeout=timeout,
+            )
+            # Handle empty response
+            if not response.choices or not response.choices[0].message:
+                logger.warning(f"Empty response from LLM model {model}")
+                return ""
+            return response.choices[0].message.content or ""
+        except Exception as e:
+            logger.error(f"LLM API call failed (model={model}): {e}")
+            raise
 
     def classify_articles(self, articles: list[dict]) -> list[dict]:
         """Classify articles into sections (tech/investment/tips)."""
@@ -140,7 +160,22 @@ Output ONLY the JSON array, no markdown fences."""
             return articles
 
         classified = []
-        classification_map = {c["index"]: c for c in classifications}
+        # BUG-H7: Validate classification_map structure before use
+        if not isinstance(classifications, list):
+            logger.warning("Classification result is not a list, using hints")
+            for a in articles:
+                a["section"] = a.get("original_section", "tech")
+                a["relevance"] = 0.5
+            return articles
+
+        classification_map = {}
+        for c in classifications:
+            if isinstance(c, dict) and "index" in c:
+                # Handle index as string or int
+                idx = c["index"]
+                if isinstance(idx, str) and idx.isdigit():
+                    idx = int(idx)
+                classification_map[idx] = c
 
         for i, article in enumerate(articles):
             c = classification_map.get(i)
@@ -285,6 +320,7 @@ Output ONLY valid JSON."""
         )
 
         prompt = f"""You are a financial news editor for a German/English bilingual AI investment newsletter.
+Content may be in English OR Chinese (from 36Kr) - process both languages equally.
 
 Categorize these articles into:
 1. Primary Market (funding rounds, venture capital investments)
@@ -303,6 +339,7 @@ Output a JSON object with this EXACT structure:
         "company": "Company Name",
         "amount": "$50 Mio.",
         "round": "Series B",
+        "roundCategory": "Series B",
         "investors": ["Investor 1", "Investor 2"],
         "valuation": "$500 Mio.",
         "content": "German description (2-3 sentences)",
@@ -318,6 +355,7 @@ Output a JSON object with this EXACT structure:
         "company": "Company Name",
         "amount": "$50M",
         "round": "Series B",
+        "roundCategory": "Series B",
         "investors": ["Investor 1", "Investor 2"],
         "valuation": "$500M",
         "content": "English description (2-3 sentences)",
@@ -368,6 +406,7 @@ Output a JSON object with this EXACT structure:
         "target": "Target Company",
         "dealValue": "$1,5 Mrd.",
         "dealType": "Akquisition",
+        "industry": "Enterprise",
         "content": "German description",
         "author": {{"name": "Source Name", "handle": "@source", "avatar": "XX", "verified": true}},
         "timestamp": "YYYY-MM-DD",
@@ -382,6 +421,7 @@ Output a JSON object with this EXACT structure:
         "target": "Target Company",
         "dealValue": "$1.5B",
         "dealType": "Acquisition",
+        "industry": "Enterprise",
         "content": "English description",
         "author": {{"name": "Source Name", "handle": "@source", "avatar": "XX", "verified": true}},
         "timestamp": "YYYY-MM-DD",
@@ -401,6 +441,21 @@ Rules:
 - dealType English: "Acquisition", "Merger", "Buyout"
 - sourceUrl: copy the exact Link URL from the article
 - IMPORTANT: Each category MUST have both "de" and "en" arrays, even if empty
+
+ROUND CATEGORY CLASSIFICATION (for Primary Market):
+- "Early": Pre-Seed, Seed, Angel, Accelerator (keywords: seed, angel, pre-seed, accelerator, 种子, 天使, 孵化)
+- "Series A": Series A, A+ rounds (keywords: series a, a round, a1, A轮, A+轮)
+- "Series B": Series B, B+ rounds (keywords: series b, b round, B轮, B+轮)
+- "Series C+": Series C, D, E, F and beyond (keywords: series c/d/e/f, C轮, D轮, E轮)
+- "Late/PE": Growth, Pre-IPO, Buyout, LBO (keywords: growth, pre-ipo, buyout, lbo, 成长轮, 上市前, 收购)
+- "Unknown": If round cannot be determined
+
+INDUSTRY CLASSIFICATION (for M&A):
+- "Healthcare": healthcare, biotech, medical, pharma, life sciences (keywords: healthcare, biotech, medical, pharma, 医疗, 生物)
+- "FinTech": fintech, banking, payments, insurance tech (keywords: fintech, banking, payments, 金融, 支付)
+- "Enterprise": enterprise software, SaaS, B2B, cloud (keywords: enterprise, saas, b2b, cloud, 企业服务)
+- "Consumer": consumer tech, retail, e-commerce, social (keywords: consumer, retail, e-commerce, 消费, 零售)
+- "Other": default if no clear match
 
 Output ONLY valid JSON."""
 
@@ -504,6 +559,10 @@ Output ONLY valid JSON."""
 
         response = self._call_llm(prompt, temperature=0.5)
         result = parse_llm_json(response, fallback={"trends": {"de": [], "en": []}})
+        # BUG-H8: Handle non-dict trends result
+        if not isinstance(result, dict):
+            logger.warning(f"Trends result is not a dict (got {type(result).__name__}), using fallback")
+            result = {"trends": {"de": [], "en": []}}
         result["teamMembers"] = self._default_team_members()
         return result
 
