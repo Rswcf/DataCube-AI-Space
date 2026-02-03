@@ -198,7 +198,7 @@ Output ONLY the JSON array, no markdown fences."""
     def process_tech_articles(
         self,
         articles: list[dict],
-        count: int = 20,
+        count: int = 30,
     ) -> dict:
         """Process tech articles into bilingual feed format."""
         if not articles:
@@ -425,7 +425,7 @@ Output a JSON object with this EXACT structure:
 }}
 
 Rules:
-- Include up to {count} items per category
+- Include EXACTLY {count} items per category (primaryMarket, secondaryMarket, ma) - select the most important/newsworthy ones
 - Use German number formatting for 'de' (e.g., $2,75 Mrd., $500 Mio.)
 - Use English number formatting for 'en' (e.g., $2.75B, $500M)
 - dealType German: "Akquisition", "Fusion", "Übernahme"
@@ -492,11 +492,11 @@ Output ONLY valid JSON."""
 
         articles_text = "\n\n".join(
             f"Source: {a['source']}\nTitle: {a['title']}\nLink: {a['link']}\nSummary: {a['summary'][:500]}\nDate: {a['published']}"
-            for a in articles[:40]
+            for a in articles  # Use all articles
         )
 
         prompt = f"""You are a financial news editor for a German/English bilingual AI newsletter.
-Your task: extract up to {count} notable M&A deals (mergers, acquisitions, buyouts) from the articles below.
+Your task: extract up to {count} notable M&A and investment deals from the articles below.
 
 ARTICLES:
 {articles_text}
@@ -507,10 +507,10 @@ Output a JSON object with EXACTLY this structure:
     "de": [
       {{
         "id": 1,
-        "acquirer": "Käufer",
+        "acquirer": "Käufer/Investor",
         "target": "Zielunternehmen",
         "dealValue": "€1,2 Mrd.",
-        "dealType": "Akquisition|Fusion|Übernahme",
+        "dealType": "Akquisition|Fusion|Übernahme|Investition|Beteiligung|Partnerschaft",
         "industry": "AI Infrastructure|AI Healthcare|AI Finance|AI Enterprise|AI Consumer|AI Robotics|AI Security|AI Creative|AI Education|Other AI|null",
         "content": "Deutsche Zusammenfassung (2-3 Sätze, geschäftsrelevant)",
         "author": {{"name": "Quelle", "handle": "@source", "avatar": "XX", "verified": true}},
@@ -522,10 +522,10 @@ Output a JSON object with EXACTLY this structure:
     "en": [
       {{
         "id": 1,
-        "acquirer": "Acquirer",
+        "acquirer": "Acquirer/Investor",
         "target": "Target",
         "dealValue": "$1.2B",
-        "dealType": "Acquisition|Merger|Buyout",
+        "dealType": "Acquisition|Merger|Buyout|Investment|Stake|Partnership",
         "industry": "AI Infrastructure|AI Healthcare|AI Finance|AI Enterprise|AI Consumer|AI Robotics|AI Security|AI Creative|AI Education|Other AI|null",
         "content": "English summary (2-3 sentences, business-relevant)",
         "author": {{"name": "Source", "handle": "@source", "avatar": "XX", "verified": true}},
@@ -538,7 +538,8 @@ Output a JSON object with EXACTLY this structure:
 }}
 
 Rules:
-- Only include genuine M&A deals (exclude partnerships or minor investments)
+- Include M&A deals (mergers, acquisitions, buyouts) AND significant investments/partnerships
+- Prioritize deals with clear financial terms or strategic importance
 - industry: use the AI industry taxonomy below; return null if not AI-related at all
 - Limit to at most {count} items per language
 
@@ -558,7 +559,7 @@ Output ONLY valid JSON."""
                         ma[lang] = arr[:count]
         return result
 
-    def process_tips_articles(self, articles: list[dict], count: int = 10) -> dict:
+    def process_tips_articles(self, articles: list[dict], count: int = 15) -> dict:
         """Process tips articles into bilingual feed format."""
         if not articles:
             return {"de": [], "en": []}

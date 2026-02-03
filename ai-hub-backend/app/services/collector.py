@@ -142,9 +142,13 @@ def load_sources() -> dict:
         ],
         "ma": [
             # Mergers & Acquisitions specific sources
-            {"url": "https://www.reuters.com/markets/deals/rss", "name": "Reuters Deals"},
             {"url": "https://techcrunch.com/tag/mergers-and-acquisitions/feed/", "name": "TechCrunch M&A"},
-            {"url": "https://www.marketwatch.com/rss/markets/deals", "name": "MarketWatch Deals"},
+            {"url": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcurrent&type=8-K&output=atom", "name": "SEC EDGAR 8-K"},
+            {"url": "https://www.ft.com/mergers-acquisitions?format=rss", "name": "FT M&A"},
+            {"url": "https://finance.yahoo.com/rss/topstories", "name": "Yahoo Finance"},
+            {"url": "https://www.globenewswire.com/RssFeed/subjectcode/15-Mergers%20and%20Acquisitions/feedTitle/GlobeNewswire%20-%20Mergers%20and%20Acquisitions", "name": "GlobeNewswire M&A"},
+            {"url": "https://www.prnewswire.com/rss/news-releases-list.rss", "name": "PR Newswire"},
+            {"url": "https://news.google.com/rss/search?q=mergers+acquisitions+AI&hl=en-US", "name": "Google News M&A"},
         ],
         "tips": [
             # Blogs (business-oriented)
