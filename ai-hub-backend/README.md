@@ -33,9 +33,9 @@ Stage 2: Classify articles
     • Other sources → LLM classification (tech/investment)
     ↓
 Stage 3: Parallel LLM processing
-    • Tech: 20-25 posts
+    • Tech: 30 posts
     • Investment: primary/secondary/M&A
-    • Tips: 10 per language
+    • Tips: 15 per language
     • Videos: 5 summaries
     ↓
 Stage 4: Save to PostgreSQL
@@ -183,12 +183,12 @@ This section provides a comprehensive overview of the entire data flow from sour
 │ (by relevance)  │   │ investment      │   │ tips articles   │   │ videos          │   │ investment      │
 │                 │   │ articles        │   │                 │   │                 │   │ results         │
 │ LLM Prompt:     │   │ LLM Prompt:     │   │ LLM Prompt:     │   │ LLM Prompt:     │   │ LLM Prompt:     │
-│ "Select 20 most │   │ "Categorize to  │   │ "Extract 10     │   │ "Select 5 most  │   │ "Generate 10    │
+│ "Select 30 most │   │ "Categorize to  │   │ "Extract 15     │   │ "Select 5 most  │   │ "Generate 10    │
 │  important"     │   │  3 categories   │   │  practical      │   │  valuable"      │   │  weekly trends" │
 │                 │   │  max 7 each"    │   │  tips"          │   │                 │   │                 │
 ├─────────────────┤   ├─────────────────┤   ├─────────────────┤   ├─────────────────┤   ├─────────────────┤
 │ Output:         │   │ Output:         │   │ Output:         │   │ Output:         │   │ Output:         │
-│ 20 posts DE/EN  │   │ 3 categories    │   │ 10 tips DE/EN   │   │ 5 videos DE/EN  │   │ 10 trends       │
+│ 30 posts DE/EN  │   │ 3 categories    │   │ 15 tips DE/EN   │   │ 5 videos DE/EN  │   │ 10 trends       │
 │                 │   │ DE/EN each:     │   │                 │   │                 │   │                 │
 │ Per post:       │   │ • primaryMarket │   │ Per tip:        │   │ Per video:      │   │                 │
 │ • content       │   │ • secondaryMkt  │   │ • content       │   │ • title         │   │                 │
@@ -201,7 +201,7 @@ This section provides a comprehensive overview of the entire data flow from sour
 │ • timestamp     │   │ • investors     │   │                 │   │                 │   │                 │
 │                 │   │ • roundCategory │   │                 │   │                 │   │                 │
 └────────┬────────┘   └────────┬────────┘   └────────┬────────┘   └────────┬────────┘   └────────┬────────┘
-         │ 20 posts            │ 7×3=21              │ 10 tips             │ 5 videos            │ 10 trends
+         │ 30 posts            │ 7×3=21              │ 15 tips             │ 5 videos            │ 10 trends
          │                     │                     │                     │                     │
          └─────────────────────┴─────────────────────┼─────────────────────┴─────────────────────┘
                                                      │
@@ -216,9 +216,9 @@ This section provides a comprehensive overview of the entire data flow from sour
                               │           Video Interspersion Strategy         │
                               │   intersperse_videos()                         │
                               ├────────────────────────────────────────────────┤
-                              │   20 Tech posts + 5 Videos                     │
-                              │   Insert positions: 3, 8, 13, 18, 23           │
-                              │   Result: 25 mixed items (with display_order)  │
+                              │   30 Tech posts + 5 Videos                     │
+                              │   Insert positions: 5, 11, 17, 23, 29          │
+                              │   Result: 35 mixed items (with display_order)  │
                               └────────────────────┬───────────────────────────┘
                                                    │
          ┌─────────────────────┬───────────────────┼───────────────────┬─────────────────────┐
@@ -228,8 +228,8 @@ This section provides a comprehensive overview of the entire data flow from sour
 │    TechPost     │   │ PrimaryMarket   │   │ SecondaryMarket │   │     MAPost      │   │    TipPost      │
 │     Table       │   │   Post Table    │   │   Post Table    │   │     Table       │   │     Table       │
 ├─────────────────┤   ├─────────────────┤   ├─────────────────┤   ├─────────────────┤   ├─────────────────┤
-│ 25 records      │   │ ~7 records      │   │ ~7 records      │   │ ~7 records      │   │ 10 records      │
-│ (20 posts +     │   │                 │   │                 │   │                 │   │                 │
+│ 35 records      │   │ ~7 records      │   │ ~7 records      │   │ ~7 records      │   │ 15 records      │
+│ (30 posts +     │   │                 │   │                 │   │                 │   │                 │
 │  5 videos)      │   │ Round types:    │   │ Stock market:   │   │ M&A deals:      │   │ Tips with:      │
 │                 │   │ • Early         │   │ • ticker        │   │ • acquirer      │   │ • tip           │
 │ Fields:         │   │ • Series A      │   │ • price         │   │ • target        │   │ • category      │
@@ -262,7 +262,7 @@ This section provides a comprehensive overview of the entire data flow from sour
 │  "en": [...]    │   │    {...},       │   │  "en": [...]    │   │  "en": [...]    │   │   {id, label,   │
 │ }               │   │  "secondaryMkt" │   │ }               │   │ }               │   │    current}     │
 │                 │   │    {...},       │   │                 │   │                 │   │  ]              │
-│ 25 mixed items  │   │  "ma": {...}    │   │ 10 Tips         │   │ 5 video details │   │ }               │
+│ 35 mixed items  │   │  "ma": {...}    │   │ 15 Tips         │   │ 5 video details │   │ }               │
 │ (posts+videos)  │   │ }               │   │                 │   │                 │   │                 │
 └─────────────────┘   └─────────────────┘   └─────────────────┘   └─────────────────┘   └─────────────────┘
          │                     │                     │                     │                     │
@@ -280,10 +280,10 @@ This section provides a comprehensive overview of the entire data flow from sour
 ┌─────────────────┐   ┌─────────────────┐   ┌─────────────────┐   ┌─────────────────┐   ┌─────────────────┐
 │   TECH FEED     │   │   INVESTMENT    │   │   TIPS FEED     │   │   VIDEO FEED    │   │   WEEK NAV      │
 ├─────────────────┤   ├─────────────────┤   ├─────────────────┤   ├─────────────────┤   ├─────────────────┤
-│ 25 cards        │   │ 3 category tabs │   │ 10 tip cards    │   │ 5 video embeds  │   │ Week selector   │
+│ 35 cards        │   │ 3 category tabs │   │ 15 tip cards    │   │ 5 video embeds  │   │ Week selector   │
 │ • Article cards │   │ • Primary Mkt   │   │ • Title + detail│   │ • YouTube player│   │ • Current week  │
 │ • Video cards   │   │ • Secondary Mkt │   │ • Difficulty    │   │ • Thumbnail     │   │   highlighted   │
-│   (at 3,8,13..) │   │ • M&A           │   │ • Platform      │   │ • Duration/views│   │ • History list  │
+│  (at 5,11,17..) │   │ • M&A           │   │ • Platform      │   │ • Duration/views│   │ • History list  │
 │                 │   │                 │   │                 │   │                 │   │                 │
 │ Impact badges:  │   │ Round badges:   │   │ Difficulty:     │   │ Categories:     │   │                 │
 │ 🔴 Critical     │   │ 🌱 Early        │   │ 🟢 Beginner     │   │ 📚 Tutorial     │   │                 │
@@ -301,8 +301,8 @@ This section provides a comprehensive overview of the entire data flow from sour
 | Stage 1 (Fetch) | RSS ~150 + HN ~50 + YouTube ~10 | ~210 raw items |
 | Stage 1 (Filter) | ~210 items | ~100 articles + 10 videos |
 | Stage 2 (Classify) | ~100 articles | tech ~20 + investment ~80 + tips ~10 |
-| Stage 3 (Process) | Classified articles | tech 20 + investment 21 + tips 10 + videos 5 (bilingual) |
-| Stage 4 (Save) | Processed content | 56 database records total |
+| Stage 3 (Process) | Classified articles | tech 30 + investment 21 + tips 15 + videos 5 (bilingual) |
+| Stage 4 (Save) | Processed content | 71 database records total |
 
 ### Key Code Locations
 
@@ -510,7 +510,7 @@ alembic downgrade -1
 | `/api/weeks/current` | GET | Get current week |
 | `/api/tech/{weekId}` | GET | Tech feed (with videos) |
 | `/api/investment/{weekId}` | GET | Investment feed |
-| `/api/tips/{weekId}` | GET | Tips feed (10 DE + 10 EN) |
+| `/api/tips/{weekId}` | GET | Tips feed (15 DE + 15 EN) |
 | `/api/trends/{weekId}` | GET | Trends feed |
 | `/api/videos/{weekId}` | GET | YouTube videos only |
 | `/api/stock/{ticker}` | GET | Real-time stock data |
@@ -520,6 +520,7 @@ alembic downgrade -1
 | `/api/admin/collect` | POST | Full collection (all stages) |
 | `/api/admin/collect/fetch` | POST | Stage 1 only |
 | `/api/admin/collect/process` | POST | Stages 2-4 only |
+| `/api/admin/collect/ma` | POST | M&A-only reprocessing |
 | `/api/admin/migrate` | POST | Migrate JSON data |
 | `/health` | GET | Health check |
 
@@ -612,6 +613,38 @@ These sources:
 - Are inherently tips/practical content
 - Skip classification and retain `section="tips"`
 - Ensure tips appear in the Tips feed
+
+## M&A Processing
+
+### AI Industry Taxonomy
+
+M&A deals are classified into AI-specific industry categories:
+
+| Category | Description |
+|----------|-------------|
+| AI Infrastructure | Cloud, chips, data centers, ML platforms, model providers |
+| AI Healthcare | Medical AI, drug discovery, clinical AI, diagnostics |
+| AI Finance | FinTech AI, algorithmic trading, risk assessment, fraud detection |
+| AI Enterprise | B2B AI tools, SaaS AI, workflow automation, document AI |
+| AI Consumer | Consumer apps, recommendation systems, voice assistants |
+| AI Robotics | Industrial robots, autonomous vehicles, drones |
+| AI Security | Cybersecurity AI, fraud detection, threat intelligence |
+| AI Creative | Image/video generation, music AI, content creation |
+| AI Education | EdTech AI, tutoring, learning platforms |
+| Other AI | AI companies not fitting above categories |
+
+**Note**: Only AI-related M&A deals are included. Deals with no clear AI connection are filtered out (industry = null).
+
+### M&A-Only Reprocessing
+
+To reprocess only the M&A section without affecting other sections:
+
+```bash
+curl -X POST "https://api-production-3ee5.up.railway.app/api/admin/collect/ma?week_id=2026-kw05" \
+  -H "X-API-Key: REDACTED_ADMIN_KEY"
+```
+
+This is useful when you want to update M&A data with new sources or fix classification issues.
 
 ## Project Structure
 
