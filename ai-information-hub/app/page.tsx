@@ -329,3 +329,4 @@ function MobileSettingsDrawer({
     </div>
   );
 }
+// Vercel auto-deploy test: 20260203-154120
