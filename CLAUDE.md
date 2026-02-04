@@ -43,13 +43,18 @@ Bilingual (DE/EN) weekly AI news aggregator with **YouTube video integration**. 
 │                                                          │
 │  ai-information-hub/ (Next.js)                           │
 │       ↓                                                  │
-│  API fetch (with static JSON fallback):                  │
+│  SPA (main page):                                        │
 │    • Feed components (tech, investment, tips)             │
 │    • Chat widget (week context for LLM)                  │
+│    • Chat Assistant: glm-4.5-air:free                    │
 │       ↓                                                  │
-│  Chat Assistant: glm-4.5-air:free                        │
-│       ↓                                                  │
-│  Tech Feed: 30 posts + 5 YouTube videos (interspersed)   │
+│  SSR pages (SEO/GEO):                                    │
+│    • /week/[weekId] — full HTML + JSON-LD structured data│
+│    • /feed.xml — Atom 1.0 feed (DE/EN)                   │
+│    • /api/content-summary — Markdown for AI consumption  │
+│    • /llms.txt — AI crawler site description              │
+│                                                          │
+│  Middleware: crawlers bypass login gate via UA detection  │
 │                                                          │
 └──────────────────────────────────────────────────────────┘
 ```
@@ -62,12 +67,20 @@ Bilingual (DE/EN) weekly AI news aggregator with **YouTube video integration**. 
 DataCube_AI_Space/
 ├── ai-information-hub/       # Frontend (Next.js)
 │   ├── app/                  # Pages + API routes
-│   │   └── api/chat/         # Chat assistant (glm-4.5-air:free)
+│   │   ├── api/
+│   │   │   ├── chat/         # Chat assistant (glm-4.5-air:free)
+│   │   │   └── content-summary/  # Markdown summary API (GEO)
+│   │   ├── feed.xml/         # Atom 1.0 feed route
+│   │   └── week/[weekId]/    # SSR week pages (SEO)
 │   ├── components/           # React components
 │   │   ├── feeds/            # Feed components
-│   │   └── video-embed.tsx   # YouTube player
+│   │   └── video-embed.tsx   # YouTube player (next/image)
 │   ├── lib/                  # Utils, types, API client
-│   ├── public/data/          # Static JSON fallback
+│   ├── middleware.ts         # Login gate + crawler bypass
+│   ├── public/
+│   │   ├── data/             # Static JSON fallback
+│   │   ├── llms.txt          # AI crawler site description
+│   │   └── robots.txt        # Crawler rules
 │   └── .env.local            # API keys
 │
 └── ai-hub-backend/           # Backend (FastAPI)

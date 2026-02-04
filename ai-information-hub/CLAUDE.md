@@ -16,18 +16,23 @@ Bilingual (DE/EN) weekly AI news aggregator for internal teams — curates tech 
 | `lib/api.ts` | API client with static JSON fallback |
 | `lib/settings-context.tsx` | Theme + language state, `t()` translation function |
 | `components/feeds/tech-feed.tsx` | Reference implementation (API + video support) |
-| `components/video-embed.tsx` | YouTube embed component |
+| `components/video-embed.tsx` | YouTube embed component (uses `next/image`) |
+| `components/structured-data.tsx` | JSON-LD schemas (Article, Video, Organization, FAQ) |
 | `components/chat-widget.tsx` | Chat UI + API-first week data fetching |
 | `app/api/chat/route.ts` | Chat assistant API (uses glm-4.5-air:free) |
-| `middleware.ts` | Auth middleware (currently disabled) |
+| `app/week/[weekId]/page.tsx` | SSR week page (Server Component, SEO) |
+| `app/feed.xml/route.ts` | Atom 1.0 feed (bilingual) |
+| `app/api/content-summary/route.ts` | Markdown summary API (GEO) |
+| `middleware.ts` | Login gate with crawler UA bypass |
 | `../ai-hub-backend/` | FastAPI backend (Railway deployment) |
 
 **Key patterns:**
-- All components use `"use client"` — pure client-side rendering
+- SPA components use `"use client"` — client-side rendering
+- SSR page (`/week/[weekId]`) is a **Server Component** — full HTML for crawlers
 - Data loading: API first (`NEXT_PUBLIC_API_URL`), fallback to static JSON
 - Translation: `const { t } = useSettings(); t("keyName")`
 - Week ID format: `YYYY-kwWW` (e.g., `2026-kw05`)
-- **Authentication is disabled** — all routes are public
+- **Login gate** — first-time visitors see welcome page; crawlers bypass via UA detection
 
 ---
 
@@ -53,16 +58,17 @@ Bilingual (DE/EN) weekly AI news aggregator for internal teams — curates tech 
 
 ┌─────────────────── Frontend (Vercel) ───────────────────┐
 │                                                          │
-│  NEXT_PUBLIC_API_URL set?                                │
-│    YES → fetch from Railway API                          │
-│    NO  → fetch from /data/{weekId}/*.json (fallback)     │
+│  Middleware: crawler UA detection → bypass login gate     │
 │       ↓                                                  │
-│  React components (all "use client")                     │
-│  Chat widget (same API-first fetch for week context)     │
+│  SPA (main page, "use client"):                          │
+│    • Feed components (tech, investment, tips)             │
+│    • Chat widget + Chat API (glm-4.5-air:free)           │
 │       ↓                                                  │
-│  Chat API: /api/chat (glm-4.5-air:free)                  │
-│       ↓                                                  │
-│  Tech Feed: 20 posts + 5 videos (interspersed)           │
+│  SSR Pages (Server Components, SEO/GEO):                 │
+│    • /week/[weekId] — HTML + JSON-LD (ISR 1h)            │
+│    • /feed.xml — Atom 1.0 (DE/EN)                        │
+│    • /api/content-summary — Markdown summary             │
+│    • /llms.txt — AI crawler site description              │
 │                                                          │
 └──────────────────────────────────────────────────────────┘
 ```
@@ -84,22 +90,31 @@ ai-information-hub/           # Frontend (Next.js)
 ├── app/
 │   ├── api/
 │   │   ├── auth/             # Auth API (disabled)
-│   │   └── chat/             # Chat assistant (glm-4.5-air:free)
-│   ├── login/                # Login page (disabled)
-│   └── page.tsx              # Main page
+│   │   ├── chat/             # Chat assistant (glm-4.5-air:free)
+│   │   └── content-summary/  # Markdown summary API (GEO)
+│   ├── feed.xml/             # Atom 1.0 feed route (DE/EN)
+│   ├── week/[weekId]/        # SSR week pages (Server Component)
+│   ├── login/                # Welcome gate page
+│   ├── page.tsx              # Main SPA page
+│   ├── layout.tsx            # Root layout (feed discovery links)
+│   └── sitemap.ts            # Dynamic sitemap (/week/ routes)
 ├── components/
 │   ├── feeds/
 │   │   ├── tech-feed.tsx     # With video support
 │   │   ├── investment-feed.tsx
 │   │   └── tips-feed.tsx
-│   ├── video-embed.tsx       # YouTube player component
+│   ├── video-embed.tsx       # YouTube player (next/image)
+│   ├── structured-data.tsx   # JSON-LD schemas
 │   └── ...
 ├── lib/
 │   ├── api.ts                # API client with fallback
 │   ├── types.ts              # Includes video fields
 │   └── ...
-├── middleware.ts             # Auth (disabled - allows all)
-├── public/data/              # Static JSON fallback
+├── middleware.ts             # Login gate + crawler UA bypass
+├── public/
+│   ├── data/                 # Static JSON fallback
+│   ├── llms.txt              # AI crawler site description
+│   └── robots.txt            # Crawler rules + crawl-delay
 └── .env.local                # API keys
 
 ai-hub-backend/               # Backend (FastAPI)
@@ -279,4 +294,22 @@ First-time visitors are redirected to `/login` (welcome page). After clicking "E
 2. User clicks "Enter" → cookie set, redirected to `/`
 3. Subsequent visits → direct access to main page
 
+**Crawler bypass:** Search engine bots (Googlebot, Bingbot, etc.), AI crawlers (GPTBot, ClaudeBot, PerplexityBot), and social media preview bots (Facebook, Twitter, Slack, etc.) are detected via User-Agent and bypass the login gate entirely.
+
 **No password required** - this is a welcome gate, not authentication.
+
+---
+
+## SEO & GEO
+
+The site includes dedicated SEO and Generative Engine Optimization features:
+
+| Feature | Path | Purpose |
+|---------|------|---------|
+| SSR Week Pages | `/week/[weekId]` | Full HTML + JSON-LD for crawlers (ISR 1h) |
+| Atom Feed | `/feed.xml?lang=de\|en` | Atom 1.0 feed, latest 2 weeks of tech posts |
+| Content Summary | `/api/content-summary?lang=de\|en` | Markdown summary for AI systems |
+| llms.txt | `/llms.txt` | AI crawler site description + API docs |
+| Sitemap | `/sitemap.xml` | Dynamic, lists all `/week/` routes |
+| Structured Data | On SSR pages | ArticleSchema + VideoSchema JSON-LD per post |
+| Image Optimization | `next/image` | YouTube thumbnails optimized via Vercel |
