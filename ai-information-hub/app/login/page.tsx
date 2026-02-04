@@ -1,116 +1,313 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, Lock, Loader2 } from "lucide-react";
+import {
+  Brain,
+  Sparkles,
+  Cpu,
+  TrendingUp,
+  Lightbulb,
+  Youtube,
+  ArrowRight,
+  Languages,
+  Zap,
+} from "lucide-react";
 
-export default function LoginPage() {
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
+const translations = {
+  de: {
+    badge: "KI-gestützte Intelligenz",
+    title1: "Data Cube",
+    title2: "AI Hub",
+    tagline:
+      "Ihr intelligentes Gateway zu kuratierten KI-Nachrichten, Investment-Insights und praktischen Tipps – wöchentlich von KI analysiert.",
+    features: [
+      "Tech-Durchbrüche",
+      "Investment-News",
+      "Praktische Tipps",
+      "KI-Videos",
+    ],
+    aiPipeline: "40+ Quellen wöchentlich",
+    aiProcess: "KI-kuratiert zu den wichtigsten Insights",
+    sourceCategories: [
+      "MIT Tech Review",
+      "Crunchbase",
+      "Financial Times",
+      "YouTube",
+      "Reddit",
+      "& 30+ mehr",
+    ],
+    welcome: "Willkommen",
+    enterCredentials: "Entdecken Sie die neuesten KI-Trends und Insights",
+    enter: "Eintreten",
+    beta: "Beta-Version",
+  },
+  en: {
+    badge: "AI-Powered Intelligence",
+    title1: "Data Cube",
+    title2: "AI Hub",
+    tagline:
+      "Your intelligent gateway to curated AI news, investment insights, and practical tips – analyzed weekly by AI.",
+    features: [
+      "Tech Breakthroughs",
+      "Investment News",
+      "Practical Tips",
+      "AI Videos",
+    ],
+    aiPipeline: "40+ sources weekly",
+    aiProcess: "AI-curated to key insights",
+    sourceCategories: [
+      "MIT Tech Review",
+      "Crunchbase",
+      "Financial Times",
+      "YouTube",
+      "Reddit",
+      "& 30+ more",
+    ],
+    welcome: "Welcome",
+    enterCredentials: "Discover the latest AI trends and insights",
+    enter: "Enter",
+    beta: "Beta Version",
+  },
+};
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setIsLoading(true);
-
-    try {
-      const res = await fetch("/api/auth", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password }),
-      });
-
-      if (res.ok) {
-        router.push("/");
-        router.refresh();
-      } else {
-        setError("Invalid password");
-      }
-    } catch {
-      setError("Something went wrong");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+function NeuralNetwork() {
+  const nodes = useMemo(
+    () =>
+      Array.from({ length: 20 }, (_, i) => ({
+        id: i,
+        x: Math.random() * 100,
+        y: Math.random() * 100,
+        delay: Math.random() * 2,
+      })),
+    []
+  );
 
   return (
-    <div className="min-h-screen w-full bg-black flex items-center justify-center p-4">
-      {/* Animated background dots */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-white/20 rounded-full animate-pulse" />
-        <div className="absolute top-1/3 right-1/3 w-1 h-1 bg-white/30 rounded-full animate-pulse delay-100" />
-        <div className="absolute bottom-1/4 left-1/3 w-1.5 h-1.5 bg-white/25 rounded-full animate-pulse delay-200" />
-        <div className="absolute top-1/2 right-1/4 w-1 h-1 bg-white/20 rounded-full animate-pulse delay-300" />
-        <div className="absolute bottom-1/3 right-1/2 w-2 h-2 bg-white/15 rounded-full animate-pulse delay-500" />
-      </div>
+    <svg
+      className="absolute inset-0 w-full h-full"
+      viewBox="0 0 100 100"
+      preserveAspectRatio="xMidYMid slice"
+    >
+      {nodes.slice(0, 15).map((node, i) => {
+        const target = nodes[(i + 3) % nodes.length];
+        return (
+          <line
+            key={`l-${node.id}`}
+            x1={`${node.x}%`}
+            y1={`${node.y}%`}
+            x2={`${target.x}%`}
+            y2={`${target.y}%`}
+            stroke="currentColor"
+            strokeWidth="0.1"
+            className="text-primary/30"
+            style={{
+              animation: `neural-pulse 3s ease-in-out infinite`,
+              animationDelay: `${node.delay}s`,
+            }}
+          />
+        );
+      })}
+      {nodes.map((node) => (
+        <circle
+          key={`n-${node.id}`}
+          cx={`${node.x}%`}
+          cy={`${node.y}%`}
+          r="0.4"
+          className="fill-primary/50"
+          style={{
+            animation: `neural-pulse 3s ease-in-out infinite`,
+            animationDelay: `${node.delay}s`,
+          }}
+        />
+      ))}
+    </svg>
+  );
+}
 
-      {/* Login card */}
-      <div className="relative w-full max-w-md">
-        {/* Glow effect */}
-        <div className="absolute -inset-1 bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-blue-500/20 rounded-3xl blur-xl opacity-50" />
+function FloatingParticles() {
+  const particles = useMemo(
+    () =>
+      Array.from({ length: 15 }, (_, i) => ({
+        id: i,
+        left: 10 + Math.random() * 80,
+        duration: 8 + Math.random() * 4,
+        delay: Math.random() * 5,
+      })),
+    []
+  );
 
-        {/* Card */}
-        <div className="relative bg-zinc-900/90 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl">
-          {/* Logo / Icon */}
-          <div className="flex justify-center mb-8">
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/25">
-              <Lock className="w-8 h-8 text-white" />
-            </div>
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {particles.map((particle) => (
+        <div
+          key={particle.id}
+          className="absolute w-1 h-1 rounded-full bg-accent/60"
+          style={{
+            left: `${particle.left}%`,
+            animation: `float-up ${particle.duration}s linear infinite`,
+            animationDelay: `${particle.delay}s`,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+export default function LoginPage() {
+  const [language, setLanguage] = useState<"de" | "en">("de");
+  const router = useRouter();
+
+  const t = translations[language];
+
+  const handleEnter = () => {
+    // Set visited cookie (expires in 30 days)
+    document.cookie = "visited=true; path=/; max-age=2592000";
+    router.push("/");
+  };
+
+  const featureIcons = [Cpu, TrendingUp, Lightbulb, Youtube];
+
+  return (
+    <div className="min-h-screen flex flex-col lg:flex-row bg-background">
+      {/* Left Hero Panel - Hidden on mobile, visible on lg+ */}
+      <div className="hidden lg:flex lg:w-[55%] relative overflow-hidden bg-gradient-to-br from-background via-secondary/30 to-background">
+        <NeuralNetwork />
+        <FloatingParticles />
+
+        <div className="relative z-10 flex flex-col justify-center p-12 xl:p-16">
+          {/* AI Badge */}
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-primary/30 bg-primary/10 backdrop-blur-sm w-fit mb-8">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute h-full w-full rounded-full bg-accent animate-ping" />
+              <span className="relative h-2 w-2 rounded-full bg-accent" />
+            </span>
+            <span className="text-sm font-medium">{t.badge}</span>
           </div>
 
           {/* Title */}
-          <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-white mb-2">Data Cube AI</h1>
-            <p className="text-zinc-400 text-sm">Enter password to access</p>
+          <h1 className="text-5xl xl:text-6xl font-bold mb-6">
+            {t.title1}
+            <span className="block bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              {t.title2}
+            </span>
+          </h1>
+
+          {/* Tagline */}
+          <p className="text-lg xl:text-xl text-muted-foreground max-w-md mb-8">
+            {t.tagline}
+          </p>
+
+          {/* Feature Pills */}
+          <div className="flex flex-wrap gap-3 mb-8">
+            {featureIcons.map((Icon, i) => (
+              <div
+                key={i}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-card/50 border border-border backdrop-blur-sm"
+              >
+                <Icon className="w-4 h-4 text-primary" />
+                <span className="text-sm">{t.features[i]}</span>
+              </div>
+            ))}
           </div>
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="relative">
-              <input
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password"
-                className="w-full bg-zinc-800/50 border border-white/10 rounded-xl px-4 py-3 pr-12 text-white placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
-                autoFocus
-              />
+          {/* AI Pipeline Stats */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/20 border border-accent/30">
+                <Zap className="w-4 h-4 text-accent" />
+                <span className="text-sm font-medium">{t.aiPipeline}</span>
+              </div>
+              <ArrowRight className="w-4 h-4 text-muted-foreground" />
+              <span className="text-sm text-muted-foreground">
+                {t.aiProcess}
+              </span>
+            </div>
+
+            {/* Source Categories */}
+            <div className="flex flex-wrap gap-2">
+              {t.sourceCategories.map((category, i) => (
+                <span
+                  key={i}
+                  className="text-xs px-2 py-1 rounded bg-secondary/50 text-muted-foreground"
+                >
+                  {category}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Hero - Visible only on mobile */}
+      <div className="lg:hidden relative h-[35vh] bg-gradient-to-b from-primary/10 to-background p-6 flex flex-col justify-end overflow-hidden">
+        <NeuralNetwork />
+        <div className="relative z-10">
+          <h1 className="text-3xl font-bold mb-2">
+            {t.title1}{" "}
+            <span className="text-primary">{t.title2}</span>
+          </h1>
+          <p className="text-sm text-muted-foreground line-clamp-2">
+            {t.tagline}
+          </p>
+        </div>
+      </div>
+
+      {/* Right Login Panel */}
+      <div className="flex-1 flex items-center justify-center p-6 lg:p-12">
+        <div className="w-full max-w-md relative">
+          {/* Glow effect */}
+          <div
+            className="absolute -inset-1 bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20 rounded-3xl blur-xl opacity-50"
+            style={{ animation: "glow-pulse 4s ease-in-out infinite" }}
+          />
+
+          {/* Card */}
+          <div className="relative bg-card/80 backdrop-blur-xl border border-border/50 rounded-2xl p-8 shadow-2xl">
+            {/* AI Icon */}
+            <div className="flex justify-center mb-8">
+              <div className="relative w-20 h-20">
+                <div className="absolute inset-0 bg-gradient-to-br from-primary to-accent rounded-2xl animate-pulse opacity-30 blur-lg" />
+                <div className="relative w-full h-full bg-gradient-to-br from-primary to-accent rounded-2xl flex items-center justify-center shadow-lg">
+                  <Brain className="w-10 h-10 text-primary-foreground" />
+                  <Sparkles className="absolute -top-1 -right-1 w-5 h-5 text-accent-foreground" />
+                </div>
+              </div>
+            </div>
+
+            {/* Welcome */}
+            <div className="text-center mb-8">
+              <h2 className="text-2xl font-bold mb-2">{t.welcome}</h2>
+              <p className="text-muted-foreground text-sm">
+                {t.enterCredentials}
+              </p>
+            </div>
+
+            {/* Enter Button */}
+            <button
+              onClick={handleEnter}
+              className="w-full h-12 bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold rounded-xl hover:opacity-90 transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/25"
+            >
+              <span>{t.enter}</span>
+              <ArrowRight className="w-5 h-5" />
+            </button>
+
+            {/* Language Toggle */}
+            <div className="flex justify-center mt-6">
               <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white transition-colors"
+                onClick={() => setLanguage(language === "de" ? "en" : "de")}
+                className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
-                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                <Languages className="w-4 h-4" />
+                {language === "de" ? "English" : "Deutsch"}
               </button>
             </div>
 
-            {error && (
-              <p className="text-red-400 text-sm text-center">{error}</p>
-            )}
-
-            <button
-              type="submit"
-              disabled={isLoading || !password}
-              className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-medium py-3 rounded-xl hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  Verifying...
-                </>
-              ) : (
-                "Enter"
-              )}
-            </button>
-          </form>
-
-          {/* Footer */}
-          <p className="text-zinc-500 text-xs text-center mt-8">
-            Beta Access Only
-          </p>
+            {/* Footer */}
+            <p className="text-muted-foreground text-xs text-center mt-6">
+              {t.beta}
+            </p>
+          </div>
         </div>
       </div>
     </div>
