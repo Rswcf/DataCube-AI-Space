@@ -105,11 +105,24 @@ export function ChatWidget({ weekId }: ChatWidgetProps) {
 
     const fetchData = async () => {
       try {
+        const apiBase = process.env.NEXT_PUBLIC_API_URL;
+
+        const fetchOne = async (apiPath: string, staticPath: string) => {
+          if (apiBase) {
+            try {
+              const res = await fetch(`${apiBase}${apiPath}`);
+              if (res.ok) return res.json();
+            } catch { /* fall through to static */ }
+          }
+          const res = await fetch(staticPath);
+          return res.ok ? res.json() : null;
+        };
+
         const [tech, investment, tips, trends] = await Promise.all([
-          fetch(`/data/${weekId}/tech.json`).then((r) => (r.ok ? r.json() : null)),
-          fetch(`/data/${weekId}/investment.json`).then((r) => (r.ok ? r.json() : null)),
-          fetch(`/data/${weekId}/tips.json`).then((r) => (r.ok ? r.json() : null)),
-          fetch(`/data/${weekId}/trends.json`).then((r) => (r.ok ? r.json() : null)),
+          fetchOne(`/tech/${weekId}`, `/data/${weekId}/tech.json`),
+          fetchOne(`/investment/${weekId}`, `/data/${weekId}/investment.json`),
+          fetchOne(`/tips/${weekId}`, `/data/${weekId}/tips.json`),
+          fetchOne(`/trends/${weekId}`, `/data/${weekId}/trends.json`),
         ]);
 
         const condensed = condenseWeekData(tech, investment, tips, trends, language);
