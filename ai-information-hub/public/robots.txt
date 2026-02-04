@@ -1,18 +1,25 @@
 User-agent: *
 Allow: /
 
+# LLM content description
+# https://www.datacubeai.space/llms.txt
+
 # AI Search Engine Bots (GEO)
 User-agent: GPTBot
 Allow: /
+Crawl-delay: 2
 
 User-agent: ChatGPT-User
 Allow: /
+Crawl-delay: 2
 
 User-agent: PerplexityBot
 Allow: /
+Crawl-delay: 2
 
 User-agent: ClaudeBot
 Allow: /
+Crawl-delay: 2
 
 User-agent: anthropic-ai
 Allow: /

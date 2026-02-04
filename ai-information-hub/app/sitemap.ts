@@ -22,12 +22,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Fallback: no weeks in sitemap if API unavailable
   }
 
-  const weekEntries = weeks.map((week) => ({
-    url: `${baseUrl}/?week=${week.id}`,
-    lastModified: new Date(),
-    changeFrequency: 'weekly' as const,
-    priority: 0.8,
-  }))
+  const weekEntries = weeks.flatMap((week) => [
+    {
+      url: `${baseUrl}/week/${week.id}`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/week/${week.id}?lang=en`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.7,
+    },
+  ])
 
   return [
     {
@@ -37,16 +45,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1,
     },
     {
-      url: `${baseUrl}/?lang=en`,
+      url: `${baseUrl}/feed.xml`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/?lang=de`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.9,
+      priority: 0.3,
     },
     ...weekEntries,
   ]

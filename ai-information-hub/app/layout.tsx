@@ -96,6 +96,8 @@ export default function RootLayout({
         <OrganizationSchema />
         <WebsiteSchema />
         <FAQSchema />
+        <link rel="alternate" type="application/atom+xml" title="DataCube AI (DE)" href="/feed.xml?lang=de" />
+        <link rel="alternate" type="application/atom+xml" title="DataCube AI (EN)" href="/feed.xml?lang=en" />
       </head>
       <body className={`font-sans antialiased`}>
         <SettingsProvider>

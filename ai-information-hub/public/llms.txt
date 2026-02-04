@@ -1,0 +1,44 @@
+# DataCube AI
+
+> Bilingual (German/English) weekly AI news aggregator curating tech breakthroughs,
+> investment news, practical tips, and YouTube videos from 40+ sources.
+
+## Content Sections
+
+### Technology Feed
+Weekly curated AI technology news (20-25 posts per week). Each post includes
+impact level, category, source attribution, and bilingual content.
+
+### Investment Feed
+- Primary Market: VC funding rounds
+- Secondary Market: Public AI stock movements
+- M&A: AI sector mergers and acquisitions
+
+### Tips Feed
+Practical AI tips from Reddit communities and expert blogs.
+15 tips per language per week.
+
+### Video Feed
+5 curated YouTube videos about AI developments per week.
+
+## Public API
+Base URL: https://api-production-3ee5.up.railway.app/api
+
+- GET /api/weeks — List all available weeks
+- GET /api/tech/{weekId} — Technology feed (bilingual JSON)
+- GET /api/investment/{weekId} — Investment feed (bilingual JSON)
+- GET /api/tips/{weekId} — Tips feed (bilingual JSON)
+- GET /api/videos/{weekId} — Video summaries
+
+Week ID format: YYYY-kwWW (e.g., 2026-kw06)
+
+## Weekly Pages
+Each week has a dedicated page at /week/{weekId} with full HTML content.
+Example: https://www.datacubeai.space/week/2026-kw06
+
+## Languages
+German (de) — default | English (en)
+
+## Update Frequency
+Weekly (new content every Monday)
+

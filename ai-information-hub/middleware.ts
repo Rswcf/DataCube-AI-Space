@@ -1,6 +1,24 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
+const CRAWLER_PATTERNS = [
+  // Search engines
+  'googlebot', 'bingbot', 'yandexbot', 'duckduckbot', 'baiduspider', 'slurp',
+  // AI crawlers
+  'gptbot', 'chatgpt-user', 'perplexitybot', 'claudebot', 'anthropic-ai',
+  'google-extended', 'cohere-ai', 'bytespider',
+  // Social media previews
+  'twitterbot', 'facebookexternalhit', 'linkedinbot', 'whatsapp',
+  'slackbot', 'telegrambot', 'discordbot',
+  // Feed fetchers
+  'feedfetcher', 'feedly',
+];
+
+function isCrawler(request: NextRequest): boolean {
+  const ua = request.headers.get('user-agent')?.toLowerCase() || '';
+  return CRAWLER_PATTERNS.some(p => ua.includes(p));
+}
+
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -11,6 +29,11 @@ export function middleware(request: NextRequest) {
     pathname.startsWith("/_next") ||
     pathname.includes(".")
   ) {
+    return NextResponse.next();
+  }
+
+  // Allow crawlers to bypass login gate
+  if (isCrawler(request)) {
     return NextResponse.next();
   }
 

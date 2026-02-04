@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Play, Eye, Clock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import Image from "next/image";
 
 interface VideoEmbedProps {
   videoId: string;
@@ -59,10 +60,12 @@ export function VideoEmbed({
       aria-label={`Play video: ${title || "YouTube video"}`}
     >
       {/* Thumbnail */}
-      <img
+      <Image
         src={thumbnail}
         alt={title || "Video thumbnail"}
-        className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+        fill
+        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+        className="object-cover transition-transform duration-300 group-hover:scale-105"
       />
 
       {/* Overlay gradient */}
