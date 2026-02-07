@@ -3,11 +3,13 @@ import { TechPost } from '@/lib/types'
 export function OrganizationSchema() {
   const schema = {
     '@context': 'https://schema.org',
-    '@type': 'Organization',
+    '@type': 'NewsMediaOrganization',
     name: 'DataCube AI',
     url: 'https://www.datacubeai.space',
     logo: 'https://www.datacubeai.space/icon.svg',
     description: 'Bilingual AI news aggregator providing weekly tech, investment, and tips content.',
+    foundingDate: '2026-01',
+    publishingPrinciples: 'https://www.datacubeai.space/impressum',
     sameAs: [],
   }
 
@@ -42,13 +44,18 @@ export function WebsiteSchema() {
   )
 }
 
-export function ArticleSchema({ post }: { post: TechPost }) {
+export function ArticleSchema({ post, inLanguage = 'de', url }: { post: TechPost; inLanguage?: string; url?: string }) {
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'NewsArticle',
     headline: post.content.slice(0, 110),
     description: post.content,
     datePublished: post.timestamp,
+    dateModified: post.timestamp,
+    image: 'https://www.datacubeai.space/opengraph-image',
+    inLanguage,
+    isAccessibleForFree: true,
+    url: url || post.sourceUrl || 'https://www.datacubeai.space',
     author: {
       '@type': 'Organization',
       name: 'DataCube AI',
@@ -145,4 +152,16 @@ export function FAQSchema() {
       dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
     />
   )
+}
+
+export function BreadcrumbListSchema({ weekId, weekLabel }: { weekId: string; weekLabel: string }) {
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://www.datacubeai.space' },
+      { '@type': 'ListItem', position: 2, name: weekLabel, item: `https://www.datacubeai.space/week/${weekId}` },
+    ],
+  }
+  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
 }

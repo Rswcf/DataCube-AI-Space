@@ -1,6 +1,6 @@
 "use client";
 
-import { Cpu, TrendingUp, Lightbulb, Home, Search, Users, Sun, Moon, Languages, Settings } from "lucide-react";
+import { Cpu, TrendingUp, Lightbulb, Home, Search, Users, Sun, Moon, Languages, Settings, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSettings } from "@/lib/settings-context";
 import type { TranslationKey } from "@/lib/translations";
@@ -155,6 +155,13 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
             icon={Languages}
             label={language === "de" ? "English" : "Deutsch"}
             onClick={() => setLanguage(language === "de" ? "en" : "de")}
+          />
+
+          {/* Support */}
+          <NavButton
+            icon={Heart}
+            label={t("support")}
+            onClick={() => window.open("https://ko-fi.com/datacubeai", "_blank", "noopener,noreferrer")}
           />
         </div>
 

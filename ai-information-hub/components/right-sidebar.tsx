@@ -3,8 +3,9 @@
 import React from "react"
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { Search } from "lucide-react";
+import { Search, Mail, Check } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { useSettings } from "@/lib/settings-context";
 
 interface TrendItem {
@@ -56,6 +57,8 @@ export function RightSidebar({ weekId, onSearchChange }: RightSidebarProps) {
 
   const [searchValue, setSearchValue] = useState("");
   const [trends, setTrends] = useState<TrendItem[]>(fallbackTrends[language]);
+  const [email, setEmail] = useState("");
+  const [subscribeState, setSubscribeState] = useState<"idle" | "success">("idle");
 
   useEffect(() => {
     const processData = (data: any) => {
@@ -162,6 +165,47 @@ export function RightSidebar({ weekId, onSearchChange }: RightSidebarProps) {
               </div>
             ))}
           </div>
+        </div>
+
+        {/* Newsletter Signup */}
+        <div className="mt-4 rounded-xl bg-secondary/50 p-4">
+          <div className="flex items-center gap-2 mb-1">
+            <Mail className="h-4 w-4 text-primary" />
+            <h3 className="font-bold text-foreground">{t("newsletter")}</h3>
+          </div>
+          <p className="text-xs text-muted-foreground mb-3">{t("newsletterDescription")}</p>
+          {subscribeState === "success" ? (
+            <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
+              <Check className="h-4 w-4" />
+              <span>{t("subscribed")}</span>
+            </div>
+          ) : (
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (!email.trim()) return;
+                const existing = JSON.parse(localStorage.getItem("datacube_newsletter_signups") || "[]");
+                existing.push({ email: email.trim(), language, date: new Date().toISOString() });
+                localStorage.setItem("datacube_newsletter_signups", JSON.stringify(existing));
+                setEmail("");
+                setSubscribeState("success");
+                setTimeout(() => setSubscribeState("idle"), 3000);
+              }}
+              className="flex flex-col gap-2"
+            >
+              <Input
+                type="email"
+                required
+                placeholder={t("emailPlaceholder")}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="bg-background border-0 focus-visible:ring-1 focus-visible:ring-primary text-sm"
+              />
+              <Button type="submit" size="sm" className="w-full rounded-full">
+                {t("subscribe")}
+              </Button>
+            </form>
+          )}
         </div>
 
         {/* Footer */}

@@ -12,6 +12,8 @@ const CRAWLER_PATTERNS = [
   'slackbot', 'telegrambot', 'discordbot',
   // Feed fetchers
   'feedfetcher', 'feedly',
+  // Additional crawlers
+  'applebot', 'ia_archiver', 'sogou', 'ccbot', 'meta-externalagent', 'amazonbot',
 ];
 
 function isCrawler(request: NextRequest): boolean {

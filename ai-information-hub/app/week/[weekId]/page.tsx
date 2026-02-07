@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { ArticleSchema, VideoSchema } from '@/components/structured-data'
+import { ArticleSchema, VideoSchema, BreadcrumbListSchema } from '@/components/structured-data'
 import { formatPeriodTitle } from '@/lib/period-utils'
 import type { TechPost, BilingualData, InvestmentData, TipPost, ImpactLevel } from '@/lib/types'
 
@@ -30,6 +30,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
       languages: {
         de: `https://www.datacubeai.space/week/${weekId}`,
         en: `https://www.datacubeai.space/week/${weekId}?lang=en`,
+        'x-default': `https://www.datacubeai.space/week/${weekId}`,
       },
     },
     openGraph: {
@@ -111,20 +112,38 @@ export default async function WeekPage({ params, searchParams }: Props) {
 
   const tips = tipsData ? (tipsData as any)[lang] || [] : []
 
-  // Optionally fetch weeks to display date range; fall back silently on errors
+  // Optionally fetch weeks to display date range and prev/next navigation
   let dateRange: string | undefined
+  let prevId: string | undefined
+  let nextId: string | undefined
   try {
     const weeksRes = await fetch(`${API_BASE}/weeks`, { next: { revalidate: 3600 } })
     if (weeksRes.ok) {
       const weeksData = await weeksRes.json()
-      const match = (weeksData?.weeks || []).find((w: any) => w.id === weekId)
+      const allWeeks: { id: string; dateRange?: string; days?: { id: string }[] }[] = weeksData?.weeks || []
+      const match = allWeeks.find((w) => w.id === weekId)
       dateRange = match?.dateRange
+
+      // Build a flat list of all period IDs (weeks + days) for prev/next
+      const allIds: string[] = []
+      for (const w of allWeeks) {
+        allIds.push(w.id)
+        if (w.days) {
+          for (const d of w.days) {
+            allIds.push(d.id)
+          }
+        }
+      }
+      const currentIdx = allIds.indexOf(weekId)
+      if (currentIdx > 0) prevId = allIds[currentIdx - 1]
+      if (currentIdx >= 0 && currentIdx < allIds.length - 1) nextId = allIds[currentIdx + 1]
     }
   } catch {}
 
   return (
     <article className="max-w-4xl mx-auto px-4 py-8">
       {/* Header */}
+      <BreadcrumbListSchema weekId={weekId} weekLabel={periodLabel} />
       <header className="mb-8">
         <h1 className="text-3xl font-bold">AI News {periodLabel}</h1>
         <p className="mt-2 text-sm text-gray-600">
@@ -175,7 +194,7 @@ export default async function WeekPage({ params, searchParams }: Props) {
                     </>
                   ) : null}
                 </div>
-                <ArticleSchema post={post} />
+                <ArticleSchema post={post} inLanguage={lang} url={`https://www.datacubeai.space/week/${weekId}${lang === 'en' ? '?lang=en' : ''}`} />
               </article>
             ))}
           </div>
@@ -189,7 +208,7 @@ export default async function WeekPage({ params, searchParams }: Props) {
           <p className="text-gray-600">No video posts available.</p>
         ) : (
           <div className="space-y-6">
-            {videoTechPosts.map((post) => (
+            {videoTechPosts.map((post, index) => (
               <article key={post.id} className="border-b border-gray-200 pb-6">
                 <h3 className="text-xl font-semibold">
                   {snippetFromContent(post.content, 100)}
@@ -205,7 +224,7 @@ export default async function WeekPage({ params, searchParams }: Props) {
                       src={post.videoThumbnailUrl || `https://img.youtube.com/vi/${post.videoId}/hqdefault.jpg`}
                       alt={snippetFromContent(post.content, 100)}
                       className="w-full h-auto rounded"
-                      loading="lazy"
+                      {...(index === 0 ? { fetchPriority: 'high' as any } : { loading: 'lazy' as any })}
                     />
                   </a>
                 ) : null}
@@ -323,7 +342,12 @@ export default async function WeekPage({ params, searchParams }: Props) {
       </section>
 
       {/* Footer */}
-      <footer className="mt-12">
+      <nav className="flex justify-between items-center mt-8 pt-4 border-t border-gray-200">
+        {prevId ? <a href={`/week/${prevId}${lang === 'en' ? '?lang=en' : ''}`} className="hover:underline">&larr; Previous</a> : <span />}
+        <a href="/" className="hover:underline">Home</a>
+        {nextId ? <a href={`/week/${nextId}${lang === 'en' ? '?lang=en' : ''}`} className="hover:underline">Next &rarr;</a> : <span />}
+      </nav>
+      <footer className="mt-4">
         <a href={`/?week=${encodeURIComponent(weekId)}`} className="underline">
           View interactive version / Interaktive Version ansehen
         </a>

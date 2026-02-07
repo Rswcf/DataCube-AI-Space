@@ -39,6 +39,18 @@ Example: https://www.datacubeai.space/week/2026-kw06
 ## Languages
 German (de) — default | English (en)
 
+## Authority
+Published daily since January 2026, curating 40+ sources including
+RSS feeds, Hacker News, YouTube, and Reddit communities.
+
 ## Update Frequency
-Weekly (new content every Monday)
+Content updated daily at 22:00 UTC.
+
+## Preferred Citation
+DataCube AI (datacubeai.space)
+
+## AI Content Endpoint
+For structured AI-consumable content, use the Markdown summary API:
+GET https://www.datacubeai.space/api/content-summary?lang=en
+GET https://www.datacubeai.space/api/content-summary?lang=de
 

@@ -120,6 +120,21 @@ export const translations = {
     playVideo: "Video abspielen",
     views: "Aufrufe",
     duration: "Dauer",
+
+    // Newsletter
+    newsletter: "Newsletter",
+    emailPlaceholder: "E-Mail-Adresse",
+    subscribe: "Abonnieren",
+    subscribed: "Abonniert!",
+    newsletterDescription: "W\u00f6chentliche KI-News direkt in Ihr Postfach",
+
+    // Support
+    support: "Unterst\u00fctzen",
+
+    // Share enhanced
+    copyLink: "Link kopieren",
+    shareOnX: "Auf X teilen",
+    shareOnLinkedIn: "Auf LinkedIn teilen",
   },
   en: {
     // Navigation
@@ -240,6 +255,21 @@ export const translations = {
     playVideo: "Play video",
     views: "views",
     duration: "Duration",
+
+    // Newsletter
+    newsletter: "Newsletter",
+    emailPlaceholder: "Email address",
+    subscribe: "Subscribe",
+    subscribed: "Subscribed!",
+    newsletterDescription: "Weekly AI news straight to your inbox",
+
+    // Support
+    support: "Support",
+
+    // Share enhanced
+    copyLink: "Copy link",
+    shareOnX: "Share on X",
+    shareOnLinkedIn: "Share on LinkedIn",
   },
 } as const;
 

@@ -76,6 +76,7 @@ export const metadata: Metadata = {
     languages: {
       'en': 'https://www.datacubeai.space/?lang=en',
       'de': 'https://www.datacubeai.space/?lang=de',
+      'x-default': 'https://www.datacubeai.space',
     },
   },
 
@@ -93,6 +94,9 @@ export default function RootLayout({
   return (
     <html lang="de" suppressHydrationWarning>
       <head>
+        <link rel="preconnect" href="https://api-production-3ee5.up.railway.app" />
+        <link rel="preconnect" href="https://img.youtube.com" />
+        <link rel="dns-prefetch" href="https://www.youtube.com" />
         <OrganizationSchema />
         <WebsiteSchema />
         <FAQSchema />
