@@ -57,6 +57,32 @@ def _run_ma_collection_with_new_session(week_id: Optional[str] = None):
         db.close()
 
 
+@router.delete("/period/{period_id}")
+async def delete_period(
+    period_id: str,
+    db: Session = Depends(get_db),
+    _: bool = Depends(verify_api_key),
+):
+    """
+    Delete a period (week or day) and all its associated data.
+
+    For weekly IDs, child day records are deleted first (FK safety).
+    Synchronous — deletion is fast.
+
+    Requires X-API-Key header.
+    """
+    from app.services.collector import delete_period as do_delete
+
+    try:
+        result = do_delete(db, period_id)
+        return {"status": "deleted", **result}
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        logger.error(f"Failed to delete period {period_id}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.post("/collect")
 async def trigger_collection(
     background_tasks: BackgroundTasks,

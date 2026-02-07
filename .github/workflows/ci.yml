@@ -107,7 +107,7 @@ jobs:
           python -c "from app.services.hn_fetcher import fetch_hn_stories; print('OK: app.services.hn_fetcher')"
           python -c "from app.services.llm_processor import LLMProcessor; print('OK: app.services.llm_processor')"
           python -c "from app.services.youtube_fetcher import fetch_youtube_videos; print('OK: app.services.youtube_fetcher')"
-          python -c "from app.services.collector import run_collection, run_fetch_only, run_process_only; print('OK: app.services.collector')"
+          python -c "from app.services.collector import run_collection, run_fetch_only, run_process_only, delete_period; print('OK: app.services.collector')"
           python -c "from app.main import app; print('OK: app.main')"
         env:
           DATABASE_URL: sqlite:///./test.db

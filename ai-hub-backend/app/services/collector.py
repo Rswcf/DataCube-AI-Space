@@ -211,6 +211,55 @@ def clear_raw_data(db: Session, week_id: str):
     logger.info(f"Cleared raw data for {week_id}")
 
 
+def delete_period(db: Session, period_id: str) -> dict:
+    """
+    Delete a period (week or day) and all its associated data.
+
+    For weekly IDs, also deletes child day records first (FK safety).
+
+    Args:
+        db: Database session
+        period_id: Period ID (e.g. '2026-kw05' or '2026-02-07')
+
+    Returns:
+        dict with deleted period info
+
+    Raises:
+        ValueError: If period does not exist
+    """
+    week = db.query(Week).filter(Week.id == period_id).first()
+    if not week:
+        raise ValueError(f"Period '{period_id}' not found")
+
+    deleted_children = []
+
+    # If this is a week, find and delete child days first (FK constraint)
+    if not is_daily_id(period_id):
+        children = db.query(Week).filter(Week.parent_week_id == period_id).all()
+        for child in children:
+            # Clear content data for each child day
+            clear_week_data(db, child.id)
+            clear_raw_data(db, child.id)
+            deleted_children.append(child.id)
+            db.delete(child)
+        db.commit()
+
+    # Clear content data for the period itself
+    clear_week_data(db, period_id)
+    clear_raw_data(db, period_id)
+
+    # Delete the Week row
+    db.delete(week)
+    db.commit()
+
+    logger.info(f"Deleted period {period_id} and {len(deleted_children)} children")
+
+    return {
+        "deleted": period_id,
+        "children_deleted": deleted_children,
+    }
+
+
 def intersperse_videos(posts: list, videos: list, interval: int = 5, start: int = 3) -> list:
     """
     Intersperse video posts among regular posts.
