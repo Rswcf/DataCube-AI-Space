@@ -10,7 +10,7 @@ restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 3
 
 # Cron job for daily data collection
-# Runs every day at 08:00 UTC
+# Runs every day at 22:00 UTC (23:00 CET / 00:00 CEST)
 [[cron]]
-schedule = "0 8 * * *"
+schedule = "0 22 * * *"
 command = "python -m scripts.daily_collect"
