@@ -62,6 +62,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!mounted) return;
     localStorage.setItem("language", language);
+    document.documentElement.lang = language;
   }, [language, mounted]);
 
   const setTheme = (newTheme: Theme) => {

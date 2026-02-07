@@ -32,13 +32,19 @@ export default function Home() {
     const fetchUrl = apiBase ? `${apiBase}/weeks` : "/data/weeks.json";
 
     fetch(fetchUrl)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
       .then(processData)
       .catch(() => {
         // If API fails, try static JSON as fallback
         if (apiBase) {
           fetch("/data/weeks.json")
-            .then((res) => res.json())
+            .then((res) => {
+              if (!res.ok) throw new Error(`HTTP ${res.status}`);
+              return res.json();
+            })
             .then(processData)
             .catch(() => {});
         }
@@ -113,7 +119,7 @@ function MobileNav({
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around border-t border-border bg-background/95 backdrop-blur-md py-2 md:hidden">
+    <nav aria-label="Main navigation" className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around border-t border-border bg-background/95 backdrop-blur-md py-2 md:hidden">
       {tabs.map((tab) => (
         <button
           key={tab.id}
@@ -179,6 +185,15 @@ function MobileSearchDrawer({
   const [trends, setTrends] = useState<{ category: string; title: string }[]>(fallbackTrends[language]);
 
   useEffect(() => {
+    if (!isOpen) return;
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [isOpen, onClose]);
+
+  useEffect(() => {
     if (!weekId) return;
 
     const processData = (data: { trends?: Record<string, { category: string; title: string }[]> }) => {
@@ -191,7 +206,10 @@ function MobileSearchDrawer({
     const fetchUrl = apiBase ? `${apiBase}/trends/${weekId}` : `/data/${weekId}/trends.json`;
 
     fetch(fetchUrl)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
       .then(processData)
       .catch(() => setTrends(fallbackTrends[language]));
   }, [weekId, language]);
@@ -275,6 +293,15 @@ function MobileSettingsDrawer({
   onClose: () => void;
 }) {
   const { theme, setTheme, language, setLanguage, t } = useSettings();
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 

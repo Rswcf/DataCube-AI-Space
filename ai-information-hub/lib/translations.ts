@@ -108,6 +108,9 @@ export const translations = {
     chatError: "Fehler beim Laden. Bitte versuche es erneut.",
     chatTimeout: "Zeitüberschreitung. Bitte versuche es erneut.",
     chatClear: "Neues Gespräch",
+    chatSuggest1: "Fasse diese Woche zusammen",
+    chatSuggest2: "Was sind die Top-Investitionen?",
+    chatSuggest3: "Welche Trends sind wichtig?",
 
     // Video
     video: "Video",
@@ -222,6 +225,9 @@ export const translations = {
     chatError: "Failed to load. Please try again.",
     chatTimeout: "Request timed out. Please try again.",
     chatClear: "New chat",
+    chatSuggest1: "Summarize this week",
+    chatSuggest2: "What are the top investments?",
+    chatSuggest3: "Which trends are important?",
 
     // Video
     video: "Video",

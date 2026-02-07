@@ -4,6 +4,7 @@ Upload local JSON data to the Railway API.
 """
 
 import json
+import os
 import argparse
 import requests
 from pathlib import Path
@@ -71,7 +72,7 @@ def upload_week_data(
 def main():
     parser = argparse.ArgumentParser(description="Upload week data to Railway API")
     parser.add_argument("--api-url", default="https://api-production-3ee5.up.railway.app/api")
-    parser.add_argument("--api-key", default="REDACTED_ADMIN_KEY")
+    parser.add_argument("--api-key", default=os.environ.get("ADMIN_API_KEY", ""), help="Admin API key")
     parser.add_argument("--data-path", default="../ai-information-hub/public/data")
     parser.add_argument("--week", help="Specific week to upload (e.g., 2026-kw05)")
     parser.add_argument("--all", action="store_true", help="Upload all weeks")

@@ -301,7 +301,20 @@ export function ChatWidget({ weekId }: ChatWidgetProps) {
           <ScrollArea className="flex-1 min-w-0 overflow-hidden p-4">
             <div ref={scrollRef} className="space-y-4">
               {messages.length === 0 ? (
-                <div className="py-8 text-center text-sm text-muted-foreground">{t("chatWelcome")}</div>
+                <div className="py-6 space-y-4">
+                  <p className="text-center text-sm text-muted-foreground">{t("chatWelcome")}</p>
+                  <div className="flex flex-col gap-2">
+                    {(["chatSuggest1", "chatSuggest2", "chatSuggest3"] as const).map((key) => (
+                      <button
+                        key={key}
+                        onClick={() => sendMessage(t(key))}
+                        className="rounded-xl border border-border px-3 py-2 text-left text-sm text-foreground transition-colors hover:bg-secondary"
+                      >
+                        {t(key)}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               ) : (
                 messages.map((message) => (
                   <div
@@ -346,6 +359,7 @@ export function ChatWidget({ weekId }: ChatWidgetProps) {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder={t("chatPlaceholder")}
+                aria-label={t("chatPlaceholder")}
                 className="flex-1 rounded-full border border-input bg-background px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                 disabled={isLoading}
               />

@@ -222,11 +222,11 @@ uvicorn app.main:app --reload   # http://localhost:8000/docs
 ```bash
 # Full collection
 curl -X POST "https://api-production-3ee5.up.railway.app/api/admin/collect?week_id=2026-kw05" \
-  -H "X-API-Key: REDACTED_ADMIN_KEY"
+  -H "X-API-Key: $ADMIN_API_KEY"
 
 # Process only (reuse existing raw data)
 curl -X POST "https://api-production-3ee5.up.railway.app/api/admin/collect/process?week_id=2026-kw05" \
-  -H "X-API-Key: REDACTED_ADMIN_KEY"
+  -H "X-API-Key: $ADMIN_API_KEY"
 ```
 
 ---
@@ -245,7 +245,7 @@ NEXT_PUBLIC_API_URL=https://api-production-3ee5.up.railway.app/api
 DATABASE_URL=postgresql://...  # Set by Railway
 OPENROUTER_API_KEY=sk-or-v1-...
 YOUTUBE_API_KEY=AIza...
-ADMIN_API_KEY=REDACTED_ADMIN_KEY
+ADMIN_API_KEY=<set-in-railway-dashboard>
 CORS_ORIGINS=["http://localhost:3000","https://www.datacubeai.space","https://ai-information-hub.vercel.app"]
 PORT=8080
 ```

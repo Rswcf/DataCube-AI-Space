@@ -5,6 +5,7 @@ import { WeekNavigation } from "./week-navigation";
 import { TechFeed } from "./feeds/tech-feed";
 import { InvestmentFeed } from "./feeds/investment-feed";
 import { TipsFeed } from "./feeds/tips-feed";
+import { ErrorBoundary } from "./error-boundary";
 import { cn } from "@/lib/utils";
 
 interface FeedProps {
@@ -74,20 +75,22 @@ export function Feed({ activeTab, selectedWeekId, onWeekChange, searchQuery }: F
   }
 
   return (
-    <main className="min-h-screen pb-20 md:pb-0">
+    <main id="main-content" className="min-h-screen pb-20 md:pb-0">
       <WeekNavigation selectedWeekId={selectedWeekId} onWeekChange={onWeekChange} />
 
-      <div className="overflow-hidden">
-        <div
-          className={cn(
-            "transition-transform duration-300 ease-out",
-            isAnimating && direction === "left" && "animate-slide-left",
-            isAnimating && direction === "right" && "animate-slide-right"
-          )}
-        >
-          {renderFeed()}
+      <ErrorBoundary>
+        <div className="overflow-hidden">
+          <div
+            className={cn(
+              "transition-transform duration-300 ease-out",
+              isAnimating && direction === "left" && "animate-slide-left",
+              isAnimating && direction === "right" && "animate-slide-right"
+            )}
+          >
+            {renderFeed()}
+          </div>
         </div>
-      </div>
+      </ErrorBoundary>
     </main>
   );
 }

@@ -136,17 +136,17 @@ uvicorn app.main:app --reload   # API docs: :8000/docs
 
 ### Data Collection
 ```bash
-# Via API
+# Via API (set ADMIN_API_KEY env var or use Railway dashboard value)
 curl -X POST "https://api-production-3ee5.up.railway.app/api/admin/collect?week_id=2026-kw05" \
-  -H "X-API-Key: REDACTED_ADMIN_KEY"
+  -H "X-API-Key: $ADMIN_API_KEY"
 
 # Process only (reuse raw data)
 curl -X POST "https://api-production-3ee5.up.railway.app/api/admin/collect/process?week_id=2026-kw05" \
-  -H "X-API-Key: REDACTED_ADMIN_KEY"
+  -H "X-API-Key: $ADMIN_API_KEY"
 
 # M&A only (reprocess M&A without affecting other sections)
 curl -X POST "https://api-production-3ee5.up.railway.app/api/admin/collect/ma?week_id=2026-kw05" \
-  -H "X-API-Key: REDACTED_ADMIN_KEY"
+  -H "X-API-Key: $ADMIN_API_KEY"
 ```
 
 ---
@@ -166,7 +166,7 @@ DATABASE_URL=postgresql://...
 OPENROUTER_API_KEY=sk-or-v1-...
 YOUTUBE_API_KEY=AIza...
 POLYGON_API_KEY=...              # Polygon.io API for real-time stock data
-ADMIN_API_KEY=REDACTED_ADMIN_KEY
+ADMIN_API_KEY=<set-in-railway-dashboard>
 CORS_ORIGINS=["http://localhost:3000","https://www.datacubeai.space","https://ai-information-hub.vercel.app"]
 ```
 

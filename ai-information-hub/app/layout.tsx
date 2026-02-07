@@ -6,8 +6,8 @@ import { SettingsProvider } from '@/lib/settings-context'
 import { OrganizationSchema, WebsiteSchema, FAQSchema } from '@/components/structured-data'
 import './globals.css'
 
-const _geist = Geist({ subsets: ["latin"] });
-const _geistMono = Geist_Mono({ subsets: ["latin"] });
+const geist = Geist({ subsets: ["latin"], variable: "--font-geist-sans" });
+const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono" });
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.datacubeai.space'),
@@ -99,7 +99,13 @@ export default function RootLayout({
         <link rel="alternate" type="application/atom+xml" title="DataCube AI (DE)" href="/feed.xml?lang=de" />
         <link rel="alternate" type="application/atom+xml" title="DataCube AI (EN)" href="/feed.xml?lang=en" />
       </head>
-      <body className={`font-sans antialiased`}>
+      <body className={`${geist.variable} ${geistMono.variable} font-sans antialiased`}>
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:rounded-lg focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground focus:shadow-lg"
+        >
+          Skip to content
+        </a>
         <SettingsProvider>
           {children}
         </SettingsProvider>

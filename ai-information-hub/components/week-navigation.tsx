@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useSettings } from "@/lib/settings-context";
 
 interface WeekNavigationProps {
@@ -32,13 +33,19 @@ export function WeekNavigation({ selectedWeekId, onWeekChange }: WeekNavigationP
     const fetchUrl = apiBase ? `${apiBase}/weeks` : "/data/weeks.json";
 
     fetch(fetchUrl)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
       .then(processData)
       .catch(() => {
         // If API fails, try static JSON as fallback
         if (apiBase) {
           fetch("/data/weeks.json")
-            .then((res) => res.json())
+            .then((res) => {
+              if (!res.ok) throw new Error(`HTTP ${res.status}`);
+              return res.json();
+            })
             .then(processData)
             .catch(() => {});
         }
@@ -96,6 +103,13 @@ export function WeekNavigation({ selectedWeekId, onWeekChange }: WeekNavigationP
         <div className="absolute left-0 top-0 bottom-3 w-8 bg-gradient-to-r from-background to-transparent pointer-events-none z-10 md:hidden" />
 
         <div className="flex gap-1 overflow-x-auto px-4 pb-3 scrollbar-hide">
+          {weeks.length === 0 && (
+            <>
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Skeleton key={i} className="h-14 w-20 shrink-0 rounded-lg" />
+              ))}
+            </>
+          )}
           {weeks.map((week) => (
             <button
               key={week.id}

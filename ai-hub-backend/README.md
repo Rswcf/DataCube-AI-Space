@@ -547,7 +547,7 @@ railway variables set DATABASE_URL=$RAILWAY_DATABASE_URL
 railway variables set OPENROUTER_API_KEY=sk-or-v1-xxxxx
 railway variables set YOUTUBE_API_KEY=AIzaSyxxxxx
 railway variables set POLYGON_API_KEY=xxxxx              # For real-time stock data
-railway variables set ADMIN_API_KEY=REDACTED_ADMIN_KEY
+railway variables set ADMIN_API_KEY=$ADMIN_API_KEY
 railway variables set CORS_ORIGINS='["http://localhost:3000","https://www.datacubeai.space","https://ai-information-hub.vercel.app"]'
 ```
 
@@ -570,7 +570,7 @@ railway run python -m scripts.init_db --migrate-all
 
 ```bash
 curl -X POST "https://api-production-3ee5.up.railway.app/api/admin/collect?week_id=2026-kw05" \
-  -H "X-API-Key: REDACTED_ADMIN_KEY"
+  -H "X-API-Key: $ADMIN_API_KEY"
 ```
 
 ### Process Only (Reuse Raw Data)
@@ -579,14 +579,14 @@ Useful when you want to re-run LLM processing without re-fetching data:
 
 ```bash
 curl -X POST "https://api-production-3ee5.up.railway.app/api/admin/collect/process?week_id=2026-kw05" \
-  -H "X-API-Key: REDACTED_ADMIN_KEY"
+  -H "X-API-Key: $ADMIN_API_KEY"
 ```
 
 ### Fetch Only (No LLM Processing)
 
 ```bash
 curl -X POST "https://api-production-3ee5.up.railway.app/api/admin/collect/fetch?week_id=2026-kw05" \
-  -H "X-API-Key: REDACTED_ADMIN_KEY"
+  -H "X-API-Key: $ADMIN_API_KEY"
 ```
 
 ### Local Collection
@@ -687,7 +687,7 @@ To reprocess only the M&A section without affecting other sections:
 
 ```bash
 curl -X POST "https://api-production-3ee5.up.railway.app/api/admin/collect/ma?week_id=2026-kw05" \
-  -H "X-API-Key: REDACTED_ADMIN_KEY"
+  -H "X-API-Key: $ADMIN_API_KEY"
 ```
 
 This is useful when you want to update M&A data with new sources or fix classification issues.
