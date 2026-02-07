@@ -16,10 +16,9 @@ from app.models import (
     TipPost, Trend, TeamMember, RawArticle, RawVideo,
 )
 from app.services.period_utils import (
-    is_daily_id, current_day_id, current_week_id, day_to_week_id,
-    week_date_range, ensure_period,
+    is_daily_id, current_day_id, ensure_period,
 )
-from app.services.rss_fetcher import fetch_rss_feeds, fetch_rss_feeds_parallel
+from app.services.rss_fetcher import fetch_rss_feeds_parallel
 from app.services.hn_fetcher import fetch_hn_stories
 from app.services.youtube_fetcher import fetch_youtube_videos, fetch_video_transcript
 from app.services.llm_processor import LLMProcessor
@@ -935,7 +934,7 @@ def run_collection(db: Session, week_id: Optional[str] = None):
     logger.info(f"Starting full collection for {week_id}")
 
     # Stage 1: Fetch and store raw data
-    fetch_stats = stage1_fetch_and_store(db, week_id)
+    stage1_fetch_and_store(db, week_id)
 
     # Initialize LLM processor
     processor = LLMProcessor()

@@ -1,0 +1,115 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # Detect which directories changed to skip unnecessary jobs
+  changes:
+    name: Detect changes
+    runs-on: ubuntu-latest
+    outputs:
+      frontend: ${{ steps.filter.outputs.frontend }}
+      backend: ${{ steps.filter.outputs.backend }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            frontend:
+              - 'ai-information-hub/**'
+            backend:
+              - 'ai-hub-backend/**'
+
+  frontend:
+    name: Frontend (Next.js)
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ai-information-hub
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: ai-information-hub/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: TypeScript type check
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_API_URL: https://api-production-3ee5.up.railway.app/api
+
+  backend:
+    name: Backend (FastAPI)
+    needs: changes
+    if: needs.changes.outputs.backend == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ai-hub-backend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: ai-hub-backend/requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Lint (ruff)
+        run: ruff check app/ scripts/
+
+      - name: Syntax check (all Python files)
+        run: |
+          echo "Checking syntax for all .py files in app/ and scripts/..."
+          errors=0
+          for f in $(find app/ scripts/ -name '*.py' -type f); do
+            if ! python -c "import ast; ast.parse(open('$f').read())" 2>&1; then
+              echo "FAIL: $f"
+              errors=$((errors + 1))
+            fi
+          done
+          if [ "$errors" -gt 0 ]; then
+            echo "$errors file(s) with syntax errors"
+            exit 1
+          fi
+          echo "All files passed syntax check"
+
+      - name: Import check (core modules)
+        run: |
+          python -c "from app.config import get_settings; print('OK: app.config')"
+          python -c "from app.database import Base, get_engine, get_db; print('OK: app.database')"
+          python -c "from app.models import Week, TechPost, Video, PrimaryMarketPost, SecondaryMarketPost, MAPost, TipPost, Trend, TeamMember, RawArticle, RawVideo; print('OK: app.models')"
+          python -c "from app.schemas import WeekResponse, WeeksResponse, DayEntry, TechPostResponse, TechFeedResponse; print('OK: app.schemas')"
+          python -c "from app.services.period_utils import current_week_id, current_day_id, is_daily_id, day_to_week_id, week_date_range, ensure_period; print('OK: app.services.period_utils')"
+          python -c "from app.services.rss_fetcher import fetch_rss_feeds, fetch_rss_feeds_parallel; print('OK: app.services.rss_fetcher')"
+          python -c "from app.services.hn_fetcher import fetch_hn_stories; print('OK: app.services.hn_fetcher')"
+          python -c "from app.services.llm_processor import LLMProcessor; print('OK: app.services.llm_processor')"
+          python -c "from app.services.youtube_fetcher import fetch_youtube_videos; print('OK: app.services.youtube_fetcher')"
+          python -c "from app.services.collector import run_collection, run_fetch_only, run_process_only; print('OK: app.services.collector')"
+          python -c "from app.main import app; print('OK: app.main')"
+        env:
+          DATABASE_URL: sqlite:///./test.db
+          OPENROUTER_API_KEY: test-key-for-ci
+          ADMIN_API_KEY: test-key-for-ci

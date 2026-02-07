@@ -333,7 +333,7 @@ def enhance_hn_articles(stories: list[dict], max_items: int = 30) -> list[dict]:
         if content:
             full_content.append(f"[Article Content]\n{content}")
         if comments:
-            full_content.append(f"[HN Discussion Highlights]\n" + "\n---\n".join(comments))
+            full_content.append("[HN Discussion Highlights]\n" + "\n---\n".join(comments))
 
         story["summary"] = "\n\n".join(full_content) if full_content else story["title"]
         story["content_type"] = content_type
@@ -362,7 +362,7 @@ def _enhance_single_story(story: dict) -> dict:
     if content:
         full_content.append(f"[Article Content]\n{content}")
     if comments:
-        full_content.append(f"[HN Discussion Highlights]\n" + "\n---\n".join(comments))
+        full_content.append("[HN Discussion Highlights]\n" + "\n---\n".join(comments))
 
     story["summary"] = "\n\n".join(full_content) if full_content else story.get("title", "")
     story["content_type"] = content_type

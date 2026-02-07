@@ -5,7 +5,6 @@ LLM processing service using DeepSeek via OpenRouter.
 import json
 import re
 import logging
-from typing import Optional
 from openai import OpenAI
 
 from app.config import get_settings

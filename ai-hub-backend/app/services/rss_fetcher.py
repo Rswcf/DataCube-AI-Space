@@ -4,7 +4,7 @@ RSS feed fetching service.
 
 import feedparser
 from datetime import datetime, timedelta
-from typing import Optional, Iterable
+from typing import Optional
 import logging
 import requests
 from concurrent.futures import ThreadPoolExecutor, as_completed

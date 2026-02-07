@@ -2,7 +2,6 @@
 Application configuration loaded from environment variables.
 """
 
-import os
 from functools import lru_cache
 from pydantic_settings import BaseSettings
 

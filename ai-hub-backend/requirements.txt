@@ -29,3 +29,4 @@ pyyaml>=6.0.0
 
 # Development
 python-dotenv>=1.0.0
+ruff>=0.4.0

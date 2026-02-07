@@ -8,10 +8,10 @@ from pathlib import Path
 from sqlalchemy.orm import Session
 
 from app.models import (
-    Week, TechPost, Video, PrimaryMarketPost, SecondaryMarketPost, MAPost,
+    Week, TechPost, PrimaryMarketPost, SecondaryMarketPost, MAPost,
     TipPost, Trend, TeamMember,
 )
-from app.services.period_utils import ensure_period, week_date_range
+from app.services.period_utils import ensure_period
 
 logger = logging.getLogger(__name__)
 

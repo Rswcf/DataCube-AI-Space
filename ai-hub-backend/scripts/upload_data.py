@@ -30,25 +30,25 @@ def upload_week_data(
     if tech_file.exists():
         with open(tech_file) as f:
             payload["tech_data"] = json.load(f)
-        print(f"  Loaded tech.json")
+        print("  Loaded tech.json")
 
     investment_file = week_path / "investment.json"
     if investment_file.exists():
         with open(investment_file) as f:
             payload["investment_data"] = json.load(f)
-        print(f"  Loaded investment.json")
+        print("  Loaded investment.json")
 
     tips_file = week_path / "tips.json"
     if tips_file.exists():
         with open(tips_file) as f:
             payload["tips_data"] = json.load(f)
-        print(f"  Loaded tips.json")
+        print("  Loaded tips.json")
 
     trends_file = week_path / "trends.json"
     if trends_file.exists():
         with open(trends_file) as f:
             payload["trends_data"] = json.load(f)
-        print(f"  Loaded trends.json")
+        print("  Loaded trends.json")
 
     # Upload to API
     url = f"{api_url}/admin/import-week?week_id={week_id}"

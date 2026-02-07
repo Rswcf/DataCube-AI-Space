@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException, Header, BackgroundTasks
 from sqlalchemy.orm import Session
 from typing import Optional
 
-from app.database import get_db, init_db, get_session_local
+from app.database import get_db, get_session_local
 from app.config import get_settings
 
 logger = logging.getLogger(__name__)
