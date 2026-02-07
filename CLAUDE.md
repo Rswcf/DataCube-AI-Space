@@ -13,7 +13,7 @@ Bilingual (DE/EN) weekly AI news aggregator with **YouTube video integration**. 
 
 **Stack**: Next.js 16 + React 19 + Tailwind CSS 4 + Shadcn/ui (Frontend) | FastAPI + PostgreSQL (Backend)
 
-**Status**: Full-stack implementation complete with Railway backend. **No authentication required**.
+**Status**: Full-stack implementation complete with Railway backend. SEO/GEO optimized, legal pages added, engagement UI (newsletter, Ko-fi, share). **No authentication required**.
 
 ---
 
@@ -53,6 +53,8 @@ Bilingual (DE/EN) weekly AI news aggregator with **YouTube video integration**. 
 │    • /feed.xml — Atom 1.0 feed (DE/EN)                   │
 │    • /api/content-summary — Markdown for AI consumption  │
 │    • /llms.txt — AI crawler site description              │
+│    • /impressum — Legal notice (DDG §5)                  │
+│    • /datenschutz — Privacy policy (GDPR)                │
 │                                                          │
 │  Middleware: crawlers bypass login gate via UA detection  │
 │                                                          │
@@ -71,6 +73,8 @@ DataCube_AI_Space/
 │   │   │   ├── chat/         # Chat assistant (glm-4.5-air:free)
 │   │   │   └── content-summary/  # Markdown summary API (GEO)
 │   │   ├── feed.xml/         # Atom 1.0 feed route
+│   │   ├── impressum/        # Legal notice (DDG §5)
+│   │   ├── datenschutz/      # Privacy policy (GDPR)
 │   │   └── week/[weekId]/    # SSR week pages (SEO)
 │   ├── components/           # React components
 │   │   ├── feeds/            # Feed components
@@ -271,3 +275,24 @@ Response file will be created at `.ai-collab/responses/`
 - Archive completed request/response pairs to `archive/`
 
 See `.ai-collab/README.md` for full protocol documentation.
+
+---
+
+## Growth Strategy & Manual Action Items
+
+Detailed strategy reports and a manual action checklist are in `.ai-collab/context/`:
+
+| File | Description |
+|------|-------------|
+| `manual-action-checklist.md` | **Prioritized TODO list** of manual tasks (legal, monetization, social media, newsletter) |
+| `seo-geo-strategy.md` | SEO & GEO optimization strategy with 25 actions |
+| `traffic-growth-strategy.md` | Channel-by-channel traffic growth plan |
+| `monetization-strategy.md` | 4-phase revenue roadmap (EUR 50/mo → EUR 8,500/mo) |
+| `feature-roadmap.md` | 25 features across 3 phases with tech architecture |
+
+**Next manual steps** (see `manual-action-checklist.md` for full list):
+1. Fill Impressum + Datenschutz placeholder values (`[brackets]`)
+2. Register EthicalAds, Ko-fi, affiliate programs (Notion AI, Jasper, Copy.ai)
+3. Create Beehiiv newsletter account, replace localStorage form with API
+4. Set up LinkedIn personal brand + Twitter/X + Telegram channel
+5. Submit "Show HN" post (month 2)

@@ -17,13 +17,15 @@ Bilingual (DE/EN) weekly AI news aggregator for internal teams — curates tech 
 | `lib/settings-context.tsx` | Theme + language state, `t()` translation function |
 | `components/feeds/tech-feed.tsx` | Reference implementation (API + video support) |
 | `components/video-embed.tsx` | YouTube embed component (uses `next/image`) |
-| `components/structured-data.tsx` | JSON-LD schemas (Article, Video, Organization, FAQ) |
+| `components/structured-data.tsx` | JSON-LD schemas (NewsArticle, Video, NewsMediaOrganization, FAQ, Breadcrumb) |
 | `components/chat-widget.tsx` | Chat UI + API-first week data fetching |
 | `app/api/chat/route.ts` | Chat assistant API (uses glm-4.5-air:free) |
 | `app/week/[weekId]/page.tsx` | SSR week page (Server Component, SEO) |
 | `app/feed.xml/route.ts` | Atom 1.0 feed (bilingual) |
 | `app/api/content-summary/route.ts` | Markdown summary API (GEO) |
 | `middleware.ts` | Login gate with crawler UA bypass |
+| `app/impressum/page.tsx` | Legal notice / Impressum (DDG §5, **placeholders need filling**) |
+| `app/datenschutz/page.tsx` | Privacy policy / Datenschutzerklärung (GDPR, **placeholders need filling**) |
 | `../ai-hub-backend/` | FastAPI backend (Railway deployment) |
 
 **Key patterns:**
@@ -309,7 +311,12 @@ The site includes dedicated SEO and Generative Engine Optimization features:
 | SSR Week Pages | `/week/[weekId]` | Full HTML + JSON-LD for crawlers (ISR 1h) |
 | Atom Feed | `/feed.xml?lang=de\|en` | Atom 1.0 feed, latest 2 weeks of tech posts |
 | Content Summary | `/api/content-summary?lang=de\|en` | Markdown summary for AI systems |
-| llms.txt | `/llms.txt` | AI crawler site description + API docs |
-| Sitemap | `/sitemap.xml` | Dynamic, lists all `/week/` routes |
-| Structured Data | On SSR pages | ArticleSchema + VideoSchema JSON-LD per post |
-| Image Optimization | `next/image` | YouTube thumbnails optimized via Vercel |
+| llms.txt | `/llms.txt` | AI crawler site description + authority info + citation format |
+| Sitemap | `/sitemap.xml` | Dynamic, real lastmod dates from period IDs |
+| Structured Data | On SSR pages | NewsArticle + VideoSchema + BreadcrumbList + NewsMediaOrganization |
+| Hreflang | All pages | DE/EN + x-default for bilingual SEO |
+| Prev/Next Nav | `/week/[weekId]` | Internal linking between adjacent weeks/days |
+| Preconnect | Layout head | Resource hints for Railway API + YouTube |
+| Image Optimization | `next/image` | YouTube thumbnails, first video fetchPriority="high" |
+| Impressum | `/impressum` | Legal notice (DDG §5) — **placeholders need filling** |
+| Datenschutz | `/datenschutz` | Privacy policy (GDPR) — **placeholders need filling** |
