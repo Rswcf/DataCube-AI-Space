@@ -8,6 +8,7 @@ import { ShareButton } from "@/components/share-button";
 import { VerifiedBadge } from "@/components/verified-badge";
 import { FeedSkeleton } from "@/components/feeds/feed-skeleton";
 import { useSettings } from "@/lib/settings-context";
+import { getPeriodLabel } from "@/lib/period-utils";
 
 interface TipsFeedProps {
   weekId: string;
@@ -106,7 +107,7 @@ export function TipsFeed({ weekId, searchQuery }: TipsFeedProps) {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const weekNum = weekId.split("-kw")[1];
+  const periodLabel = getPeriodLabel(weekId, language);
 
   return (
     <div className="divide-y divide-border">
@@ -116,7 +117,7 @@ export function TipsFeed({ weekId, searchQuery }: TipsFeedProps) {
           <Lightbulb className="h-5 w-5 text-chart-3" />
           <h3 className="text-sm sm:text-base font-semibold text-foreground">{t("practicalTipsTitle")}</h3>
           <Badge variant="secondary" className="ml-auto">
-            {t("week")} {weekNum}
+            {periodLabel}
           </Badge>
         </div>
         <p className="mt-0.5 sm:mt-1 text-xs sm:text-sm text-muted-foreground">
@@ -130,7 +131,7 @@ export function TipsFeed({ weekId, searchQuery }: TipsFeedProps) {
       {/* Empty State */}
       {!loading && filteredPosts.length === 0 && (
         <div className="px-4 py-12 text-center text-muted-foreground">
-          {language === "de" ? "Keine Daten für diese Woche verfügbar." : "No data available for this week."}
+          {t("noDataForThisPeriod")}
         </div>
       )}
 

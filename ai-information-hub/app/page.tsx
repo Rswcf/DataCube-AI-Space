@@ -17,13 +17,25 @@ export default function Home() {
   const [showMobileSettings, setShowMobileSettings] = useState(false);
 
   useEffect(() => {
-    const processData = (data: { weeks?: { id: string; current?: boolean }[] }) => {
+    const processData = (data: {
+      weeks?: {
+        id: string;
+        current?: boolean;
+        days?: { id: string; current?: boolean }[];
+      }[];
+    }) => {
       const weeks = data.weeks || [];
-      const current = weeks.find((w: { current?: boolean }) => w.current);
-      if (current) {
-        setSelectedWeekId(current.id);
-      } else if (weeks.length > 0) {
-        setSelectedWeekId(weeks[0].id);
+
+      if (weeks.length > 0) {
+        const currentWeek = weeks.find((w) => w.current) || weeks[0];
+
+        if (currentWeek.days && currentWeek.days.length > 0) {
+          const today = currentWeek.days.find((d) => d.current);
+          const latest = currentWeek.days[currentWeek.days.length - 1];
+          setSelectedWeekId((today || latest).id);
+        } else {
+          setSelectedWeekId(currentWeek.id);
+        }
       }
     };
 

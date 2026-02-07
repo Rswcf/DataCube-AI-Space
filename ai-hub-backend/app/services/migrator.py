@@ -11,7 +11,7 @@ from app.models import (
     Week, TechPost, Video, PrimaryMarketPost, SecondaryMarketPost, MAPost,
     TipPost, Trend, TeamMember,
 )
-from app.services.collector import week_date_range
+from app.services.period_utils import ensure_period, week_date_range
 
 logger = logging.getLogger(__name__)
 
@@ -51,20 +51,7 @@ def migrate_week_data(
     # Ensure week exists
     week = db.query(Week).filter(Week.id == week_id).first()
     if not week:
-        parts = week_id.split("-kw")
-        year = int(parts[0])
-        week_num = int(parts[1])
-
-        week = Week(
-            id=week_id,
-            label=f"KW {week_num:02d}",
-            year=year,
-            week_num=week_num,
-            date_range=week_date_range(year, week_num),
-            is_current=False,
-        )
-        db.add(week)
-        db.commit()
+        week = ensure_period(db, week_id, is_current=False)
 
     # Migrate tech.json
     tech_file = week_path / "tech.json"
@@ -257,14 +244,15 @@ def migrate_weeks_json(db: Session, data_path: Path = DEFAULT_DATA_PATH) -> int:
         if existing:
             continue
 
-        week = Week(
-            id=w["id"],
-            label=w.get("label", ""),
-            year=w.get("year", 0),
-            week_num=w.get("weekNum", 0),
-            date_range=w.get("dateRange", ""),
-            is_current=w.get("current", False),
-        )
+        week = ensure_period(db, w["id"], is_current=w.get("current", False))
+        week.label = w.get("label", week.label)
+        week.year = w.get("year", week.year)
+        week.date_range = w.get("dateRange", week.date_range)
+
+        # Preserve imported weekly weekNum when available.
+        if week.period_type == "week" and w.get("weekNum") is not None:
+            week.week_num = w.get("weekNum")
+
         db.add(week)
         count += 1
 

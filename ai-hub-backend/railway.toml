@@ -9,8 +9,8 @@ healthcheckTimeout = 60
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 3
 
-# Cron job for weekly data collection
-# Runs every Monday at 08:00 UTC
+# Cron job for daily data collection
+# Runs every day at 08:00 UTC
 [[cron]]
-schedule = "0 8 * * 1"
-command = "python -m scripts.weekly_collect"
+schedule = "0 8 * * *"
+command = "python -m scripts.daily_collect"

@@ -31,15 +31,15 @@ class Settings(BaseSettings):
 
     # Collection settings
     hn_min_points: int = 100
-    hn_days: int = 7
+    hn_days: int = 1
     hn_limit: int = 50
     youtube_max_results: int = 10
 
     # Output counts
-    tech_output_count: int = 30
-    tips_output_count: int = 15
-    investment_output_count: int = 10
-    video_output_count: int = 5
+    tech_output_count: int = 10
+    tips_output_count: int = 5
+    investment_output_count: int = 5
+    video_output_count: int = 2
 
     # Thread pool and timeout settings
     rss_max_workers: int = 8

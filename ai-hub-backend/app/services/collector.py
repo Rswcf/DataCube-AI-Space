@@ -15,27 +15,16 @@ from app.models import (
     Week, TechPost, Video, PrimaryMarketPost, SecondaryMarketPost, MAPost,
     TipPost, Trend, TeamMember, RawArticle, RawVideo,
 )
+from app.services.period_utils import (
+    is_daily_id, current_day_id, current_week_id, day_to_week_id,
+    week_date_range, ensure_period,
+)
 from app.services.rss_fetcher import fetch_rss_feeds, fetch_rss_feeds_parallel
 from app.services.hn_fetcher import fetch_hn_stories
 from app.services.youtube_fetcher import fetch_youtube_videos, fetch_video_transcript
 from app.services.llm_processor import LLMProcessor
 
 logger = logging.getLogger(__name__)
-
-
-def current_week_id() -> str:
-    """Return the current ISO week as '2025-kw04' format."""
-    now = datetime.now()
-    year, week, _ = now.isocalendar()
-    return f"{year}-kw{week:02d}"
-
-
-def week_date_range(year: int, week: int) -> str:
-    """Return date range string like '20.01 - 26.01' for a given ISO week."""
-    jan4 = datetime(year, 1, 4)
-    start = jan4 + timedelta(weeks=week - 1, days=-jan4.weekday())
-    end = start + timedelta(days=6)
-    return f"{start.day:02d}.{start.month:02d} - {end.day:02d}.{end.month:02d}"
 
 
 def get_week_boundaries(week_id: str) -> tuple[datetime, datetime]:
@@ -50,6 +39,10 @@ def get_week_boundaries(week_id: str) -> tuple[datetime, datetime]:
         - start: Monday 00:00:00 of the week
         - end: Monday 00:00:00 of the next week (exclusive)
     """
+    if is_daily_id(week_id):
+        day = datetime.strptime(week_id, "%Y-%m-%d")
+        return day, day + timedelta(days=1)
+
     parts = week_id.split("-kw")
     year = int(parts[0])
     week_num = int(parts[1])
@@ -156,28 +149,28 @@ def load_sources() -> dict:
             {"url": "https://www.oneusefulthing.org/feed", "name": "One Useful Thing (Ethan Mollick)"},
 
             # Reddit - LLM & Chat Tools
-            {"url": "https://www.reddit.com/r/ChatGPT/top/.rss?t=week", "name": "Reddit r/ChatGPT"},
-            {"url": "https://www.reddit.com/r/ClaudeAI/top/.rss?t=week", "name": "Reddit r/ClaudeAI"},
-            {"url": "https://www.reddit.com/r/OpenAI/top/.rss?t=week", "name": "Reddit r/OpenAI"},
-            {"url": "https://www.reddit.com/r/PromptEngineering/top/.rss?t=week", "name": "Reddit r/PromptEngineering"},
+            {"url": "https://www.reddit.com/r/ChatGPT/top/.rss?t=day", "name": "Reddit r/ChatGPT"},
+            {"url": "https://www.reddit.com/r/ClaudeAI/top/.rss?t=day", "name": "Reddit r/ClaudeAI"},
+            {"url": "https://www.reddit.com/r/OpenAI/top/.rss?t=day", "name": "Reddit r/OpenAI"},
+            {"url": "https://www.reddit.com/r/PromptEngineering/top/.rss?t=day", "name": "Reddit r/PromptEngineering"},
 
             # Reddit - Image Generation (marketing use)
-            {"url": "https://www.reddit.com/r/midjourney/top/.rss?t=week", "name": "Reddit r/Midjourney"},
+            {"url": "https://www.reddit.com/r/midjourney/top/.rss?t=day", "name": "Reddit r/Midjourney"},
 
             # Reddit - AI Search & Research Tools
-            {"url": "https://www.reddit.com/r/perplexity_ai/top/.rss?t=week", "name": "Reddit r/perplexity_ai"},
-            {"url": "https://www.reddit.com/r/NotebookLM/top/.rss?t=week", "name": "Reddit r/NotebookLM"},
+            {"url": "https://www.reddit.com/r/perplexity_ai/top/.rss?t=day", "name": "Reddit r/perplexity_ai"},
+            {"url": "https://www.reddit.com/r/NotebookLM/top/.rss?t=day", "name": "Reddit r/NotebookLM"},
 
             # Reddit - General AI Discussion
-            {"url": "https://www.reddit.com/r/artificial/top/.rss?t=week", "name": "Reddit r/artificial"},
-            {"url": "https://www.reddit.com/r/singularity/top/.rss?t=week", "name": "Reddit r/singularity"},
+            {"url": "https://www.reddit.com/r/artificial/top/.rss?t=day", "name": "Reddit r/artificial"},
+            {"url": "https://www.reddit.com/r/singularity/top/.rss?t=day", "name": "Reddit r/singularity"},
 
             # Reddit - Video/Audio Generation (content creation)
-            {"url": "https://www.reddit.com/r/aivideo/top/.rss?t=week", "name": "Reddit r/aivideo"},
-            {"url": "https://www.reddit.com/r/ElevenLabs/top/.rss?t=week", "name": "Reddit r/ElevenLabs"},
+            {"url": "https://www.reddit.com/r/aivideo/top/.rss?t=day", "name": "Reddit r/aivideo"},
+            {"url": "https://www.reddit.com/r/ElevenLabs/top/.rss?t=day", "name": "Reddit r/ElevenLabs"},
 
             # Reddit - Pro Users
-            {"url": "https://www.reddit.com/r/ChatGPTPro/top/.rss?t=week", "name": "Reddit r/ChatGPTPro"},
+            {"url": "https://www.reddit.com/r/ChatGPTPro/top/.rss?t=day", "name": "Reddit r/ChatGPTPro"},
         ],
     }
 
@@ -195,29 +188,7 @@ def load_sources() -> dict:
 
 def ensure_week(db: Session, week_id: str) -> Week:
     """Ensure week exists in database, create if not."""
-    week = db.query(Week).filter(Week.id == week_id).first()
-
-    if not week:
-        parts = week_id.split("-kw")
-        year = int(parts[0])
-        week_num = int(parts[1])
-
-        # Set all existing weeks to non-current
-        db.query(Week).update({Week.is_current: False})
-
-        week = Week(
-            id=week_id,
-            label=f"KW {week_num:02d}",
-            year=year,
-            week_num=week_num,
-            date_range=week_date_range(year, week_num),
-            is_current=True,
-        )
-        db.add(week)
-        db.commit()
-        logger.info(f"Created week {week_id}")
-
-    return week
+    return ensure_period(db, week_id, is_current=True)
 
 
 def clear_week_data(db: Session, week_id: str):
@@ -903,7 +874,7 @@ def run_fetch_only(db: Session, week_id: Optional[str] = None) -> dict:
     Returns:
         dict with fetch statistics
     """
-    week_id = week_id or current_week_id()
+    week_id = week_id or current_day_id()
     logger.info(f"Starting fetch-only for {week_id}")
 
     return stage1_fetch_and_store(db, week_id)
@@ -920,7 +891,7 @@ def run_process_only(db: Session, week_id: Optional[str] = None) -> dict:
     Returns:
         dict with processing statistics
     """
-    week_id = week_id or current_week_id()
+    week_id = week_id or current_day_id()
     logger.info(f"Starting process-only for {week_id}")
 
     # Check if raw data exists
@@ -959,7 +930,7 @@ def run_collection(db: Session, week_id: Optional[str] = None):
         db: Database session
         week_id: Week ID or None for current week
     """
-    week_id = week_id or current_week_id()
+    week_id = week_id or current_day_id()
 
     logger.info(f"Starting full collection for {week_id}")
 
@@ -1032,7 +1003,7 @@ def run_ma_collection(db: Session, week_id: Optional[str] = None):
     - Save only M&A posts (does not clear other sections)
     """
     settings = get_settings()
-    week_id = week_id or current_week_id()
+    week_id = week_id or current_day_id()
     logger.info(f"Starting M&A-only collection for {week_id}")
 
     # Ensure week exists but do not clear everything

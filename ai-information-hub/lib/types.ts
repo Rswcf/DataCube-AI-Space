@@ -187,14 +187,24 @@ export interface TrendsData {
 // Week Navigation Types (weeks.json)
 // =============================================================================
 
+/** A day entry within a week for hierarchical navigation */
+export interface DayEntry {
+  id: string;       // "2026-02-07"
+  label: string;    // "07.02."
+  weekday: string;  // "Fr" or "Fri"
+  current: boolean;
+}
+
 /** A week entry for navigation */
 export interface Week {
   id: string; // e.g., "2025-kw04"
   label: string; // e.g., "KW 04"
   year: number;
-  weekNum: number;
+  weekNum?: number;        // optional (null for daily entries)
   dateRange: string; // e.g., "20.01 - 26.01"
   current: boolean;
+  periodType?: string;     // "week" | "day"
+  days?: DayEntry[];       // child days within this week
 }
 
 /** Full weeks.json structure */

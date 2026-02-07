@@ -8,6 +8,7 @@ import { VideoEmbed, VideoBadge } from "@/components/video-embed";
 import { VerifiedBadge } from "@/components/verified-badge";
 import { FeedSkeleton } from "@/components/feeds/feed-skeleton";
 import { useSettings } from "@/lib/settings-context";
+import { getPeriodLabel } from "@/lib/period-utils";
 import type { TechPost } from "@/lib/types";
 
 interface TechFeedProps {
@@ -111,7 +112,7 @@ export function TechFeed({ weekId, searchQuery }: TechFeedProps) {
       });
   }, [weekId, language]);
 
-  const weekNum = weekId.split("-kw")[1];
+  const periodLabel = getPeriodLabel(weekId, language);
 
   return (
     <div className="divide-y divide-border">
@@ -121,7 +122,7 @@ export function TechFeed({ weekId, searchQuery }: TechFeedProps) {
           <Cpu className="h-5 w-5 text-primary" />
           <h3 className="text-sm sm:text-base font-semibold text-foreground">{t("aiTechProgress")}</h3>
           <Badge variant="secondary" className="ml-auto">
-            {t("week")} {weekNum}
+            {periodLabel}
           </Badge>
         </div>
         <p className="mt-0.5 sm:mt-1 text-xs sm:text-sm text-muted-foreground">
@@ -135,7 +136,7 @@ export function TechFeed({ weekId, searchQuery }: TechFeedProps) {
       {/* Empty State */}
       {!loading && filteredPosts.length === 0 && (
         <div className="px-4 py-12 text-center text-muted-foreground">
-          {language === "de" ? "Keine Daten für diese Woche verfügbar." : "No data available for this week."}
+          {t("noDataForThisPeriod")}
         </div>
       )}
 

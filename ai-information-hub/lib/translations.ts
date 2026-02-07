@@ -112,6 +112,9 @@ export const translations = {
     chatSuggest2: "Was sind die Top-Investitionen?",
     chatSuggest3: "Welche Trends sind wichtig?",
 
+    // Period/Daily
+    noDataForThisPeriod: "Keine Daten für diesen Zeitraum verfügbar.",
+
     // Video
     video: "Video",
     playVideo: "Video abspielen",
@@ -228,6 +231,9 @@ export const translations = {
     chatSuggest1: "Summarize this week",
     chatSuggest2: "What are the top investments?",
     chatSuggest3: "Which trends are important?",
+
+    // Period/Daily
+    noDataForThisPeriod: "No data available for this period.",
 
     // Video
     video: "Video",

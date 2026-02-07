@@ -1,24 +1,35 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ChevronLeft, ChevronRight, Calendar } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronDown, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import { useSettings } from "@/lib/settings-context";
+import { isDailyId, getPeriodLabel } from "@/lib/period-utils";
 
 interface WeekNavigationProps {
   selectedWeekId: string;
   onWeekChange: (weekId: string) => void;
 }
 
+interface DayData {
+  id: string;
+  label: string;
+  weekday: string;
+  current: boolean;
+}
+
 interface WeekData {
   id: string;
   label: string;
   year: number;
-  weekNum: number;
+  weekNum?: number;
   dateRange: string;
   current: boolean;
+  periodType?: string;
+  days?: DayData[];
 }
 
 export function WeekNavigation({ selectedWeekId, onWeekChange }: WeekNavigationProps) {
@@ -28,7 +39,6 @@ export function WeekNavigation({ selectedWeekId, onWeekChange }: WeekNavigationP
   useEffect(() => {
     const processData = (data: any) => setWeeks(data.weeks || []);
 
-    // Try API first if configured, fall back to static JSON
     const apiBase = process.env.NEXT_PUBLIC_API_URL;
     const fetchUrl = apiBase ? `${apiBase}/weeks` : "/data/weeks.json";
 
@@ -39,7 +49,6 @@ export function WeekNavigation({ selectedWeekId, onWeekChange }: WeekNavigationP
       })
       .then(processData)
       .catch(() => {
-        // If API fails, try static JSON as fallback
         if (apiBase) {
           fetch("/data/weeks.json")
             .then((res) => {
@@ -52,21 +61,41 @@ export function WeekNavigation({ selectedWeekId, onWeekChange }: WeekNavigationP
       });
   }, []);
 
-  const currentIndex = weeks.findIndex((w) => w.id === selectedWeekId);
+  const activeWeek = weeks.find((week) =>
+    isDailyId(selectedWeekId)
+      ? week.days?.some((day) => day.id === selectedWeekId)
+      : week.id === selectedWeekId
+  );
+
+  const activeWeekIndex = activeWeek ? weeks.indexOf(activeWeek) : -1;
+  const selectedDay = isDailyId(selectedWeekId) ? selectedWeekId : null;
+
+  const selectWeek = (week: WeekData) => {
+    if (week.days && week.days.length > 0) {
+      const today = week.days.find((day) => day.current);
+      const latest = week.days[week.days.length - 1];
+      onWeekChange((today || latest).id);
+      return;
+    }
+
+    onWeekChange(week.id);
+  };
 
   const handlePrev = () => {
-    if (currentIndex < weeks.length - 1) {
-      onWeekChange(weeks[currentIndex + 1].id);
+    if (activeWeekIndex >= 0 && activeWeekIndex < weeks.length - 1) {
+      const prevWeek = weeks[activeWeekIndex + 1];
+      selectWeek(prevWeek);
     }
   };
 
   const handleNext = () => {
-    if (currentIndex > 0) {
-      onWeekChange(weeks[currentIndex - 1].id);
+    if (activeWeekIndex > 0) {
+      const nextWeek = weeks[activeWeekIndex - 1];
+      selectWeek(nextWeek);
     }
   };
 
-  const weekLabel = language === "en" ? "W" : "KW";
+  const hasDays = !!activeWeek?.days?.length;
 
   return (
     <div className="sticky top-0 z-10 border-b border-border bg-background/80 backdrop-blur-md">
@@ -80,7 +109,7 @@ export function WeekNavigation({ selectedWeekId, onWeekChange }: WeekNavigationP
             variant="ghost"
             size="icon"
             onClick={handlePrev}
-            disabled={currentIndex >= weeks.length - 1}
+            disabled={activeWeekIndex < 0 || activeWeekIndex >= weeks.length - 1}
             className="h-8 w-8"
           >
             <ChevronLeft className="h-4 w-4" />
@@ -89,7 +118,7 @@ export function WeekNavigation({ selectedWeekId, onWeekChange }: WeekNavigationP
             variant="ghost"
             size="icon"
             onClick={handleNext}
-            disabled={currentIndex <= 0}
+            disabled={activeWeekIndex <= 0}
             className="h-8 w-8"
           >
             <ChevronRight className="h-4 w-4" />
@@ -97,46 +126,83 @@ export function WeekNavigation({ selectedWeekId, onWeekChange }: WeekNavigationP
         </div>
       </div>
 
-      {/* Week pills with gradient hints for scrollability */}
       <div className="relative">
-        {/* Left gradient hint */}
-        <div className="absolute left-0 top-0 bottom-3 w-8 bg-gradient-to-r from-background to-transparent pointer-events-none z-10 md:hidden" />
+        <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-background to-transparent pointer-events-none z-10 md:hidden" />
 
-        <div className="flex gap-1 overflow-x-auto px-4 pb-3 scrollbar-hide">
+        <div className="flex gap-1 overflow-x-auto px-4 pb-2 scrollbar-hide">
           {weeks.length === 0 && (
             <>
               {Array.from({ length: 5 }).map((_, i) => (
-                <Skeleton key={i} className="h-14 w-20 shrink-0 rounded-lg" />
+                <Skeleton key={i} className="h-12 w-20 shrink-0 rounded-lg" />
               ))}
             </>
           )}
-          {weeks.map((week) => (
-            <button
-              key={week.id}
-              onClick={() => onWeekChange(week.id)}
-              className={cn(
-                "flex shrink-0 flex-col items-center rounded-lg px-4 py-2 transition-all duration-200",
-                selectedWeekId === week.id
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
-              )}
-            >
-              <span className="text-sm font-semibold">
-                {weekLabel} {String(week.weekNum).padStart(2, "0")}
-              </span>
-              <span className="text-xs opacity-80">{week.dateRange}</span>
-              {week.current && (
-                <span className="mt-1 rounded-full bg-accent px-2 py-0.5 text-[10px] font-medium text-accent-foreground">
-                  {t("current")}
-                </span>
-              )}
-            </button>
-          ))}
+          {weeks.map((week) => {
+            const isActive = activeWeek?.id === week.id;
+            const weekHasDays = !!week.days?.length;
+
+            return (
+              <button
+                key={week.id}
+                onClick={() => selectWeek(week)}
+                className={cn(
+                  "flex shrink-0 items-center gap-1.5 rounded-lg px-4 py-2 transition-all duration-200",
+                  isActive
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                )}
+              >
+                <div className="flex flex-col items-center">
+                  <span className="text-sm font-semibold">{getPeriodLabel(week.id, language)}</span>
+                  <span className="text-xs opacity-80">{week.dateRange}</span>
+                </div>
+                {weekHasDays && (
+                  <ChevronDown
+                    className={cn(
+                      "h-3 w-3 transition-transform duration-200",
+                      isActive && "rotate-180"
+                    )}
+                  />
+                )}
+                {week.current && !weekHasDays && (
+                  <span className="ml-1 rounded-full bg-accent px-2 py-0.5 text-[10px] font-medium text-accent-foreground">
+                    {t("current")}
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </div>
 
-        {/* Right gradient hint */}
-        <div className="absolute right-0 top-0 bottom-3 w-8 bg-gradient-to-l from-background to-transparent pointer-events-none z-10 md:hidden" />
+        <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background to-transparent pointer-events-none z-10 md:hidden" />
       </div>
+
+      <Collapsible open={hasDays}>
+        <CollapsibleContent className="overflow-hidden data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0 data-[state=open]:slide-in-from-top-1 data-[state=closed]:slide-out-to-top-1">
+          <div className="border-t border-border/50">
+            <div className="flex gap-1.5 overflow-x-auto px-4 py-2 scrollbar-hide">
+              {activeWeek?.days?.map((day) => (
+                <button
+                  key={day.id}
+                  onClick={() => onWeekChange(day.id)}
+                  className={cn(
+                    "shrink-0 flex flex-col items-center rounded-lg px-3 py-1.5 transition-all duration-200",
+                    selectedDay === day.id
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-secondary/60 text-secondary-foreground hover:bg-secondary/80",
+                    day.current &&
+                      selectedDay !== day.id &&
+                      "ring-2 ring-accent ring-offset-1 ring-offset-background"
+                  )}
+                >
+                  <span className="text-[11px] font-medium opacity-80">{day.weekday}</span>
+                  <span className="text-sm font-semibold">{day.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
     </div>
   );
 }

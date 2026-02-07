@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { VerifiedBadge } from "@/components/verified-badge";
 import { FeedSkeleton } from "@/components/feeds/feed-skeleton";
 import { useSettings } from "@/lib/settings-context";
+import { getPeriodLabel } from "@/lib/period-utils";
 
 interface InvestmentFeedProps {
   weekId: string;
@@ -213,7 +214,7 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
     fetchRealTimeStockData();
   }, [secondaryPosts.length, language]); // Only re-fetch when posts change or language changes
 
-  const weekNum = weekId.split("-kw")[1];
+  const periodLabel = getPeriodLabel(weekId, language);
 
   const filterByQuery = (text: string) => {
     if (!searchQuery) return true;
@@ -268,7 +269,7 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
           <TrendingUp className="h-5 w-5 text-accent" />
           <h3 className="text-sm sm:text-base font-semibold text-foreground">{t("aiInvestments")}</h3>
           <Badge variant="secondary" className="ml-auto">
-            {t("week")} {weekNum}
+            {periodLabel}
           </Badge>
         </div>
         <p className="mt-0.5 sm:mt-1 text-xs sm:text-sm text-muted-foreground">
@@ -325,7 +326,7 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
         <div className="divide-y divide-border">
           {filteredPrimary.length === 0 && (
             <div className="px-4 py-12 text-center text-muted-foreground">
-              {language === "de" ? "Keine Daten für diese Woche verfügbar." : "No data available for this week."}
+              {t("noDataForThisPeriod")}
             </div>
           )}
           {filteredPrimary.map((post) => (
@@ -393,7 +394,7 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
           )}
           {filteredSecondary.length === 0 && (
             <div className="px-4 py-12 text-center text-muted-foreground">
-              {language === "de" ? "Keine Daten für diese Woche verfügbar." : "No data available for this week."}
+              {t("noDataForThisPeriod")}
             </div>
           )}
           {filteredSecondary.map((post) => (
@@ -470,7 +471,7 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
         <div className="divide-y divide-border">
           {filteredMa.length === 0 && (
             <div className="px-4 py-12 text-center text-muted-foreground">
-              {language === "de" ? "Keine Daten für diese Woche verfügbar." : "No data available for this week."}
+              {t("noDataForThisPeriod")}
             </div>
           )}
           {filteredMa.map((post) => (

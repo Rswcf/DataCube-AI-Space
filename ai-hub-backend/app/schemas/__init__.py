@@ -2,7 +2,7 @@
 Pydantic schemas for API request/response models.
 """
 
-from app.schemas.week import WeekResponse, WeeksResponse
+from app.schemas.week import WeekResponse, WeeksResponse, DayEntry
 from app.schemas.tech import TechPostResponse, TechFeedResponse
 from app.schemas.video import VideoResponse
 from app.schemas.investment import (
@@ -18,6 +18,7 @@ from app.schemas.common import Author, Metrics
 __all__ = [
     "Author",
     "Metrics",
+    "DayEntry",
     "WeekResponse",
     "WeeksResponse",
     "TechPostResponse",

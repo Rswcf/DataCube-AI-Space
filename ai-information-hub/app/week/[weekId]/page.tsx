@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { ArticleSchema, VideoSchema } from '@/components/structured-data'
+import { formatPeriodTitle } from '@/lib/period-utils'
 import type { TechPost, BilingualData, InvestmentData, TipPost, ImpactLevel } from '@/lib/types'
 
 // API base URL with production fallback
@@ -17,15 +18,13 @@ export type Props = {
 export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
   const { weekId } = await params
   const lang = (await searchParams)?.lang === 'en' ? 'en' : 'de'
-  const weekNum = weekId.replace(/^\d{4}-kw/, 'KW ')
+  const periodLabel = formatPeriodTitle(weekId, lang)
 
   return {
-    title: lang === 'de'
-      ? `AI News ${weekNum} | DataCube AI`
-      : `AI News Week ${weekNum.replace('KW ', '')} | DataCube AI`,
+    title: `AI News ${periodLabel} | DataCube AI`,
     description: lang === 'de'
-      ? `Wöchentliche KI-News: Technologie, Investment und Tipps - ${weekNum}`
-      : `Weekly AI News: Technology, Investment and Tips - Week ${weekNum.replace('KW ', '')}`,
+      ? `KI-News: Technologie, Investment und Tipps - ${periodLabel}`
+      : `AI News: Technology, Investment and Tips - ${periodLabel}`,
     alternates: {
       canonical: `https://www.datacubeai.space/week/${weekId}`,
       languages: {
@@ -34,8 +33,10 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
       },
     },
     openGraph: {
-      title: `AI News ${weekNum} | DataCube AI`,
-      description: `Curated AI news, investments, and tips for ${weekNum}`,
+      title: `AI News ${periodLabel} | DataCube AI`,
+      description: lang === 'de'
+        ? `Kuratierte KI-News, Investments und Tipps - ${periodLabel}`
+        : `Curated AI news, investments, and tips - ${periodLabel}`,
       url: `https://www.datacubeai.space/week/${weekId}`,
       type: 'article',
     },
@@ -77,7 +78,7 @@ function snippetFromContent(content: string, max = 100) {
 export default async function WeekPage({ params, searchParams }: Props) {
   const { weekId } = await params
   const lang = (await searchParams)?.lang === 'en' ? 'en' : 'de'
-  const weekNum = weekId.replace(/^\d{4}-kw/, 'KW ')
+  const periodLabel = formatPeriodTitle(weekId, lang)
 
   // Fetch the three feeds in parallel
   const [techRes, investmentRes, tipsRes] = await Promise.all([
@@ -125,7 +126,7 @@ export default async function WeekPage({ params, searchParams }: Props) {
     <article className="max-w-4xl mx-auto px-4 py-8">
       {/* Header */}
       <header className="mb-8">
-        <h1 className="text-3xl font-bold">AI News {weekNum}</h1>
+        <h1 className="text-3xl font-bold">AI News {periodLabel}</h1>
         <p className="mt-2 text-sm text-gray-600">
           {dateRange ? <span>{dateRange}</span> : null}
           {dateRange ? <span> • </span> : null}
@@ -330,4 +331,3 @@ export default async function WeekPage({ params, searchParams }: Props) {
     </article>
   )
 }
-

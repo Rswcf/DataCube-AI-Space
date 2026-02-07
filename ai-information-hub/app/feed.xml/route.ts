@@ -31,13 +31,13 @@ function escapeXml(str: string): string {
 export async function GET(request: NextRequest) {
   const lang = request.nextUrl.searchParams.get('lang') === 'en' ? 'en' : 'de';
 
-  // Fetch weeks to get the latest 2
+  // Fetch weeks to get the latest 7 periods
   let weekIds: string[] = [];
   try {
     const weeksRes = await fetch(`${API_BASE}/weeks`, { next: { revalidate: 3600 } });
     if (weeksRes.ok) {
       const data = await weeksRes.json();
-      weekIds = (data.weeks || []).slice(0, 2).map((w: Week) => w.id);
+      weekIds = (data.weeks || []).slice(0, 7).map((w: Week) => w.id);
     }
   } catch {}
 

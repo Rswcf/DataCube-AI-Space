@@ -9,7 +9,7 @@ from app.models import (
     Week, TechPost, Video, PrimaryMarketPost, SecondaryMarketPost, MAPost,
     TipPost, Trend, TeamMember,
 )
-from app.services.collector import week_date_range
+from app.services.period_utils import ensure_period
 
 logger = logging.getLogger(__name__)
 
@@ -35,20 +35,7 @@ def import_week_from_json(
     # Ensure week exists
     week = db.query(Week).filter(Week.id == week_id).first()
     if not week:
-        parts = week_id.split("-kw")
-        year = int(parts[0])
-        week_num = int(parts[1])
-
-        week = Week(
-            id=week_id,
-            label=f"KW {week_num:02d}",
-            year=year,
-            week_num=week_num,
-            date_range=week_date_range(year, week_num),
-            is_current=True,
-        )
-        db.add(week)
-        db.commit()
+        week = ensure_period(db, week_id, is_current=True)
 
     # Import tech data
     if tech_data:

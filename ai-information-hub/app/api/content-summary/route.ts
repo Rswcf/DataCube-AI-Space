@@ -77,10 +77,21 @@ export async function GET(request: NextRequest) {
   const investmentData = investmentRes?.ok ? await investmentRes.json() : null;
   const tipsData = tipsRes?.ok ? await tipsRes.json() : null;
 
-  const weekLabel = weekId.replace(/^\d{4}-kw/, 'KW ');
-  const title = lang === 'de'
-    ? `DataCube AI - KI-News ${weekLabel}`
-    : `DataCube AI - AI News Week ${weekLabel.replace('KW ', '')}`;
+  const isDayId = /^\d{4}-\d{2}-\d{2}$/.test(weekId);
+  let title: string;
+  if (isDayId) {
+    const [y, m, d] = weekId.split('-').map(Number);
+    const deLabel = `${String(d).padStart(2, '0')}.${String(m).padStart(2, '0')}.${y}`;
+    const enLabel = new Date(Date.UTC(y, m - 1, d)).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+    title = lang === 'de'
+      ? `DataCube AI - KI-News ${deLabel}`
+      : `DataCube AI - AI News ${enLabel}`;
+  } else {
+    const weekLabel = weekId.replace(/^\d{4}-kw/, 'KW ');
+    title = lang === 'de'
+      ? `DataCube AI - KI-News ${weekLabel}`
+      : `DataCube AI - AI News Week ${weekLabel.replace('KW ', '')}`;
+  }
 
   let md = `# ${title}\n\n`;
 
@@ -161,7 +172,7 @@ export async function GET(request: NextRequest) {
   }
 
   md += `---\n\n`;
-  md += `*Updated weekly. Visit [DataCube AI](https://www.datacubeai.space) for the interactive version.*\n`;
+  md += `*Updated daily. Visit [DataCube AI](https://www.datacubeai.space) for the interactive version.*\n`;
 
   return new Response(md, {
     headers: {
@@ -170,4 +181,3 @@ export async function GET(request: NextRequest) {
     },
   });
 }
-
