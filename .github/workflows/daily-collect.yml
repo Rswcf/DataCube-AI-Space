@@ -1,0 +1,40 @@
+name: Daily Collection
+
+on:
+  schedule:
+    # Every day at 22:00 UTC (23:00 CET / 00:00 CEST)
+    - cron: "0 22 * * *"
+  workflow_dispatch:
+    inputs:
+      period_id:
+        description: "Period ID (e.g. 2026-02-08 or 2026-kw06)"
+        required: false
+
+jobs:
+  collect:
+    name: Trigger daily collection
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger collection via API
+        run: |
+          PERIOD="${{ github.event.inputs.period_id }}"
+          URL="${{ secrets.API_BASE_URL }}/admin/collect"
+          if [ -n "$PERIOD" ]; then
+            URL="${URL}?period_id=${PERIOD}"
+          fi
+
+          echo "Triggering collection: $URL"
+
+          HTTP_CODE=$(curl -s -o response.json -w "%{http_code}" \
+            -X POST "$URL" \
+            -H "X-API-Key: ${{ secrets.ADMIN_API_KEY }}")
+
+          cat response.json
+          echo ""
+
+          if [ "$HTTP_CODE" -lt 200 ] || [ "$HTTP_CODE" -ge 300 ]; then
+            echo "ERROR: API returned HTTP $HTTP_CODE"
+            exit 1
+          fi
+
+          echo "Collection triggered successfully (HTTP $HTTP_CODE)"
