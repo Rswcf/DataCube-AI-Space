@@ -1,6 +1,6 @@
 # DataCube AI Space
 
-Bilingual (DE/EN) weekly AI news aggregator with YouTube video integration. Curates tech breakthroughs, investment news, practical tips, and videos from RSS feeds, Hacker News, and YouTube.
+Bilingual (DE/EN) daily + weekly AI news aggregator with YouTube video integration. Curates tech breakthroughs, investment news, practical tips, and videos from RSS feeds, Hacker News, and YouTube.
 
 ## Projects
 
@@ -15,7 +15,8 @@ Bilingual (DE/EN) weekly AI news aggregator with YouTube video integration. Cura
 - **Investment Tracking** - Primary funding, Secondary rounds, M&A deals
 - **Practical Tips** - Curated from Reddit communities and tech blogs
 - **Bilingual Content** - German and English summaries
-- **Chat Assistant** - Ask questions about the weekly AI news
+- **Daily + Weekly Mode** - Daily automated collection with weekly rollup view
+- **Chat Assistant** - Ask questions about the AI news
 
 ## Architecture
 

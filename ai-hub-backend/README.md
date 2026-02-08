@@ -1,17 +1,19 @@
 # AI Hub Backend
 
-FastAPI backend for the AI Information Hub - bilingual AI news aggregator with YouTube video integration.
+FastAPI backend for the AI Information Hub - bilingual daily + weekly AI news aggregator with YouTube video integration.
 
 ## Features
 
 - RESTful API for tech news, investment data, tips, trends
-- YouTube video integration (5 videos/week interspersed in tech feed)
+- **Daily + weekly collection modes** (daily: reduced output; weekly: full output)
+- YouTube video integration (interspersed in tech feed)
 - **Real-time stock data** via Polygon.io API (Secondary Market)
 - PostgreSQL database with SQLAlchemy ORM
 - 4-stage data collection pipeline
 - Two-model LLM approach (classifier + processor)
 - Tips sources bypass classification (Reddit, Simon Willison)
 - Bilingual content support (DE/EN)
+- Period ID support: daily `YYYY-MM-DD` or weekly `YYYY-kwWW`
 
 ## LLM Models
 
@@ -33,10 +35,10 @@ Stage 2: Classify articles
     • Other sources → LLM classification (tech/investment)
     ↓
 Stage 3: Parallel LLM processing
-    • Tech: 30 posts
-    • Investment: primary/secondary/M&A
-    • Tips: 15 per language
-    • Videos: 5 summaries
+    • Tech: 30 posts (weekly) / 10 posts (daily)
+    • Investment: primary/secondary/M&A — 7 each (weekly) / 5 total (daily)
+    • Tips: 15 per language (weekly) / 5 (daily)
+    • Videos: 5 summaries (weekly) / 2 (daily)
     ↓
 Stage 4: Save to PostgreSQL
 ```
@@ -92,12 +94,13 @@ This section provides a comprehensive overview of the entire data flow from sour
                                                       │
                                                       ▼
                                     ┌─────────────────────────────────────┐
-                                    │      ISO Week Boundary Filter       │
-                                    │   get_week_boundaries(week_id)      │
-                                    │   is_article_in_week()              │
+                                    │      Period Boundary Filter          │
+                                    │   get_period_boundaries(period_id)  │
+                                    │   is_article_in_period()            │
                                     ├─────────────────────────────────────┤
-                                    │ Example: Week 06 = 2026-02-02 ~     │
-                                    │          2026-02-08                 │
+                                    │ Weekly: Week 06 = 2026-02-02 ~      │
+                                    │         2026-02-08                  │
+                                    │ Daily:  2026-02-07 = single day     │
                                     │ Articles outside boundary filtered  │
                                     │ No-date articles: lenient (keep)    │
                                     └─────────────────┬───────────────────┘
@@ -297,7 +300,7 @@ This section provides a comprehensive overview of the entire data flow from sour
 └─────────────────┘   └─────────────────┘   └─────────────────┘   └─────────────────┘   └─────────────────┘
 ```
 
-### Data Volume Summary
+### Data Volume Summary (Weekly)
 
 | Stage | Input | Output |
 |-------|-------|--------|
@@ -306,6 +309,17 @@ This section provides a comprehensive overview of the entire data flow from sour
 | Stage 2 (Classify) | ~100 articles | tech ~20 + investment ~80 + tips ~10 |
 | Stage 3 (Process) | Classified articles | tech 30 + investment 21 + tips 15 + videos 5 (bilingual) |
 | Stage 4 (Save) | Processed content | 71 database records total |
+
+### Data Volume Summary (Daily)
+
+Daily collections use reduced output counts to match the smaller time window:
+
+| Section | Daily Output |
+|---------|-------------|
+| Tech | 10 posts |
+| Investment | 5 entries |
+| Tips | 5 tips |
+| Videos | 2 videos |
 
 ### Key Code Locations
 
@@ -319,7 +333,7 @@ This section provides a comprehensive overview of the entire data flow from sour
 | 4-stage pipeline | `collector.py` | 242-781 |
 | Video interspersion | `collector.py` | 210-239 |
 | HN fetching | `hn_fetcher.py` | 248-279 |
-| Week boundary filter | `collector.py` | 41-114 |
+| Period boundary filter | `collector.py` / `period_utils.py` | — |
 | Config settings | `config.py` | 31-37 |
 
 ### Importance Evaluation System
@@ -509,13 +523,13 @@ alembic downgrade -1
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/api/weeks` | GET | List all available weeks |
-| `/api/weeks/current` | GET | Get current week |
-| `/api/tech/{weekId}` | GET | Tech feed (with videos) |
-| `/api/investment/{weekId}` | GET | Investment feed |
-| `/api/tips/{weekId}` | GET | Tips feed (15 DE + 15 EN) |
-| `/api/trends/{weekId}` | GET | Trends feed |
-| `/api/videos/{weekId}` | GET | YouTube videos only |
+| `/api/weeks` | GET | List periods (weeks with nested days) |
+| `/api/weeks/current` | GET | Get current period |
+| `/api/tech/{periodId}` | GET | Tech feed (with videos) |
+| `/api/investment/{periodId}` | GET | Investment feed |
+| `/api/tips/{periodId}` | GET | Tips feed |
+| `/api/trends/{periodId}` | GET | Trends feed |
+| `/api/videos/{periodId}` | GET | YouTube videos only |
 | `/api/stock/{ticker}` | GET | Real-time stock data |
 | `/api/stock/batch/?tickers=...` | GET | Batch stock data |
 | `/api/stock/formatted/{ticker}` | GET | Pre-formatted stock data |
@@ -569,7 +583,12 @@ railway run python -m scripts.init_db --migrate-all
 ### Full Collection (All Stages)
 
 ```bash
-curl -X POST "https://api-production-3ee5.up.railway.app/api/admin/collect?week_id=2026-kw05" \
+# Daily (period_id = YYYY-MM-DD)
+curl -X POST "https://api-production-3ee5.up.railway.app/api/admin/collect?period_id=2026-02-07" \
+  -H "X-API-Key: $ADMIN_API_KEY"
+
+# Weekly (period_id = YYYY-kwWW)
+curl -X POST "https://api-production-3ee5.up.railway.app/api/admin/collect?period_id=2026-kw05" \
   -H "X-API-Key: $ADMIN_API_KEY"
 ```
 
@@ -578,14 +597,14 @@ curl -X POST "https://api-production-3ee5.up.railway.app/api/admin/collect?week_
 Useful when you want to re-run LLM processing without re-fetching data:
 
 ```bash
-curl -X POST "https://api-production-3ee5.up.railway.app/api/admin/collect/process?week_id=2026-kw05" \
+curl -X POST "https://api-production-3ee5.up.railway.app/api/admin/collect/process?period_id=2026-kw05" \
   -H "X-API-Key: $ADMIN_API_KEY"
 ```
 
 ### Fetch Only (No LLM Processing)
 
 ```bash
-curl -X POST "https://api-production-3ee5.up.railway.app/api/admin/collect/fetch?week_id=2026-kw05" \
+curl -X POST "https://api-production-3ee5.up.railway.app/api/admin/collect/fetch?period_id=2026-kw05" \
   -H "X-API-Key: $ADMIN_API_KEY"
 ```
 
@@ -664,7 +683,7 @@ M&A RSS Fetch → process_ma_articles() → ma_posts table
 
 Use M&A-only collection when you want to refresh M&A data without reprocessing tech/tips:
 ```bash
-curl -X POST ".../api/admin/collect/ma?week_id=2026-kw06" -H "X-API-Key: ..."
+curl -X POST ".../api/admin/collect/ma?period_id=2026-kw06" -H "X-API-Key: ..."
 ```
 
 ### AI Industry Taxonomy
@@ -691,7 +710,7 @@ M&A deals are classified into AI-specific industry categories:
 To reprocess only the M&A section without affecting other sections:
 
 ```bash
-curl -X POST "https://api-production-3ee5.up.railway.app/api/admin/collect/ma?week_id=2026-kw05" \
+curl -X POST "https://api-production-3ee5.up.railway.app/api/admin/collect/ma?period_id=2026-kw05" \
   -H "X-API-Key: $ADMIN_API_KEY"
 ```
 
@@ -715,6 +734,7 @@ ai-hub-backend/
 │   │   └── ...
 │   └── services/            # Business logic
 │       ├── collector.py     # 4-stage pipeline
+│       ├── period_utils.py  # Period ID utilities (daily/weekly)
 │       ├── rss_fetcher.py   # RSS feeds
 │       ├── hn_fetcher.py    # Hacker News
 │       ├── youtube_fetcher.py  # YouTube API
@@ -722,6 +742,8 @@ ai-hub-backend/
 │       └── migrator.py      # JSON migration
 ├── alembic/                 # DB migrations
 ├── scripts/                 # CLI scripts
+│   ├── daily_collect.py     # Daily cron script (Railway)
+│   └── weekly_collect.py    # Weekly collection script
 ├── Dockerfile
 ├── railway.toml
 └── requirements.txt

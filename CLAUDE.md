@@ -7,9 +7,27 @@ This repository contains multiple projects:
 
 ---
 
+## Documentation Guidelines
+
+When asked to "update documentation", this means **all** relevant documentation files across the entire repository — not just `CLAUDE.md`. Always check and update:
+
+| File | Purpose |
+|------|---------|
+| `CLAUDE.md` (root) | Root project instructions for AI assistants |
+| `ai-information-hub/CLAUDE.md` | Frontend-specific instructions |
+| `README.md` (root) | Project overview for humans |
+| `ai-information-hub/README.md` | Frontend README |
+| `ai-hub-backend/README.md` | Backend README with pipeline docs |
+| `.ai-collab/context/project-overview.md` | Shared AI collaboration context |
+| `.ai-collab/context/codebase-map.md` | Repository structure map |
+
+Keep all documentation in sync. When a feature changes (e.g., weekly → daily, new endpoints, new scripts), propagate the update to **every** file that references it.
+
+---
+
 ## AI Information Hub (Quick Reference)
 
-Bilingual (DE/EN) weekly AI news aggregator with **YouTube video integration**. Curates tech breakthroughs, investment news, practical tips, and videos from RSS feeds + Hacker News + YouTube.
+Bilingual (DE/EN) daily + weekly AI news aggregator with **YouTube video integration**. Curates tech breakthroughs, investment news, practical tips, and videos from RSS feeds + Hacker News + YouTube.
 
 **Stack**: Next.js 16 + React 19 + Tailwind CSS 4 + Shadcn/ui (Frontend) | FastAPI + PostgreSQL (Backend)
 
@@ -109,7 +127,7 @@ The backend uses a 4-stage pipeline:
 
 | Stage | Description |
 |-------|-------------|
-| **Stage 1** | Fetch raw data (RSS, HN, YouTube) + ISO week boundary filter |
+| **Stage 1** | Fetch raw data (RSS, HN, YouTube) + period boundary filter (daily or weekly) |
 | **Stage 2** | Classify articles (tips sources skip classification) |
 | **Stage 3** | Parallel LLM processing (tech, investment, tips, videos) |
 | **Stage 4** | Save to PostgreSQL |
@@ -140,18 +158,32 @@ uvicorn app.main:app --reload   # API docs: :8000/docs
 
 ### Data Collection
 ```bash
+# Daily collection (automated via Railway cron at 22:00 UTC)
+python -m scripts.daily_collect              # Collect today
+python -m scripts.daily_collect --date 2026-02-07  # Specific date
+
+# Weekly collection (full week at once)
+python -m scripts.weekly_collect             # Current week
+python -m scripts.weekly_collect --week 2026-kw05   # Specific week
+
 # Via API (set ADMIN_API_KEY env var or use Railway dashboard value)
-curl -X POST "https://api-production-3ee5.up.railway.app/api/admin/collect?week_id=2026-kw05" \
+curl -X POST "https://api-production-3ee5.up.railway.app/api/admin/collect?period_id=2026-02-07" \
   -H "X-API-Key: $ADMIN_API_KEY"
 
 # Process only (reuse raw data)
-curl -X POST "https://api-production-3ee5.up.railway.app/api/admin/collect/process?week_id=2026-kw05" \
+curl -X POST "https://api-production-3ee5.up.railway.app/api/admin/collect/process?period_id=2026-kw05" \
   -H "X-API-Key: $ADMIN_API_KEY"
 
 # M&A only (reprocess M&A without affecting other sections)
-curl -X POST "https://api-production-3ee5.up.railway.app/api/admin/collect/ma?week_id=2026-kw05" \
+curl -X POST "https://api-production-3ee5.up.railway.app/api/admin/collect/ma?period_id=2026-kw05" \
   -H "X-API-Key: $ADMIN_API_KEY"
 ```
+
+### Period ID Format
+- **Daily**: `YYYY-MM-DD` (e.g., `2026-02-07`)
+- **Weekly**: `YYYY-kwWW` (e.g., `2026-kw05`)
+
+Daily collections produce reduced output counts (10 tech, 5 tips, 5 investment, 2 videos) compared to weekly.
 
 ---
 
@@ -180,11 +212,11 @@ CORS_ORIGINS=["http://localhost:3000","https://www.datacubeai.space","https://ai
 
 | Endpoint | Description |
 |----------|-------------|
-| `GET /api/weeks` | List weeks |
-| `GET /api/tech/{weekId}` | Tech + videos |
-| `GET /api/investment/{weekId}` | Investment |
-| `GET /api/tips/{weekId}` | Tips (15 DE + 15 EN) |
-| `GET /api/videos/{weekId}` | Videos only |
+| `GET /api/weeks` | List periods (weeks with nested days) |
+| `GET /api/tech/{periodId}` | Tech + videos |
+| `GET /api/investment/{periodId}` | Investment |
+| `GET /api/tips/{periodId}` | Tips |
+| `GET /api/videos/{periodId}` | Videos only |
 | `GET /api/stock/{ticker}` | Real-time stock data (Polygon.io) |
 | `GET /api/stock/batch/?tickers=AAPL,NVDA` | Batch stock data |
 | `GET /api/stock/formatted/{ticker}?language=en` | Pre-formatted stock data |

@@ -1,8 +1,8 @@
 # DataCube AI Information Hub
 
-Bilingual (DE/EN) weekly AI news aggregator for internal teams — curates tech breakthroughs, investment news, practical tips, and **YouTube videos** from RSS feeds + Hacker News + YouTube. Built with Next.js 16 + React 19 + Tailwind CSS 4 + Shadcn/ui, deployed on Vercel.
+Bilingual (DE/EN) daily + weekly AI news aggregator for internal teams — curates tech breakthroughs, investment news, practical tips, and **YouTube videos** from RSS feeds + Hacker News + YouTube. Built with Next.js 16 + React 19 + Tailwind CSS 4 + Shadcn/ui, deployed on Vercel.
 
-**Status**: Core app complete with Railway backend integration. Supports 3 feed types + YouTube videos, bilingual, week navigation, dark/light theme. **No authentication required**.
+**Status**: Core app complete with Railway backend integration. Supports 3 feed types + YouTube videos, bilingual, daily + weekly navigation, dark/light theme. **No authentication required**.
 
 ---
 
@@ -14,6 +14,7 @@ Bilingual (DE/EN) weekly AI news aggregator for internal teams — curates tech 
 |------|---------|
 | `lib/types.ts` | All TypeScript interfaces (includes video fields) |
 | `lib/api.ts` | API client with static JSON fallback |
+| `lib/period-utils.ts` | Period ID utilities (daily/weekly detection, labels) |
 | `lib/settings-context.tsx` | Theme + language state, `t()` translation function |
 | `components/feeds/tech-feed.tsx` | Reference implementation (API + video support) |
 | `components/video-embed.tsx` | YouTube embed component (uses `next/image`) |
@@ -33,7 +34,7 @@ Bilingual (DE/EN) weekly AI news aggregator for internal teams — curates tech 
 - SSR page (`/week/[weekId]`) is a **Server Component** — full HTML for crawlers
 - Data loading: API first (`NEXT_PUBLIC_API_URL`), fallback to static JSON
 - Translation: `const { t } = useSettings(); t("keyName")`
-- Week ID format: `YYYY-kwWW` (e.g., `2026-kw05`)
+- Period ID format: weekly `YYYY-kwWW` (e.g., `2026-kw05`) or daily `YYYY-MM-DD` (e.g., `2026-02-07`)
 - **Login gate** — first-time visitors see welcome page; crawlers bypass via UA detection
 
 ---
@@ -54,7 +55,7 @@ Bilingual (DE/EN) weekly AI news aggregator for internal teams — curates tech 
 │    • Classifier: glm-4.5-air:free                        │
 │    • Processor: deepseek-v3.2                            │
 │       ↓                                                  │
-│  REST API: /api/tech/{weekId}, /api/tips/{weekId}...     │
+│  REST API: /api/tech/{periodId}, /api/tips/{periodId}... │
 │                                                          │
 └──────────────────────────────────────────────────────────┘
 
@@ -77,11 +78,11 @@ Bilingual (DE/EN) weekly AI news aggregator for internal teams — curates tech 
 
 ### Content Distribution
 
-| Section | Source | Per Week |
-|---------|--------|----------|
-| **Tech** | HN + RSS | ~20-25 posts + 5 videos |
-| **Investment** | RSS feeds | Primary/Secondary/M&A |
-| **Tips** | Reddit + Simon Willison | 10 DE + 10 EN |
+| Section | Source | Per Week | Per Day |
+|---------|--------|----------|---------|
+| **Tech** | HN + RSS | ~20-25 posts + 5 videos | 10 posts + 2 videos |
+| **Investment** | RSS feeds | Primary/Secondary/M&A | 5 entries |
+| **Tips** | Reddit + Simon Willison | 10 DE + 10 EN | 5 tips |
 
 ---
 
@@ -137,7 +138,8 @@ ai-hub-backend/               # Backend (FastAPI)
 ├── alembic/                  # DB migrations
 ├── scripts/
 │   ├── init_db.py            # Database setup
-│   └── weekly_collect.py     # Cron script
+│   ├── daily_collect.py      # Daily cron script
+│   └── weekly_collect.py     # Weekly collection script
 ├── Dockerfile
 ├── railway.toml
 └── requirements.txt
@@ -185,13 +187,13 @@ Stage 4: Save to PostgreSQL (videos interspersed at positions 3,8,13,18,23)
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/api/weeks` | GET | List all weeks |
-| `/api/weeks/current` | GET | Current week |
-| `/api/tech/{weekId}` | GET | Tech feed (with videos) |
-| `/api/investment/{weekId}` | GET | Investment feed |
-| `/api/tips/{weekId}` | GET | Tips feed (10 DE + 10 EN) |
-| `/api/trends/{weekId}` | GET | Trends |
-| `/api/videos/{weekId}` | GET | Videos only |
+| `/api/weeks` | GET | List periods (weeks with nested days) |
+| `/api/weeks/current` | GET | Current period |
+| `/api/tech/{periodId}` | GET | Tech feed (with videos) |
+| `/api/investment/{periodId}` | GET | Investment feed |
+| `/api/tips/{periodId}` | GET | Tips feed |
+| `/api/trends/{periodId}` | GET | Trends |
+| `/api/videos/{periodId}` | GET | Videos only |
 | `/api/admin/collect` | POST | Full collection (requires API key) |
 | `/api/admin/collect/fetch` | POST | Stage 1 only |
 | `/api/admin/collect/process` | POST | Stages 2-4 only |
@@ -223,11 +225,11 @@ uvicorn app.main:app --reload   # http://localhost:8000/docs
 ### Data Collection
 ```bash
 # Full collection
-curl -X POST "https://api-production-3ee5.up.railway.app/api/admin/collect?week_id=2026-kw05" \
+curl -X POST "https://api-production-3ee5.up.railway.app/api/admin/collect?period_id=2026-02-07" \
   -H "X-API-Key: $ADMIN_API_KEY"
 
 # Process only (reuse existing raw data)
-curl -X POST "https://api-production-3ee5.up.railway.app/api/admin/collect/process?week_id=2026-kw05" \
+curl -X POST "https://api-production-3ee5.up.railway.app/api/admin/collect/process?period_id=2026-kw05" \
   -H "X-API-Key: $ADMIN_API_KEY"
 ```
 

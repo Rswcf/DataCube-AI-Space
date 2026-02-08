@@ -1,6 +1,6 @@
 # DataCube AI Information Hub
 
-Bilingual (DE/EN) weekly AI news aggregator with YouTube video integration. See [CLAUDE.md](./CLAUDE.md) for full documentation.
+Bilingual (DE/EN) daily + weekly AI news aggregator with YouTube video integration. See [CLAUDE.md](./CLAUDE.md) for full documentation.
 
 **Live**: https://www.datacubeai.space (no login required)
 
@@ -25,7 +25,8 @@ vercel --prod
 ## Features
 
 - 3 feed types: Tech, Investment, Tips
-- YouTube video integration (5 videos/week)
+- YouTube video integration
+- Daily + weekly collection modes (daily: 10 tech, 5 tips, 5 investment, 2 videos)
 - Bilingual content (DE/EN)
 - Dark/light theme
 - AI chat assistant
