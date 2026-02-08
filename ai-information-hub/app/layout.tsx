@@ -12,11 +12,11 @@ const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono"
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.datacubeai.space'),
   title: {
-    default: 'DataCube AI | Weekly AI News & Insights',
+    default: 'DataCube AI | Daily AI News & Insights',
     template: '%s | DataCube AI',
   },
-  description: 'Bilingual (DE/EN) weekly AI news aggregator. Tech breakthroughs, investment news, practical tips, and curated YouTube videos.',
-  keywords: ['AI news', 'artificial intelligence', 'machine learning', 'AI investment', 'AI tips', 'KI Nachrichten', 'weekly AI digest', 'AI trends', 'tech news'],
+  description: 'Bilingual (DE/EN) daily AI news aggregator. Tech breakthroughs, investment news, practical tips, and curated YouTube videos.',
+  keywords: ['AI news', 'artificial intelligence', 'machine learning', 'AI investment', 'AI tips', 'KI Nachrichten', 'daily AI digest', 'AI trends', 'tech news'],
   authors: [{ name: 'DataCube Team' }],
   creator: 'DataCube AI',
   publisher: 'DataCube AI',
@@ -46,15 +46,15 @@ export const metadata: Metadata = {
     alternateLocale: 'de_DE',
     url: 'https://www.datacubeai.space',
     siteName: 'DataCube AI',
-    title: 'DataCube AI | Weekly AI News & Insights',
-    description: 'Curated AI news, investment updates, and practical tips - updated weekly in German and English.',
+    title: 'DataCube AI | Daily AI News & Insights',
+    description: 'Curated AI news, investment updates, and practical tips - updated daily in German and English.',
   },
 
   // Twitter - uses dynamic opengraph-image.tsx
   twitter: {
     card: 'summary_large_image',
-    title: 'DataCube AI | Weekly AI News',
-    description: 'Your weekly dose of AI news, investments, and tips.',
+    title: 'DataCube AI | Daily AI News',
+    description: 'Your daily dose of AI news, investments, and tips.',
   },
 
   // Robots

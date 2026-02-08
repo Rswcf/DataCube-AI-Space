@@ -26,7 +26,7 @@ export const translations = {
     
     // Tech Feed
     aiTechProgress: "KI-Technologie Fortschritte",
-    importantDevThisWeek: "Die wichtigsten technischen Entwicklungen dieser Woche",
+    importantDevThisWeek: "Die wichtigsten technischen Entwicklungen",
     impact: "Auswirkung",
     source: "Quelle",
     
@@ -161,7 +161,7 @@ export const translations = {
     
     // Tech Feed
     aiTechProgress: "AI Technology Progress",
-    importantDevThisWeek: "The most important technical developments this week",
+    importantDevThisWeek: "The most important technical developments",
     impact: "Impact",
     source: "Source",
     

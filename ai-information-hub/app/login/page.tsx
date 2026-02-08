@@ -20,14 +20,14 @@ const translations = {
     title1: "Data Cube",
     title2: "AI Hub",
     tagline:
-      "Ihr intelligentes Gateway zu kuratierten KI-Nachrichten, Investment-Insights und praktischen Tipps – wöchentlich von KI analysiert.",
+      "Ihr intelligentes Gateway zu kuratierten KI-Nachrichten, Investment-Insights und praktischen Tipps – täglich von KI analysiert und kuratiert.",
     features: [
       "Tech-Durchbrüche",
       "Investment-News",
       "Praktische Tipps",
       "KI-Videos",
     ],
-    aiPipeline: "40+ Quellen wöchentlich",
+    aiPipeline: "40+ Quellen täglich",
     aiProcess: "KI-kuratiert zu den wichtigsten Insights",
     sourceCategories: [
       "MIT Tech Review",
@@ -47,14 +47,14 @@ const translations = {
     title1: "Data Cube",
     title2: "AI Hub",
     tagline:
-      "Your intelligent gateway to curated AI news, investment insights, and practical tips – analyzed weekly by AI.",
+      "Your intelligent gateway to curated AI news, investment insights, and practical tips – analyzed daily by AI.",
     features: [
       "Tech Breakthroughs",
       "Investment News",
       "Practical Tips",
       "AI Videos",
     ],
-    aiPipeline: "40+ sources weekly",
+    aiPipeline: "40+ sources daily",
     aiProcess: "AI-curated to key insights",
     sourceCategories: [
       "MIT Tech Review",

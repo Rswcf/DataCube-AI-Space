@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """
-Weekly data collection script.
+Data collection script (weekly mode).
 
-This script is called by Railway cron to collect weekly data.
+Legacy script for collecting a full week of data at once.
+For daily collection (used by Railway cron), see daily_collect.py.
 
 Usage:
     python -m scripts.weekly_collect
@@ -29,7 +30,7 @@ logger = logging.getLogger(__name__)
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Weekly data collection")
+    parser = argparse.ArgumentParser(description="Data collection (weekly mode)")
     parser.add_argument(
         "--week",
         type=str,
@@ -38,7 +39,7 @@ def main():
     )
     args = parser.parse_args()
 
-    logger.info("Starting weekly collection...")
+    logger.info("Starting collection (weekly mode)...")
 
     db = SessionLocal()
     try:

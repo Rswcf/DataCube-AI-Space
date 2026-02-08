@@ -1,12 +1,12 @@
 # DataCube AI
 
-> Bilingual (German/English) weekly AI news aggregator curating tech breakthroughs,
+> Bilingual (German/English) daily AI news aggregator curating tech breakthroughs,
 > investment news, practical tips, and YouTube videos from 40+ sources.
 
 ## Content Sections
 
 ### Technology Feed
-Weekly curated AI technology news (20-25 posts per week). Each post includes
+Daily curated AI technology news (10-25 posts per day). Each post includes
 impact level, category, source attribution, and bilingual content.
 
 ### Investment Feed
@@ -16,24 +16,24 @@ impact level, category, source attribution, and bilingual content.
 
 ### Tips Feed
 Practical AI tips from Reddit communities and expert blogs.
-15 tips per language per week.
+5-15 tips per language per day.
 
 ### Video Feed
-5 curated YouTube videos about AI developments per week.
+2-5 curated YouTube videos about AI developments per day.
 
 ## Public API
 Base URL: https://api-production-3ee5.up.railway.app/api
 
-- GET /api/weeks — List all available weeks
-- GET /api/tech/{weekId} — Technology feed (bilingual JSON)
-- GET /api/investment/{weekId} — Investment feed (bilingual JSON)
-- GET /api/tips/{weekId} — Tips feed (bilingual JSON)
-- GET /api/videos/{weekId} — Video summaries
+- GET /api/weeks — List all available periods (weeks and days)
+- GET /api/tech/{periodId} — Technology feed (bilingual JSON)
+- GET /api/investment/{periodId} — Investment feed (bilingual JSON)
+- GET /api/tips/{periodId} — Tips feed (bilingual JSON)
+- GET /api/videos/{periodId} — Video summaries
 
-Week ID format: YYYY-kwWW (e.g., 2026-kw06)
+Period ID format: YYYY-kwWW (weekly) or YYYY-MM-DD (daily)
 
-## Weekly Pages
-Each week has a dedicated page at /week/{weekId} with full HTML content.
+## Period Pages
+Each period has a dedicated page at /week/{periodId} with full HTML content.
 Example: https://www.datacubeai.space/week/2026-kw06
 
 ## Languages

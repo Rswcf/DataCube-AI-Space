@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
     } catch {}
   }
 
-  const feedTitle = lang === 'de' ? 'DataCube AI - Wöchentliche KI-News' : 'DataCube AI - Weekly AI News';
+  const feedTitle = lang === 'de' ? 'DataCube AI - Tägliche KI-News' : 'DataCube AI - Daily AI News';
   const feedSubtitle = lang === 'de'
     ? 'Kuratierte KI-Nachrichten: Technologie, Investment und Tipps'
     : 'Curated AI news: Technology, Investment, and Tips';

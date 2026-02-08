@@ -125,7 +125,7 @@ class LLMProcessor:
             )
         articles_text = "\n\n".join(article_entries)
 
-        prompt = f"""You are an AI news classifier for a bilingual (German/English) weekly newsletter.
+        prompt = f"""You are an AI news classifier for a bilingual (German/English) AI newsletter.
 
 Your task: classify each article into EXACTLY ONE section.
 

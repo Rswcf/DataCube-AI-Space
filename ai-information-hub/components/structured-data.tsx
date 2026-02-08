@@ -7,7 +7,7 @@ export function OrganizationSchema() {
     name: 'DataCube AI',
     url: 'https://www.datacubeai.space',
     logo: 'https://www.datacubeai.space/icon.svg',
-    description: 'Bilingual AI news aggregator providing weekly tech, investment, and tips content.',
+    description: 'Bilingual AI news aggregator providing daily tech, investment, and tips content.',
     foundingDate: '2026-01',
     publishingPrinciples: 'https://www.datacubeai.space/impressum',
     sameAs: [],
@@ -28,7 +28,7 @@ export function WebsiteSchema() {
     name: 'DataCube AI',
     url: 'https://www.datacubeai.space',
     inLanguage: ['en', 'de'],
-    description: 'Weekly AI news aggregator with tech breakthroughs, investment news, and practical tips.',
+    description: 'Daily AI news aggregator with tech breakthroughs, investment news, and practical tips.',
     potentialAction: {
       '@type': 'SearchAction',
       target: 'https://www.datacubeai.space/?search={search_term_string}',
@@ -116,7 +116,7 @@ export function FAQSchema() {
         name: 'What is DataCube AI?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'DataCube AI is a bilingual (German/English) weekly AI news aggregator that curates tech breakthroughs, investment news, practical tips, and YouTube videos from RSS feeds, Hacker News, and YouTube.',
+          text: 'DataCube AI is a bilingual (German/English) daily AI news aggregator that curates tech breakthroughs, investment news, practical tips, and YouTube videos from RSS feeds, Hacker News, and YouTube.',
         },
       },
       {
@@ -124,7 +124,7 @@ export function FAQSchema() {
         name: 'How often is the content updated?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Content is updated weekly, with new tech posts, investment news, and tips curated every week.',
+          text: 'Content is updated daily, with new tech posts, investment news, and tips curated every day.',
         },
       },
       {

@@ -1,7 +1,7 @@
 import { ImageResponse } from 'next/og'
 
 export const runtime = 'edge'
-export const alt = 'DataCube AI - Weekly AI Intelligence'
+export const alt = 'DataCube AI - Daily AI Intelligence'
 export const size = {
   width: 1200,
   height: 630,
@@ -70,7 +70,7 @@ export default async function Image() {
             marginBottom: 40,
           }}
         >
-          Weekly AI Intelligence
+          Daily AI Intelligence
         </div>
 
         {/* Features */}

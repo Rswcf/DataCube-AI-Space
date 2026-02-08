@@ -187,7 +187,7 @@ This section provides a comprehensive overview of the entire data flow from sour
 │                 │   │ articles        │   │                 │   │                 │   │ results         │
 │ LLM Prompt:     │   │ LLM Prompt:     │   │ LLM Prompt:     │   │ LLM Prompt:     │   │ LLM Prompt:     │
 │ "Select 30 most │   │ "Categorize to  │   │ "Extract 15     │   │ "Select 5 most  │   │ "Generate 10    │
-│  important"     │   │  3 categories   │   │  practical      │   │  valuable"      │   │  weekly trends" │
+│  important"     │   │  3 categories   │   │  practical      │   │  valuable"      │   │  trends"        │
 │                 │   │  max 7 each"    │   │  tips"          │   │                 │   │                 │
 ├─────────────────┤   ├─────────────────┤   ├─────────────────┤   ├─────────────────┤   ├─────────────────┤
 │ Output:         │   │ Output:         │   │ Output:         │   │ Output:         │   │ Output:         │
@@ -592,6 +592,11 @@ curl -X POST "https://api-production-3ee5.up.railway.app/api/admin/collect/fetch
 ### Local Collection
 
 ```bash
+# Daily collection (default: today)
+python -m scripts.daily_collect
+python -m scripts.daily_collect --date 2026-02-07
+
+# Weekly collection (full week at once)
 python -m scripts.weekly_collect
 python -m scripts.weekly_collect --week 2026-kw05
 ```
