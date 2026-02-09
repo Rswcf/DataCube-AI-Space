@@ -25,6 +25,20 @@ def verify_api_key(x_api_key: str = Header(...)):
     return True
 
 
+def _resolve_period_id(week_id: Optional[str], period_id: Optional[str]) -> Optional[str]:
+    """
+    Resolve period query parameters.
+
+    Supports both `week_id` (new) and `period_id` (backward compatibility).
+    """
+    if week_id and period_id and week_id != period_id:
+        raise HTTPException(
+            status_code=400,
+            detail="Conflicting query params: week_id and period_id must match",
+        )
+    return week_id or period_id
+
+
 def _run_collection_with_new_session(week_id: Optional[str] = None):
     """Background task wrapper that creates its own database session."""
     from app.services.collector import run_collection
@@ -87,6 +101,9 @@ async def delete_period(
 async def trigger_collection(
     background_tasks: BackgroundTasks,
     week_id: Optional[str] = None,
+    period_id: Optional[str] = None,
+    wait: bool = False,
+    db: Session = Depends(get_db),
     _: bool = Depends(verify_api_key),
 ):
     """
@@ -100,12 +117,29 @@ async def trigger_collection(
 
     Requires X-API-Key header.
     """
+    resolved_period = _resolve_period_id(week_id, period_id)
+
+    if wait:
+        from app.services.collector import run_collection
+
+        try:
+            run_collection(db, resolved_period)
+        except Exception as e:
+            logger.error(f"Synchronous collection failed: {e}")
+            raise HTTPException(status_code=500, detail=f"Collection failed: {str(e)}")
+
+        return {
+            "status": "completed",
+            "week_id": resolved_period or "current",
+            "message": "Full collection completed",
+        }
+
     # Run collection in background with its own session
-    background_tasks.add_task(_run_collection_with_new_session, week_id)
+    background_tasks.add_task(_run_collection_with_new_session, resolved_period)
 
     return {
         "status": "started",
-        "week_id": week_id or "current",
+        "week_id": resolved_period or "current",
         "message": "Full collection started in background (fetch + process)",
     }
 
@@ -114,6 +148,7 @@ async def trigger_collection(
 async def trigger_ma_collection(
     background_tasks: BackgroundTasks,
     week_id: Optional[str] = None,
+    period_id: Optional[str] = None,
     _: bool = Depends(verify_api_key),
 ):
     """
@@ -122,11 +157,12 @@ async def trigger_ma_collection(
     Only fetches M&A sources and updates M&A posts, leaving other sections untouched.
     Requires X-API-Key header.
     """
-    background_tasks.add_task(_run_ma_collection_with_new_session, week_id)
+    resolved_period = _resolve_period_id(week_id, period_id)
+    background_tasks.add_task(_run_ma_collection_with_new_session, resolved_period)
 
     return {
         "status": "started",
-        "week_id": week_id or "current",
+        "week_id": resolved_period or "current",
         "message": "M&A collection started in background",
     }
 
@@ -151,6 +187,7 @@ def _run_fetch_only_with_new_session(week_id: Optional[str] = None):
 async def trigger_fetch_only(
     background_tasks: BackgroundTasks,
     week_id: Optional[str] = None,
+    period_id: Optional[str] = None,
     _: bool = Depends(verify_api_key),
 ):
     """
@@ -161,12 +198,14 @@ async def trigger_fetch_only(
 
     Requires X-API-Key header.
     """
+    resolved_period = _resolve_period_id(week_id, period_id)
+
     # Run fetch in background with its own session
-    background_tasks.add_task(_run_fetch_only_with_new_session, week_id)
+    background_tasks.add_task(_run_fetch_only_with_new_session, resolved_period)
 
     return {
         "status": "started",
-        "week_id": week_id or "current",
+        "week_id": resolved_period or "current",
         "message": "Fetch-only started in background (Stage 1)",
     }
 
@@ -191,6 +230,7 @@ def _run_process_only_with_new_session(week_id: Optional[str] = None):
 async def trigger_process_only(
     background_tasks: BackgroundTasks,
     week_id: Optional[str] = None,
+    period_id: Optional[str] = None,
     _: bool = Depends(verify_api_key),
 ):
     """
@@ -201,12 +241,14 @@ async def trigger_process_only(
 
     Requires X-API-Key header.
     """
+    resolved_period = _resolve_period_id(week_id, period_id)
+
     # Run processing in background with its own session
-    background_tasks.add_task(_run_process_only_with_new_session, week_id)
+    background_tasks.add_task(_run_process_only_with_new_session, resolved_period)
 
     return {
         "status": "started",
-        "week_id": week_id or "current",
+        "week_id": resolved_period or "current",
         "message": "Process-only started in background (Stages 2-4)",
     }
 

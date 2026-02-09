@@ -4,9 +4,11 @@ Shared utilities for period ID handling (weekly and daily).
 
 import re
 from datetime import datetime, timedelta, date as date_type
+from zoneinfo import ZoneInfo
 
 from sqlalchemy.orm import Session
 
+from app.config import get_settings
 from app.models import Week
 
 
@@ -17,12 +19,14 @@ def is_daily_id(period_id: str) -> bool:
 
 def current_day_id() -> str:
     """Return today's date as 'YYYY-MM-DD'."""
-    return datetime.now().strftime("%Y-%m-%d")
+    settings = get_settings()
+    return datetime.now(ZoneInfo(settings.app_timezone)).strftime("%Y-%m-%d")
 
 
 def current_week_id() -> str:
     """Return the current ISO week as '2025-kw04' format."""
-    now = datetime.now()
+    settings = get_settings()
+    now = datetime.now(ZoneInfo(settings.app_timezone))
     year, week, _ = now.isocalendar()
     return f"{year}-kw{week:02d}"
 

@@ -19,6 +19,7 @@ class Settings(BaseSettings):
 
     # Admin
     admin_api_key: str = ""
+    app_timezone: str = "Europe/Berlin"
 
     # CORS
     cors_origins: list[str] = [

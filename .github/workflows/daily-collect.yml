@@ -2,8 +2,9 @@ name: Daily Collection
 
 on:
   schedule:
-    # Every day at 22:00 UTC (23:00 CET / 00:00 CEST)
-    - cron: "0 22 * * *"
+    # Fire at both possible UTC slots, then gate in script to Berlin 23:xx.
+    - cron: "7 21 * * *"
+    - cron: "7 22 * * *"
   workflow_dispatch:
     inputs:
       period_id:
@@ -17,17 +18,26 @@ jobs:
     steps:
       - name: Trigger collection via API
         run: |
-          PERIOD="${{ github.event.inputs.period_id }}"
-          URL="${{ secrets.API_BASE_URL }}/admin/collect"
-          if [ -n "$PERIOD" ]; then
-            URL="${URL}?period_id=${PERIOD}"
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            BERLIN_HOUR=$(TZ=Europe/Berlin date +%H)
+            if [ "$BERLIN_HOUR" != "23" ]; then
+              echo "Skip: now is not 23:xx in Europe/Berlin (hour=$BERLIN_HOUR)"
+              exit 0
+            fi
           fi
 
-          echo "Triggering collection: $URL"
+          PERIOD="${{ github.event.inputs.period_id }}"
+          if [ -z "$PERIOD" ]; then
+            PERIOD=$(TZ=Europe/Berlin date +%F)
+          fi
 
-          HTTP_CODE=$(curl -s -o response.json -w "%{http_code}" \
+          URL="${{ secrets.API_BASE_URL }}/admin/collect?week_id=${PERIOD}&wait=true"
+          echo "Triggering synchronous collection: $URL"
+
+          HTTP_CODE=$(curl -sS -o response.json -w "%{http_code}" \
             -X POST "$URL" \
-            -H "X-API-Key: ${{ secrets.ADMIN_API_KEY }}")
+            -H "X-API-Key: ${{ secrets.ADMIN_API_KEY }}" \
+            --max-time 7200)
 
           cat response.json
           echo ""
