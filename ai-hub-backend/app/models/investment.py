@@ -87,8 +87,8 @@ class MAPost(Base):
     # Deal info
     acquirer: Mapped[str] = mapped_column(String(200))
     target: Mapped[str] = mapped_column(String(200))
-    deal_value_de: Mapped[str | None] = mapped_column(String(50), nullable=True)
-    deal_value_en: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    deal_value_de: Mapped[str | None] = mapped_column(Text, nullable=True)
+    deal_value_en: Mapped[str | None] = mapped_column(Text, nullable=True)
     deal_type_de: Mapped[str] = mapped_column(String(50))  # "Akquisition"
     deal_type_en: Mapped[str] = mapped_column(String(50))  # "Acquisition"
     # Industry category for filtering: Healthcare, FinTech, Enterprise, Consumer, Other
