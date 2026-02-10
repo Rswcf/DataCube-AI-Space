@@ -165,7 +165,7 @@ DATA:
 ${context}`;
 
     const result = streamText({
-      model: openrouter.chat("openrouter/pony-alpha"),
+      model: openrouter.chat("openrouter/aurora-alpha"),
       system: systemPrompt,
       messages: [
         {
