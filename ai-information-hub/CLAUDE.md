@@ -352,7 +352,7 @@ The frontend uses a distinctive visual identity with section-specific theming:
 - **Card entrance**: Staggered `animate-fade-up` with 50ms delay per card (max 10)
 - **Loading skeletons**: Shimmer effect via `animate-shimmer` class (replaces `animate-pulse` everywhere)
 - **Impact borders**: Tech cards have left borders colored by impact level (critical=red, high=orange, medium=blue)
-- **Trend rankings**: Right sidebar shows numbered (1-10) rankings with large semi-transparent index numbers
+- **Trend rankings**: Right sidebar shows numbered (1-10) rankings with large semi-transparent index numbers; clicking a trend filters the feed in the SPA (crawlers still follow the `href` to the topic page for SEO)
 - **Mobile nav**: Active tab has scale animation + colored dot indicator
 - **Ambient gradient**: Subtle brand color wash (`from-primary/[0.02]`) at top of main app for login→app visual continuity
 - **Sidebar**: Active nav items have `border-l-[3px]` indicator; combined `transition-[color,background-color,border-color,transform]` for smooth animations; logo uses `from-primary to-accent` gradient
@@ -364,5 +364,5 @@ The frontend uses a distinctive visual identity with section-specific theming:
 - **Layout template**: `%s | DataCube AI` — child pages should NOT include "| DataCube AI" in their title
 - **Homepage**: Uses `title: { absolute: '...' }` to bypass template (includes brand in title itself)
 - **Week pages**: Localized titles — `KI-News KW 06` (DE) / `AI News KW 06` (EN)
-- **Topic pages**: Language-specific slugs — `/de/topic/nvidia-trainiert-roboter` vs `/en/topic/nvidia-trains-robots`
+- **Topic pages**: Language-specific slugs — `/de/topic/nvidia-trainiert-roboter` vs `/en/topic/nvidia-trains-robots` (SSR for crawlers only; human users filter in-SPA via trend click)
 - **Sitemap**: No parameterized URLs (`?section=`, `?period=`), no `feed.xml`, top 30 topics per language
