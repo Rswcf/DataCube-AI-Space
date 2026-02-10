@@ -64,7 +64,7 @@ Bilingual (DE/EN) daily + weekly AI news aggregator with **YouTube video integra
 │  SPA (main page):                                        │
 │    • Feed components (tech, investment, tips)             │
 │    • Chat widget (week context for LLM)                  │
-│    • Chat Assistant: glm-4.5-air:free                    │
+│    • Chat Assistant: openrouter/aurora-alpha              │
 │       ↓                                                  │
 │  SSR pages (SEO/GEO):                                    │
 │    • /week/[weekId] — full HTML + JSON-LD structured data│
@@ -88,7 +88,7 @@ DataCube_AI_Space/
 ├── ai-information-hub/       # Frontend (Next.js)
 │   ├── app/                  # Pages + API routes
 │   │   ├── api/
-│   │   │   ├── chat/         # Chat assistant (glm-4.5-air:free)
+│   │   │   ├── chat/         # Chat assistant (aurora-alpha)
 │   │   │   └── content-summary/  # Markdown summary API (GEO)
 │   │   ├── [lang]/            # Localized routes (DE/EN)
 │   │   │   ├── page.tsx       # Localized homepage (meta tags per language)
@@ -248,7 +248,7 @@ CORS_ORIGINS=["http://localhost:3000","https://www.datacubeai.space","https://ai
 |---------|-------|----------|
 | Classification | `z-ai/glm-4.5-air:free` | OpenRouter (free) |
 | Content Processing | `deepseek/deepseek-v3.2` | OpenRouter |
-| Chat Assistant | `z-ai/glm-4.5-air:free` | OpenRouter (free) |
+| Chat Assistant | `openrouter/aurora-alpha` | OpenRouter |
 
 ---
 

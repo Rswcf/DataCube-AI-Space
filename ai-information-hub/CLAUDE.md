@@ -20,7 +20,7 @@ Bilingual (DE/EN) daily + weekly AI news aggregator for internal teams — curat
 | `components/video-embed.tsx` | YouTube embed component (uses `next/image`) |
 | `components/structured-data.tsx` | JSON-LD schemas (NewsArticle, Video, NewsMediaOrganization, FAQ, Breadcrumb) |
 | `components/chat-widget.tsx` | Chat UI + API-first week data fetching |
-| `app/api/chat/route.ts` | Chat assistant API (uses glm-4.5-air:free) |
+| `app/api/chat/route.ts` | Chat assistant API (uses aurora-alpha) |
 | `app/week/[weekId]/page.tsx` | SSR week page (Server Component, SEO) |
 | `app/feed.xml/route.ts` | Atom 1.0 feed (bilingual) |
 | `app/api/content-summary/route.ts` | Markdown summary API (GEO) |
@@ -65,7 +65,7 @@ Bilingual (DE/EN) daily + weekly AI news aggregator for internal teams — curat
 │       ↓                                                  │
 │  SPA (main page, "use client"):                          │
 │    • Feed components (tech, investment, tips)             │
-│    • Chat widget + Chat API (glm-4.5-air:free)           │
+│    • Chat widget + Chat API (aurora-alpha)                │
 │       ↓                                                  │
 │  SSR Pages (Server Components, SEO/GEO):                 │
 │    • /week/[weekId] — HTML + JSON-LD (ISR 1h)            │
@@ -153,7 +153,7 @@ ai-hub-backend/               # Backend (FastAPI)
 |---------|-------|-------|
 | **Classification** | `z-ai/glm-4.5-air:free` | Free tier, classifies articles |
 | **Content Processing** | `deepseek/deepseek-v3.2` | Tech, investment, tips, videos |
-| **Chat Assistant** | `z-ai/glm-4.5-air:free` | Same as classifier (free) |
+| **Chat Assistant** | `openrouter/aurora-alpha` | OpenRouter |
 
 ---
 
@@ -311,7 +311,7 @@ The site includes dedicated SEO and Generative Engine Optimization features:
 | Feature | Path | Purpose |
 |---------|------|---------|
 | SSR Week Pages | `/[lang]/week/[weekId]` | Full HTML + JSON-LD for crawlers (ISR 1h) |
-| Topic Pages | `/[lang]/topic/[topic]` | Language-specific slugs (DE slugs for /de/, EN for /en/) |
+| Topic Pages | `/[lang]/topic/[topic]` | Language-specific slugs, SSR for crawlers only |
 | Atom Feed | `/feed.xml?lang=de\|en` | Atom 1.0 feed, latest 2 weeks of tech posts |
 | Content Summary | `/api/content-summary?lang=de\|en` | Markdown summary for AI systems |
 | llms.txt | `/llms.txt` | AI crawler site description + authority info + citation format |
@@ -352,7 +352,7 @@ The frontend uses a distinctive visual identity with section-specific theming:
 - **Card entrance**: Staggered `animate-fade-up` with 50ms delay per card (max 10)
 - **Loading skeletons**: Shimmer effect via `animate-shimmer` class (replaces `animate-pulse` everywhere)
 - **Impact borders**: Tech cards have left borders colored by impact level (critical=red, high=orange, medium=blue)
-- **Trend rankings**: Right sidebar shows numbered (1-10) rankings with large semi-transparent index numbers; clicking a trend filters the feed in the SPA (crawlers still follow the `href` to the topic page for SEO)
+- **Trend rankings**: Right sidebar shows numbered (1-10) rankings with large semi-transparent index numbers (display only, non-clickable)
 - **Mobile nav**: Active tab has scale animation + colored dot indicator
 - **Ambient gradient**: Subtle brand color wash (`from-primary/[0.02]`) at top of main app for login→app visual continuity
 - **Sidebar**: Active nav items have `border-l-[3px]` indicator; combined `transition-[color,background-color,border-color,transform]` for smooth animations; logo uses `from-primary to-accent` gradient
@@ -364,5 +364,5 @@ The frontend uses a distinctive visual identity with section-specific theming:
 - **Layout template**: `%s | DataCube AI` — child pages should NOT include "| DataCube AI" in their title
 - **Homepage**: Uses `title: { absolute: '...' }` to bypass template (includes brand in title itself)
 - **Week pages**: Localized titles — `KI-News KW 06` (DE) / `AI News KW 06` (EN)
-- **Topic pages**: Language-specific slugs — `/de/topic/nvidia-trainiert-roboter` vs `/en/topic/nvidia-trains-robots` (SSR for crawlers only; human users filter in-SPA via trend click)
+- **Topic pages**: Language-specific slugs — `/de/topic/nvidia-trainiert-roboter` vs `/en/topic/nvidia-trains-robots` (SSR for crawlers only)
 - **Sitemap**: No parameterized URLs (`?section=`, `?period=`), no `feed.xml`, top 30 topics per language

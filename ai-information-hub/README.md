@@ -25,7 +25,7 @@ vercel --prod
 
 - **Frontend**: Next.js 16, React 19, Tailwind CSS 4, Shadcn/ui
 - **Backend**: FastAPI + PostgreSQL on Railway
-- **LLM**: OpenRouter (glm-4.5-air for chat, deepseek-v3.2 for processing)
+- **LLM**: OpenRouter (aurora-alpha for chat, deepseek-v3.2 for processing)
 - **Data**: RSS feeds, Hacker News, YouTube
 
 ## Features
@@ -37,5 +37,5 @@ vercel --prod
 - Dark/light theme
 - AI chat assistant
 - Accessible UI (44px touch targets, focus-visible, aria-hidden, skip-to-content, prefers-reduced-motion, mobile bottom padding)
-- Distinctive design: Instrument Serif display font on all section headers, section-specific color accents and hover states (tech=blue, invest=amber, tips=emerald), staggered card entrance animations, shimmer loading skeletons, gradient section headers, trend rankings with in-SPA filtering, tabular-nums on financial data
+- Distinctive design: Instrument Serif display font on all section headers, section-specific color accents and hover states (tech=blue, invest=amber, tips=emerald), staggered card entrance animations, shimmer loading skeletons, gradient section headers, trend rankings, tabular-nums on financial data
 - No authentication required
