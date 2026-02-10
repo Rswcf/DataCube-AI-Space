@@ -17,8 +17,8 @@ Bilingual (DE/EN) daily + weekly AI news aggregator with YouTube video integrati
 - **Bilingual Content** - German and English summaries
 - **Daily + Weekly Mode** - Daily automated collection with weekly rollup view
 - **Chat Assistant** - Ask questions about the AI news
-- **Accessible UI** - focus-visible states, aria-hidden decorative icons, prefers-reduced-motion
-- **Distinctive Design** - Instrument Serif display font, section-specific color accents, staggered card animations, shimmer loading, gradient section headers, numbered trend rankings
+- **Accessible UI** - 44px touch targets, focus-visible states, aria-hidden decorative icons, skip-to-content link, prefers-reduced-motion, mobile bottom padding
+- **Distinctive Design** - Instrument Serif display font on all section headers, section-specific color accents and hover states, staggered card animations, shimmer loading, gradient section headers, numbered trend rankings, tabular-nums on financial data
 
 ## Architecture
 

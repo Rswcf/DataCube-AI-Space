@@ -2,7 +2,7 @@
 
 Bilingual (DE/EN) daily + weekly AI news aggregator for internal teams — curates tech breakthroughs, investment news, practical tips, and **YouTube videos** from RSS feeds + Hacker News + YouTube. Built with Next.js 16 + React 19 + Tailwind CSS 4 + Shadcn/ui, deployed on Vercel.
 
-**Status**: Core app complete with Railway backend integration. Supports 3 feed types + YouTube videos, bilingual, daily + weekly navigation, dark/light theme, accessibility audited (Web Interface Guidelines), design overhauled with distinctive visual identity (Instrument Serif display font, section-specific accents, staggered animations, shimmer skeletons). **No authentication required**.
+**Status**: Core app complete with Railway backend integration. Supports 3 feed types + YouTube videos, bilingual, daily + weekly navigation, dark/light theme, accessibility audited (Web Interface Guidelines), design overhauled with distinctive visual identity (Instrument Serif display font, section-specific accents, staggered animations, shimmer skeletons), UI/UX quality audit applied. **No authentication required**.
 
 ---
 
@@ -327,31 +327,36 @@ The site includes dedicated SEO and Generative Engine Optimization features:
 
 ### Accessibility (Web Interface Guidelines)
 
-All page components pass a Web Interface Guidelines audit (2026-02-10):
+All page components pass a Web Interface Guidelines audit (2026-02-10), with UI/UX quality fixes applied (2026-02-11):
 
 - **Focus-visible**: All interactive elements (links, buttons) have `focus-visible:ring-2` styles
-- **aria-hidden**: Decorative icons (Lucide) and SVGs marked `aria-hidden="true"`
+- **aria-hidden**: All decorative icons (Lucide) marked `aria-hidden="true"` — including video-embed stats icons and chat widget FAB/spinner
 - **prefers-reduced-motion**: Login page animations respect `prefers-reduced-motion: reduce`
-- **No transition-all**: Explicit transition properties only (e.g. `transition-opacity`)
+- **No transition-all**: Explicit transition properties only (e.g. `transition-opacity`, `transition-[color,background-color,border-color,transform]`)
 - **Image dimensions**: `<img>` tags include explicit `width`/`height` to prevent CLS
-- **tabular-nums**: Financial tables use `font-variant-numeric: tabular-nums` for number alignment
+- **tabular-nums**: Financial tables AND stock data cards (prices, changes, market cap) use `tabular-nums`
 - **scroll-margin-top**: Topic page anchor targets use `scroll-mt-20` for hash navigation
+- **Touch targets**: All navigation buttons meet 44px minimum (week nav prev/next, chat widget controls)
+- **Skip link**: `#main-content` target on main content container, skip link in layout
+- **Mobile bottom padding**: `pb-16 md:pb-0` prevents mobile bottom nav from overlapping feed content
+- **cursor-pointer**: All hoverable feed cards have `cursor-pointer` for interaction feedback
 
-### Design System (2026-02-10)
+### Design System (2026-02-10, refined 2026-02-11)
 
 The frontend uses a distinctive visual identity with section-specific theming:
 
-- **Typography**: Instrument Serif (`font-display`) for display headings, Geist for body, Geist Mono for code
+- **Typography**: Instrument Serif (`font-display`) for all section headers, week nav title, chat title, and trends heading; Geist for body; Geist Mono for code
 - **Section accents**: Each feed type has a unique color — tech (blue/primary), investment (amber `--invest-accent`), tips (emerald `--tips-accent`), video (coral `--video-accent`)
-- **Section headers**: Gradient backgrounds via `.section-header-tech/invest/tips` CSS classes with `border-l-4` accent borders
+- **Section headers**: Gradient backgrounds via `.section-header-tech/invest/tips` CSS classes with `border-l-4` accent borders, `font-display` serif headings
+- **Card hover**: Section-colored hover states — `hover:bg-tech-accent/5`, `hover:bg-invest-accent/5`, `hover:bg-tips-accent/5` (consistent across all feeds)
 - **Card entrance**: Staggered `animate-fade-up` with 50ms delay per card (max 10)
-- **Loading skeletons**: Shimmer effect via `animate-shimmer` class
+- **Loading skeletons**: Shimmer effect via `animate-shimmer` class (replaces `animate-pulse` everywhere)
 - **Impact borders**: Tech cards have left borders colored by impact level (critical=red, high=orange, medium=blue)
 - **Trend rankings**: Right sidebar shows numbered (1-10) rankings with large semi-transparent index numbers
 - **Mobile nav**: Active tab has scale animation + colored dot indicator
 - **Ambient gradient**: Subtle brand color wash (`from-primary/[0.02]`) at top of main app for login→app visual continuity
-- **Sidebar**: Active nav items have `border-l-[3px]` indicator; logo uses `from-primary to-accent` gradient
-- **Share feedback**: Button has `active:scale-95` press animation
+- **Sidebar**: Active nav items have `border-l-[3px]` indicator; combined `transition-[color,background-color,border-color,transform]` for smooth animations; logo uses `from-primary to-accent` gradient
+- **Share**: `active:scale-95` press animation; right-aligned popup menu to prevent viewport overflow
 - **Week nav**: Fade edge masks on scrollable area, enhanced current-period highlighting
 
 ### SEO Metadata Patterns

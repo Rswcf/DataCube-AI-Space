@@ -36,6 +36,6 @@ vercel --prod
 - Bilingual content (DE/EN)
 - Dark/light theme
 - AI chat assistant
-- Accessible UI (focus-visible, aria-hidden, prefers-reduced-motion)
-- Distinctive design: Instrument Serif display font, section-specific color accents (tech=blue, invest=amber, tips=emerald), staggered card entrance animations, shimmer loading skeletons, gradient section headers, numbered trend rankings
+- Accessible UI (44px touch targets, focus-visible, aria-hidden, skip-to-content, prefers-reduced-motion, mobile bottom padding)
+- Distinctive design: Instrument Serif display font on all section headers, section-specific color accents and hover states (tech=blue, invest=amber, tips=emerald), staggered card entrance animations, shimmer loading skeletons, gradient section headers, numbered trend rankings, tabular-nums on financial data
 - No authentication required
