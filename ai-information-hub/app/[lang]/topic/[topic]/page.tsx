@@ -258,27 +258,22 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   const canonicalQuery = canonicalParams.toString()
   const canonicalUrl = canonicalQuery ? `${localizedUrl}?${canonicalQuery}` : localizedUrl
 
-  const deUrl = canonicalQuery
-    ? `https://www.datacubeai.space/de/topic/${topic}?${canonicalQuery}`
-    : `https://www.datacubeai.space/de/topic/${topic}`
-  const enUrl = canonicalQuery
-    ? `https://www.datacubeai.space/en/topic/${topic}?${canonicalQuery}`
-    : `https://www.datacubeai.space/en/topic/${topic}`
-
   return {
-    title: `${topicTitle} AI News | DataCube AI`,
-    description: `Curated AI coverage and related investment/tips updates for topic: ${topicTitle}.`,
+    title: lang === 'de' ? `${topicTitle} KI-News` : `${topicTitle} AI News`,
+    description: lang === 'de'
+      ? `Kuratierte KI-Berichterstattung und Investment-/Tipps-Updates zum Thema ${topicTitle}.`
+      : `Curated AI coverage and investment/tips updates for: ${topicTitle}.`,
     alternates: {
       canonical: canonicalUrl,
       languages: {
-        de: deUrl,
-        en: enUrl,
-        'x-default': deUrl,
+        'x-default': canonicalUrl,
       },
     },
     openGraph: {
-      title: `${topicTitle} AI News | DataCube AI`,
-      description: `Topic-centric AI coverage: ${topicTitle}.`,
+      title: lang === 'de' ? `${topicTitle} KI-News` : `${topicTitle} AI News`,
+      description: lang === 'de'
+        ? `KI-Berichterstattung: ${topicTitle}.`
+        : `AI coverage: ${topicTitle}.`,
       url: canonicalUrl,
       type: 'article',
     },
@@ -286,7 +281,8 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
 }
 
 export async function generateStaticParams() {
-  const seeds = new Set<string>()
+  const deSlugs = new Set<string>()
+  const enSlugs = new Set<string>()
 
   try {
     const dataRoot = path.join(process.cwd(), 'public', 'data')
@@ -297,23 +293,22 @@ export async function generateStaticParams() {
       try {
         const trendsRaw = await readFile(path.join(dataRoot, week.id, 'trends.json'), 'utf-8')
         const trendsData = JSON.parse(trendsRaw)
-        const allTitles: string[] = [
-          ...(trendsData?.trends?.de || []).map((item: { title: string }) => item.title),
-          ...(trendsData?.trends?.en || []).map((item: { title: string }) => item.title),
-        ]
-        for (const title of allTitles) {
-          const slug = toTopicSlug(title)
-          if (slug && slug !== 'topic') seeds.add(slug)
+        for (const item of (trendsData?.trends?.de || [])) {
+          const slug = toTopicSlug(item.title)
+          if (slug && slug !== 'topic') deSlugs.add(slug)
+        }
+        for (const item of (trendsData?.trends?.en || [])) {
+          const slug = toTopicSlug(item.title)
+          if (slug && slug !== 'topic') enSlugs.add(slug)
         }
       } catch {}
     }
   } catch {}
 
-  const topics = Array.from(seeds).slice(0, 40)
-  return topics.flatMap((topic) => [
-    { lang: 'de', topic },
-    { lang: 'en', topic },
-  ])
+  return [
+    ...Array.from(deSlugs).slice(0, 40).map((topic) => ({ lang: 'de', topic })),
+    ...Array.from(enSlugs).slice(0, 40).map((topic) => ({ lang: 'en', topic })),
+  ]
 }
 
 export default async function TopicPage({ params, searchParams }: Props) {

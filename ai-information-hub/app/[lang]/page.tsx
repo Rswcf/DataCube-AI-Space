@@ -15,7 +15,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const localizedHome = `https://www.datacubeai.space/${lang}`
 
+  const isDE = lang === 'de'
+
   return {
+    title: {
+      absolute: isDE
+        ? 'DataCube AI | Tägliche KI-News & Einblicke'
+        : 'DataCube AI | Daily AI News & Insights',
+    },
+    description: isDE
+      ? 'Zweisprachiger (DE/EN) täglicher KI-News-Aggregator. Technologie-Durchbrüche, Investment-News, praktische Tipps und kuratierte YouTube-Videos.'
+      : 'Bilingual (DE/EN) daily AI news aggregator. Tech breakthroughs, investment news, practical tips, and curated YouTube videos.',
     alternates: {
       canonical: localizedHome,
       languages: {
@@ -25,6 +35,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       },
     },
     openGraph: {
+      title: isDE
+        ? 'DataCube AI | Tägliche KI-News & Einblicke'
+        : 'DataCube AI | Daily AI News & Insights',
+      description: isDE
+        ? 'Kuratierte KI-News, Investments und Tipps – täglich aktualisiert auf Deutsch und Englisch.'
+        : 'Curated AI news, investment updates, and practical tips - updated daily in German and English.',
       url: localizedHome,
     },
   }

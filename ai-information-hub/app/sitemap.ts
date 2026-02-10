@@ -37,32 +37,24 @@ function lastModFromId(id: string): Date {
   return new Date()
 }
 
-function extractTopicTitles(data: TrendsResponse): string[] {
-  return [
-    ...(data.trends?.de || []).map((item) => item.title || ''),
-    ...(data.trends?.en || []).map((item) => item.title || ''),
-  ].map((title) => title.trim()).filter(Boolean)
-}
-
-async function getTopicTitlesForPeriod(periodId: string, apiUrl: string): Promise<string[]> {
+async function getTopicTitlesByLanguage(periodId: string, apiUrl: string): Promise<{ de: string[]; en: string[] }> {
+  let data: TrendsResponse | null = null
   try {
     const res = await fetch(`${apiUrl}/trends/${periodId}`, { next: { revalidate: 3600 } })
-    if (res.ok) {
-      const data = (await res.json()) as TrendsResponse
-      const titles = extractTopicTitles(data)
-      if (titles.length > 0) return titles
-    }
-  } catch {
-    // Handled by static file fallback.
+    if (res.ok) data = (await res.json()) as TrendsResponse
+  } catch {}
+
+  if (!data) {
+    try {
+      const filePath = path.join(process.cwd(), 'public', 'data', periodId, 'trends.json')
+      const raw = await readFile(filePath, 'utf-8')
+      data = JSON.parse(raw) as TrendsResponse
+    } catch {}
   }
 
-  try {
-    const filePath = path.join(process.cwd(), 'public', 'data', periodId, 'trends.json')
-    const raw = await readFile(filePath, 'utf-8')
-    const data = JSON.parse(raw) as TrendsResponse
-    return extractTopicTitles(data)
-  } catch {
-    return []
+  return {
+    de: (data?.trends?.de || []).map((i) => (i.title || '').trim()).filter(Boolean),
+    en: (data?.trends?.en || []).map((i) => (i.title || '').trim()).filter(Boolean),
   }
 }
 
@@ -120,54 +112,37 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ]
   })
 
-  const topicTitleSet = new Set<string>()
+  const deTopicSet = new Set<string>()
+  const enTopicSet = new Set<string>()
   for (const periodId of periodIds.slice(0, 8)) {
-    const titles = await getTopicTitlesForPeriod(periodId, apiUrl)
-    for (const title of titles) topicTitleSet.add(title)
+    const titles = await getTopicTitlesByLanguage(periodId, apiUrl)
+    for (const t of titles.de) {
+      const s = toTopicSlug(t)
+      if (s && s !== 'topic') deTopicSet.add(s)
+    }
+    for (const t of titles.en) {
+      const s = toTopicSlug(t)
+      if (s && s !== 'topic') enTopicSet.add(s)
+    }
   }
 
-  const topicSlugs = Array.from(topicTitleSet)
-    .map((title) => toTopicSlug(title))
-    .filter((slug) => slug && slug !== 'topic')
-    .slice(0, 120)
+  const deSlugs = Array.from(deTopicSet).slice(0, 30)
+  const enSlugs = Array.from(enTopicSet).slice(0, 30)
 
-  const topicEntries = topicSlugs.flatMap((topic) => [
-    {
+  const topicEntries = [
+    ...deSlugs.map((topic) => ({
       url: `${baseUrl}/de/topic/${topic}`,
       lastModified: new Date(),
       changeFrequency: 'weekly' as const,
       priority: 0.5,
-    },
-    {
+    })),
+    ...enSlugs.map((topic) => ({
       url: `${baseUrl}/en/topic/${topic}`,
       lastModified: new Date(),
       changeFrequency: 'weekly' as const,
       priority: 0.5,
-    },
-  ])
-
-  const featuredTopicSlugs = topicSlugs.slice(0, 30)
-  const featuredPeriodIds = periodIds.slice(0, 2)
-  const filterSections = ['tech', 'investment', 'tips'] as const
-
-  const topicFilterEntries = featuredTopicSlugs.flatMap((topic) =>
-    (['de', 'en'] as const).flatMap((lang) => [
-      ...filterSections.map((section) => ({
-        url: `${baseUrl}/${lang}/topic/${topic}?section=${section}`,
-        lastModified: new Date(),
-        changeFrequency: 'weekly' as const,
-        priority: 0.45,
-      })),
-      ...featuredPeriodIds.flatMap((periodId) =>
-        filterSections.map((section) => ({
-          url: `${baseUrl}/${lang}/topic/${topic}?section=${section}&period=${encodeURIComponent(periodId)}`,
-          lastModified: lastModFromId(periodId),
-          changeFrequency: 'daily' as const,
-          priority: 0.4,
-        }))
-      ),
-    ])
-  )
+    })),
+  ]
 
   return [
     {
@@ -188,14 +163,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'daily',
       priority: 0.9,
     },
-    {
-      url: `${baseUrl}/feed.xml`,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.3,
-    },
     ...topicEntries,
-    ...topicFilterEntries,
     ...periodEntries,
   ]
 }

@@ -23,10 +23,10 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   const localizedUrl = `https://www.datacubeai.space/${lang}/week/${weekId}`
 
   return {
-    title: `AI News ${periodLabel} | DataCube AI`,
+    title: lang === 'de' ? `KI-News ${periodLabel}` : `AI News ${periodLabel}`,
     description: lang === 'de'
-      ? `KI-News: Technologie, Investment und Tipps - ${periodLabel}`
-      : `AI News: Technology, Investment and Tips - ${periodLabel}`,
+      ? `Kuratierte KI-News der ${periodLabel}: Technologie-Durchbrüche, Investment-Signale und praktische Tipps – täglich aktualisiert auf DataCube AI.`
+      : `Curated AI news for ${periodLabel}: technology breakthroughs, investment signals, and practical tips – updated daily on DataCube AI.`,
     alternates: {
       canonical: localizedUrl,
       languages: {
@@ -36,10 +36,10 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
       },
     },
     openGraph: {
-      title: `AI News ${periodLabel} | DataCube AI`,
+      title: lang === 'de' ? `KI-News ${periodLabel}` : `AI News ${periodLabel}`,
       description: lang === 'de'
-        ? `Kuratierte KI-News, Investments und Tipps - ${periodLabel}`
-        : `Curated AI news, investments, and tips - ${periodLabel}`,
+        ? `Kuratierte KI-News der ${periodLabel}: Technologie-Durchbrüche, Investment-Signale und praktische Tipps – täglich aktualisiert auf DataCube AI.`
+        : `Curated AI news for ${periodLabel}: technology breakthroughs, investment signals, and practical tips – updated daily on DataCube AI.`,
       url: localizedUrl,
       type: 'article',
     },

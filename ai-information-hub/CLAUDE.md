@@ -310,15 +310,25 @@ The site includes dedicated SEO and Generative Engine Optimization features:
 
 | Feature | Path | Purpose |
 |---------|------|---------|
-| SSR Week Pages | `/week/[weekId]` | Full HTML + JSON-LD for crawlers (ISR 1h) |
+| SSR Week Pages | `/[lang]/week/[weekId]` | Full HTML + JSON-LD for crawlers (ISR 1h) |
+| Topic Pages | `/[lang]/topic/[topic]` | Language-specific slugs (DE slugs for /de/, EN for /en/) |
 | Atom Feed | `/feed.xml?lang=de\|en` | Atom 1.0 feed, latest 2 weeks of tech posts |
 | Content Summary | `/api/content-summary?lang=de\|en` | Markdown summary for AI systems |
 | llms.txt | `/llms.txt` | AI crawler site description + authority info + citation format |
-| Sitemap | `/sitemap.xml` | Dynamic, real lastmod dates from period IDs |
+| Sitemap | `/sitemap.xml` | Pruned (~80 URLs): core pages + top 30 topics/lang + period pages |
 | Structured Data | On SSR pages | NewsArticle + VideoSchema + BreadcrumbList + NewsMediaOrganization |
-| Hreflang | All pages | DE/EN + x-default for bilingual SEO |
-| Prev/Next Nav | `/week/[weekId]` | Internal linking between adjacent weeks/days |
+| Localized Meta | Homepage + all pages | Title, description, OG tags localized per language (DE/EN) |
+| Hreflang | Homepage + week pages | DE/EN + x-default (topic pages use self-referencing canonical) |
+| Prev/Next Nav | `/[lang]/week/[weekId]` | Internal linking between adjacent weeks/days |
 | Preconnect | Layout head | Resource hints for Railway API + YouTube |
 | Image Optimization | `next/image` | YouTube thumbnails, first video fetchPriority="high" |
 | Impressum | `/impressum` | Legal notice (DDG §5) — **placeholders need filling** |
 | Datenschutz | `/datenschutz` | Privacy policy (GDPR) — **placeholders need filling** |
+
+### SEO Metadata Patterns
+
+- **Layout template**: `%s | DataCube AI` — child pages should NOT include "| DataCube AI" in their title
+- **Homepage**: Uses `title: { absolute: '...' }` to bypass template (includes brand in title itself)
+- **Week pages**: Localized titles — `KI-News KW 06` (DE) / `AI News KW 06` (EN)
+- **Topic pages**: Language-specific slugs — `/de/topic/nvidia-trainiert-roboter` vs `/en/topic/nvidia-trains-robots`
+- **Sitemap**: No parameterized URLs (`?section=`, `?period=`), no `feed.xml`, top 30 topics per language

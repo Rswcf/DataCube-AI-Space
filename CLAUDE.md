@@ -90,6 +90,10 @@ DataCube_AI_Space/
 │   │   ├── api/
 │   │   │   ├── chat/         # Chat assistant (glm-4.5-air:free)
 │   │   │   └── content-summary/  # Markdown summary API (GEO)
+│   │   ├── [lang]/            # Localized routes (DE/EN)
+│   │   │   ├── page.tsx       # Localized homepage (meta tags per language)
+│   │   │   ├── week/[weekId]/ # Localized week pages
+│   │   │   └── topic/[topic]/ # Topic pages (lang-specific slugs)
 │   │   ├── feed.xml/         # Atom 1.0 feed route
 │   │   ├── impressum/        # Legal notice (DDG §5)
 │   │   ├── datenschutz/      # Privacy policy (GDPR)
