@@ -44,6 +44,19 @@ function isCrawler(request: NextRequest): boolean {
   return CRAWLER_PATTERNS.some((pattern) => ua.includes(pattern))
 }
 
+function isLikelyHumanBrowser(request: NextRequest): boolean {
+  const ua = request.headers.get('user-agent')?.toLowerCase() || ''
+  if (!ua) return false
+
+  const browserSignatures = ['chrome/', 'safari/', 'firefox/', 'edg/', 'opr/', 'mobile/']
+  const automationHints = ['bot', 'spider', 'crawler', 'curl/', 'wget/', 'python-requests', 'headless', 'lighthouse']
+
+  const hasBrowserSignature = browserSignatures.some((signature) => ua.includes(signature))
+  const hasAutomationHint = automationHints.some((hint) => ua.includes(hint))
+
+  return hasBrowserSignature && !hasAutomationHint
+}
+
 function isLocalizablePath(pathname: string): boolean {
   return (
     pathname === '/' ||
@@ -83,19 +96,14 @@ export function proxy(request: NextRequest) {
     return NextResponse.next()
   }
 
-  // Keep SEO crawler access while preserving login gate for real users.
-  if (isCrawler(request)) {
-    return NextResponse.next()
-  }
-
-  // Keep key SEO/GEO landing paths crawlable even without cookies.
-  if (isSeoAlwaysAllowedPath(pathname)) {
-    return NextResponse.next()
-  }
-
-  const hasVisited = request.cookies.get('visited')
-  if (!hasVisited) {
-    return NextResponse.redirect(new URL('/login', request.url))
+  // Keep login for normal browsers, but let crawlers/automation reach SEO paths.
+  const isSeoAutomationPass = isSeoAlwaysAllowedPath(pathname) && !isLikelyHumanBrowser(request)
+  const shouldBypassLoginGate = isCrawler(request) || isSeoAutomationPass
+  if (!shouldBypassLoginGate) {
+    const hasVisited = request.cookies.get('visited')
+    if (!hasVisited) {
+      return NextResponse.redirect(new URL('/login', request.url))
+    }
   }
 
   const searchParams = new URLSearchParams(request.nextUrl.searchParams)
