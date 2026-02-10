@@ -5,6 +5,7 @@ import { Sidebar } from "@/components/sidebar";
 import { Feed } from "@/components/feed";
 import { RightSidebar } from "@/components/right-sidebar";
 import { ChatWidget } from "@/components/chat-widget";
+import { ReportGenerator } from "@/components/report-generator";
 import { Cpu, TrendingUp, Lightbulb, Search, X, Settings, Sun, Moon, Languages } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSettings } from "@/lib/settings-context";
@@ -114,6 +115,9 @@ export default function HomePageClient({ initialWeekId = "" }: HomePageClientPro
         isOpen={showMobileSettings}
         onClose={() => setShowMobileSettings(false)}
       />
+
+      {/* AI Report Generator */}
+      {selectedWeekId && <ReportGenerator weekId={selectedWeekId} />}
 
       {/* AI Chat Widget */}
       {selectedWeekId && <ChatWidget weekId={selectedWeekId} />}

@@ -135,6 +135,16 @@ export const translations = {
     copyLink: "Link kopieren",
     shareOnX: "Auf X teilen",
     shareOnLinkedIn: "Auf LinkedIn teilen",
+
+    // Report Generator
+    reportGenerate: "KI-Bericht erstellen",
+    reportTitle: "KI-Wochenbericht",
+    reportGenerating: "Bericht wird erstellt...",
+    reportComplete: "Bericht fertig!",
+    reportExportMd: "Als Markdown exportieren",
+    reportExportDocx: "Als Word exportieren",
+    reportClose: "Schließen",
+    reportError: "Fehler beim Erstellen des Berichts. Bitte versuche es erneut.",
   },
   en: {
     // Navigation
@@ -270,6 +280,16 @@ export const translations = {
     copyLink: "Copy link",
     shareOnX: "Share on X",
     shareOnLinkedIn: "Share on LinkedIn",
+
+    // Report Generator
+    reportGenerate: "Generate AI Report",
+    reportTitle: "AI Weekly Report",
+    reportGenerating: "Generating report...",
+    reportComplete: "Report complete!",
+    reportExportMd: "Export as Markdown",
+    reportExportDocx: "Export as Word",
+    reportClose: "Close",
+    reportError: "Failed to generate report. Please try again.",
   },
 } as const;
 
