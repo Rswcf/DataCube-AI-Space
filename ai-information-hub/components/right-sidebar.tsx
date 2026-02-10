@@ -7,7 +7,6 @@ import { Search, Mail, Check, TrendingUp } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useSettings } from "@/lib/settings-context";
-import { toTopicSlug } from "@/lib/topic-utils";
 
 interface TrendItem {
   category: string;
@@ -152,26 +151,20 @@ export function RightSidebar({ weekId, onSearchChange }: RightSidebarProps) {
           </div>
           <div className="mt-3 space-y-1">
             {trends.slice(0, 10).map((trend, index) => (
-              <a
+              <div
                 key={index}
-                href={`/${language}/topic/${toTopicSlug(trend.title)}`}
-                onClick={(e) => {
-                  e.preventDefault();
-                  setSearchValue(trend.title);
-                  onSearchChange(trend.title);
-                }}
-                className="group flex items-start gap-3 rounded-lg p-2 cursor-pointer hover:bg-secondary/80 transition-colors focus-visible:ring-2 focus-visible:ring-ring"
+                className="flex items-start gap-3 rounded-lg p-2"
               >
                 <span className="text-2xl font-bold text-muted-foreground/30 tabular-nums w-8 shrink-0 select-none">
                   {index + 1}
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="text-xs text-muted-foreground">{trend.category}</p>
-                  <p className="font-semibold text-foreground group-hover:text-primary transition-colors leading-tight">
+                  <p className="font-semibold text-foreground leading-tight">
                     {trend.title}
                   </p>
                 </div>
-              </a>
+              </div>
             ))}
           </div>
         </div>
