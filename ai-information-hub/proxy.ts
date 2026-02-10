@@ -2,9 +2,46 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { isSupportedLanguage, toLocalizedPath } from './lib/i18n'
 
+const CRAWLER_PATTERNS = [
+  'googlebot',
+  'bingbot',
+  'yandexbot',
+  'duckduckbot',
+  'baiduspider',
+  'slurp',
+  'gptbot',
+  'chatgpt-user',
+  'perplexitybot',
+  'claudebot',
+  'anthropic-ai',
+  'google-extended',
+  'cohere-ai',
+  'bytespider',
+  'twitterbot',
+  'facebookexternalhit',
+  'linkedinbot',
+  'whatsapp',
+  'slackbot',
+  'telegrambot',
+  'discordbot',
+  'feedfetcher',
+  'feedly',
+  'applebot',
+  'ia_archiver',
+  'sogou',
+  'ccbot',
+  'meta-externalagent',
+  'amazonbot',
+]
+
 function buildTarget(pathname: string, searchParams: URLSearchParams): string {
   const query = searchParams.toString()
   return query ? `${pathname}?${query}` : pathname
+}
+
+function isCrawler(request: NextRequest): boolean {
+  const ua = request.headers.get('user-agent')?.toLowerCase() || ''
+  return CRAWLER_PATTERNS.some((pattern) => ua.includes(pattern))
 }
 
 function isLocalizablePath(pathname: string): boolean {
@@ -19,16 +56,46 @@ function isLocalizablePath(pathname: string): boolean {
   )
 }
 
+function isSeoAlwaysAllowedPath(pathname: string): boolean {
+  return (
+    pathname === '/' ||
+    pathname === '/de' ||
+    pathname === '/en' ||
+    pathname === '/impressum' ||
+    pathname === '/datenschutz' ||
+    /^\/week\/[^/]+$/.test(pathname) ||
+    /^\/topic\/[^/]+$/.test(pathname) ||
+    /^\/(de|en)\/week\/[^/]+$/.test(pathname) ||
+    /^\/(de|en)\/topic\/[^/]+$/.test(pathname)
+  )
+}
+
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // Skip API and static assets.
+  // Skip login, API and static assets.
   if (
+    pathname === '/login' ||
     pathname.startsWith('/api') ||
     pathname.startsWith('/_next') ||
     pathname.includes('.')
   ) {
     return NextResponse.next()
+  }
+
+  // Keep SEO crawler access while preserving login gate for real users.
+  if (isCrawler(request)) {
+    return NextResponse.next()
+  }
+
+  // Keep key SEO/GEO landing paths crawlable even without cookies.
+  if (isSeoAlwaysAllowedPath(pathname)) {
+    return NextResponse.next()
+  }
+
+  const hasVisited = request.cookies.get('visited')
+  if (!hasVisited) {
+    return NextResponse.redirect(new URL('/login', request.url))
   }
 
   const searchParams = new URLSearchParams(request.nextUrl.searchParams)
