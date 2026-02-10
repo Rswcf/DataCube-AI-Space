@@ -127,7 +127,7 @@ export function TechFeed({ weekId, searchQuery }: TechFeedProps) {
       <div className="section-header-tech border-l-4 border-tech-accent px-3 py-2 sm:px-4 sm:py-3">
         <div className="flex items-center gap-2">
           <Cpu className="h-5 w-5 text-tech-accent" aria-hidden="true" />
-          <h3 className="text-sm sm:text-base font-semibold text-foreground">{t("aiTechProgress")}</h3>
+          <h3 className="font-display text-base sm:text-lg font-semibold text-foreground">{t("aiTechProgress")}</h3>
           {!loading && filteredPosts.length > 0 && (
             <Badge variant="outline" className="text-xs text-tech-accent border-tech-accent/30">
               {filteredPosts.length}
@@ -167,7 +167,7 @@ export function TechFeed({ weekId, searchQuery }: TechFeedProps) {
         return (
           <article
             key={post.id}
-            className={`border-l-2 ${borderColor} px-3 py-3 sm:px-4 sm:py-4 transition-colors hover:bg-secondary/30 animate-fade-up`}
+            className={`border-l-2 ${borderColor} px-3 py-3 sm:px-4 sm:py-4 cursor-pointer transition-colors hover:bg-tech-accent/5 animate-fade-up`}
             style={{ animationDelay: `${Math.min(index, 10) * 50}ms` }}
           >
             <div className="flex gap-2 sm:gap-3">

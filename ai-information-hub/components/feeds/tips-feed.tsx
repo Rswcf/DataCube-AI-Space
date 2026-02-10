@@ -115,7 +115,7 @@ export function TipsFeed({ weekId, searchQuery }: TipsFeedProps) {
       <div className="section-header-tips border-l-4 border-tips-accent px-3 py-2 sm:px-4 sm:py-3">
         <div className="flex items-center gap-2">
           <Lightbulb className="h-5 w-5 text-tips-accent" aria-hidden="true" />
-          <h3 className="text-sm sm:text-base font-semibold text-foreground">{t("practicalTipsTitle")}</h3>
+          <h3 className="font-display text-base sm:text-lg font-semibold text-foreground">{t("practicalTipsTitle")}</h3>
           {!loading && filteredPosts.length > 0 && (
             <Badge variant="outline" className="text-xs text-tips-accent border-tips-accent/30">
               {filteredPosts.length}

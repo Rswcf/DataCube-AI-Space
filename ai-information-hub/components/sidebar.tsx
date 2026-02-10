@@ -62,7 +62,7 @@ function NavButton({
         <button
           onClick={onClick}
           className={cn(
-            "flex w-full items-center gap-4 rounded-lg px-4 py-3 border-l-[3px] transition-colors duration-200 hover:translate-x-0.5 transition-transform focus-visible:ring-2 focus-visible:ring-ring",
+            "flex w-full items-center gap-4 rounded-lg px-4 py-3 border-l-[3px] transition-[color,background-color,border-color,transform] duration-200 hover:translate-x-0.5 focus-visible:ring-2 focus-visible:ring-ring",
             isActive
               ? "bg-primary/10 text-primary font-bold shadow-sm shadow-primary/10 border-l-primary"
               : "text-foreground hover:bg-secondary border-l-transparent",

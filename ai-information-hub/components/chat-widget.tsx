@@ -269,7 +269,7 @@ export function ChatWidget({ weekId }: ChatWidgetProps) {
         )}
         aria-label={isOpen ? "Close chat" : "Open chat"}
       >
-        {isOpen ? <X className="h-6 w-6" /> : <MessageCircle className="h-6 w-6" />}
+        {isOpen ? <X className="h-6 w-6" aria-hidden="true" /> : <MessageCircle className="h-6 w-6" aria-hidden="true" />}
       </button>
 
       {/* Chat Panel */}
@@ -284,14 +284,14 @@ export function ChatWidget({ weekId }: ChatWidgetProps) {
         >
           {/* Header */}
           <div className="flex items-center justify-between border-b border-border px-4 py-3">
-            <h3 className="font-semibold">{t("chatTitle")}</h3>
+            <h3 className="font-display text-lg font-semibold">{t("chatTitle")}</h3>
             <div className="flex items-center gap-1">
               {messages.length > 0 && (
-                <Button variant="ghost" size="icon" onClick={clearMessages} title={t("chatClear")}>
+                <Button variant="ghost" size="icon" className="h-11 w-11" onClick={clearMessages} title={t("chatClear")}>
                   <Trash2 className="h-4 w-4" />
                 </Button>
               )}
-              <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}>
+              <Button variant="ghost" size="icon" className="h-11 w-11" onClick={() => setIsOpen(false)}>
                 <X className="h-4 w-4" />
               </Button>
             </div>
@@ -343,7 +343,7 @@ export function ChatWidget({ weekId }: ChatWidgetProps) {
               {isLoading && !messages[messages.length - 1]?.content && (
                 <div className="flex justify-start">
                   <div className="rounded-2xl bg-secondary px-4 py-2 text-sm text-muted-foreground">
-                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
                   </div>
                 </div>
               )}

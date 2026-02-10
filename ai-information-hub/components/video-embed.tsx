@@ -90,13 +90,13 @@ export function VideoEmbed({
         <div className="flex items-center gap-3">
           {viewCount && (
             <div className="flex items-center gap-1 text-white/90 text-sm">
-              <Eye className="w-4 h-4" />
+              <Eye className="w-4 h-4" aria-hidden="true" />
               <span>{viewCount}</span>
             </div>
           )}
           {duration && (
             <div className="flex items-center gap-1 text-white/90 text-sm">
-              <Clock className="w-4 h-4" />
+              <Clock className="w-4 h-4" aria-hidden="true" />
               <span>{duration}</span>
             </div>
           )}
@@ -123,13 +123,13 @@ export function VideoBadge({
       </Badge>
       {duration && (
         <span className="text-xs text-muted-foreground flex items-center gap-1">
-          <Clock className="w-3 h-3" />
+          <Clock className="w-3 h-3" aria-hidden="true" />
           {duration}
         </span>
       )}
       {viewCount && (
         <span className="text-xs text-muted-foreground flex items-center gap-1">
-          <Eye className="w-3 h-3" />
+          <Eye className="w-3 h-3" aria-hidden="true" />
           {viewCount}
         </span>
       )}

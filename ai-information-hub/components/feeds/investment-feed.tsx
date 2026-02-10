@@ -267,7 +267,7 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
       <div className="section-header-invest border-l-4 border-invest-accent px-3 py-2 sm:px-4 sm:py-3">
         <div className="flex items-center gap-2">
           <TrendingUp className="h-5 w-5 text-invest-accent" aria-hidden="true" />
-          <h3 className="text-sm sm:text-base font-semibold text-foreground">{t("aiInvestments")}</h3>
+          <h3 className="font-display text-base sm:text-lg font-semibold text-foreground">{t("aiInvestments")}</h3>
           <Badge variant="secondary" className="ml-auto">
             {periodLabel}
           </Badge>
@@ -430,7 +430,7 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
                       <div className="flex items-center gap-3">
                         <span className="text-lg font-bold text-foreground">{post.ticker}</span>
                         {post.price && post.price !== "N/A" && (
-                          <span className="text-xl font-semibold text-foreground">{post.price}</span>
+                          <span className="text-xl font-semibold text-foreground tabular-nums">{post.price}</span>
                         )}
                         {/* Live indicator for real-time data */}
                         {post.price && post.price !== "N/A" && !stockDataLoading && (
@@ -442,7 +442,7 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
                       {post.change && post.change !== "N/A" && (
                         <div
                           className={cn(
-                            "flex items-center gap-1 rounded-full px-3 py-1 text-sm font-semibold",
+                            "flex items-center gap-1 rounded-full px-3 py-1 text-sm font-semibold tabular-nums",
                             post.direction === "up"
                               ? "bg-accent/20 text-accent"
                               : "bg-destructive/20 text-destructive"
@@ -453,16 +453,16 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
                         </div>
                       )}
                       {(!post.change || post.change === "N/A") && stockDataLoading && (
-                        <div className="h-6 w-16 bg-secondary/50 animate-pulse rounded-full" />
+                        <div className="h-6 w-16 bg-secondary/50 animate-shimmer rounded-full" />
                       )}
                     </div>
                     {post.marketCap && post.marketCap !== "N/A" && (
                       <div className="mt-2 text-sm text-muted-foreground">
-                        {t("marketCap")}: <span className="text-foreground">{post.marketCap}</span>
+                        {t("marketCap")}: <span className="text-foreground tabular-nums">{post.marketCap}</span>
                       </div>
                     )}
                     {(!post.marketCap || post.marketCap === "N/A") && stockDataLoading && (
-                      <div className="mt-2 h-4 w-32 bg-secondary/50 animate-pulse rounded" />
+                      <div className="mt-2 h-4 w-32 bg-secondary/50 animate-shimmer rounded" />
                     )}
                   </div>
 

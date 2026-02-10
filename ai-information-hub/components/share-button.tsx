@@ -115,7 +115,7 @@ export function ShareButton({ title, text, url }: ShareButtonProps) {
       </button>
 
       {showMenu && (
-        <div className="absolute bottom-full left-0 mb-1 z-50 min-w-[180px] rounded-lg border bg-popover p-1 shadow-md animate-in fade-in-0 zoom-in-95">
+        <div className="absolute bottom-full right-0 mb-1 z-50 min-w-[180px] rounded-lg border bg-popover p-1 shadow-md animate-in fade-in-0 zoom-in-95">
           <button
             onClick={handleCopy}
             className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-accent transition-colors focus-visible:ring-2 focus-visible:ring-ring"

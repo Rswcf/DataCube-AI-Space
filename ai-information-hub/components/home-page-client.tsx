@@ -68,13 +68,13 @@ export default function HomePageClient({ initialWeekId = "" }: HomePageClientPro
   }, []);
 
   return (
-    <div className="min-h-screen w-full">
+    <div className="min-h-screen w-full pb-16 md:pb-0">
       {/* Ambient gradient - visual continuity from login */}
       <div
         className="pointer-events-none fixed top-0 left-0 right-0 h-32 bg-gradient-to-b from-primary/[0.02] to-transparent z-0"
         aria-hidden="true"
       />
-      <div className="mx-auto flex max-w-[1280px]">
+      <div id="main-content" className="mx-auto flex max-w-[1280px]">
         {/* Left Sidebar - Fixed width */}
         <div className="hidden md:flex md:w-20 xl:w-[275px] shrink-0 justify-end">
           <div className="w-full xl:w-[275px]">
