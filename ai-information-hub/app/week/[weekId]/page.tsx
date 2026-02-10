@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { ArticleSchema, VideoSchema, BreadcrumbListSchema } from '@/components/structured-data'
 import { formatPeriodTitle } from '@/lib/period-utils'
 import type { TechPost, BilingualData, InvestmentData, TipPost, ImpactLevel } from '@/lib/types'
+import { toTopicSlug } from '@/lib/topic-utils'
 
 // API base URL with production fallback
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api-production-3ee5.up.railway.app/api'
@@ -19,6 +20,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   const { weekId } = await params
   const lang = (await searchParams)?.lang === 'en' ? 'en' : 'de'
   const periodLabel = formatPeriodTitle(weekId, lang)
+  const localizedUrl = `https://www.datacubeai.space/${lang}/week/${weekId}`
 
   return {
     title: `AI News ${periodLabel} | DataCube AI`,
@@ -26,11 +28,11 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
       ? `KI-News: Technologie, Investment und Tipps - ${periodLabel}`
       : `AI News: Technology, Investment and Tips - ${periodLabel}`,
     alternates: {
-      canonical: `https://www.datacubeai.space/week/${weekId}`,
+      canonical: localizedUrl,
       languages: {
-        de: `https://www.datacubeai.space/week/${weekId}`,
-        en: `https://www.datacubeai.space/week/${weekId}?lang=en`,
-        'x-default': `https://www.datacubeai.space/week/${weekId}`,
+        de: `https://www.datacubeai.space/de/week/${weekId}`,
+        en: `https://www.datacubeai.space/en/week/${weekId}`,
+        'x-default': `https://www.datacubeai.space/de/week/${weekId}`,
       },
     },
     openGraph: {
@@ -38,7 +40,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
       description: lang === 'de'
         ? `Kuratierte KI-News, Investments und Tipps - ${periodLabel}`
         : `Curated AI news, investments, and tips - ${periodLabel}`,
-      url: `https://www.datacubeai.space/week/${weekId}`,
+      url: localizedUrl,
       type: 'article',
     },
   }
@@ -150,9 +152,9 @@ export default async function WeekPage({ params, searchParams }: Props) {
           {dateRange ? <span>{dateRange}</span> : null}
           {dateRange ? <span> • </span> : null}
           <span>Language: </span>
-          <a href={`/week/${weekId}`} className={lang === 'de' ? 'font-semibold underline' : 'hover:underline'}>DE</a>
+          <a href={`/de/week/${weekId}`} className={lang === 'de' ? 'font-semibold underline' : 'hover:underline'}>DE</a>
           <span> / </span>
-          <a href={`/week/${weekId}?lang=en`} className={lang === 'en' ? 'font-semibold underline' : 'hover:underline'}>EN</a>
+          <a href={`/en/week/${weekId}`} className={lang === 'en' ? 'font-semibold underline' : 'hover:underline'}>EN</a>
         </p>
       </header>
 
@@ -194,7 +196,20 @@ export default async function WeekPage({ params, searchParams }: Props) {
                     </>
                   ) : null}
                 </div>
-                <ArticleSchema post={post} inLanguage={lang} url={`https://www.datacubeai.space/week/${weekId}${lang === 'en' ? '?lang=en' : ''}`} />
+                {Array.from(new Set([post.category, ...(post.tags || []).slice(0, 3)])).filter(Boolean).length > 0 ? (
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {Array.from(new Set([post.category, ...(post.tags || []).slice(0, 3)])).filter(Boolean).map((topic) => (
+                      <a
+                        key={`${post.id}-${topic}`}
+                        href={`/${lang}/topic/${toTopicSlug(topic)}`}
+                        className="rounded-full border border-gray-300 px-2 py-0.5 text-xs text-gray-700 hover:border-gray-500 hover:text-gray-900"
+                      >
+                        {topic}
+                      </a>
+                    ))}
+                  </div>
+                ) : null}
+                <ArticleSchema post={post} inLanguage={lang} url={`https://www.datacubeai.space/${lang}/week/${weekId}`} />
               </article>
             ))}
           </div>
@@ -343,12 +358,12 @@ export default async function WeekPage({ params, searchParams }: Props) {
 
       {/* Footer */}
       <nav className="flex justify-between items-center mt-8 pt-4 border-t border-gray-200">
-        {prevId ? <a href={`/week/${prevId}${lang === 'en' ? '?lang=en' : ''}`} className="hover:underline">&larr; Previous</a> : <span />}
-        <a href="/" className="hover:underline">Home</a>
-        {nextId ? <a href={`/week/${nextId}${lang === 'en' ? '?lang=en' : ''}`} className="hover:underline">Next &rarr;</a> : <span />}
+        {prevId ? <a href={`/${lang}/week/${prevId}`} className="hover:underline">&larr; Previous</a> : <span />}
+        <a href={`/${lang}`} className="hover:underline">Home</a>
+        {nextId ? <a href={`/${lang}/week/${nextId}`} className="hover:underline">Next &rarr;</a> : <span />}
       </nav>
       <footer className="mt-4">
-        <a href={`/?week=${encodeURIComponent(weekId)}`} className="underline">
+        <a href={`/${lang}`} className="underline">
           View interactive version / Interaktive Version ansehen
         </a>
       </footer>

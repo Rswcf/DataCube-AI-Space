@@ -74,8 +74,8 @@ export const metadata: Metadata = {
   alternates: {
     canonical: 'https://www.datacubeai.space',
     languages: {
-      'en': 'https://www.datacubeai.space/?lang=en',
-      'de': 'https://www.datacubeai.space/?lang=de',
+      'en': 'https://www.datacubeai.space/en',
+      'de': 'https://www.datacubeai.space/de',
       'x-default': 'https://www.datacubeai.space',
     },
   },

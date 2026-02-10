@@ -7,6 +7,7 @@ import { Search, Mail, Check } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useSettings } from "@/lib/settings-context";
+import { toTopicSlug } from "@/lib/topic-utils";
 
 interface TrendItem {
   category: string;
@@ -148,21 +149,21 @@ export function RightSidebar({ weekId, onSearchChange }: RightSidebarProps) {
           <h3 className="text-xl font-bold text-foreground">{t("whatsNew")}</h3>
           <div className="mt-3 space-y-4">
             {trends.slice(0, 10).map((trend, index) => (
-              <div key={index} className="group cursor-pointer">
+              <a key={index} href={`/${language}/topic/${toTopicSlug(trend.title)}`} className="group block cursor-pointer">
                 <div className="flex items-start justify-between">
                   <div>
                     <p className="text-xs text-muted-foreground">{trend.category}</p>
                     <p className="font-bold text-foreground group-hover:underline">{trend.title}</p>
                   </div>
-                  <button className="rounded-full p-1 opacity-0 group-hover:opacity-100 hover:bg-primary/10 transition-all">
+                  <span className="rounded-full p-1 opacity-0 group-hover:opacity-100 hover:bg-primary/10 transition-all">
                     <svg className="h-4 w-4 text-muted-foreground" viewBox="0 0 24 24" fill="currentColor">
                       <circle cx="12" cy="6" r="2" />
                       <circle cx="12" cy="12" r="2" />
                       <circle cx="12" cy="18" r="2" />
                     </svg>
-                  </button>
+                  </span>
                 </div>
-              </div>
+              </a>
             ))}
           </div>
         </div>

@@ -53,4 +53,11 @@ DataCube AI (datacubeai.space)
 For structured AI-consumable content, use the Markdown summary API:
 GET https://www.datacubeai.space/api/content-summary?lang=en
 GET https://www.datacubeai.space/api/content-summary?lang=de
+GET https://www.datacubeai.space/api/content-summary?lang=en&periodId=2026-kw06
+GET https://www.datacubeai.space/api/content-summary?lang=en&periodId=2026-kw06&section=tech
+GET https://www.datacubeai.space/api/content-summary?lang=en&periodId=2026-kw06&section=investment&topic=nvidia
 
+Parameters:
+- periodId: YYYY-kwWW or YYYY-MM-DD
+- section: all | tech | investment | tips
+- topic: optional free-text filter

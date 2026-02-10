@@ -1,7 +1,9 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { translations, type Language, type TranslationKey } from "./translations";
+import { getLanguageFromPathname, toLocalizedPath } from "./i18n";
 
 type Theme = "dark" | "light";
 
@@ -28,6 +30,8 @@ const SettingsContext = createContext<SettingsContextType | undefined>(undefined
  * </SettingsProvider>
  */
 export function SettingsProvider({ children }: { children: ReactNode }) {
+  const router = useRouter();
+  const pathname = usePathname();
   const [theme, setThemeState] = useState<Theme>("dark");
   const [language, setLanguageState] = useState<Language>("de");
   const [mounted, setMounted] = useState(false);
@@ -37,7 +41,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     // Check for saved preferences
     const savedTheme = localStorage.getItem("theme") as Theme | null;
     const savedLanguage = localStorage.getItem("language") as Language | null;
-    
+
     if (savedTheme) {
       setThemeState(savedTheme);
     }
@@ -47,8 +51,15 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
+    const pathLanguage = getLanguageFromPathname(pathname || "");
+    if (pathLanguage && pathLanguage !== language) {
+      setLanguageState(pathLanguage);
+    }
+  }, [pathname, language]);
+
+  useEffect(() => {
     if (!mounted) return;
-    
+
     // Apply theme to document
     const root = document.documentElement;
     if (theme === "dark") {
@@ -71,6 +82,28 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
 
   const setLanguage = (newLanguage: Language) => {
     setLanguageState(newLanguage);
+
+    const currentPath = pathname || "/";
+    const isLocalizablePath =
+      currentPath === "/" ||
+      currentPath === "/de" ||
+      currentPath === "/en" ||
+      currentPath.startsWith("/week/") ||
+      currentPath.startsWith("/de/week/") ||
+      currentPath.startsWith("/en/week/");
+
+    if (!isLocalizablePath) return;
+
+    const targetPath = toLocalizedPath(currentPath, newLanguage);
+    const queryString = typeof window !== "undefined"
+      ? window.location.search.replace(/^\?/, "")
+      : "";
+    const nextUrl = queryString ? `${targetPath}?${queryString}` : targetPath;
+    const currentUrl = queryString ? `${currentPath}?${queryString}` : currentPath;
+
+    if (nextUrl !== currentUrl) {
+      router.push(nextUrl);
+    }
   };
 
   const t = (key: TranslationKey): string => {

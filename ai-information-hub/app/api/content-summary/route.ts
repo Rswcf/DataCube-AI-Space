@@ -41,23 +41,56 @@ interface TipPost {
   category: string;
 }
 
+type SummarySection = 'all' | 'tech' | 'investment' | 'tips';
+
+function isValidPeriodId(value: string): boolean {
+  return /^\d{4}-kw\d{2}$/.test(value) || /^\d{4}-\d{2}-\d{2}$/.test(value);
+}
+
+function parseSection(value: string | null): SummarySection | null {
+  if (!value) return 'all';
+  const normalized = value.toLowerCase();
+  if (normalized === 'all' || normalized === 'tech' || normalized === 'investment' || normalized === 'tips') {
+    return normalized;
+  }
+  return null;
+}
+
+function matchTopic(fields: Array<string | undefined>, topic: string): boolean {
+  if (!topic) return true;
+  return fields.some((value) => (value || '').toLowerCase().includes(topic));
+}
+
 export async function GET(request: NextRequest) {
   const lang = request.nextUrl.searchParams.get('lang') === 'en' ? 'en' : 'de';
+  const requestedPeriodId = request.nextUrl.searchParams.get('periodId')?.trim() || '';
+  const section = parseSection(request.nextUrl.searchParams.get('section'));
+  const topic = (request.nextUrl.searchParams.get('topic') || '').trim().toLowerCase();
 
-  // Get current week
-  let weekId = '';
-  try {
-    const weeksRes = await fetch(`${API_BASE}/weeks`, { next: { revalidate: 3600 } });
-    if (weeksRes.ok) {
-      const data = await weeksRes.json();
-      const weeks = data.weeks || [];
-      if (weeks.length > 0) {
-        weekId = weeks[0].id;
+  if (requestedPeriodId && !isValidPeriodId(requestedPeriodId)) {
+    return new Response('Invalid periodId. Use YYYY-kwWW or YYYY-MM-DD.', { status: 400 });
+  }
+
+  if (!section) {
+    return new Response('Invalid section. Use all, tech, investment, or tips.', { status: 400 });
+  }
+
+  let periodId = requestedPeriodId;
+
+  if (!periodId) {
+    try {
+      const weeksRes = await fetch(`${API_BASE}/weeks`, { next: { revalidate: 3600 } });
+      if (weeksRes.ok) {
+        const data = await weeksRes.json();
+        const weeks = data.weeks || [];
+        if (weeks.length > 0) {
+          periodId = weeks[0].id;
+        }
       }
-    }
-  } catch {}
+    } catch {}
+  }
 
-  if (!weekId) {
+  if (!periodId) {
     return new Response('# DataCube AI\n\nNo content available.', {
       headers: {
         'Content-Type': 'text/markdown; charset=utf-8',
@@ -66,28 +99,27 @@ export async function GET(request: NextRequest) {
     });
   }
 
-  // Fetch all data in parallel
   const [techRes, investmentRes, tipsRes] = await Promise.all([
-    fetch(`${API_BASE}/tech/${weekId}`, { next: { revalidate: 3600 } }).catch(() => null),
-    fetch(`${API_BASE}/investment/${weekId}`, { next: { revalidate: 3600 } }).catch(() => null),
-    fetch(`${API_BASE}/tips/${weekId}`, { next: { revalidate: 3600 } }).catch(() => null),
+    fetch(`${API_BASE}/tech/${periodId}`, { next: { revalidate: 3600 } }).catch(() => null),
+    fetch(`${API_BASE}/investment/${periodId}`, { next: { revalidate: 3600 } }).catch(() => null),
+    fetch(`${API_BASE}/tips/${periodId}`, { next: { revalidate: 3600 } }).catch(() => null),
   ]);
 
   const techData = techRes?.ok ? await techRes.json() : null;
   const investmentData = investmentRes?.ok ? await investmentRes.json() : null;
   const tipsData = tipsRes?.ok ? await tipsRes.json() : null;
 
-  const isDayId = /^\d{4}-\d{2}-\d{2}$/.test(weekId);
+  const isDayId = /^\d{4}-\d{2}-\d{2}$/.test(periodId);
   let title: string;
   if (isDayId) {
-    const [y, m, d] = weekId.split('-').map(Number);
+    const [y, m, d] = periodId.split('-').map(Number);
     const deLabel = `${String(d).padStart(2, '0')}.${String(m).padStart(2, '0')}.${y}`;
     const enLabel = new Date(Date.UTC(y, m - 1, d)).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
     title = lang === 'de'
       ? `DataCube AI - KI-News ${deLabel}`
       : `DataCube AI - AI News ${enLabel}`;
   } else {
-    const weekLabel = weekId.replace(/^\d{4}-kw/, 'KW ');
+    const weekLabel = periodId.replace(/^\d{4}-kw/, 'KW ');
     title = lang === 'de'
       ? `DataCube AI - KI-News ${weekLabel}`
       : `DataCube AI - AI News Week ${weekLabel.replace('KW ', '')}`;
@@ -95,11 +127,13 @@ export async function GET(request: NextRequest) {
 
   let md = `# ${title}\n\n`;
 
-  // Tech section
-  if (techData?.[lang]) {
-    const posts: TechPost[] = techData[lang];
-    const articles = posts.filter(p => !p.isVideo);
-    const videos = posts.filter(p => p.isVideo);
+  if ((section === 'all' || section === 'tech') && techData?.[lang]) {
+    const posts: TechPost[] = (techData[lang] || []).filter((post: TechPost) =>
+      matchTopic([post.content, post.category, post.source], topic)
+    );
+
+    const articles = posts.filter((p) => !p.isVideo);
+    const videos = posts.filter((p) => p.isVideo);
 
     if (articles.length > 0) {
       md += lang === 'de' ? `## Technologie\n\n` : `## Technology\n\n`;
@@ -120,11 +154,12 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  // Investment section
-  if (investmentData) {
+  if (section === 'all' || section === 'investment') {
     md += `## Investment\n\n`;
 
-    const pm: PrimaryMarketPost[] = investmentData.primaryMarket?.[lang] || [];
+    const pm: PrimaryMarketPost[] = (investmentData?.primaryMarket?.[lang] || []).filter((post: PrimaryMarketPost) =>
+      matchTopic([post.company, post.round, post.content], topic)
+    );
     if (pm.length > 0) {
       md += `### Primary Market\n\n`;
       md += `| Company | Amount | Round |\n|---------|--------|-------|\n`;
@@ -134,7 +169,9 @@ export async function GET(request: NextRequest) {
       md += '\n';
     }
 
-    const sm: SecondaryMarketPost[] = investmentData.secondaryMarket?.[lang] || [];
+    const sm: SecondaryMarketPost[] = (investmentData?.secondaryMarket?.[lang] || []).filter((post: SecondaryMarketPost) =>
+      matchTopic([post.ticker, post.content], topic)
+    );
     if (sm.length > 0) {
       md += `### Secondary Market\n\n`;
       md += `| Ticker | Price | Change |\n|--------|-------|--------|\n`;
@@ -144,7 +181,9 @@ export async function GET(request: NextRequest) {
       md += '\n';
     }
 
-    const ma: MAPost[] = investmentData.ma?.[lang] || [];
+    const ma: MAPost[] = (investmentData?.ma?.[lang] || []).filter((post: MAPost) =>
+      matchTopic([post.acquirer, post.target, post.dealType, post.content], topic)
+    );
     if (ma.length > 0) {
       md += `### M&A\n\n`;
       md += `| Acquirer | Target | Value | Type |\n|----------|--------|-------|------|\n`;
@@ -155,9 +194,11 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  // Tips section
-  if (tipsData?.[lang]) {
-    const tips: TipPost[] = tipsData[lang];
+  if (section === 'all' || section === 'tips') {
+    const tips: TipPost[] = (tipsData?.[lang] || []).filter((tip: TipPost) =>
+      matchTopic([tip.content, tip.category, tip.tip], topic)
+    );
+
     if (tips.length > 0) {
       md += `## Tips\n\n`;
       for (const t of tips) {
@@ -171,7 +212,12 @@ export async function GET(request: NextRequest) {
     }
   }
 
+  const permalinkParams = new URLSearchParams({ lang, periodId });
+  if (section !== 'all') permalinkParams.set('section', section);
+  if (topic) permalinkParams.set('topic', topic);
+
   md += `---\n\n`;
+  md += `Canonical summary URL: https://www.datacubeai.space/api/content-summary?${permalinkParams.toString()}\n\n`;
   md += `*Updated daily. Visit [DataCube AI](https://www.datacubeai.space) for the interactive version.*\n`;
 
   return new Response(md, {
