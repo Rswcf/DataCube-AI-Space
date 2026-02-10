@@ -155,7 +155,12 @@ export function RightSidebar({ weekId, onSearchChange }: RightSidebarProps) {
               <a
                 key={index}
                 href={`/${language}/topic/${toTopicSlug(trend.title)}`}
-                className="group flex items-start gap-3 rounded-lg p-2 hover:bg-secondary/80 transition-colors focus-visible:ring-2 focus-visible:ring-ring"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setSearchValue(trend.title);
+                  onSearchChange(trend.title);
+                }}
+                className="group flex items-start gap-3 rounded-lg p-2 cursor-pointer hover:bg-secondary/80 transition-colors focus-visible:ring-2 focus-visible:ring-ring"
               >
                 <span className="text-2xl font-bold text-muted-foreground/30 tabular-nums w-8 shrink-0 select-none">
                   {index + 1}
