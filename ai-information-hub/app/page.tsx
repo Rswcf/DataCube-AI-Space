@@ -5,6 +5,7 @@ import type { AppLanguage } from '@/lib/i18n'
 import { toTopicSlug } from '@/lib/topic-utils'
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api-production-3ee5.up.railway.app/api'
+const SHOW_HOMEPAGE_TOP_LINKS = /^(1|true|yes|on)$/i.test(process.env.HOMEPAGE_SHOW_TOP_LINKS || '')
 
 export const revalidate = 3600
 
@@ -123,18 +124,22 @@ type HomePageContentProps = {
 export async function HomePageContent({ language = 'de' }: HomePageContentProps = {}) {
   const weeks = await getWeeks()
   const initialWeekId = getInitialPeriodId(weeks)
-  const recentPeriodIds = getRecentPeriodIds(weeks)
-  const trendingTopics = Array.from(new Set(await getTrendingTopicTitles(initialWeekId, language))).slice(0, 8)
+  const recentPeriodIds = SHOW_HOMEPAGE_TOP_LINKS ? getRecentPeriodIds(weeks) : []
+  const trendingTopics = SHOW_HOMEPAGE_TOP_LINKS
+    ? Array.from(new Set(await getTrendingTopicTitles(initialWeekId, language))).slice(0, 8)
+    : []
+  const introDescription = SHOW_HOMEPAGE_TOP_LINKS
+    ? 'Bilingual AI intelligence hub covering technology breakthroughs, funding and market movements, practical AI workflows, and curated videos. Explore the latest periods below or jump into the interactive feed.'
+    : 'Bilingual AI intelligence hub covering technology breakthroughs, funding and market movements, practical AI workflows, and curated videos. Jump into the interactive feed.'
 
   return (
     <main className="min-h-screen w-full">
       <section className="mx-auto max-w-[1280px] border-b border-border px-4 py-5">
         <h1 className="text-xl font-semibold sm:text-2xl">DataCube AI: Daily AI News, Investment Signals, and Practical Tips</h1>
         <p className="mt-2 max-w-4xl text-sm text-muted-foreground sm:text-base">
-          Bilingual AI intelligence hub covering technology breakthroughs, funding and market movements, practical AI workflows,
-          and curated videos. Explore the latest periods below or jump into the interactive feed.
+          {introDescription}
         </p>
-        {recentPeriodIds.length > 0 ? (
+        {SHOW_HOMEPAGE_TOP_LINKS && recentPeriodIds.length > 0 ? (
           <nav aria-label="Latest AI news periods" className="mt-4 flex flex-wrap gap-2">
             {recentPeriodIds.map((id) => (
               <a
@@ -147,7 +152,7 @@ export async function HomePageContent({ language = 'de' }: HomePageContentProps 
             ))}
           </nav>
         ) : null}
-        {trendingTopics.length > 0 ? (
+        {SHOW_HOMEPAGE_TOP_LINKS && trendingTopics.length > 0 ? (
           <nav aria-label="Trending AI topics" className="mt-3 flex flex-wrap gap-2">
             {trendingTopics.map((topic) => (
               <a

@@ -15,6 +15,12 @@ npm run dev     # localhost:3000
 vercel --prod
 ```
 
+## Environment Flags
+
+- `HOMEPAGE_SHOW_TOP_LINKS`:
+  - `false` (default): hide homepage top quick-link chips (periods + trending topics)
+  - `true`: show homepage top quick-link chips
+
 ## Tech Stack
 
 - **Frontend**: Next.js 16, React 19, Tailwind CSS 4, Shadcn/ui
