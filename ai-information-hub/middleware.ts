@@ -83,7 +83,7 @@ function isSeoAlwaysAllowedPath(pathname: string): boolean {
   )
 }
 
-export function proxy(request: NextRequest) {
+export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // Skip login, API and static assets.
