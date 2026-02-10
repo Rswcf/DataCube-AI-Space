@@ -29,9 +29,9 @@ Keep all documentation in sync. When a feature changes (e.g., weekly → daily, 
 
 Bilingual (DE/EN) daily + weekly AI news aggregator with **YouTube video integration**. Curates tech breakthroughs, investment news, practical tips, and videos from RSS feeds + Hacker News + YouTube.
 
-**Stack**: Next.js 16 + React 19 + Tailwind CSS 4 + Shadcn/ui (Frontend) | FastAPI + PostgreSQL (Backend)
+**Stack**: Next.js 16 + React 19 + Tailwind CSS 4 + Shadcn/ui + Instrument Serif (Frontend) | FastAPI + PostgreSQL (Backend)
 
-**Status**: Full-stack implementation complete with Railway backend. SEO/GEO optimized, legal pages added, engagement UI (newsletter, Ko-fi, share), accessibility audited (Web Interface Guidelines). **No authentication required**.
+**Status**: Full-stack implementation complete with Railway backend. SEO/GEO optimized, legal pages added, engagement UI (newsletter, Ko-fi, share), accessibility audited (Web Interface Guidelines), design overhauled with distinctive visual identity. **No authentication required**.
 
 ---
 
@@ -99,7 +99,7 @@ DataCube_AI_Space/
 │   │   ├── datenschutz/      # Privacy policy (GDPR)
 │   │   └── week/[weekId]/    # SSR week pages (SEO)
 │   ├── components/           # React components
-│   │   ├── feeds/            # Feed components
+│   │   ├── feeds/            # Feed components (section-specific styling)
 │   │   └── video-embed.tsx   # YouTube player (next/image)
 │   ├── lib/                  # Utils, types, API client
 │   ├── middleware.ts         # Login gate + crawler bypass

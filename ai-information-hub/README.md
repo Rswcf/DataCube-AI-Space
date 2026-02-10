@@ -30,11 +30,12 @@ vercel --prod
 
 ## Features
 
-- 3 feed types: Tech, Investment, Tips
+- 3 feed types: Tech, Investment, Tips — each with distinct visual identity
 - YouTube video integration
 - Daily + weekly collection modes (daily: 10 tech, 5 tips, 5 investment, 2 videos)
 - Bilingual content (DE/EN)
 - Dark/light theme
 - AI chat assistant
 - Accessible UI (focus-visible, aria-hidden, prefers-reduced-motion)
+- Distinctive design: Instrument Serif display font, section-specific color accents (tech=blue, invest=amber, tips=emerald), staggered card entrance animations, shimmer loading skeletons, gradient section headers, numbered trend rankings
 - No authentication required

@@ -2,7 +2,7 @@
 
 Bilingual (DE/EN) daily + weekly AI news aggregator for internal teams — curates tech breakthroughs, investment news, practical tips, and **YouTube videos** from RSS feeds + Hacker News + YouTube. Built with Next.js 16 + React 19 + Tailwind CSS 4 + Shadcn/ui, deployed on Vercel.
 
-**Status**: Core app complete with Railway backend integration. Supports 3 feed types + YouTube videos, bilingual, daily + weekly navigation, dark/light theme, accessibility audited (Web Interface Guidelines). **No authentication required**.
+**Status**: Core app complete with Railway backend integration. Supports 3 feed types + YouTube videos, bilingual, daily + weekly navigation, dark/light theme, accessibility audited (Web Interface Guidelines), design overhauled with distinctive visual identity (Instrument Serif display font, section-specific accents, staggered animations, shimmer skeletons). **No authentication required**.
 
 ---
 
@@ -336,6 +336,23 @@ All page components pass a Web Interface Guidelines audit (2026-02-10):
 - **Image dimensions**: `<img>` tags include explicit `width`/`height` to prevent CLS
 - **tabular-nums**: Financial tables use `font-variant-numeric: tabular-nums` for number alignment
 - **scroll-margin-top**: Topic page anchor targets use `scroll-mt-20` for hash navigation
+
+### Design System (2026-02-10)
+
+The frontend uses a distinctive visual identity with section-specific theming:
+
+- **Typography**: Instrument Serif (`font-display`) for display headings, Geist for body, Geist Mono for code
+- **Section accents**: Each feed type has a unique color — tech (blue/primary), investment (amber `--invest-accent`), tips (emerald `--tips-accent`), video (coral `--video-accent`)
+- **Section headers**: Gradient backgrounds via `.section-header-tech/invest/tips` CSS classes with `border-l-4` accent borders
+- **Card entrance**: Staggered `animate-fade-up` with 50ms delay per card (max 10)
+- **Loading skeletons**: Shimmer effect via `animate-shimmer` class
+- **Impact borders**: Tech cards have left borders colored by impact level (critical=red, high=orange, medium=blue)
+- **Trend rankings**: Right sidebar shows numbered (1-10) rankings with large semi-transparent index numbers
+- **Mobile nav**: Active tab has scale animation + colored dot indicator
+- **Ambient gradient**: Subtle brand color wash (`from-primary/[0.02]`) at top of main app for login→app visual continuity
+- **Sidebar**: Active nav items have `border-l-[3px]` indicator; logo uses `from-primary to-accent` gradient
+- **Share feedback**: Button has `active:scale-95` press animation
+- **Week nav**: Fade edge masks on scrollable area, enhanced current-period highlighting
 
 ### SEO Metadata Patterns
 
