@@ -3,7 +3,7 @@
 import React from "react"
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { Search, Mail, Check } from "lucide-react";
+import { Search, Mail, Check, TrendingUp } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useSettings } from "@/lib/settings-context";
@@ -132,7 +132,7 @@ export function RightSidebar({ weekId, onSearchChange }: RightSidebarProps) {
       <div ref={contentRef}>
         {/* Search */}
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Search aria-hidden="true" className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder={t("search")}
             className="pl-10 bg-secondary border-0 focus-visible:ring-1 focus-visible:ring-primary rounded-full"
@@ -146,22 +146,25 @@ export function RightSidebar({ weekId, onSearchChange }: RightSidebarProps) {
 
         {/* Trends */}
         <div className="mt-4 rounded-xl bg-secondary/50 p-4">
-          <h3 className="text-xl font-bold text-foreground">{t("whatsNew")}</h3>
-          <div className="mt-3 space-y-4">
+          <div className="flex items-center gap-2">
+            <TrendingUp aria-hidden="true" className="h-5 w-5 text-primary" />
+            <h3 className="font-display text-xl font-bold text-foreground">{t("whatsNew")}</h3>
+          </div>
+          <div className="mt-3 space-y-1">
             {trends.slice(0, 10).map((trend, index) => (
-              <a key={index} href={`/${language}/topic/${toTopicSlug(trend.title)}`} className="group block cursor-pointer">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="text-xs text-muted-foreground">{trend.category}</p>
-                    <p className="font-bold text-foreground group-hover:underline">{trend.title}</p>
-                  </div>
-                  <span className="rounded-full p-1 opacity-0 group-hover:opacity-100 hover:bg-primary/10 transition-all">
-                    <svg className="h-4 w-4 text-muted-foreground" viewBox="0 0 24 24" fill="currentColor">
-                      <circle cx="12" cy="6" r="2" />
-                      <circle cx="12" cy="12" r="2" />
-                      <circle cx="12" cy="18" r="2" />
-                    </svg>
-                  </span>
+              <a
+                key={index}
+                href={`/${language}/topic/${toTopicSlug(trend.title)}`}
+                className="group flex items-start gap-3 rounded-lg p-2 hover:bg-secondary/80 transition-colors focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <span className="text-2xl font-bold text-muted-foreground/30 tabular-nums w-8 shrink-0 select-none">
+                  {index + 1}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs text-muted-foreground">{trend.category}</p>
+                  <p className="font-semibold text-foreground group-hover:text-primary transition-colors leading-tight">
+                    {trend.title}
+                  </p>
                 </div>
               </a>
             ))}
@@ -169,15 +172,15 @@ export function RightSidebar({ weekId, onSearchChange }: RightSidebarProps) {
         </div>
 
         {/* Newsletter Signup */}
-        <div className="mt-4 rounded-xl bg-secondary/50 p-4">
+        <div className="mt-4 rounded-xl border border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5 p-4">
           <div className="flex items-center gap-2 mb-1">
-            <Mail className="h-4 w-4 text-primary" />
+            <Mail aria-hidden="true" className="h-4 w-4 text-primary" />
             <h3 className="font-bold text-foreground">{t("newsletter")}</h3>
           </div>
           <p className="text-xs text-muted-foreground mb-3">{t("newsletterDescription")}</p>
           {subscribeState === "success" ? (
             <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
-              <Check className="h-4 w-4" />
+              <Check aria-hidden="true" className="h-4 w-4" />
               <span>{t("subscribed")}</span>
             </div>
           ) : (
@@ -202,7 +205,7 @@ export function RightSidebar({ weekId, onSearchChange }: RightSidebarProps) {
                 onChange={(e) => setEmail(e.target.value)}
                 className="bg-background border-0 focus-visible:ring-1 focus-visible:ring-primary text-sm"
               />
-              <Button type="submit" size="sm" className="w-full rounded-full">
+              <Button type="submit" size="sm" className="w-full rounded-full bg-gradient-to-r from-primary to-accent text-primary-foreground hover:opacity-90 transition-opacity">
                 {t("subscribe")}
               </Button>
             </form>

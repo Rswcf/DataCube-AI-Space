@@ -1,6 +1,6 @@
 "use client";
 
-import { Cpu, TrendingUp, Lightbulb, Home, Search, Users, Sun, Moon, Languages, Settings, Heart } from "lucide-react";
+import { Cpu, TrendingUp, Lightbulb, Home, Search, Users, Sun, Moon, Languages, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSettings } from "@/lib/settings-context";
 import type { TranslationKey } from "@/lib/translations";
@@ -46,6 +46,7 @@ function NavButton({
   onClick,
   isActive,
   className,
+  iconClassName,
 }: {
   icon: React.ElementType;
   label: string;
@@ -53,6 +54,7 @@ function NavButton({
   onClick?: () => void;
   isActive?: boolean;
   className?: string;
+  iconClassName?: string;
 }) {
   return (
     <Tooltip delayDuration={300}>
@@ -60,17 +62,19 @@ function NavButton({
         <button
           onClick={onClick}
           className={cn(
-            "flex w-full items-center gap-4 rounded-full px-4 py-3 transition-all duration-200",
+            "flex w-full items-center gap-4 rounded-lg px-4 py-3 border-l-[3px] transition-colors duration-200 hover:translate-x-0.5 transition-transform focus-visible:ring-2 focus-visible:ring-ring",
             isActive
-              ? "bg-primary/10 text-primary font-semibold"
-              : "text-foreground hover:bg-secondary",
+              ? "bg-primary/10 text-primary font-bold shadow-sm shadow-primary/10 border-l-primary"
+              : "text-foreground hover:bg-secondary border-l-transparent",
             className
           )}
         >
           <Icon
+            aria-hidden="true"
             className={cn(
-              "h-6 w-6 transition-colors",
-              isActive ? "text-primary" : ""
+              "h-6 w-6 shrink-0 transition-colors",
+              isActive ? "text-primary" : "",
+              iconClassName
             )}
           />
           <div className="text-left hidden xl:block">
@@ -98,7 +102,7 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
         {/* Logo */}
         <div className="mb-6 px-3">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-accent shadow-lg shadow-primary/25">
               <span className="text-lg font-bold text-primary-foreground">DC</span>
             </div>
             <span className="text-xl font-bold text-foreground hidden xl:block">Data Cube</span>
@@ -148,6 +152,7 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
             icon={theme === "dark" ? Sun : Moon}
             label={theme === "dark" ? t("lightMode") : t("darkMode")}
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            iconClassName={theme === "dark" ? "text-yellow-500" : "text-blue-400"}
           />
 
           {/* Language Toggle */}
@@ -155,6 +160,7 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
             icon={Languages}
             label={language === "de" ? "English" : "Deutsch"}
             onClick={() => setLanguage(language === "de" ? "en" : "de")}
+            iconClassName="text-accent"
           />
 
           {/* Support */}
@@ -162,6 +168,7 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
             icon={Heart}
             label={t("support")}
             onClick={() => window.open("https://ko-fi.com/datacubeai", "_blank", "noopener,noreferrer")}
+            iconClassName="text-pink-500"
           />
         </div>
 

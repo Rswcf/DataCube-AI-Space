@@ -30,6 +30,13 @@ const impactColors: Record<string, string> = {
   low: "bg-muted text-muted-foreground border-border",
 };
 
+const impactBorderColors: Record<string, string> = {
+  critical: "border-l-destructive",
+  high: "border-l-chart-4",
+  medium: "border-l-primary",
+  low: "border-l-transparent",
+};
+
 const impactLabels = {
   de: { critical: "Kritisch", high: "Hoch", medium: "Mittel", low: "Niedrig" },
   en: { critical: "Critical", high: "High", medium: "Medium", low: "Low" },
@@ -117,10 +124,15 @@ export function TechFeed({ weekId, searchQuery }: TechFeedProps) {
   return (
     <div className="divide-y divide-border">
       {/* Section Header */}
-      <div className="bg-secondary/30 px-3 py-2 sm:px-4 sm:py-3">
+      <div className="section-header-tech border-l-4 border-tech-accent px-3 py-2 sm:px-4 sm:py-3">
         <div className="flex items-center gap-2">
-          <Cpu className="h-5 w-5 text-primary" />
+          <Cpu className="h-5 w-5 text-tech-accent" aria-hidden="true" />
           <h3 className="text-sm sm:text-base font-semibold text-foreground">{t("aiTechProgress")}</h3>
+          {!loading && filteredPosts.length > 0 && (
+            <Badge variant="outline" className="text-xs text-tech-accent border-tech-accent/30">
+              {filteredPosts.length}
+            </Badge>
+          )}
           <Badge variant="secondary" className="ml-auto">
             {periodLabel}
           </Badge>
@@ -135,20 +147,28 @@ export function TechFeed({ weekId, searchQuery }: TechFeedProps) {
 
       {/* Empty State */}
       {!loading && filteredPosts.length === 0 && (
-        <div className="px-4 py-12 text-center text-muted-foreground">
-          {t("noDataForThisPeriod")}
+        <div className="px-4 py-16 text-center">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-secondary">
+            <Cpu className="h-8 w-8 text-muted-foreground/50" aria-hidden="true" />
+          </div>
+          <p className="text-muted-foreground font-medium">{t("noDataForThisPeriod")}</p>
+          <p className="mt-1 text-sm text-muted-foreground/60">
+            {language === "de" ? "Daten werden täglich um 23:00 Uhr gesammelt" : "Data is collected daily at 11:00 PM CET"}
+          </p>
         </div>
       )}
 
       {/* Posts */}
-      {filteredPosts.map((post) => {
+      {filteredPosts.map((post, index) => {
         const IconComponent = iconMap[post.iconType] || Brain;
         const isVideoPost = post.isVideo && post.videoId;
+        const borderColor = isVideoPost ? "border-l-video-accent" : (impactBorderColors[post.impact] || "border-l-transparent");
 
         return (
           <article
             key={post.id}
-            className="px-3 py-3 sm:px-4 sm:py-4 transition-colors hover:bg-secondary/30"
+            className={`border-l-2 ${borderColor} px-3 py-3 sm:px-4 sm:py-4 transition-colors hover:bg-secondary/30 animate-fade-up`}
+            style={{ animationDelay: `${Math.min(index, 10) * 50}ms` }}
           >
             <div className="flex gap-2 sm:gap-3">
               {/* Avatar */}
@@ -221,7 +241,7 @@ export function TechFeed({ weekId, searchQuery }: TechFeedProps) {
 
                 {/* Source */}
                 <div className="mt-2 flex items-center gap-1 text-xs sm:text-sm text-muted-foreground">
-                  <ExternalLink className="h-3 w-3" />
+                  <ExternalLink className="h-3 w-3" aria-hidden="true" />
                   {post.sourceUrl ? (
                     <a
                       href={post.sourceUrl}

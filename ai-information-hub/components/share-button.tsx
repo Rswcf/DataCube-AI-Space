@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Share, Check, Copy, Link } from "lucide-react";
 import { useSettings } from "@/lib/settings-context";
+import { cn } from "@/lib/utils";
 
 interface ShareButtonProps {
   title: string;
@@ -95,16 +96,21 @@ export function ShareButton({ title, text, url }: ShareButtonProps) {
     <div className="relative" ref={menuRef}>
       <button
         onClick={handleShare}
-        className="flex items-center gap-1.5 rounded-full px-2 py-1.5 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+        className={cn(
+          "flex items-center gap-1.5 rounded-full px-2 py-1.5 active:scale-95 transition-transform duration-150",
+          copied
+            ? "text-accent bg-accent/10"
+            : "text-muted-foreground hover:text-primary hover:bg-primary/10"
+        )}
         title={t("share")}
       >
         {copied ? (
-          <Check className="h-4 w-4 text-accent" />
+          <Check className="h-4 w-4" aria-hidden="true" />
         ) : (
-          <Share className="h-4 w-4" />
+          <Share className="h-4 w-4" aria-hidden="true" />
         )}
         {copied && (
-          <span className="text-xs text-accent">{t("copiedToClipboard")}</span>
+          <span className="text-xs font-medium">{t("copiedToClipboard")}</span>
         )}
       </button>
 
@@ -112,23 +118,23 @@ export function ShareButton({ title, text, url }: ShareButtonProps) {
         <div className="absolute bottom-full left-0 mb-1 z-50 min-w-[180px] rounded-lg border bg-popover p-1 shadow-md animate-in fade-in-0 zoom-in-95">
           <button
             onClick={handleCopy}
-            className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-accent transition-colors"
+            className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-accent transition-colors focus-visible:ring-2 focus-visible:ring-ring"
           >
-            <Link className="h-4 w-4" />
+            <Link className="h-4 w-4" aria-hidden="true" />
             {t("copyLink")}
           </button>
           <button
             onClick={handleShareX}
-            className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-accent transition-colors"
+            className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-accent transition-colors focus-visible:ring-2 focus-visible:ring-ring"
           >
-            <XIcon className="h-4 w-4" />
+            <XIcon className="h-4 w-4" aria-hidden="true" />
             {t("shareOnX")}
           </button>
           <button
             onClick={handleShareLinkedIn}
-            className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-accent transition-colors"
+            className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-accent transition-colors focus-visible:ring-2 focus-visible:ring-ring"
           >
-            <LinkedInIcon className="h-4 w-4" />
+            <LinkedInIcon className="h-4 w-4" aria-hidden="true" />
             {t("shareOnLinkedIn")}
           </button>
         </div>

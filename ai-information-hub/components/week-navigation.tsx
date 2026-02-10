@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, ChevronDown, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -96,12 +96,23 @@ export function WeekNavigation({ selectedWeekId, onWeekChange }: WeekNavigationP
   };
 
   const hasDays = !!activeWeek?.days?.length;
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Scroll to active week button when it changes
+  useEffect(() => {
+    if (!scrollRef.current || activeWeekIndex < 0) return;
+    const container = scrollRef.current;
+    const activeButton = container.children[activeWeekIndex] as HTMLElement | undefined;
+    if (activeButton) {
+      activeButton.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+    }
+  }, [activeWeekIndex]);
 
   return (
     <div className="sticky top-0 z-10 border-b border-border bg-background/80 backdrop-blur-md">
       <div className="flex items-center justify-between px-4 py-3">
         <div className="flex items-center gap-2">
-          <Calendar className="h-5 w-5 text-primary" />
+          <Calendar className="h-5 w-5 text-primary" aria-hidden="true" />
           <h2 className="text-lg font-bold text-foreground">{t("weekOverview")}</h2>
         </div>
         <div className="flex items-center gap-2">
@@ -112,7 +123,7 @@ export function WeekNavigation({ selectedWeekId, onWeekChange }: WeekNavigationP
             disabled={activeWeekIndex < 0 || activeWeekIndex >= weeks.length - 1}
             className="h-8 w-8"
           >
-            <ChevronLeft className="h-4 w-4" />
+            <ChevronLeft className="h-4 w-4" aria-hidden="true" />
           </Button>
           <Button
             variant="ghost"
@@ -121,15 +132,15 @@ export function WeekNavigation({ selectedWeekId, onWeekChange }: WeekNavigationP
             disabled={activeWeekIndex <= 0}
             className="h-8 w-8"
           >
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-4 w-4" aria-hidden="true" />
           </Button>
         </div>
       </div>
 
       <div className="relative">
-        <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-background to-transparent pointer-events-none z-10 md:hidden" />
+        <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-background to-transparent pointer-events-none z-10" aria-hidden="true" />
 
-        <div className="flex gap-1 overflow-x-auto px-4 pb-2 scrollbar-hide">
+        <div ref={scrollRef} className="flex gap-1 overflow-x-auto px-4 pb-2 scrollbar-hide scroll-smooth">
           {weeks.length === 0 && (
             <>
               {Array.from({ length: 5 }).map((_, i) => (
@@ -146,10 +157,11 @@ export function WeekNavigation({ selectedWeekId, onWeekChange }: WeekNavigationP
                 key={week.id}
                 onClick={() => selectWeek(week)}
                 className={cn(
-                  "flex shrink-0 items-center gap-1.5 rounded-lg px-4 py-2 transition-all duration-200",
+                  "flex shrink-0 items-center gap-1.5 rounded-lg px-4 py-2 transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-ring",
                   isActive
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+                  week.current && !isActive && "ring-1 ring-primary/30"
                 )}
               >
                 <div className="flex flex-col items-center">
@@ -162,6 +174,7 @@ export function WeekNavigation({ selectedWeekId, onWeekChange }: WeekNavigationP
                       "h-3 w-3 transition-transform duration-200",
                       isActive && "rotate-180"
                     )}
+                    aria-hidden="true"
                   />
                 )}
                 {week.current && !weekHasDays && (
@@ -174,7 +187,7 @@ export function WeekNavigation({ selectedWeekId, onWeekChange }: WeekNavigationP
           })}
         </div>
 
-        <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background to-transparent pointer-events-none z-10 md:hidden" />
+        <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background to-transparent pointer-events-none z-10" aria-hidden="true" />
       </div>
 
       <Collapsible open={hasDays}>
@@ -186,7 +199,7 @@ export function WeekNavigation({ selectedWeekId, onWeekChange }: WeekNavigationP
                   key={day.id}
                   onClick={() => onWeekChange(day.id)}
                   className={cn(
-                    "shrink-0 flex flex-col items-center rounded-lg px-3 py-1.5 transition-all duration-200",
+                    "shrink-0 flex flex-col items-center rounded-lg px-3 py-1.5 transition-colors duration-200",
                     selectedDay === day.id
                       ? "bg-primary text-primary-foreground"
                       : "bg-secondary/60 text-secondary-foreground hover:bg-secondary/80",

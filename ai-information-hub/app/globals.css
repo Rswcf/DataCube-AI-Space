@@ -29,6 +29,10 @@
   --chart-4: oklch(0.55 0.2 30);
   --chart-5: oklch(0.6 0.15 320);
   --radius: 0.5rem;
+  --tech-accent: oklch(0.55 0.2 250);
+  --invest-accent: oklch(0.7 0.15 85);
+  --tips-accent: oklch(0.6 0.18 155);
+  --video-accent: oklch(0.65 0.2 25);
   --sidebar: oklch(0.96 0.005 260);
   --sidebar-foreground: oklch(0.15 0.01 260);
   --content-surface: oklch(0.98 0.005 260);
@@ -76,11 +80,16 @@
 
   /* Elevated surface for main content area */
   --content-surface: oklch(0.18 0.01 260);
+  --tech-accent: oklch(0.65 0.18 250);
+  --invest-accent: oklch(0.75 0.15 85);
+  --tips-accent: oklch(0.6 0.2 155);
+  --video-accent: oklch(0.65 0.22 25);
 }
 
 @theme inline {
   --font-sans: 'Geist', 'Geist Fallback';
   --font-mono: 'Geist Mono', 'Geist Mono Fallback';
+  --font-display: 'Instrument Serif', serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -118,6 +127,10 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-content-surface: var(--content-surface);
+  --color-tech-accent: var(--tech-accent);
+  --color-invest-accent: var(--invest-accent);
+  --color-tips-accent: var(--tips-accent);
+  --color-video-accent: var(--video-accent);
 }
 
 @layer base {
@@ -231,4 +244,51 @@
     0%, 100% { box-shadow: 0 0 20px oklch(0.65 0.18 250 / 0.3); }
     50% { box-shadow: 0 0 40px oklch(0.65 0.18 250 / 0.6); }
   }
+}
+
+/* Staggered card entrance */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up {
+  animation: fade-up 0.4s ease-out both;
+}
+
+/* Shimmer effect for loading skeletons */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent 25%, var(--secondary) 50%, transparent 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Subtle gradient sweep for section headers */
+@keyframes gradient-sweep {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Section header gradient backgrounds */
+.section-header-tech {
+  background: linear-gradient(135deg, oklch(0.55 0.2 250 / 0.08), oklch(0.5 0.18 165 / 0.05));
+}
+.section-header-invest {
+  background: linear-gradient(135deg, oklch(0.6 0.18 85 / 0.1), oklch(0.7 0.15 60 / 0.05));
+}
+.section-header-tips {
+  background: linear-gradient(135deg, oklch(0.6 0.18 155 / 0.08), oklch(0.5 0.15 140 / 0.05));
+}
+
+.dark .section-header-tech {
+  background: linear-gradient(135deg, oklch(0.65 0.18 250 / 0.12), oklch(0.55 0.2 165 / 0.06));
+}
+.dark .section-header-invest {
+  background: linear-gradient(135deg, oklch(0.75 0.15 85 / 0.12), oklch(0.65 0.12 60 / 0.06));
+}
+.dark .section-header-tips {
+  background: linear-gradient(135deg, oklch(0.6 0.2 155 / 0.12), oklch(0.55 0.15 140 / 0.06));
 }

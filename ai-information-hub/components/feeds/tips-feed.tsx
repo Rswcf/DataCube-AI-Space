@@ -112,10 +112,15 @@ export function TipsFeed({ weekId, searchQuery }: TipsFeedProps) {
   return (
     <div className="divide-y divide-border">
       {/* Section Header */}
-      <div className="bg-secondary/30 px-3 py-2 sm:px-4 sm:py-3">
+      <div className="section-header-tips border-l-4 border-tips-accent px-3 py-2 sm:px-4 sm:py-3">
         <div className="flex items-center gap-2">
-          <Lightbulb className="h-5 w-5 text-chart-3" />
+          <Lightbulb className="h-5 w-5 text-tips-accent" aria-hidden="true" />
           <h3 className="text-sm sm:text-base font-semibold text-foreground">{t("practicalTipsTitle")}</h3>
+          {!loading && filteredPosts.length > 0 && (
+            <Badge variant="outline" className="text-xs text-tips-accent border-tips-accent/30">
+              {filteredPosts.length}
+            </Badge>
+          )}
           <Badge variant="secondary" className="ml-auto">
             {periodLabel}
           </Badge>
@@ -130,16 +135,23 @@ export function TipsFeed({ weekId, searchQuery }: TipsFeedProps) {
 
       {/* Empty State */}
       {!loading && filteredPosts.length === 0 && (
-        <div className="px-4 py-12 text-center text-muted-foreground">
-          {t("noDataForThisPeriod")}
+        <div className="px-4 py-16 text-center">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-secondary">
+            <Lightbulb className="h-8 w-8 text-muted-foreground/50" aria-hidden="true" />
+          </div>
+          <p className="text-muted-foreground font-medium">{t("noDataForThisPeriod")}</p>
+          <p className="mt-1 text-sm text-muted-foreground/60">
+            {language === "de" ? "Daten werden täglich um 23:00 Uhr gesammelt" : "Data is collected daily at 11:00 PM CET"}
+          </p>
         </div>
       )}
 
       {/* Tips Posts */}
-      {filteredPosts.map((post) => (
+      {filteredPosts.map((post, index) => (
         <article
           key={post.id}
-          className="px-3 py-3 sm:px-4 sm:py-4 transition-colors hover:bg-secondary/30 cursor-pointer"
+          className="border-l-2 border-l-tips-accent/30 px-3 py-3 sm:px-4 sm:py-4 transition-colors hover:bg-tips-accent/5 cursor-pointer animate-fade-up"
+          style={{ animationDelay: `${Math.min(index, 10) * 50}ms` }}
         >
           <div className="flex gap-2 sm:gap-3">
             {/* Avatar */}
@@ -175,9 +187,9 @@ export function TipsFeed({ weekId, searchQuery }: TipsFeedProps) {
               <p className="mt-2 text-[15px] sm:text-base text-foreground leading-relaxed">{post.content}</p>
 
               {/* Tip Code Block */}
-              <div className="mt-3 rounded-lg border border-border bg-secondary/50 p-3">
+              <div className="mt-3 rounded-lg border border-tips-accent/20 bg-tips-accent/5 p-3">
                 <div className="flex items-start justify-between gap-2">
-                  <pre className="flex-1 overflow-x-auto whitespace-pre-wrap text-sm font-mono text-foreground">
+                  <pre className="flex-1 overflow-x-auto whitespace-pre-wrap text-sm font-mono text-foreground leading-relaxed">
                     {post.tip}
                   </pre>
                   <Button
@@ -201,7 +213,7 @@ export function TipsFeed({ weekId, searchQuery }: TipsFeedProps) {
               {/* Source */}
               {post.sourceUrl && (
                 <div className="mt-2 flex items-center gap-1 text-xs sm:text-sm text-muted-foreground">
-                  <ExternalLink className="h-3 w-3" />
+                  <ExternalLink className="h-3 w-3" aria-hidden="true" />
                   <a
                     href={post.sourceUrl}
                     target="_blank"

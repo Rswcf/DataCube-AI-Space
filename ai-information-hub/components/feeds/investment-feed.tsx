@@ -247,7 +247,7 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
   const SourceLink = ({ sourceUrl }: { sourceUrl?: string }) =>
     sourceUrl ? (
       <div className="mt-2 flex items-center gap-1 text-xs sm:text-sm text-muted-foreground">
-        <ExternalLink className="h-3 w-3" />
+        <ExternalLink className="h-3 w-3" aria-hidden="true" />
         <a
           href={sourceUrl}
           target="_blank"
@@ -264,9 +264,9 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
   return (
     <div className="divide-y divide-border">
       {/* Section Header */}
-      <div className="bg-secondary/30 px-3 py-2 sm:px-4 sm:py-3">
+      <div className="section-header-invest border-l-4 border-invest-accent px-3 py-2 sm:px-4 sm:py-3">
         <div className="flex items-center gap-2">
-          <TrendingUp className="h-5 w-5 text-accent" />
+          <TrendingUp className="h-5 w-5 text-invest-accent" aria-hidden="true" />
           <h3 className="text-sm sm:text-base font-semibold text-foreground">{t("aiInvestments")}</h3>
           <Badge variant="secondary" className="ml-auto">
             {periodLabel}
@@ -290,7 +290,7 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
                 : "text-muted-foreground hover:text-foreground hover:bg-secondary/30"
             )}
           >
-            <tab.icon className="h-4 w-4" />
+            <tab.icon className="h-4 w-4" aria-hidden="true" />
             {tab.label}
           </button>
         ))}
@@ -325,12 +325,18 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
       {!loading && activeTab === "primary" && (
         <div className="divide-y divide-border">
           {filteredPrimary.length === 0 && (
-            <div className="px-4 py-12 text-center text-muted-foreground">
-              {t("noDataForThisPeriod")}
+            <div className="px-4 py-16 text-center">
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-secondary">
+                <Briefcase className="h-8 w-8 text-muted-foreground/50" aria-hidden="true" />
+              </div>
+              <p className="text-muted-foreground font-medium">{t("noDataForThisPeriod")}</p>
+              <p className="mt-1 text-sm text-muted-foreground/60">
+                {language === "de" ? "Daten werden täglich um 23:00 Uhr gesammelt" : "Data is collected daily at 11:00 PM CET"}
+              </p>
             </div>
           )}
-          {filteredPrimary.map((post) => (
-            <article key={post.id} className="px-3 py-3 sm:px-4 sm:py-4 transition-colors hover:bg-secondary/30 cursor-pointer">
+          {filteredPrimary.map((post, index) => (
+            <article key={post.id} className="border-l-2 border-l-invest-accent/30 px-3 py-3 sm:px-4 sm:py-4 transition-colors hover:bg-invest-accent/5 cursor-pointer animate-fade-up" style={{ animationDelay: `${Math.min(index, 10) * 50}ms` }}>
               <div className="flex gap-2 sm:gap-3">
                 <div className="flex h-10 w-10 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-full bg-accent/20 text-accent font-bold text-sm sm:text-base">
                   {post.author.avatar}
@@ -348,7 +354,7 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
                   <div className="mt-2 rounded-lg border border-border bg-card p-3">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <Building2 className="h-4 w-4 text-accent" />
+                        <Building2 className="h-4 w-4 text-accent" aria-hidden="true" />
                         <span className="font-semibold text-foreground">{post.company}</span>
                       </div>
                       <Badge className="bg-accent/20 text-accent border-accent/30">{post.round}</Badge>
@@ -393,12 +399,18 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
             </div>
           )}
           {filteredSecondary.length === 0 && (
-            <div className="px-4 py-12 text-center text-muted-foreground">
-              {t("noDataForThisPeriod")}
+            <div className="px-4 py-16 text-center">
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-secondary">
+                <TrendingUp className="h-8 w-8 text-muted-foreground/50" aria-hidden="true" />
+              </div>
+              <p className="text-muted-foreground font-medium">{t("noDataForThisPeriod")}</p>
+              <p className="mt-1 text-sm text-muted-foreground/60">
+                {language === "de" ? "Daten werden täglich um 23:00 Uhr gesammelt" : "Data is collected daily at 11:00 PM CET"}
+              </p>
             </div>
           )}
-          {filteredSecondary.map((post) => (
-            <article key={post.id} className="px-3 py-3 sm:px-4 sm:py-4 transition-colors hover:bg-secondary/30 cursor-pointer">
+          {filteredSecondary.map((post, index) => (
+            <article key={post.id} className="border-l-2 border-l-invest-accent/30 px-3 py-3 sm:px-4 sm:py-4 transition-colors hover:bg-invest-accent/5 cursor-pointer animate-fade-up" style={{ animationDelay: `${Math.min(index, 10) * 50}ms` }}>
               <div className="flex gap-2 sm:gap-3">
                 <div className="flex h-10 w-10 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-full bg-chart-3/20 text-chart-3 font-bold text-sm sm:text-base">
                   {post.author.avatar}
@@ -436,7 +448,7 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
                               : "bg-destructive/20 text-destructive"
                           )}
                         >
-                          {post.direction === "up" ? <TrendingUp className="h-4 w-4" /> : <TrendingDown className="h-4 w-4" />}
+                          {post.direction === "up" ? <TrendingUp className="h-4 w-4" aria-hidden="true" /> : <TrendingDown className="h-4 w-4" aria-hidden="true" />}
                           {post.change}
                         </div>
                       )}
@@ -470,12 +482,18 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
       {!loading && activeTab === "ma" && (
         <div className="divide-y divide-border">
           {filteredMa.length === 0 && (
-            <div className="px-4 py-12 text-center text-muted-foreground">
-              {t("noDataForThisPeriod")}
+            <div className="px-4 py-16 text-center">
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-secondary">
+                <GitMerge className="h-8 w-8 text-muted-foreground/50" aria-hidden="true" />
+              </div>
+              <p className="text-muted-foreground font-medium">{t("noDataForThisPeriod")}</p>
+              <p className="mt-1 text-sm text-muted-foreground/60">
+                {language === "de" ? "Daten werden täglich um 23:00 Uhr gesammelt" : "Data is collected daily at 11:00 PM CET"}
+              </p>
             </div>
           )}
-          {filteredMa.map((post) => (
-            <article key={post.id} className="px-3 py-3 sm:px-4 sm:py-4 transition-colors hover:bg-secondary/30 cursor-pointer">
+          {filteredMa.map((post, index) => (
+            <article key={post.id} className="border-l-2 border-l-invest-accent/30 px-3 py-3 sm:px-4 sm:py-4 transition-colors hover:bg-invest-accent/5 cursor-pointer animate-fade-up" style={{ animationDelay: `${Math.min(index, 10) * 50}ms` }}>
               <div className="flex gap-2 sm:gap-3">
                 <div className="flex h-10 w-10 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-full bg-chart-5/20 text-chart-5 font-bold text-sm sm:text-base">
                   {post.author.avatar}
@@ -496,7 +514,7 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
                         <p className="text-xs text-muted-foreground">{t("acquirer")}</p>
                         <p className="font-semibold text-foreground">{post.acquirer}</p>
                       </div>
-                      <GitMerge className="h-6 w-6 text-chart-5" />
+                      <GitMerge className="h-6 w-6 text-chart-5" aria-hidden="true" />
                       <div className="text-center">
                         <p className="text-xs text-muted-foreground">{t("target")}</p>
                         <p className="font-semibold text-foreground">{post.target}</p>

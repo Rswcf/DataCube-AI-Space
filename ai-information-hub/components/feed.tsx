@@ -82,10 +82,12 @@ export function Feed({ activeTab, selectedWeekId, onWeekChange, searchQuery }: F
         <div className="overflow-hidden">
           <div
             className={cn(
-              "transition-transform duration-300 ease-out",
+              "transition-opacity duration-300 ease-out",
               isAnimating && direction === "left" && "animate-slide-left",
-              isAnimating && direction === "right" && "animate-slide-right"
+              isAnimating && direction === "right" && "animate-slide-right",
+              isAnimating ? "opacity-0" : "opacity-100"
             )}
+            onAnimationEnd={() => setIsAnimating(false)}
           >
             {renderFeed()}
           </div>

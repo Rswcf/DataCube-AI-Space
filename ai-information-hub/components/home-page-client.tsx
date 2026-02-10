@@ -69,6 +69,11 @@ export default function HomePageClient({ initialWeekId = "" }: HomePageClientPro
 
   return (
     <div className="min-h-screen w-full">
+      {/* Ambient gradient - visual continuity from login */}
+      <div
+        className="pointer-events-none fixed top-0 left-0 right-0 h-32 bg-gradient-to-b from-primary/[0.02] to-transparent z-0"
+        aria-hidden="true"
+      />
       <div className="mx-auto flex max-w-[1280px]">
         {/* Left Sidebar - Fixed width */}
         <div className="hidden md:flex md:w-20 xl:w-[275px] shrink-0 justify-end">
@@ -141,26 +146,29 @@ function MobileNav({
           key={tab.id}
           onClick={() => onTabChange(tab.id)}
           className={cn(
-            "flex flex-col items-center gap-1 px-2 py-2 transition-colors",
-            activeTab === tab.id ? "text-primary" : "text-muted-foreground"
+            "flex flex-col items-center gap-1 px-3 py-2 transition-transform duration-200",
+            activeTab === tab.id ? "text-primary scale-105" : "text-muted-foreground"
           )}
         >
-          <tab.icon className="h-5 w-5" />
+          <tab.icon className="h-5 w-5" aria-hidden="true" />
+          {activeTab === tab.id && (
+            <span className="h-1 w-1 rounded-full bg-primary" aria-hidden="true" />
+          )}
           <span className="text-[10px] font-medium">{tab.label}</span>
         </button>
       ))}
       <button
         onClick={onSearchClick}
-        className="flex flex-col items-center gap-1 px-2 py-2 transition-colors text-muted-foreground"
+        className="flex flex-col items-center gap-1 px-3 py-2 active:scale-95 transition-transform duration-200 text-muted-foreground"
       >
-        <Search className="h-5 w-5" />
+        <Search className="h-5 w-5" aria-hidden="true" />
         <span className="text-[10px] font-medium">{t("search")}</span>
       </button>
       <button
         onClick={onSettingsClick}
-        className="flex flex-col items-center gap-1 px-2 py-2 transition-colors text-muted-foreground"
+        className="flex flex-col items-center gap-1 px-3 py-2 active:scale-95 transition-transform duration-200 text-muted-foreground"
       >
-        <Settings className="h-5 w-5" />
+        <Settings className="h-5 w-5" aria-hidden="true" />
         <span className="text-[10px] font-medium">{t("settings")}</span>
       </button>
     </nav>
@@ -249,9 +257,10 @@ function MobileSearchDrawer({
 
       {/* Drawer */}
       <div className="absolute bottom-0 left-0 right-0 max-h-[85vh] rounded-t-2xl bg-background animate-in slide-in-from-bottom duration-300">
-        {/* Handle */}
-        <div className="flex justify-center py-3">
-          <div className="h-1 w-12 rounded-full bg-muted-foreground/30" />
+        {/* Handle with subtle gradient */}
+        <div className="relative flex justify-center py-3">
+          <div className="absolute inset-x-0 top-0 h-full rounded-t-2xl bg-gradient-to-b from-primary/[0.03] to-transparent" aria-hidden="true" />
+          <div className="relative h-1 w-12 rounded-full bg-muted-foreground/30" />
         </div>
 
         {/* Header */}
@@ -259,16 +268,16 @@ function MobileSearchDrawer({
           <h2 className="text-lg font-bold">{t("search")}</h2>
           <button
             onClick={onClose}
-            className="rounded-full p-2 hover:bg-secondary transition-colors"
+            className="rounded-full p-2 hover:bg-secondary transition-colors focus-visible:ring-2 focus-visible:ring-ring"
           >
-            <X className="h-5 w-5" />
+            <X className="h-5 w-5" aria-hidden="true" />
           </button>
         </div>
 
         {/* Search Input */}
         <div className="px-4 pb-4">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
             <input
               type="text"
               placeholder={t("search")}
@@ -283,15 +292,18 @@ function MobileSearchDrawer({
         {/* Trends */}
         <div className="px-4 pb-6 overflow-y-auto max-h-[50vh]">
           <h3 className="text-sm font-semibold text-muted-foreground mb-3">{t("whatsNew")}</h3>
-          <div className="space-y-3">
+          <div className="space-y-1">
             {trends.map((trend, index) => (
               <button
                 key={index}
                 onClick={() => handleTrendClick(trend.title)}
-                className="w-full text-left p-3 rounded-lg hover:bg-secondary transition-colors"
+                className="w-full text-left p-3 rounded-lg hover:bg-secondary transition-colors focus-visible:ring-2 focus-visible:ring-ring flex items-start gap-3"
               >
-                <p className="text-xs text-muted-foreground">{trend.category}</p>
-                <p className="font-semibold">{trend.title}</p>
+                <span className="text-sm font-bold text-muted-foreground/50 mt-0.5 w-5 shrink-0 tabular-nums" aria-hidden="true">{index + 1}</span>
+                <div className="min-w-0">
+                  <p className="text-xs text-muted-foreground">{trend.category}</p>
+                  <p className="font-semibold">{trend.title}</p>
+                </div>
               </button>
             ))}
           </div>
@@ -338,9 +350,9 @@ function MobileSettingsDrawer({
           <h2 className="text-lg font-bold">{t("settings")}</h2>
           <button
             onClick={onClose}
-            className="rounded-full p-2 hover:bg-secondary transition-colors"
+            className="rounded-full p-2 hover:bg-secondary transition-colors focus-visible:ring-2 focus-visible:ring-ring"
           >
-            <X className="h-5 w-5" />
+            <X className="h-5 w-5" aria-hidden="true" />
           </button>
         </div>
 
@@ -351,12 +363,12 @@ function MobileSettingsDrawer({
             onClick={() => {
               setTheme(theme === "dark" ? "light" : "dark");
             }}
-            className="flex w-full items-center gap-4 rounded-xl p-4 hover:bg-secondary transition-colors"
+            className="flex w-full items-center gap-4 rounded-xl p-4 hover:bg-secondary transition-colors focus-visible:ring-2 focus-visible:ring-ring"
           >
             {theme === "dark" ? (
-              <Sun className="h-6 w-6 text-primary" />
+              <Sun className="h-6 w-6 text-primary" aria-hidden="true" />
             ) : (
-              <Moon className="h-6 w-6 text-primary" />
+              <Moon className="h-6 w-6 text-primary" aria-hidden="true" />
             )}
             <div className="flex-1 text-left">
               <p className="font-semibold">{theme === "dark" ? t("lightMode") : t("darkMode")}</p>
@@ -371,9 +383,9 @@ function MobileSettingsDrawer({
             onClick={() => {
               setLanguage(language === "de" ? "en" : "de");
             }}
-            className="flex w-full items-center gap-4 rounded-xl p-4 hover:bg-secondary transition-colors"
+            className="flex w-full items-center gap-4 rounded-xl p-4 hover:bg-secondary transition-colors focus-visible:ring-2 focus-visible:ring-ring"
           >
-            <Languages className="h-6 w-6 text-primary" />
+            <Languages className="h-6 w-6 text-primary" aria-hidden="true" />
             <div className="flex-1 text-left">
               <p className="font-semibold">{language === "de" ? "English" : "Deutsch"}</p>
               <p className="text-sm text-muted-foreground">
