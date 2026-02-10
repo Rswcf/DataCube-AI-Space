@@ -152,9 +152,9 @@ export default async function WeekPage({ params, searchParams }: Props) {
           {dateRange ? <span>{dateRange}</span> : null}
           {dateRange ? <span> • </span> : null}
           <span>Language: </span>
-          <a href={`/de/week/${weekId}`} className={lang === 'de' ? 'font-semibold underline' : 'hover:underline'}>DE</a>
+          <a href={`/de/week/${weekId}`} className={`rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${lang === 'de' ? 'font-semibold underline' : 'hover:underline'}`}>DE</a>
           <span> / </span>
-          <a href={`/en/week/${weekId}`} className={lang === 'en' ? 'font-semibold underline' : 'hover:underline'}>EN</a>
+          <a href={`/en/week/${weekId}`} className={`rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${lang === 'en' ? 'font-semibold underline' : 'hover:underline'}`}>EN</a>
         </p>
       </header>
 
@@ -186,7 +186,7 @@ export default async function WeekPage({ params, searchParams }: Props) {
                       <span>
                         Source:{' '}
                         {post.sourceUrl ? (
-                          <a href={post.sourceUrl} target="_blank" rel="noopener noreferrer" className="underline hover:no-underline">
+                          <a href={post.sourceUrl} target="_blank" rel="noopener noreferrer" className="underline hover:no-underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">
                             {post.source || post.sourceUrl}
                           </a>
                         ) : (
@@ -238,6 +238,8 @@ export default async function WeekPage({ params, searchParams }: Props) {
                     <img
                       src={post.videoThumbnailUrl || `https://img.youtube.com/vi/${post.videoId}/hqdefault.jpg`}
                       alt={snippetFromContent(post.content, 100)}
+                      width={480}
+                      height={360}
                       className="w-full h-auto rounded"
                       {...(index === 0 ? { fetchPriority: 'high' as any } : { loading: 'lazy' as any })}
                     />
@@ -260,7 +262,7 @@ export default async function WeekPage({ params, searchParams }: Props) {
           <p className="text-gray-600 mb-6">No primary market data.</p>
         ) : (
           <div className="overflow-x-auto mb-6">
-            <table className="w-full border-collapse text-sm">
+            <table className="w-full border-collapse text-sm tabular-nums">
               <thead>
                 <tr>
                   <th className="border border-gray-200 px-2 py-1 text-left">Company</th>
@@ -288,7 +290,7 @@ export default async function WeekPage({ params, searchParams }: Props) {
           <p className="text-gray-600 mb-6">No secondary market data.</p>
         ) : (
           <div className="overflow-x-auto mb-6">
-            <table className="w-full border-collapse text-sm">
+            <table className="w-full border-collapse text-sm tabular-nums">
               <thead>
                 <tr>
                   <th className="border border-gray-200 px-2 py-1 text-left">Ticker</th>
@@ -358,12 +360,12 @@ export default async function WeekPage({ params, searchParams }: Props) {
 
       {/* Footer */}
       <nav className="flex justify-between items-center mt-8 pt-4 border-t border-gray-200">
-        {prevId ? <a href={`/${lang}/week/${prevId}`} className="hover:underline">&larr; Previous</a> : <span />}
-        <a href={`/${lang}`} className="hover:underline">Home</a>
-        {nextId ? <a href={`/${lang}/week/${nextId}`} className="hover:underline">Next &rarr;</a> : <span />}
+        {prevId ? <a href={`/${lang}/week/${prevId}`} className="hover:underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">&larr; Previous</a> : <span />}
+        <a href={`/${lang}`} className="hover:underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">Home</a>
+        {nextId ? <a href={`/${lang}/week/${nextId}`} className="hover:underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">Next &rarr;</a> : <span />}
       </nav>
       <footer className="mt-4">
-        <a href={`/${lang}`} className="underline">
+        <a href={`/${lang}`} className="underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">
           View interactive version / Interaktive Version ansehen
         </a>
       </footer>

@@ -31,7 +31,7 @@ Bilingual (DE/EN) daily + weekly AI news aggregator with **YouTube video integra
 
 **Stack**: Next.js 16 + React 19 + Tailwind CSS 4 + Shadcn/ui (Frontend) | FastAPI + PostgreSQL (Backend)
 
-**Status**: Full-stack implementation complete with Railway backend. SEO/GEO optimized, legal pages added, engagement UI (newsletter, Ko-fi, share). **No authentication required**.
+**Status**: Full-stack implementation complete with Railway backend. SEO/GEO optimized, legal pages added, engagement UI (newsletter, Ko-fi, share), accessibility audited (Web Interface Guidelines). **No authentication required**.
 
 ---
 

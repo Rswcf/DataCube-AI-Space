@@ -145,7 +145,7 @@ export async function HomePageContent({ language = 'de' }: HomePageContentProps 
               <a
                 key={id}
                 href={`/${language}/week/${id}`}
-                className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground hover:border-primary hover:text-primary sm:text-sm"
+                className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground hover:border-primary hover:text-primary focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 sm:text-sm"
               >
                 {id}
               </a>
@@ -158,7 +158,7 @@ export async function HomePageContent({ language = 'de' }: HomePageContentProps 
               <a
                 key={topic}
                 href={`/${language}/topic/${toTopicSlug(topic)}`}
-                className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground hover:border-primary hover:text-primary sm:text-sm"
+                className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground hover:border-primary hover:text-primary focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 sm:text-sm"
               >
                 {topic}
               </a>

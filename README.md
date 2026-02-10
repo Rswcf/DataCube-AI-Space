@@ -17,6 +17,7 @@ Bilingual (DE/EN) daily + weekly AI news aggregator with YouTube video integrati
 - **Bilingual Content** - German and English summaries
 - **Daily + Weekly Mode** - Daily automated collection with weekly rollup view
 - **Chat Assistant** - Ask questions about the AI news
+- **Accessible UI** - focus-visible states, aria-hidden decorative icons, prefers-reduced-motion
 
 ## Architecture
 

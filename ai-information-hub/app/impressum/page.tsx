@@ -12,7 +12,7 @@ export default function ImpressumPage() {
       <header className="mb-8">
         <h1 className="text-3xl font-bold">Impressum / Legal Notice</h1>
         <p className="mt-2 text-sm text-gray-600">
-          <a href="/" className="underline hover:no-underline">
+          <a href="/" className="underline hover:no-underline focus-visible:ring-2 focus-visible:ring-primary rounded">
             &larr; Zur Startseite / Back to Home
           </a>
         </p>
@@ -171,9 +171,9 @@ export default function ImpressumPage() {
 
       <footer className="mt-12 border-t border-gray-200 pt-6">
         <div className="flex gap-4 text-sm">
-          <a href="/" className="underline hover:no-underline">Startseite / Home</a>
+          <a href="/" className="underline hover:no-underline focus-visible:ring-2 focus-visible:ring-primary rounded">Startseite / Home</a>
           <span className="text-gray-400">|</span>
-          <a href="/datenschutz" className="underline hover:no-underline">Datenschutz / Privacy</a>
+          <a href="/datenschutz" className="underline hover:no-underline focus-visible:ring-2 focus-visible:ring-primary rounded">Datenschutz / Privacy</a>
         </div>
       </footer>
     </article>

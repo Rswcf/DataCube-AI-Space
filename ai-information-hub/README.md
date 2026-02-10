@@ -36,4 +36,5 @@ vercel --prod
 - Bilingual content (DE/EN)
 - Dark/light theme
 - AI chat assistant
+- Accessible UI (focus-visible, aria-hidden, prefers-reduced-motion)
 - No authentication required

@@ -85,6 +85,7 @@ function NeuralNetwork() {
 
   return (
     <svg
+      aria-hidden="true"
       className="absolute inset-0 w-full h-full"
       viewBox="0 0 100 100"
       preserveAspectRatio="xMidYMid slice"
@@ -169,7 +170,15 @@ export default function LoginPage() {
   const featureIcons = [Cpu, TrendingUp, Lightbulb, Youtube];
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-background">
+    <div className="login-page min-h-screen flex flex-col lg:flex-row bg-background">
+      <style>{`
+        @media (prefers-reduced-motion: reduce) {
+          .login-page *, .login-page *::before, .login-page *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+          }
+        }
+      `}</style>
       {/* Left Hero Panel - Hidden on mobile, visible on lg+ */}
       <div className="hidden lg:flex lg:w-[55%] relative overflow-hidden bg-gradient-to-br from-background via-secondary/30 to-background">
         <NeuralNetwork />
@@ -205,7 +214,7 @@ export default function LoginPage() {
                 key={i}
                 className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-card/50 border border-border backdrop-blur-sm"
               >
-                <Icon className="w-4 h-4 text-primary" />
+                <Icon aria-hidden="true" className="w-4 h-4 text-primary" />
                 <span className="text-sm">{t.features[i]}</span>
               </div>
             ))}
@@ -215,10 +224,10 @@ export default function LoginPage() {
           <div className="space-y-4">
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/20 border border-accent/30">
-                <Zap className="w-4 h-4 text-accent" />
+                <Zap aria-hidden="true" className="w-4 h-4 text-accent" />
                 <span className="text-sm font-medium">{t.aiPipeline}</span>
               </div>
-              <ArrowRight className="w-4 h-4 text-muted-foreground" />
+              <ArrowRight aria-hidden="true" className="w-4 h-4 text-muted-foreground" />
               <span className="text-sm text-muted-foreground">
                 {t.aiProcess}
               </span>
@@ -269,8 +278,8 @@ export default function LoginPage() {
               <div className="relative w-20 h-20">
                 <div className="absolute inset-0 bg-gradient-to-br from-primary to-accent rounded-2xl animate-pulse opacity-30 blur-lg" />
                 <div className="relative w-full h-full bg-gradient-to-br from-primary to-accent rounded-2xl flex items-center justify-center shadow-lg">
-                  <Brain className="w-10 h-10 text-primary-foreground" />
-                  <Sparkles className="absolute -top-1 -right-1 w-5 h-5 text-accent-foreground" />
+                  <Brain aria-hidden="true" className="w-10 h-10 text-primary-foreground" />
+                  <Sparkles aria-hidden="true" className="absolute -top-1 -right-1 w-5 h-5 text-accent-foreground" />
                 </div>
               </div>
             </div>
@@ -286,19 +295,19 @@ export default function LoginPage() {
             {/* Enter Button */}
             <button
               onClick={handleEnter}
-              className="w-full h-12 bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold rounded-xl hover:opacity-90 transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/25"
+              className="w-full h-12 bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold rounded-xl hover:opacity-90 transition-opacity flex items-center justify-center gap-2 shadow-lg shadow-primary/25 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none"
             >
               <span>{t.enter}</span>
-              <ArrowRight className="w-5 h-5" />
+              <ArrowRight aria-hidden="true" className="w-5 h-5" />
             </button>
 
             {/* Language Toggle */}
             <div className="flex justify-center mt-6">
               <button
                 onClick={() => setLanguage(language === "de" ? "en" : "de")}
-                className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none rounded"
               >
-                <Languages className="w-4 h-4" />
+                <Languages aria-hidden="true" className="w-4 h-4" />
                 {language === "de" ? "English" : "Deutsch"}
               </button>
             </div>

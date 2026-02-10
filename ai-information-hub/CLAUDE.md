@@ -2,7 +2,7 @@
 
 Bilingual (DE/EN) daily + weekly AI news aggregator for internal teams — curates tech breakthroughs, investment news, practical tips, and **YouTube videos** from RSS feeds + Hacker News + YouTube. Built with Next.js 16 + React 19 + Tailwind CSS 4 + Shadcn/ui, deployed on Vercel.
 
-**Status**: Core app complete with Railway backend integration. Supports 3 feed types + YouTube videos, bilingual, daily + weekly navigation, dark/light theme. **No authentication required**.
+**Status**: Core app complete with Railway backend integration. Supports 3 feed types + YouTube videos, bilingual, daily + weekly navigation, dark/light theme, accessibility audited (Web Interface Guidelines). **No authentication required**.
 
 ---
 
@@ -324,6 +324,18 @@ The site includes dedicated SEO and Generative Engine Optimization features:
 | Image Optimization | `next/image` | YouTube thumbnails, first video fetchPriority="high" |
 | Impressum | `/impressum` | Legal notice (DDG §5) — **placeholders need filling** |
 | Datenschutz | `/datenschutz` | Privacy policy (GDPR) — **placeholders need filling** |
+
+### Accessibility (Web Interface Guidelines)
+
+All page components pass a Web Interface Guidelines audit (2026-02-10):
+
+- **Focus-visible**: All interactive elements (links, buttons) have `focus-visible:ring-2` styles
+- **aria-hidden**: Decorative icons (Lucide) and SVGs marked `aria-hidden="true"`
+- **prefers-reduced-motion**: Login page animations respect `prefers-reduced-motion: reduce`
+- **No transition-all**: Explicit transition properties only (e.g. `transition-opacity`)
+- **Image dimensions**: `<img>` tags include explicit `width`/`height` to prevent CLS
+- **tabular-nums**: Financial tables use `font-variant-numeric: tabular-nums` for number alignment
+- **scroll-margin-top**: Topic page anchor targets use `scroll-mt-20` for hash navigation
 
 ### SEO Metadata Patterns
 

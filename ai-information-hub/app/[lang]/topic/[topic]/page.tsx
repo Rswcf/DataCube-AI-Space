@@ -378,7 +378,7 @@ export default async function TopicPage({ params, searchParams }: Props) {
             <a
               key={section}
               href={buildTopicHref(lang, topic, { section, period: periodFilter || undefined })}
-              className={`rounded-full border px-3 py-1 text-xs ${sectionFilter === section ? 'border-primary text-primary' : 'border-border text-muted-foreground'}`}
+              className={`rounded-full border px-3 py-1 text-xs focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${sectionFilter === section ? 'border-primary text-primary' : 'border-border text-muted-foreground'}`}
             >
               {sectionTitle[section]}
             </a>
@@ -389,7 +389,7 @@ export default async function TopicPage({ params, searchParams }: Props) {
           <nav className="mt-3 flex flex-wrap items-center gap-2" aria-label="Period filter">
             <a
               href={buildTopicHref(lang, topic, { section: sectionFilter })}
-              className={`rounded-full border px-3 py-1 text-xs ${periodFilter ? 'border-border text-muted-foreground' : 'border-primary text-primary'}`}
+              className={`rounded-full border px-3 py-1 text-xs focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${periodFilter ? 'border-border text-muted-foreground' : 'border-primary text-primary'}`}
             >
               {sectionLabel('Alle Zeiträume', 'All periods')}
             </a>
@@ -397,7 +397,7 @@ export default async function TopicPage({ params, searchParams }: Props) {
               <a
                 key={periodId}
                 href={buildTopicHref(lang, topic, { period: periodId, section: sectionFilter })}
-                className={`rounded-full border px-3 py-1 text-xs ${periodFilter === periodId ? 'border-primary text-primary' : 'border-border text-muted-foreground'}`}
+                className={`rounded-full border px-3 py-1 text-xs focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${periodFilter === periodId ? 'border-primary text-primary' : 'border-border text-muted-foreground'}`}
               >
                 {periodId}
               </a>
@@ -425,7 +425,7 @@ export default async function TopicPage({ params, searchParams }: Props) {
                     {bucket.tech.slice(0, 8).map((post) => {
                       const anchorId = entryAnchorId(bucket.periodId, 'tech', post.id)
                       return (
-                        <li id={anchorId} key={`tech-${bucket.periodId}-${post.id}`} className="border-l-2 border-border pl-3">
+                        <li id={anchorId} key={`tech-${bucket.periodId}-${post.id}`} className="scroll-mt-20 border-l-2 border-border pl-3">
                           <p className="font-medium">{post.content}</p>
                           <p className="text-sm text-muted-foreground">{post.category} • {post.source}</p>
                           <a
@@ -448,7 +448,7 @@ export default async function TopicPage({ params, searchParams }: Props) {
                     {bucket.primary.slice(0, 4).map((post) => {
                       const anchorId = entryAnchorId(bucket.periodId, 'pm', post.id)
                       return (
-                        <li id={anchorId} key={`pm-${bucket.periodId}-${post.id}`} className="border-l-2 border-border pl-3">
+                        <li id={anchorId} key={`pm-${bucket.periodId}-${post.id}`} className="scroll-mt-20 border-l-2 border-border pl-3">
                           <p className="font-medium">{post.company} • {post.round}</p>
                           <p className="text-sm text-muted-foreground">{post.content}</p>
                           <a className="text-xs text-muted-foreground underline" href={buildTopicHref(lang, topic, { period: bucket.periodId, section: sectionFilter, hash: anchorId })}>
@@ -460,7 +460,7 @@ export default async function TopicPage({ params, searchParams }: Props) {
                     {bucket.secondary.slice(0, 4).map((post) => {
                       const anchorId = entryAnchorId(bucket.periodId, 'sm', post.id)
                       return (
-                        <li id={anchorId} key={`sm-${bucket.periodId}-${post.id}`} className="border-l-2 border-border pl-3">
+                        <li id={anchorId} key={`sm-${bucket.periodId}-${post.id}`} className="scroll-mt-20 border-l-2 border-border pl-3">
                           <p className="font-medium">{post.ticker}</p>
                           <p className="text-sm text-muted-foreground">{post.content}</p>
                           <a className="text-xs text-muted-foreground underline" href={buildTopicHref(lang, topic, { period: bucket.periodId, section: sectionFilter, hash: anchorId })}>
@@ -472,7 +472,7 @@ export default async function TopicPage({ params, searchParams }: Props) {
                     {bucket.ma.slice(0, 4).map((post) => {
                       const anchorId = entryAnchorId(bucket.periodId, 'ma', post.id)
                       return (
-                        <li id={anchorId} key={`ma-${bucket.periodId}-${post.id}`} className="border-l-2 border-border pl-3">
+                        <li id={anchorId} key={`ma-${bucket.periodId}-${post.id}`} className="scroll-mt-20 border-l-2 border-border pl-3">
                           <p className="font-medium">{post.acquirer} → {post.target}</p>
                           <p className="text-sm text-muted-foreground">{post.content}</p>
                           <a className="text-xs text-muted-foreground underline" href={buildTopicHref(lang, topic, { period: bucket.periodId, section: sectionFilter, hash: anchorId })}>
@@ -492,7 +492,7 @@ export default async function TopicPage({ params, searchParams }: Props) {
                     {bucket.tips.slice(0, 6).map((tip) => {
                       const anchorId = entryAnchorId(bucket.periodId, 'tips', tip.id)
                       return (
-                        <li id={anchorId} key={`tip-${bucket.periodId}-${tip.id}`} className="border-l-2 border-border pl-3">
+                        <li id={anchorId} key={`tip-${bucket.periodId}-${tip.id}`} className="scroll-mt-20 border-l-2 border-border pl-3">
                           <p className="font-medium">{tip.category}</p>
                           <p className="text-sm text-muted-foreground">{tip.content}</p>
                           <a className="text-xs text-muted-foreground underline" href={buildTopicHref(lang, topic, { period: bucket.periodId, section: sectionFilter, hash: anchorId })}>
@@ -512,7 +512,7 @@ export default async function TopicPage({ params, searchParams }: Props) {
       {filteredBuckets.length > PAGE_SIZE ? (
         <nav className="mt-10 flex items-center justify-between border-t border-border pt-4" aria-label="Topic pagination">
           {currentPage > 1 ? (
-            <a className="underline" href={buildTopicHref(lang, topic, { period: periodFilter || undefined, section: sectionFilter, page: currentPage - 1 })}>
+            <a className="underline focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded" href={buildTopicHref(lang, topic, { period: periodFilter || undefined, section: sectionFilter, page: currentPage - 1 })}>
               {sectionLabel('← Vorherige', '← Previous')}
             </a>
           ) : (
@@ -524,7 +524,7 @@ export default async function TopicPage({ params, searchParams }: Props) {
           </span>
 
           {currentPage < totalPages ? (
-            <a className="underline" href={buildTopicHref(lang, topic, { period: periodFilter || undefined, section: sectionFilter, page: currentPage + 1 })}>
+            <a className="underline focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded" href={buildTopicHref(lang, topic, { period: periodFilter || undefined, section: sectionFilter, page: currentPage + 1 })}>
               {sectionLabel('Nächste →', 'Next →')}
             </a>
           ) : (
