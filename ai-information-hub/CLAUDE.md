@@ -2,7 +2,7 @@
 
 Bilingual (DE/EN) daily + weekly AI news aggregator for internal teams — curates tech breakthroughs, investment news, practical tips, and **YouTube videos** from RSS feeds + Hacker News + YouTube. Built with Next.js 16 + React 19 + Tailwind CSS 4 + Shadcn/ui, deployed on Vercel.
 
-**Status**: Core app complete with Railway backend integration. Supports 3 feed types + YouTube videos, bilingual, daily + weekly navigation, dark/light theme, accessibility audited (Web Interface Guidelines), design overhauled with distinctive visual identity (Instrument Serif display font, section-specific accents, staggered animations, shimmer skeletons), UI/UX quality audit applied. **No authentication required**.
+**Status**: Core app complete with Railway backend integration. Supports 3 feed types + YouTube videos, bilingual, daily + weekly navigation, dark/light theme, AI report generator (streaming + multi-format export), accessibility audited (Web Interface Guidelines), design overhauled with distinctive visual identity (Instrument Serif display font, section-specific accents, staggered animations, shimmer skeletons), UI/UX quality audit applied. **No authentication required**.
 
 ---
 
@@ -21,6 +21,8 @@ Bilingual (DE/EN) daily + weekly AI news aggregator for internal teams — curat
 | `components/structured-data.tsx` | JSON-LD schemas (NewsArticle, Video, NewsMediaOrganization, FAQ, Breadcrumb) |
 | `components/chat-widget.tsx` | Chat UI + API-first week data fetching |
 | `app/api/chat/route.ts` | Chat assistant API (uses aurora-alpha) |
+| `app/api/report/route.ts` | AI report generator API (uses aurora-alpha, streams structured report) |
+| `components/report-generator.tsx` | Report UI: floating button, overlay, streaming Markdown, export (DOCX/HTML/MD/TXT/JSON) |
 | `app/week/[weekId]/page.tsx` | SSR week page (Server Component, SEO) |
 | `app/feed.xml/route.ts` | Atom 1.0 feed (bilingual) |
 | `app/api/content-summary/route.ts` | Markdown summary API (GEO) |
@@ -66,6 +68,7 @@ Bilingual (DE/EN) daily + weekly AI news aggregator for internal teams — curat
 │  SPA (main page, "use client"):                          │
 │    • Feed components (tech, investment, tips)             │
 │    • Chat widget + Chat API (aurora-alpha)                │
+│    • AI Report generator (aurora-alpha → DOCX/HTML/MD)   │
 │       ↓                                                  │
 │  SSR Pages (Server Components, SEO/GEO):                 │
 │    • /week/[weekId] — HTML + JSON-LD (ISR 1h)            │
@@ -93,7 +96,8 @@ ai-information-hub/           # Frontend (Next.js)
 ├── app/
 │   ├── api/
 │   │   ├── auth/             # Auth API (disabled)
-│   │   ├── chat/             # Chat assistant (glm-4.5-air:free)
+│   │   ├── chat/             # Chat assistant (aurora-alpha)
+│   │   ├── report/           # AI report generator (aurora-alpha)
 │   │   └── content-summary/  # Markdown summary API (GEO)
 │   ├── feed.xml/             # Atom 1.0 feed route (DE/EN)
 │   ├── week/[weekId]/        # SSR week pages (Server Component)
@@ -107,6 +111,7 @@ ai-information-hub/           # Frontend (Next.js)
 │   │   ├── investment-feed.tsx
 │   │   └── tips-feed.tsx
 │   ├── video-embed.tsx       # YouTube player (next/image)
+│   ├── report-generator.tsx  # AI report UI + export (DOCX/HTML/MD/TXT/JSON)
 │   ├── structured-data.tsx   # JSON-LD schemas
 │   └── ...
 ├── lib/
@@ -154,6 +159,7 @@ ai-hub-backend/               # Backend (FastAPI)
 | **Classification** | `z-ai/glm-4.5-air:free` | Free tier, classifies articles |
 | **Content Processing** | `deepseek/deepseek-v3.2` | Tech, investment, tips, videos |
 | **Chat Assistant** | `openrouter/aurora-alpha` | OpenRouter |
+| **Report Generator** | `openrouter/aurora-alpha` | OpenRouter |
 
 ---
 
