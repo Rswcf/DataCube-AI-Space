@@ -22,7 +22,7 @@ Bilingual (DE/EN) daily + weekly AI news aggregator for internal teams — curat
 | `components/chat-widget.tsx` | Chat UI + API-first week data fetching |
 | `app/api/chat/route.ts` | Chat assistant API (uses aurora-alpha) |
 | `app/api/report/route.ts` | AI report generator API (uses aurora-alpha, streams structured report) |
-| `components/report-generator.tsx` | Report UI: floating button, overlay, streaming Markdown, export (DOCX/HTML/MD/TXT/JSON) |
+| `components/report-generator.tsx` | Report UI: floating button, overlay, streaming Markdown + GFM tables (remark-gfm), export (DOCX/HTML/MD/TXT/JSON) |
 | `app/week/[weekId]/page.tsx` | SSR week page (Server Component, SEO) |
 | `app/feed.xml/route.ts` | Atom 1.0 feed (bilingual) |
 | `app/api/content-summary/route.ts` | Markdown summary API (GEO) |
