@@ -7,6 +7,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { useSettings } from "@/lib/settings-context";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 interface ReportGeneratorProps {
   weekId: string;
@@ -14,32 +15,61 @@ interface ReportGeneratorProps {
 
 /** Convert markdown to styled HTML document */
 function markdownToHtml(md: string, title: string): string {
-  // Simple markdown → HTML conversion for export
-  let html = md
-    // Headings
-    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-    .replace(/^# (.+)$/gm, '<h1>$1</h1>')
-    // Bold
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    // Italic
-    .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    // Bullet lists
-    .replace(/^- (.+)$/gm, '<li>$1</li>')
-    // Horizontal rule
-    .replace(/^---$/gm, '<hr>')
-    // Paragraphs (lines that aren't already tags)
-    .split('\n')
-    .map(line => {
-      const trimmed = line.trim();
-      if (!trimmed) return '';
-      if (trimmed.startsWith('<h') || trimmed.startsWith('<li') || trimmed.startsWith('<hr')) return trimmed;
-      return `<p>${trimmed}</p>`;
-    })
-    .join('\n');
+  const lines = md.split('\n');
+  const output: string[] = [];
+  let inList = false;
+  let inTable = false;
+  let isHeaderRow = true;
 
-  // Wrap consecutive <li> in <ul>
-  html = html.replace(/(<li>.*<\/li>\n?)+/g, (match) => `<ul>${match}</ul>`);
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+
+    // Skip separator rows in tables (|---|---|)
+    if (/^\|[\s\-:|]+\|$/.test(line)) {
+      continue;
+    }
+
+    // Table row
+    if (line.startsWith('|') && line.endsWith('|')) {
+      if (inList) { output.push('</ul>'); inList = false; }
+      if (!inTable) {
+        output.push('<table>');
+        inTable = true;
+        isHeaderRow = true;
+      }
+      const cells = line.slice(1, -1).split('|').map(c => c.trim());
+      const tag = isHeaderRow ? 'th' : 'td';
+      const rowClass = isHeaderRow ? ' class="header"' : '';
+      output.push(`<tr${rowClass}>${cells.map(c => `<${tag}>${c.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')}</${tag}>`).join('')}</tr>`);
+      // Check if next line is separator → current line was header
+      const next = lines[i + 1]?.trim() || '';
+      if (/^\|[\s\-:|]+\|$/.test(next)) {
+        isHeaderRow = false;
+      } else {
+        isHeaderRow = false;
+      }
+      continue;
+    }
+
+    // Close table if we left table rows
+    if (inTable) { output.push('</table>'); inTable = false; }
+
+    if (!line) { if (inList) { output.push('</ul>'); inList = false; } output.push(''); continue; }
+    if (line.startsWith('### ')) { if (inList) { output.push('</ul>'); inList = false; } output.push(`<h3>${line.slice(4)}</h3>`); continue; }
+    if (line.startsWith('## ')) { if (inList) { output.push('</ul>'); inList = false; } output.push(`<h2>${line.slice(3)}</h2>`); continue; }
+    if (line.startsWith('# ')) { if (inList) { output.push('</ul>'); inList = false; } output.push(`<h1>${line.slice(2)}</h1>`); continue; }
+    if (line === '---') { if (inList) { output.push('</ul>'); inList = false; } output.push('<hr>'); continue; }
+    if (line.startsWith('- ')) {
+      if (!inList) { output.push('<ul>'); inList = true; }
+      output.push(`<li>${line.slice(2).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\*(.+?)\*/g, '<em>$1</em>')}</li>`);
+      continue;
+    }
+    if (inList) { output.push('</ul>'); inList = false; }
+    output.push(`<p>${line.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\*(.+?)\*/g, '<em>$1</em>')}</p>`);
+  }
+
+  if (inList) output.push('</ul>');
+  if (inTable) output.push('</table>');
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -58,10 +88,14 @@ function markdownToHtml(md: string, title: string): string {
   strong { color: #1a1a2e; }
   hr { border: none; border-top: 1px solid #e8e8f0; margin: 32px 0; }
   code { background: #f0f0f8; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
+  table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 0.9em; }
+  th { background: #f0f0f8; padding: 10px 14px; text-align: left; font-weight: 600; border-bottom: 2px solid #ddd; }
+  td { padding: 10px 14px; border-bottom: 1px solid #eee; }
+  tr:hover td { background: #fafafa; }
 </style>
 </head>
 <body>
-${html}
+${output.join('\n')}
 </body>
 </html>`;
 }
@@ -375,6 +409,7 @@ export function ReportGenerator({ weekId }: ReportGeneratorProps) {
               ) : reportContent ? (
                 <article className="report-content">
                   <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
                     components={{
                       h1: ({ children }) => (
                         <h1 className="font-display text-2xl font-bold mt-8 mb-4 pb-3 border-b-2 border-primary/20 text-foreground first:mt-0">
@@ -421,6 +456,38 @@ export function ReportGenerator({ weekId }: ReportGeneratorProps) {
                       ),
                       code: ({ children }) => (
                         <code className="bg-secondary px-1.5 py-0.5 rounded text-xs font-mono">{children}</code>
+                      ),
+                      table: ({ children }) => (
+                        <div className="my-6 overflow-x-auto rounded-lg border border-border">
+                          <table className="w-full text-sm">
+                            {children}
+                          </table>
+                        </div>
+                      ),
+                      thead: ({ children }) => (
+                        <thead className="bg-secondary/50 border-b border-border">
+                          {children}
+                        </thead>
+                      ),
+                      tbody: ({ children }) => (
+                        <tbody className="divide-y divide-border">
+                          {children}
+                        </tbody>
+                      ),
+                      tr: ({ children }) => (
+                        <tr className="hover:bg-secondary/30 transition-colors">
+                          {children}
+                        </tr>
+                      ),
+                      th: ({ children }) => (
+                        <th className="px-4 py-2.5 text-left font-semibold text-foreground whitespace-nowrap">
+                          {children}
+                        </th>
+                      ),
+                      td: ({ children }) => (
+                        <td className="px-4 py-2.5 text-foreground/90">
+                          {children}
+                        </td>
                       ),
                     }}
                   >
