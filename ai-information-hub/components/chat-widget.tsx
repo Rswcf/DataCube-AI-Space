@@ -94,6 +94,9 @@ export function ChatWidget({ weekId }: ChatWidgetProps) {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [fabExpanded, setFabExpanded] = useState(false);
+  const [fabHovered, setFabHovered] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(false);
   const { language, t } = useSettings();
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -141,6 +144,25 @@ export function ChatWidget({ weekId }: ChatWidgetProps) {
     return () => {
       abortControllerRef.current?.abort();
     };
+  }, []);
+
+  // FAB expand/collapse on first visit
+  useEffect(() => {
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    setReducedMotion(prefersReduced);
+
+    if (prefersReduced) return;
+
+    const seen = localStorage.getItem("fab-seen");
+    if (seen) return;
+
+    setFabExpanded(true);
+    const timer = setTimeout(() => {
+      setFabExpanded(false);
+      // Report generator also sets this, but set it here too for safety
+      localStorage.setItem("fab-seen", "true");
+    }, 4000);
+    return () => clearTimeout(timer);
   }, []);
 
   // Auto-scroll to bottom
@@ -262,14 +284,43 @@ export function ChatWidget({ weekId }: ChatWidgetProps) {
       {/* Floating Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
+        onMouseEnter={() => !isOpen && setFabHovered(true)}
+        onMouseLeave={() => setFabHovered(false)}
         className={cn(
-          "fixed z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-all hover:scale-105 hover:shadow-xl",
+          "fixed z-50 flex h-14 items-center rounded-full bg-primary text-primary-foreground shadow-lg overflow-hidden whitespace-nowrap",
           "bottom-20 right-4 md:bottom-6 md:right-6",
-          isOpen && "rotate-90"
+          "hover:shadow-xl hover:scale-105",
+          "focus-visible:ring-2 focus-visible:ring-ring",
+          isOpen
+            ? "w-14 justify-center rotate-90"
+            : reducedMotion
+              ? "w-14 justify-center"
+              : [
+                  "transition-[max-width,box-shadow,transform] duration-500 ease-in-out",
+                  fabExpanded || fabHovered
+                    ? "max-w-[140px] md:max-w-[180px] px-5 gap-3 flex-row-reverse"
+                    : "max-w-[56px] w-14 justify-center",
+                ]
         )}
-        aria-label={isOpen ? "Close chat" : "Open chat"}
+        aria-label={isOpen ? t("reportClose") : t("chatTitle")}
       >
-        {isOpen ? <X className="h-6 w-6" aria-hidden="true" /> : <MessageCircle className="h-6 w-6" aria-hidden="true" />}
+        {isOpen ? (
+          <X className="h-6 w-6 shrink-0" aria-hidden="true" />
+        ) : (
+          <>
+            <MessageCircle className="h-6 w-6 shrink-0" aria-hidden="true" />
+            {!reducedMotion && (
+              <span
+                className={cn(
+                  "text-sm font-medium transition-opacity duration-300",
+                  fabExpanded || fabHovered ? "opacity-100" : "opacity-0 w-0"
+                )}
+              >
+                {t("fabChat")}
+              </span>
+            )}
+          </>
+        )}
       </button>
 
       {/* Chat Panel */}

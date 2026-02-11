@@ -136,6 +136,10 @@ export const translations = {
     shareOnX: "Auf X teilen",
     shareOnLinkedIn: "Auf LinkedIn teilen",
 
+    // FAB Labels
+    fabReport: "KI-Bericht",
+    fabChat: "KI-Chat",
+
     // Report Generator
     reportGenerate: "KI-Bericht erstellen",
     reportTitle: "KI-Wochenbericht",
@@ -285,6 +289,10 @@ export const translations = {
     copyLink: "Copy link",
     shareOnX: "Share on X",
     shareOnLinkedIn: "Share on LinkedIn",
+
+    // FAB Labels
+    fabReport: "AI Report",
+    fabChat: "AI Chat",
 
     // Report Generator
     reportGenerate: "Generate AI Report",
