@@ -360,7 +360,7 @@ export function ReportGenerator({ weekId }: ReportGeneratorProps) {
             </div>
 
             {/* Content */}
-            <ScrollArea className="flex-1 px-6 py-6">
+            <ScrollArea className="flex-1 min-h-0 px-6 py-6">
               {error ? (
                 <div className="flex flex-col items-center gap-4 py-12">
                   <div className="flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10">
