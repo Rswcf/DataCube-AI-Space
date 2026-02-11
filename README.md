@@ -18,6 +18,7 @@ Bilingual (DE/EN) daily + weekly AI news aggregator with YouTube video integrati
 - **Daily + Weekly Mode** - Daily automated collection with weekly rollup view
 - **Chat Assistant** - Ask questions about the AI news
 - **AI Report Generator** - One-click streaming report with GFM table rendering, export (Word, HTML, Markdown, Text, JSON)
+- **Extended FABs** - Report and Chat buttons use pill-shaped labels on first visit, auto-collapse to circles, re-expand on hover
 - **Accessible UI** - 44px touch targets, focus-visible states, aria-hidden decorative icons, skip-to-content link, prefers-reduced-motion, mobile bottom padding
 - **Distinctive Design** - Instrument Serif display font on all section headers, section-specific color accents and hover states, staggered card animations, shimmer loading, gradient section headers, trend rankings, tabular-nums on financial data
 

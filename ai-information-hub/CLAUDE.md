@@ -2,7 +2,7 @@
 
 Bilingual (DE/EN) daily + weekly AI news aggregator for internal teams — curates tech breakthroughs, investment news, practical tips, and **YouTube videos** from RSS feeds + Hacker News + YouTube. Built with Next.js 16 + React 19 + Tailwind CSS 4 + Shadcn/ui, deployed on Vercel.
 
-**Status**: Core app complete with Railway backend integration. Supports 3 feed types + YouTube videos, bilingual, daily + weekly navigation, dark/light theme, AI report generator (streaming + multi-format export), accessibility audited (Web Interface Guidelines), design overhauled with distinctive visual identity (Instrument Serif display font, section-specific accents, staggered animations, shimmer skeletons), UI/UX quality audit applied. **No authentication required**.
+**Status**: Core app complete with Railway backend integration. Supports 3 feed types + YouTube videos, bilingual, daily + weekly navigation, dark/light theme, AI report generator (streaming + multi-format export), accessibility audited (Web Interface Guidelines), design overhauled with distinctive visual identity (Instrument Serif display font, section-specific accents, staggered animations, shimmer skeletons), UI/UX quality audit applied, Extended FAB buttons for discoverability. **No authentication required**.
 
 ---
 
@@ -22,7 +22,7 @@ Bilingual (DE/EN) daily + weekly AI news aggregator for internal teams — curat
 | `components/chat-widget.tsx` | Chat UI + API-first week data fetching |
 | `app/api/chat/route.ts` | Chat assistant API (uses aurora-alpha) |
 | `app/api/report/route.ts` | AI report generator API (uses aurora-alpha, streams structured report) |
-| `components/report-generator.tsx` | Report UI: floating button, overlay, streaming Markdown + GFM tables (remark-gfm), export (DOCX/HTML/MD/TXT/JSON) |
+| `components/report-generator.tsx` | Report UI: Extended FAB button, overlay, streaming Markdown + GFM tables (remark-gfm), export (DOCX/HTML/MD/TXT/JSON) |
 | `app/week/[weekId]/page.tsx` | SSR week page (Server Component, SEO) |
 | `app/feed.xml/route.ts` | Atom 1.0 feed (bilingual) |
 | `app/api/content-summary/route.ts` | Markdown summary API (GEO) |
@@ -337,7 +337,7 @@ All page components pass a Web Interface Guidelines audit (2026-02-10), with UI/
 
 - **Focus-visible**: All interactive elements (links, buttons) have `focus-visible:ring-2` styles
 - **aria-hidden**: All decorative icons (Lucide) marked `aria-hidden="true"` — including video-embed stats icons and chat widget FAB/spinner
-- **prefers-reduced-motion**: Login page animations respect `prefers-reduced-motion: reduce`
+- **prefers-reduced-motion**: Login page animations and FAB expand/collapse respect `prefers-reduced-motion: reduce`
 - **No transition-all**: Explicit transition properties only (e.g. `transition-opacity`, `transition-[color,background-color,border-color,transform]`)
 - **Image dimensions**: `<img>` tags include explicit `width`/`height` to prevent CLS
 - **tabular-nums**: Financial tables AND stock data cards (prices, changes, market cap) use `tabular-nums`
@@ -364,6 +364,7 @@ The frontend uses a distinctive visual identity with section-specific theming:
 - **Sidebar**: Active nav items have `border-l-[3px]` indicator; combined `transition-[color,background-color,border-color,transform]` for smooth animations; logo uses `from-primary to-accent` gradient
 - **Share**: `active:scale-95` press animation; right-aligned popup menu to prevent viewport overflow
 - **Week nav**: Fade edge masks on scrollable area, enhanced current-period highlighting
+- **Extended FABs**: Report (bottom-left) and Chat (bottom-right) buttons use Material Design Extended FAB pattern — pill-shaped with icon + text label on first visit, auto-collapse to 56px circles after 4s, re-expand on desktop hover. Shared `localStorage("fab-seen")` key. Mobile capped at `max-w-[140px]`, desktop `max-w-[180px]`. Chat FAB uses `flex-row-reverse` for text-left/icon-right layout
 
 ### SEO Metadata Patterns
 
