@@ -2,7 +2,7 @@
 
 Bilingual (DE/EN) daily + weekly AI news aggregator for internal teams — curates tech breakthroughs, investment news, practical tips, and **YouTube videos** from RSS feeds + Hacker News + YouTube. Built with Next.js 16 + React 19 + Tailwind CSS 4 + Shadcn/ui, deployed on Vercel.
 
-**Status**: Core app complete with Railway backend integration. Supports 3 feed types + YouTube videos, bilingual, daily + weekly navigation, dark/light theme, AI report generator (streaming + multi-format export), accessibility audited (Web Interface Guidelines), design overhauled with distinctive visual identity (Instrument Serif display font, section-specific accents, staggered animations, shimmer skeletons), UI/UX quality audit applied, Extended FAB buttons for discoverability. **No authentication required**.
+**Status**: Core app complete with Railway backend integration. Supports 3 feed types + YouTube videos, bilingual, daily + weekly navigation, dark/light theme, AI report generator (streaming + multi-format export), accessibility audited (Web Interface Guidelines), design overhauled with distinctive visual identity (Instrument Serif display font, section-specific accents, staggered animations, shimmer skeletons), UI/UX quality audit applied, Extended FAB buttons for discoverability, mobile UX audit applied (25 issues fixed), mobile feature parity (Support + Newsletter in settings drawer). **No authentication required**.
 
 ---
 
@@ -333,19 +333,24 @@ The site includes dedicated SEO and Generative Engine Optimization features:
 
 ### Accessibility (Web Interface Guidelines)
 
-All page components pass a Web Interface Guidelines audit (2026-02-10), with UI/UX quality fixes applied (2026-02-11):
+All page components pass a Web Interface Guidelines audit (2026-02-10), with UI/UX quality fixes (2026-02-11) and mobile UX audit (2026-02-13):
 
 - **Focus-visible**: All interactive elements (links, buttons) have `focus-visible:ring-2` styles
 - **aria-hidden**: All decorative icons (Lucide) marked `aria-hidden="true"` — including video-embed stats icons and chat widget FAB/spinner
-- **prefers-reduced-motion**: Login page animations and FAB expand/collapse respect `prefers-reduced-motion: reduce`
+- **prefers-reduced-motion**: All custom animations (`animate-fade-up`, `animate-shimmer`, `animate-slide-left/right`) disabled via global `@media (prefers-reduced-motion: reduce)` in globals.css; FAB expand/collapse starts collapsed
 - **No transition-all**: Explicit transition properties only (e.g. `transition-opacity`, `transition-[color,background-color,border-color,transform]`)
 - **Image dimensions**: `<img>` tags include explicit `width`/`height` to prevent CLS
 - **tabular-nums**: Financial tables AND stock data cards (prices, changes, market cap) use `tabular-nums`
 - **scroll-margin-top**: Topic page anchor targets use `scroll-mt-20` for hash navigation
-- **Touch targets**: All navigation buttons meet 44px minimum (week nav prev/next, chat widget controls)
+- **Touch targets**: All navigation buttons meet 44px minimum (week nav prev/next, chat widget controls, day buttons `py-2.5`)
 - **Skip link**: `#main-content` target on main content container, skip link in layout
 - **Mobile bottom padding**: `pb-16 md:pb-0` prevents mobile bottom nav from overlapping feed content
 - **cursor-pointer**: All hoverable feed cards have `cursor-pointer` for interaction feedback
+- **ARIA dialog**: Mobile drawers (search, settings) use `role="dialog" aria-modal="true" aria-labelledby`
+- **Body scroll lock**: All overlays (search drawer, settings drawer, chat panel, report overlay) lock `document.body.style.overflow` when open
+- **Safe area insets**: `viewport-fit: cover` in layout + `pb-[max(0.5rem,env(safe-area-inset-bottom))]` on mobile nav for iPhone notch
+- **Dynamic viewport**: Root container uses `min-h-dvh` instead of `min-h-screen` for Mobile Safari
+- **Overflow prevention**: `overflow-x-hidden` on `<body>` and root container prevents horizontal scroll on mobile
 
 ### Design System (2026-02-10, refined 2026-02-11)
 
@@ -359,7 +364,11 @@ The frontend uses a distinctive visual identity with section-specific theming:
 - **Loading skeletons**: Shimmer effect via `animate-shimmer` class (replaces `animate-pulse` everywhere)
 - **Impact borders**: Tech cards have left borders colored by impact level (critical=red, high=orange, medium=blue)
 - **Trend rankings**: Right sidebar shows numbered (1-10) rankings with large semi-transparent index numbers (display only, non-clickable)
-- **Mobile nav**: Active tab has scale animation + colored dot indicator
+- **Mobile nav**: Active tab has scale animation + colored dot indicator; `active:scale-95` press feedback; safe-area-inset-bottom padding
+- **Mobile search drawer**: Trends hidden when typing (shows filter feedback + "Show results" button), clear button in search input, search resets on close
+- **Mobile settings drawer**: Includes Support (Ko-fi) button and Newsletter signup form (matching desktop right-sidebar)
+- **Investment cards**: `flex-wrap` + `min-w-0` + `truncate` on stock headers; M&A deal grid `grid-cols-1 sm:grid-cols-2`
+- **Week nav touch**: `touch-action: pan-x` on scroll containers; day buttons have larger touch targets (`py-2.5`)
 - **Ambient gradient**: Subtle brand color wash (`from-primary/[0.02]`) at top of main app for login→app visual continuity
 - **Sidebar**: Active nav items have `border-l-[3px]` indicator; combined `transition-[color,background-color,border-color,transform]` for smooth animations; logo uses `from-primary to-accent` gradient
 - **Share**: `active:scale-95` press animation; right-aligned popup menu to prevent viewport overflow
