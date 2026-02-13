@@ -20,8 +20,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: {
       absolute: isDE
-        ? 'DataCube AI | Tägliche KI-News & Einblicke'
-        : 'DataCube AI | Daily AI News & Insights',
+        ? 'Data Cube AI | Tägliche KI-News & Einblicke'
+        : 'Data Cube AI | Daily AI News & Insights',
     },
     description: isDE
       ? 'Zweisprachiger (DE/EN) täglicher KI-News-Aggregator. Technologie-Durchbrüche, Investment-News, praktische Tipps und kuratierte YouTube-Videos.'
@@ -36,8 +36,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
     openGraph: {
       title: isDE
-        ? 'DataCube AI | Tägliche KI-News & Einblicke'
-        : 'DataCube AI | Daily AI News & Insights',
+        ? 'Data Cube AI | Tägliche KI-News & Einblicke'
+        : 'Data Cube AI | Daily AI News & Insights',
       description: isDE
         ? 'Kuratierte KI-News, Investments und Tipps – täglich aktualisiert auf Deutsch und Englisch.'
         : 'Curated AI news, investment updates, and practical tips - updated daily in German and English.',
@@ -48,8 +48,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
           width: 1200,
           height: 630,
           alt: isDE
-            ? 'DataCube AI – Wo KI auf menschliche Einsicht trifft'
-            : 'DataCube AI – Where AI meets human insight',
+            ? 'Data Cube AI – Wo KI auf menschliche Einsicht trifft'
+            : 'Data Cube AI – Where AI meets human insight',
         },
       ],
     },

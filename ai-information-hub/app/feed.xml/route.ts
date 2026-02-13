@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
     } catch {}
   }
 
-  const feedTitle = lang === 'de' ? 'DataCube AI - Tägliche KI-News' : 'DataCube AI - Daily AI News';
+  const feedTitle = lang === 'de' ? 'Data Cube AI - Tägliche KI-News' : 'Data Cube AI - Daily AI News';
   const feedSubtitle = lang === 'de'
     ? 'Kuratierte KI-Nachrichten: Technologie, Investment und Tipps'
     : 'Curated AI news: Technology, Investment, and Tips';
@@ -98,10 +98,10 @@ export async function GET(request: NextRequest) {
   <id>tag:datacubeai.space,2026:feed:${lang}</id>
   <updated>${now}</updated>
   <author>
-    <name>DataCube AI</name>
+    <name>Data Cube AI</name>
     <uri>${SITE_URL}</uri>
   </author>
-  <generator>DataCube AI</generator>
+  <generator>Data Cube AI</generator>
 ${entries}
 </feed>`;
 

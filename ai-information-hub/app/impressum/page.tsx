@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Impressum',
-  description: 'Legal notice / Impressum for DataCube AI Space',
+  description: 'Legal notice / Impressum for Data Cube AI Space',
   robots: { index: false, follow: true },
 }
 

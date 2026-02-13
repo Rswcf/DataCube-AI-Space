@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import type { ReactNode } from 'react'
 
 export const metadata: Metadata = {
-  title: 'Login | DataCube AI',
-  description: 'Gateway page for DataCube AI Space.',
+  title: 'Login | Data Cube AI',
+  description: 'Gateway page for Data Cube AI Space.',
   robots: {
     index: false,
     follow: false,

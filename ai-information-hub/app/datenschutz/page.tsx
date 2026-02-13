@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Datenschutzerklärung / Privacy Policy',
-  description: 'Privacy policy / Datenschutzerklärung for DataCube AI Space',
+  description: 'Privacy policy / Datenschutzerklärung for Data Cube AI Space',
   robots: { index: false, follow: true },
 }
 

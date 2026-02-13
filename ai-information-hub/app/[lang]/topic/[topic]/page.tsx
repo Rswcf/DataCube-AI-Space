@@ -282,8 +282,8 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
           width: 1200,
           height: 630,
           alt: lang === 'de'
-            ? `DataCube AI – ${topicTitle}`
-            : `DataCube AI – ${topicTitle}`,
+            ? `Data Cube AI – ${topicTitle}`
+            : `Data Cube AI – ${topicTitle}`,
         },
       ],
     },

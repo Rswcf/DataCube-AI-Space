@@ -91,7 +91,7 @@ export async function GET(request: NextRequest) {
   }
 
   if (!periodId) {
-    return new Response('# DataCube AI\n\nNo content available.', {
+    return new Response('# Data Cube AI\n\nNo content available.', {
       headers: {
         'Content-Type': 'text/markdown; charset=utf-8',
         'Cache-Control': 'public, s-maxage=3600',
@@ -116,13 +116,13 @@ export async function GET(request: NextRequest) {
     const deLabel = `${String(d).padStart(2, '0')}.${String(m).padStart(2, '0')}.${y}`;
     const enLabel = new Date(Date.UTC(y, m - 1, d)).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
     title = lang === 'de'
-      ? `DataCube AI - KI-News ${deLabel}`
-      : `DataCube AI - AI News ${enLabel}`;
+      ? `Data Cube AI - KI-News ${deLabel}`
+      : `Data Cube AI - AI News ${enLabel}`;
   } else {
     const weekLabel = periodId.replace(/^\d{4}-kw/, 'KW ');
     title = lang === 'de'
-      ? `DataCube AI - KI-News ${weekLabel}`
-      : `DataCube AI - AI News Week ${weekLabel.replace('KW ', '')}`;
+      ? `Data Cube AI - KI-News ${weekLabel}`
+      : `Data Cube AI - AI News Week ${weekLabel.replace('KW ', '')}`;
   }
 
   let md = `# ${title}\n\n`;
@@ -218,7 +218,7 @@ export async function GET(request: NextRequest) {
 
   md += `---\n\n`;
   md += `Canonical summary URL: https://www.datacubeai.space/api/content-summary?${permalinkParams.toString()}\n\n`;
-  md += `*Updated daily. Visit [DataCube AI](https://www.datacubeai.space) for the interactive version.*\n`;
+  md += `*Updated daily. Visit [Data Cube AI](https://www.datacubeai.space) for the interactive version.*\n`;
 
   return new Response(md, {
     headers: {

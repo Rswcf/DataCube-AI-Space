@@ -4,7 +4,7 @@ export function OrganizationSchema() {
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'NewsMediaOrganization',
-    name: 'DataCube AI',
+    name: 'Data Cube AI',
     url: 'https://www.datacubeai.space',
     logo: 'https://www.datacubeai.space/icon.svg',
     description: 'Bilingual AI news aggregator providing daily tech, investment, and tips content.',
@@ -25,7 +25,7 @@ export function WebsiteSchema() {
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: 'DataCube AI',
+    name: 'Data Cube AI',
     url: 'https://www.datacubeai.space',
     inLanguage: ['en', 'de'],
     description: 'Daily AI news aggregator with tech breakthroughs, investment news, and practical tips.',
@@ -52,17 +52,17 @@ export function ArticleSchema({ post, inLanguage = 'de', url }: { post: TechPost
     description: post.content,
     datePublished: post.timestamp,
     dateModified: post.timestamp,
-    image: 'https://www.datacubeai.space/opengraph-image',
+    image: 'https://www.datacubeai.space/og-image.jpg',
     inLanguage,
     isAccessibleForFree: true,
     url: url || post.sourceUrl || 'https://www.datacubeai.space',
     author: {
       '@type': 'Organization',
-      name: 'DataCube AI',
+      name: 'Data Cube AI',
     },
     publisher: {
       '@type': 'Organization',
-      name: 'DataCube AI',
+      name: 'Data Cube AI',
       logo: {
         '@type': 'ImageObject',
         url: 'https://www.datacubeai.space/icon.svg',
@@ -94,7 +94,7 @@ export function VideoSchema({ video }: { video: TechPost }) {
     embedUrl: `https://www.youtube.com/embed/${video.videoId}`,
     publisher: {
       '@type': 'Organization',
-      name: 'DataCube AI',
+      name: 'Data Cube AI',
     },
   }
 
@@ -113,10 +113,10 @@ export function FAQSchema() {
     mainEntity: [
       {
         '@type': 'Question',
-        name: 'What is DataCube AI?',
+        name: 'What is Data Cube AI?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'DataCube AI is a bilingual (German/English) daily AI news aggregator that curates tech breakthroughs, investment news, practical tips, and YouTube videos from RSS feeds, Hacker News, and YouTube.',
+          text: 'Data Cube AI is a bilingual (German/English) daily AI news aggregator that curates tech breakthroughs, investment news, practical tips, and YouTube videos from RSS feeds, Hacker News, and YouTube.',
         },
       },
       {
@@ -129,18 +129,18 @@ export function FAQSchema() {
       },
       {
         '@type': 'Question',
-        name: 'What languages does DataCube AI support?',
+        name: 'What languages does Data Cube AI support?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'DataCube AI supports both German (DE) and English (EN). Users can switch between languages using the language toggle.',
+          text: 'Data Cube AI supports both German (DE) and English (EN). Users can switch between languages using the language toggle.',
         },
       },
       {
         '@type': 'Question',
-        name: 'What types of AI news does DataCube AI cover?',
+        name: 'What types of AI news does Data Cube AI cover?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'DataCube AI covers three main categories: Tech (AI breakthroughs, research, and product launches), Investment (funding rounds, M&A, stock movements), and Tips (practical AI tools and prompts).',
+          text: 'Data Cube AI covers three main categories: Tech (AI breakthroughs, research, and product launches), Investment (funding rounds, M&A, stock movements), and Tips (practical AI tools and prompts).',
         },
       },
     ],

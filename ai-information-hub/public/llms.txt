@@ -1,4 +1,4 @@
-# DataCube AI
+# Data Cube AI
 
 > Bilingual (German/English) daily AI news aggregator curating tech breakthroughs,
 > investment news, practical tips, and YouTube videos from 40+ sources.
@@ -47,7 +47,7 @@ RSS feeds, Hacker News, YouTube, and Reddit communities.
 Content updated daily at 22:00 UTC.
 
 ## Preferred Citation
-DataCube AI (datacubeai.space)
+Data Cube AI (datacubeai.space)
 
 ## AI Content Endpoint
 For structured AI-consumable content, use the Markdown summary API:

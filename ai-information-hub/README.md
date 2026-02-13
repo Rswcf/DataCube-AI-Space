@@ -1,4 +1,4 @@
-# DataCube AI Information Hub
+# Data Cube AI Information Hub
 
 Bilingual (DE/EN) daily + weekly AI news aggregator with YouTube video integration. See [CLAUDE.md](./CLAUDE.md) for full documentation.
 

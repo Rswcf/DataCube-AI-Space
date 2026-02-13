@@ -17,7 +17,7 @@ export async function POST(req: Request) {
   try {
     const { messages, weekContext, language } = await req.json();
 
-    const systemPrompt = `You are the DataCube AI Hub Assistant — a concise helper for the Data Cube AI Information Hub platform.
+    const systemPrompt = `You are the Data Cube AI Hub Assistant — a concise helper for the Data Cube AI Information Hub platform.
 
 SCOPE:
 - Answer questions about this week's AI news, trends, investments, and tips shown on the platform.

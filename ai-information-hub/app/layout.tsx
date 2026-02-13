@@ -13,14 +13,14 @@ const instrumentSerif = Instrument_Serif({ subsets: ["latin"], weight: "400", va
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.datacubeai.space'),
   title: {
-    default: 'DataCube AI | Daily AI News & Insights',
-    template: '%s | DataCube AI',
+    default: 'Data Cube AI | Daily AI News & Insights',
+    template: '%s | Data Cube AI',
   },
   description: 'Bilingual (DE/EN) daily AI news aggregator. Tech breakthroughs, investment news, practical tips, and curated YouTube videos.',
   keywords: ['AI news', 'artificial intelligence', 'machine learning', 'AI investment', 'AI tips', 'KI Nachrichten', 'daily AI digest', 'AI trends', 'tech news'],
-  authors: [{ name: 'DataCube Team' }],
-  creator: 'DataCube AI',
-  publisher: 'DataCube AI',
+  authors: [{ name: 'Data Cube Team' }],
+  creator: 'Data Cube AI',
+  publisher: 'Data Cube AI',
   generator: 'Next.js',
   icons: {
     icon: [
@@ -46,15 +46,15 @@ export const metadata: Metadata = {
     locale: 'en_US',
     alternateLocale: 'de_DE',
     url: 'https://www.datacubeai.space',
-    siteName: 'DataCube AI',
-    title: 'DataCube AI | Daily AI News & Insights',
+    siteName: 'Data Cube AI',
+    title: 'Data Cube AI | Daily AI News & Insights',
     description: 'Curated AI news, investment updates, and practical tips - updated daily in German and English.',
     images: [
       {
         url: '/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'DataCube AI – Where AI meets human insight',
+        alt: 'Data Cube AI – Where AI meets human insight',
         type: 'image/jpeg',
       },
     ],
@@ -63,14 +63,14 @@ export const metadata: Metadata = {
   // Twitter Card
   twitter: {
     card: 'summary_large_image',
-    title: 'DataCube AI | Daily AI News',
+    title: 'Data Cube AI | Daily AI News',
     description: 'Your daily dose of AI news, investments, and tips.',
     images: [
       {
         url: '/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'DataCube AI – Where AI meets human insight',
+        alt: 'Data Cube AI – Where AI meets human insight',
       },
     ],
   },
@@ -118,8 +118,8 @@ export default function RootLayout({
         <OrganizationSchema />
         <WebsiteSchema />
         <FAQSchema />
-        <link rel="alternate" type="application/atom+xml" title="DataCube AI (DE)" href="/feed.xml?lang=de" />
-        <link rel="alternate" type="application/atom+xml" title="DataCube AI (EN)" href="/feed.xml?lang=en" />
+        <link rel="alternate" type="application/atom+xml" title="Data Cube AI (DE)" href="/feed.xml?lang=de" />
+        <link rel="alternate" type="application/atom+xml" title="Data Cube AI (EN)" href="/feed.xml?lang=en" />
       </head>
       <body className={`${geist.variable} ${geistMono.variable} ${instrumentSerif.variable} font-sans antialiased`}>
         <a

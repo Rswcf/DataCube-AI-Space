@@ -25,8 +25,8 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   return {
     title: lang === 'de' ? `KI-News ${periodLabel}` : `AI News ${periodLabel}`,
     description: lang === 'de'
-      ? `Kuratierte KI-News der ${periodLabel}: Technologie-Durchbrüche, Investment-Signale und praktische Tipps – täglich aktualisiert auf DataCube AI.`
-      : `Curated AI news for ${periodLabel}: technology breakthroughs, investment signals, and practical tips – updated daily on DataCube AI.`,
+      ? `Kuratierte KI-News der ${periodLabel}: Technologie-Durchbrüche, Investment-Signale und praktische Tipps – täglich aktualisiert auf Data Cube AI.`
+      : `Curated AI news for ${periodLabel}: technology breakthroughs, investment signals, and practical tips – updated daily on Data Cube AI.`,
     alternates: {
       canonical: localizedUrl,
       languages: {
@@ -38,8 +38,8 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
     openGraph: {
       title: lang === 'de' ? `KI-News ${periodLabel}` : `AI News ${periodLabel}`,
       description: lang === 'de'
-        ? `Kuratierte KI-News der ${periodLabel}: Technologie-Durchbrüche, Investment-Signale und praktische Tipps – täglich aktualisiert auf DataCube AI.`
-        : `Curated AI news for ${periodLabel}: technology breakthroughs, investment signals, and practical tips – updated daily on DataCube AI.`,
+        ? `Kuratierte KI-News der ${periodLabel}: Technologie-Durchbrüche, Investment-Signale und praktische Tipps – täglich aktualisiert auf Data Cube AI.`
+        : `Curated AI news for ${periodLabel}: technology breakthroughs, investment signals, and practical tips – updated daily on Data Cube AI.`,
       url: localizedUrl,
       type: 'article',
       images: [
@@ -48,8 +48,8 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
           width: 1200,
           height: 630,
           alt: lang === 'de'
-            ? `DataCube AI – KI-News ${periodLabel}`
-            : `DataCube AI – AI News ${periodLabel}`,
+            ? `Data Cube AI – KI-News ${periodLabel}`
+            : `Data Cube AI – AI News ${periodLabel}`,
         },
       ],
     },

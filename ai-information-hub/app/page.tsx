@@ -135,7 +135,7 @@ export async function HomePageContent({ language = 'de' }: HomePageContentProps 
   return (
     <main className="min-h-screen w-full">
       <section className="mx-auto max-w-[1280px] border-b border-border px-4 py-5">
-        <h1 className="text-xl font-semibold sm:text-2xl">DataCube AI: Daily AI News, Investment Signals, and Practical Tips</h1>
+        <h1 className="text-xl font-semibold sm:text-2xl">Data Cube AI: Daily AI News, Investment Signals, and Practical Tips</h1>
         <p className="mt-2 max-w-4xl text-sm text-muted-foreground sm:text-base">
           {introDescription}
         </p>
