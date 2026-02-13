@@ -130,6 +130,7 @@ export const translations = {
 
     // Support
     support: "Unterst\u00fctzen",
+    supportDescription: "Unterstütze Data Cube auf Ko-fi",
 
     // Share enhanced
     copyLink: "Link kopieren",
@@ -284,6 +285,7 @@ export const translations = {
 
     // Support
     support: "Support",
+    supportDescription: "Support Data Cube on Ko-fi",
 
     // Share enhanced
     copyLink: "Copy link",

@@ -6,7 +6,7 @@ import { Feed } from "@/components/feed";
 import { RightSidebar } from "@/components/right-sidebar";
 import { ChatWidget } from "@/components/chat-widget";
 import { ReportGenerator } from "@/components/report-generator";
-import { Cpu, TrendingUp, Lightbulb, Search, X, Settings, Sun, Moon, Languages } from "lucide-react";
+import { Cpu, TrendingUp, Lightbulb, Search, X, Settings, Sun, Moon, Languages, Heart, Mail, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSettings } from "@/lib/settings-context";
 
@@ -325,6 +325,8 @@ function MobileSettingsDrawer({
   onClose: () => void;
 }) {
   const { theme, setTheme, language, setLanguage, t } = useSettings();
+  const [email, setEmail] = useState("");
+  const [subscribeState, setSubscribeState] = useState<"idle" | "success">("idle");
 
   useEffect(() => {
     if (!isOpen) return;
@@ -343,7 +345,7 @@ function MobileSettingsDrawer({
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
 
       {/* Drawer */}
-      <div className="absolute bottom-0 left-0 right-0 rounded-t-2xl bg-background animate-in slide-in-from-bottom duration-300">
+      <div className="absolute bottom-0 left-0 right-0 max-h-[85vh] rounded-t-2xl bg-background animate-in slide-in-from-bottom duration-300 overflow-y-auto">
         {/* Handle */}
         <div className="flex justify-center py-3">
           <div className="h-1 w-12 rounded-full bg-muted-foreground/30" />
@@ -397,6 +399,65 @@ function MobileSettingsDrawer({
               </p>
             </div>
           </button>
+
+          {/* Support (Ko-fi) */}
+          <button
+            onClick={() => window.open("https://ko-fi.com/datacubeai", "_blank", "noopener,noreferrer")}
+            className="flex w-full items-center gap-4 rounded-xl p-4 hover:bg-secondary transition-colors focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <Heart className="h-6 w-6 text-pink-500" aria-hidden="true" />
+            <div className="flex-1 text-left">
+              <p className="font-semibold">{t("support")}</p>
+              <p className="text-sm text-muted-foreground">{t("supportDescription")}</p>
+            </div>
+          </button>
+
+          {/* Divider */}
+          <div className="border-t border-border my-2" />
+
+          {/* Newsletter */}
+          <div className="rounded-xl border border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5 p-4">
+            <div className="flex items-center gap-2 mb-1">
+              <Mail className="h-4 w-4 text-primary" aria-hidden="true" />
+              <h3 className="font-bold text-foreground">{t("newsletter")}</h3>
+            </div>
+            <p className="text-xs text-muted-foreground mb-3">{t("newsletterDescription")}</p>
+            {subscribeState === "success" ? (
+              <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
+                <Check className="h-4 w-4" aria-hidden="true" />
+                <span>{t("subscribed")}</span>
+              </div>
+            ) : (
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (!email.trim()) return;
+                  const existing = JSON.parse(localStorage.getItem("datacube_newsletter_signups") || "[]");
+                  existing.push({ email: email.trim(), language, date: new Date().toISOString() });
+                  localStorage.setItem("datacube_newsletter_signups", JSON.stringify(existing));
+                  setEmail("");
+                  setSubscribeState("success");
+                  setTimeout(() => setSubscribeState("idle"), 3000);
+                }}
+                className="flex flex-col gap-2"
+              >
+                <input
+                  type="email"
+                  required
+                  placeholder={t("emailPlaceholder")}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+                <button
+                  type="submit"
+                  className="w-full rounded-full bg-gradient-to-r from-primary to-accent px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 transition-opacity focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  {t("subscribe")}
+                </button>
+              </form>
+            )}
+          </div>
         </div>
       </div>
     </div>
