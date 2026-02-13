@@ -189,7 +189,7 @@ export function TipsFeed({ weekId, searchQuery }: TipsFeedProps) {
               {/* Tip Code Block */}
               <div className="mt-3 rounded-lg border border-tips-accent/20 bg-tips-accent/5 p-3">
                 <div className="flex items-start justify-between gap-2">
-                  <pre className="flex-1 overflow-x-auto whitespace-pre-wrap text-sm font-mono text-foreground leading-relaxed">
+                  <pre className="flex-1 overflow-x-auto whitespace-pre-wrap break-all text-sm font-mono text-foreground leading-relaxed">
                     {post.tip}
                   </pre>
                   <Button

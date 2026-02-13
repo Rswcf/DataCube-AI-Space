@@ -359,7 +359,7 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
                       </div>
                       <Badge className="bg-accent/20 text-accent border-accent/30">{post.round}</Badge>
                     </div>
-                    <div className="mt-2 grid grid-cols-2 gap-2 text-sm">
+                    <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
                       <div>
                         <span className="text-muted-foreground">{t("volume")}:</span>
                         <span className="ml-2 font-semibold text-accent">{post.amount}</span>
@@ -426,8 +426,8 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
 
                   {/* Stock Info Card */}
                   <div className="mt-2 rounded-lg border border-border bg-card p-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex items-center gap-3 min-w-0 flex-wrap">
                         <span className="text-lg font-bold text-foreground">{post.ticker}</span>
                         {post.price && post.price !== "N/A" && (
                           <span className="text-xl font-semibold text-foreground tabular-nums">{post.price}</span>
@@ -509,15 +509,15 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
 
                   {/* M&A Info Card */}
                   <div className="mt-2 rounded-lg border border-border bg-card p-3">
-                    <div className="flex items-center justify-center gap-4">
-                      <div className="text-center">
+                    <div className="flex items-center justify-center gap-3 min-w-0">
+                      <div className="text-center min-w-0">
                         <p className="text-xs text-muted-foreground">{t("acquirer")}</p>
-                        <p className="font-semibold text-foreground">{post.acquirer}</p>
+                        <p className="font-semibold text-foreground truncate">{post.acquirer}</p>
                       </div>
-                      <GitMerge className="h-6 w-6 text-chart-5" aria-hidden="true" />
-                      <div className="text-center">
+                      <GitMerge className="h-6 w-6 text-chart-5 shrink-0" aria-hidden="true" />
+                      <div className="text-center min-w-0">
                         <p className="text-xs text-muted-foreground">{t("target")}</p>
-                        <p className="font-semibold text-foreground">{post.target}</p>
+                        <p className="font-semibold text-foreground truncate">{post.target}</p>
                       </div>
                     </div>
                     <div className="mt-3 flex items-center justify-center gap-2 flex-wrap">

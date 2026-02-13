@@ -104,6 +104,10 @@ export const metadata: Metadata = {
   },
 }
 
+export const viewport = {
+  viewportFit: 'cover' as const,
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{

@@ -69,7 +69,7 @@ export default function HomePageClient({ initialWeekId = "" }: HomePageClientPro
   }, []);
 
   return (
-    <div className="min-h-screen w-full pb-16 md:pb-0">
+    <div className="min-h-dvh w-full overflow-x-hidden pb-16 md:pb-0">
       {/* Ambient gradient - visual continuity from login */}
       <div
         className="pointer-events-none fixed top-0 left-0 right-0 h-32 bg-gradient-to-b from-primary/[0.02] to-transparent z-0"
@@ -105,7 +105,7 @@ export default function HomePageClient({ initialWeekId = "" }: HomePageClientPro
       {/* Mobile Search Drawer */}
       <MobileSearchDrawer
         isOpen={showMobileSearch}
-        onClose={() => setShowMobileSearch(false)}
+        onClose={() => { setShowMobileSearch(false); setSearchQuery(""); }}
         weekId={selectedWeekId}
         onSearchChange={setSearchQuery}
       />
@@ -144,13 +144,13 @@ function MobileNav({
   ];
 
   return (
-    <nav aria-label="Main navigation" className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around border-t border-border bg-background/95 backdrop-blur-md py-2 md:hidden">
+    <nav aria-label="Main navigation" className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around border-t border-border bg-background/95 backdrop-blur-md py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] md:hidden">
       {tabs.map((tab) => (
         <button
           key={tab.id}
           onClick={() => onTabChange(tab.id)}
           className={cn(
-            "flex flex-col items-center gap-1 px-3 py-2 transition-transform duration-200",
+            "flex flex-col items-center gap-1 px-3 py-2 active:scale-95 transition-transform duration-200",
             activeTab === tab.id ? "text-primary scale-105" : "text-muted-foreground"
           )}
         >
@@ -222,6 +222,13 @@ function MobileSearchDrawer({
   }, [isOpen, onClose]);
 
   useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+      return () => { document.body.style.overflow = ''; };
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
     if (!weekId) return;
 
     const processData = (data: { trends?: Record<string, { category: string; title: string }[]> }) => {
@@ -255,24 +262,25 @@ function MobileSearchDrawer({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[60] md:hidden">
+    <div className="fixed inset-0 z-[60] md:hidden" role="dialog" aria-modal="true" aria-labelledby="mobile-search-title">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/50" onClick={onClose} aria-hidden="true" />
 
       {/* Drawer */}
       <div className="absolute bottom-0 left-0 right-0 max-h-[85vh] rounded-t-2xl bg-background animate-in slide-in-from-bottom duration-300">
         {/* Handle with subtle gradient */}
-        <div className="relative flex justify-center py-3">
-          <div className="absolute inset-x-0 top-0 h-full rounded-t-2xl bg-gradient-to-b from-primary/[0.03] to-transparent" aria-hidden="true" />
+        <div className="relative flex justify-center py-3" aria-hidden="true">
+          <div className="absolute inset-x-0 top-0 h-full rounded-t-2xl bg-gradient-to-b from-primary/[0.03] to-transparent" />
           <div className="relative h-1 w-12 rounded-full bg-muted-foreground/30" />
         </div>
 
         {/* Header */}
         <div className="flex items-center justify-between px-4 pb-3">
-          <h2 className="text-lg font-bold">{t("search")}</h2>
+          <h2 id="mobile-search-title" className="text-lg font-bold">{t("search")}</h2>
           <button
             onClick={onClose}
-            className="rounded-full p-2 hover:bg-secondary transition-colors focus-visible:ring-2 focus-visible:ring-ring"
+            className="rounded-full p-2.5 hover:bg-secondary transition-colors focus-visible:ring-2 focus-visible:ring-ring"
+            aria-label={language === "de" ? "Schließen" : "Close"}
           >
             <X className="h-5 w-5" aria-hidden="true" />
           </button>
@@ -287,30 +295,57 @@ function MobileSearchDrawer({
               placeholder={t("search")}
               value={searchValue}
               onChange={(e) => handleSearch(e.target.value)}
-              className="w-full rounded-full border border-input bg-secondary pl-10 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full rounded-full border border-input bg-secondary pl-10 pr-10 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
               autoFocus
+              aria-label={t("search")}
             />
+            {searchValue && (
+              <button
+                onClick={() => handleSearch("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 hover:bg-muted-foreground/20 transition-colors"
+                aria-label="Clear search"
+              >
+                <X className="h-4 w-4 text-muted-foreground" />
+              </button>
+            )}
           </div>
         </div>
 
-        {/* Trends */}
+        {/* Trends / Search Feedback */}
         <div className="px-4 pb-6 overflow-y-auto max-h-[50vh]">
-          <h3 className="text-sm font-semibold text-muted-foreground mb-3">{t("whatsNew")}</h3>
-          <div className="space-y-1">
-            {trends.map((trend, index) => (
+          {searchValue ? (
+            <div className="text-center py-8">
+              <Search className="h-8 w-8 mx-auto text-muted-foreground/50 mb-3" aria-hidden="true" />
+              <p className="text-sm text-muted-foreground">
+                {language === "de" ? `Filtere nach "${searchValue}"...` : `Filtering for "${searchValue}"...`}
+              </p>
               <button
-                key={index}
-                onClick={() => handleTrendClick(trend.title)}
-                className="w-full text-left p-3 rounded-lg hover:bg-secondary transition-colors focus-visible:ring-2 focus-visible:ring-ring flex items-start gap-3"
+                onClick={onClose}
+                className="mt-4 inline-flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground hover:opacity-90 transition-opacity focus-visible:ring-2 focus-visible:ring-ring"
               >
-                <span className="text-sm font-bold text-muted-foreground/50 mt-0.5 w-5 shrink-0 tabular-nums" aria-hidden="true">{index + 1}</span>
-                <div className="min-w-0">
-                  <p className="text-xs text-muted-foreground">{trend.category}</p>
-                  <p className="font-semibold">{trend.title}</p>
-                </div>
+                {language === "de" ? "Ergebnisse anzeigen" : "Show results"}
               </button>
-            ))}
-          </div>
+            </div>
+          ) : (
+            <>
+              <h3 className="text-sm font-semibold text-muted-foreground mb-3">{t("whatsNew")}</h3>
+              <div className="space-y-1">
+                {trends.map((trend, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleTrendClick(trend.title)}
+                    className="w-full text-left p-3 rounded-lg hover:bg-secondary transition-colors focus-visible:ring-2 focus-visible:ring-ring flex items-start gap-3"
+                  >
+                    <span className="text-sm font-bold text-muted-foreground/50 mt-0.5 w-5 shrink-0 tabular-nums" aria-hidden="true">{index + 1}</span>
+                    <div className="min-w-0">
+                      <p className="text-xs text-muted-foreground">{trend.category}</p>
+                      <p className="font-semibold">{trend.title}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>
@@ -337,26 +372,34 @@ function MobileSettingsDrawer({
     return () => document.removeEventListener("keydown", handleEscape);
   }, [isOpen, onClose]);
 
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+      return () => { document.body.style.overflow = ''; };
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[60] md:hidden">
+    <div className="fixed inset-0 z-[60] md:hidden" role="dialog" aria-modal="true" aria-labelledby="mobile-settings-title">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/50" onClick={onClose} aria-hidden="true" />
 
       {/* Drawer */}
       <div className="absolute bottom-0 left-0 right-0 max-h-[85vh] rounded-t-2xl bg-background animate-in slide-in-from-bottom duration-300 overflow-y-auto">
         {/* Handle */}
-        <div className="flex justify-center py-3">
+        <div className="flex justify-center py-3" aria-hidden="true">
           <div className="h-1 w-12 rounded-full bg-muted-foreground/30" />
         </div>
 
         {/* Header */}
         <div className="flex items-center justify-between px-4 pb-3">
-          <h2 className="text-lg font-bold">{t("settings")}</h2>
+          <h2 id="mobile-settings-title" className="text-lg font-bold">{t("settings")}</h2>
           <button
             onClick={onClose}
-            className="rounded-full p-2 hover:bg-secondary transition-colors focus-visible:ring-2 focus-visible:ring-ring"
+            className="rounded-full p-2.5 hover:bg-secondary transition-colors focus-visible:ring-2 focus-visible:ring-ring"
+            aria-label={language === "de" ? "Schließen" : "Close"}
           >
             <X className="h-5 w-5" aria-hidden="true" />
           </button>

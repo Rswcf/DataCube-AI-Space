@@ -195,6 +195,14 @@ export function ReportGenerator({ weekId }: ReportGeneratorProps) {
     return () => clearTimeout(timer);
   }, []);
 
+  // Lock body scroll when report overlay is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+      return () => { document.body.style.overflow = ''; };
+    }
+  }, [isOpen]);
+
   // Close export menu on click outside
   useEffect(() => {
     if (!showExportMenu) return;

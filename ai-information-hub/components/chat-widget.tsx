@@ -165,6 +165,14 @@ export function ChatWidget({ weekId }: ChatWidgetProps) {
     return () => clearTimeout(timer);
   }, []);
 
+  // Lock body scroll when chat panel is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+      return () => { document.body.style.overflow = ''; };
+    }
+  }, [isOpen]);
+
   // Auto-scroll to bottom
   useEffect(() => {
     if (scrollRef.current) {
@@ -327,7 +335,7 @@ export function ChatWidget({ weekId }: ChatWidgetProps) {
       {isOpen && (
         <div
           className={cn(
-            "fixed z-40 flex flex-col overflow-hidden rounded-2xl border border-border bg-background shadow-2xl",
+            "fixed z-[55] flex flex-col overflow-hidden rounded-2xl border border-border bg-background shadow-2xl",
             "bottom-36 right-4 w-[380px] max-w-[calc(100vw-2rem)]",
             "h-[calc(100vh-160px)] max-h-[500px] md:h-[500px]",
             "md:bottom-24 md:right-6"
@@ -417,7 +425,7 @@ export function ChatWidget({ weekId }: ChatWidgetProps) {
               <Button
                 type="submit"
                 size="icon"
-                className="h-10 w-10 rounded-full"
+                className="h-11 w-11 rounded-full"
                 disabled={isLoading || !input.trim()}
               >
                 <Send className="h-4 w-4" />

@@ -138,7 +138,7 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground overflow-x-hidden;
   }
 }
 
@@ -264,6 +264,22 @@
   background: linear-gradient(90deg, transparent 25%, var(--secondary) 50%, transparent 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-up {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+  .animate-shimmer {
+    animation: none;
+  }
+  .animate-slide-left,
+  .animate-slide-right {
+    animation: none;
+  }
 }
 
 /* Subtle gradient sweep for section headers */

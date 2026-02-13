@@ -140,7 +140,7 @@ export function WeekNavigation({ selectedWeekId, onWeekChange }: WeekNavigationP
       <div className="relative">
         <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-background to-transparent pointer-events-none z-10" aria-hidden="true" />
 
-        <div ref={scrollRef} className="flex gap-1 overflow-x-auto px-4 pb-2 scrollbar-hide scroll-smooth">
+        <div ref={scrollRef} className="flex gap-1 overflow-x-auto px-4 pb-2 scrollbar-hide scroll-smooth" style={{ touchAction: 'pan-x' }}>
           {weeks.length === 0 && (
             <>
               {Array.from({ length: 5 }).map((_, i) => (
@@ -193,13 +193,13 @@ export function WeekNavigation({ selectedWeekId, onWeekChange }: WeekNavigationP
       <Collapsible open={hasDays}>
         <CollapsibleContent className="overflow-hidden data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0 data-[state=open]:slide-in-from-top-1 data-[state=closed]:slide-out-to-top-1">
           <div className="border-t border-border/50">
-            <div className="flex gap-1.5 overflow-x-auto px-4 py-2 scrollbar-hide">
+            <div className="flex gap-1.5 overflow-x-auto px-4 py-2 scrollbar-hide" style={{ touchAction: 'pan-x' }}>
               {activeWeek?.days?.map((day) => (
                 <button
                   key={day.id}
                   onClick={() => onWeekChange(day.id)}
                   className={cn(
-                    "shrink-0 flex flex-col items-center rounded-lg px-3 py-1.5 transition-colors duration-200",
+                    "shrink-0 flex flex-col items-center rounded-lg px-3 py-2.5 transition-colors duration-200",
                     selectedDay === day.id
                       ? "bg-primary text-primary-foreground"
                       : "bg-secondary/60 text-secondary-foreground hover:bg-secondary/80",
