@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     apple: '/apple-icon.png',
   },
 
-  // Open Graph - uses dynamic opengraph-image.tsx
+  // Open Graph
   openGraph: {
     type: 'website',
     locale: 'en_US',
@@ -49,13 +49,30 @@ export const metadata: Metadata = {
     siteName: 'DataCube AI',
     title: 'DataCube AI | Daily AI News & Insights',
     description: 'Curated AI news, investment updates, and practical tips - updated daily in German and English.',
+    images: [
+      {
+        url: '/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'DataCube AI – Where AI meets human insight',
+        type: 'image/jpeg',
+      },
+    ],
   },
 
-  // Twitter - uses dynamic opengraph-image.tsx
+  // Twitter Card
   twitter: {
     card: 'summary_large_image',
     title: 'DataCube AI | Daily AI News',
     description: 'Your daily dose of AI news, investments, and tips.',
+    images: [
+      {
+        url: '/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'DataCube AI – Where AI meets human insight',
+      },
+    ],
   },
 
   // Robots

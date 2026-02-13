@@ -42,6 +42,16 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
         : `Curated AI news for ${periodLabel}: technology breakthroughs, investment signals, and practical tips – updated daily on DataCube AI.`,
       url: localizedUrl,
       type: 'article',
+      images: [
+        {
+          url: '/og-image.jpg',
+          width: 1200,
+          height: 630,
+          alt: lang === 'de'
+            ? `DataCube AI – KI-News ${periodLabel}`
+            : `DataCube AI – AI News ${periodLabel}`,
+        },
+      ],
     },
   }
 }

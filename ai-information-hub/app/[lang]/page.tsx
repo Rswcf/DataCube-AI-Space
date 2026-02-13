@@ -42,6 +42,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         ? 'Kuratierte KI-News, Investments und Tipps – täglich aktualisiert auf Deutsch und Englisch.'
         : 'Curated AI news, investment updates, and practical tips - updated daily in German and English.',
       url: localizedHome,
+      images: [
+        {
+          url: '/og-image.jpg',
+          width: 1200,
+          height: 630,
+          alt: isDE
+            ? 'DataCube AI – Wo KI auf menschliche Einsicht trifft'
+            : 'DataCube AI – Where AI meets human insight',
+        },
+      ],
     },
   }
 }

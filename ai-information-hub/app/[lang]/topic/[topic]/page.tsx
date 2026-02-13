@@ -276,6 +276,16 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
         : `AI coverage: ${topicTitle}.`,
       url: canonicalUrl,
       type: 'article',
+      images: [
+        {
+          url: '/og-image.jpg',
+          width: 1200,
+          height: 630,
+          alt: lang === 'de'
+            ? `DataCube AI – ${topicTitle}`
+            : `DataCube AI – ${topicTitle}`,
+        },
+      ],
     },
   }
 }
