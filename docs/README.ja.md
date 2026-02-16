@@ -23,11 +23,9 @@ Data Cube AI は **22 の RSS フィード**、**Hacker News**、**YouTube** か
 **[datacubeai.space](https://www.datacubeai.space) で公開中** — ログイン不要。
 
 <div align="center">
-  <a href="https://github.com/Rswcf/DataCube-AI-Space/blob/main/docs/assets/demo.mp4">
-    <img src="assets/demo-thumbnail.png" alt="Data Cube AI デモ動画" width="600">
-    <br>
-    <strong>▶ デモ動画を見る (84秒)</strong>
-  </a>
+
+https://github.com/user-attachments/assets/a2a94ed6-a55c-4e76-9ecc-9eef2625188f
+
 </div>
 
 ## 機能
