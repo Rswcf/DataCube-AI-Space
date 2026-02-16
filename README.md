@@ -22,6 +22,14 @@ Data Cube AI automatically collects, classifies, and summarizes AI news from **2
 
 **Live at [datacubeai.space](https://www.datacubeai.space)** — no login required.
 
+<div align="center">
+  <a href="https://github.com/Rswcf/DataCube-AI-Space/raw/main/docs/assets/demo.mp4">
+    <img src="docs/assets/demo-thumbnail.png" alt="Data Cube AI Demo Video" width="600">
+    <br>
+    <strong>▶ Watch Demo Video (84s)</strong>
+  </a>
+</div>
+
 ## Features
 
 - **Tech Feed** — AI/ML breakthroughs with embedded YouTube videos and impact ratings

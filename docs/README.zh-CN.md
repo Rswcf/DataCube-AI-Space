@@ -22,6 +22,14 @@ Data Cube AI 自动从 **22 个 RSS 订阅源**、**Hacker News** 和 **YouTube*
 
 **已上线 [datacubeai.space](https://www.datacubeai.space)** — 无需登录。
 
+<div align="center">
+  <a href="https://github.com/Rswcf/DataCube-AI-Space/raw/main/docs/assets/demo.mp4">
+    <img src="assets/demo-thumbnail.png" alt="Data Cube AI 演示视频" width="600">
+    <br>
+    <strong>▶ 观看演示视频 (84秒)</strong>
+  </a>
+</div>
+
 ## 功能特性
 
 - **科技动态** — AI/ML 技术突破，附带嵌入式 YouTube 视频和影响力评级

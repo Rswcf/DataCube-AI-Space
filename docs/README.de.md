@@ -22,6 +22,14 @@ Data Cube AI sammelt, klassifiziert und fasst automatisch KI-Nachrichten aus **2
 
 **Live unter [datacubeai.space](https://www.datacubeai.space)** — keine Anmeldung erforderlich.
 
+<div align="center">
+  <a href="https://github.com/Rswcf/DataCube-AI-Space/raw/main/docs/assets/demo.mp4">
+    <img src="assets/demo-thumbnail.png" alt="Data Cube AI Demo-Video" width="600">
+    <br>
+    <strong>▶ Demo-Video ansehen (84s)</strong>
+  </a>
+</div>
+
 ## Funktionen
 
 - **Tech-Feed** — KI/ML-Durchbrüche mit eingebetteten YouTube-Videos und Bewertungen der Tragweite
