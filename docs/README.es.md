@@ -23,7 +23,7 @@ Data Cube AI recopila, clasifica y resume automaticamente noticias sobre IA de *
 **Disponible en [datacubeai.space](https://www.datacubeai.space)** — sin necesidad de iniciar sesion.
 
 <div align="center">
-  <a href="https://github.com/Rswcf/DataCube-AI-Space/raw/main/docs/assets/demo.mp4">
+  <a href="https://github.com/Rswcf/DataCube-AI-Space/blob/main/docs/assets/demo.mp4">
     <img src="assets/demo-thumbnail.png" alt="Video de demostración Data Cube AI" width="600">
     <br>
     <strong>▶ Ver video de demostración (84s)</strong>

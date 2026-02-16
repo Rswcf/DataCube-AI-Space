@@ -23,7 +23,7 @@ Data Cube AI는 **22개 RSS 피드**, **Hacker News**, **YouTube**에서 AI 뉴�
 **[datacubeai.space](https://www.datacubeai.space)에서 바로 확인** — 로그인이 필요 없습니다.
 
 <div align="center">
-  <a href="https://github.com/Rswcf/DataCube-AI-Space/raw/main/docs/assets/demo.mp4">
+  <a href="https://github.com/Rswcf/DataCube-AI-Space/blob/main/docs/assets/demo.mp4">
     <img src="assets/demo-thumbnail.png" alt="Data Cube AI 데모 영상" width="600">
     <br>
     <strong>▶ 데모 영상 보기 (84초)</strong>

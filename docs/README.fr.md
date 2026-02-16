@@ -23,7 +23,7 @@ Data Cube AI collecte, classe et résume automatiquement les actualités IA prov
 **Accessible sur [datacubeai.space](https://www.datacubeai.space)** — aucune connexion requise.
 
 <div align="center">
-  <a href="https://github.com/Rswcf/DataCube-AI-Space/raw/main/docs/assets/demo.mp4">
+  <a href="https://github.com/Rswcf/DataCube-AI-Space/blob/main/docs/assets/demo.mp4">
     <img src="assets/demo-thumbnail.png" alt="Vidéo de démonstration Data Cube AI" width="600">
     <br>
     <strong>▶ Regarder la démo (84s)</strong>
