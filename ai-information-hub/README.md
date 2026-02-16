@@ -1,6 +1,8 @@
 # Data Cube AI Information Hub
 
-Bilingual (DE/EN) daily + weekly AI news aggregator with YouTube video integration. See [CLAUDE.md](./CLAUDE.md) for full documentation.
+[![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](../LICENSE)
+
+Bilingual (DE/EN) daily + weekly AI news aggregator with YouTube video integration.
 
 **Live**: https://www.datacubeai.space (no login required)
 

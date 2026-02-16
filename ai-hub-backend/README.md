@@ -1,6 +1,8 @@
 # AI Hub Backend
 
-FastAPI backend for the AI Information Hub - bilingual daily + weekly AI news aggregator with YouTube video integration.
+[![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](../LICENSE)
+
+FastAPI backend for the AI Information Hub — bilingual daily + weekly AI news aggregator with YouTube video integration.
 
 ## Features
 

@@ -18,6 +18,7 @@ yarn-error.log*
 
 # env files
 .env*
+!.env.example
 
 # vercel
 .vercel
@@ -33,19 +34,34 @@ scripts/.cache/*
 # Python virtual environments
 .venv/
 venv/
+venv312/
 __pycache__/
+*.pyc
 
 # OS
 .DS_Store
+Thumbs.db
+Desktop.ini
 
-# Claude Code instructions (not for public)
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Certificates
+*.pem
+*.key
+
+# Claude Code (local AI assistant settings)
+.claude/
 CLAUDE.md
 **/CLAUDE.md
 
-# Code review files (not for public)
+# Code review files
 CODEX_REVIEW.md
 REVIEW_FINDINGS.md
 
-# AI collaboration platform (not for public)
+# AI collaboration platform
 .ai-collab/
-venv312/
