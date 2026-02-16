@@ -8,7 +8,7 @@
 
 [![MIT 许可证](https://img.shields.io/badge/License-MIT-blue.svg)](../LICENSE)
 [![在线演示](https://img.shields.io/badge/demo-datacubeai.space-brightgreen)](https://www.datacubeai.space)
-[![CI](https://img.shields.io/github/actions/workflow/status/mayijie/DataCube-AI-Space/ci.yml?label=CI)](https://github.com/mayijie/DataCube-AI-Space/actions)
+[![CI](https://img.shields.io/github/actions/workflow/status/Rswcf/DataCube-AI-Space/ci.yml?label=CI)](https://github.com/Rswcf/DataCube-AI-Space/actions)
 
 [English](../README.md) | **简体中文** | [Deutsch](README.de.md) | [Français](README.fr.md) | [Español](README.es.md) | [Português](README.pt-BR.md) | [日本語](README.ja.md) | [한국어](README.ko.md)
 
@@ -237,7 +237,7 @@ DataCube-AI-Space/
 
 <div align="center">
 
-**[在线演示](https://www.datacubeai.space)** · **[报告 Bug](https://github.com/mayijie/DataCube-AI-Space/issues)** · **[功能建议](https://github.com/mayijie/DataCube-AI-Space/issues)**
+**[在线演示](https://www.datacubeai.space)** · **[报告 Bug](https://github.com/Rswcf/DataCube-AI-Space/issues)** · **[功能建议](https://github.com/Rswcf/DataCube-AI-Space/issues)**
 
 如果你觉得这个项目有用，请考虑给它一颗星！
 

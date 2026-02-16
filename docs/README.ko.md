@@ -8,7 +8,7 @@
 
 [![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](../LICENSE)
 [![Live Demo](https://img.shields.io/badge/demo-datacubeai.space-brightgreen)](https://www.datacubeai.space)
-[![CI](https://img.shields.io/github/actions/workflow/status/mayijie/DataCube-AI-Space/ci.yml?label=CI)](https://github.com/mayijie/DataCube-AI-Space/actions)
+[![CI](https://img.shields.io/github/actions/workflow/status/Rswcf/DataCube-AI-Space/ci.yml?label=CI)](https://github.com/Rswcf/DataCube-AI-Space/actions)
 
 [English](../README.md) | [简体中文](README.zh-CN.md) | [Deutsch](README.de.md) | [Français](README.fr.md) | [Español](README.es.md) | [Português](README.pt-BR.md) | [日本語](README.ja.md) | **한국어**
 
@@ -237,7 +237,7 @@ DataCube-AI-Space/
 
 <div align="center">
 
-**[라이브 데모](https://www.datacubeai.space)** · **[버그 신고](https://github.com/mayijie/DataCube-AI-Space/issues)** · **[기능 요청](https://github.com/mayijie/DataCube-AI-Space/issues)**
+**[라이브 데모](https://www.datacubeai.space)** · **[버그 신고](https://github.com/Rswcf/DataCube-AI-Space/issues)** · **[기능 요청](https://github.com/Rswcf/DataCube-AI-Space/issues)**
 
 이 프로젝트가 유용하셨다면 별을 눌러주세요!
 

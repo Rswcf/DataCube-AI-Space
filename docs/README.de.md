@@ -8,7 +8,7 @@
 
 [![MIT-Lizenz](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Live-Demo](https://img.shields.io/badge/demo-datacubeai.space-brightgreen)](https://www.datacubeai.space)
-[![CI](https://img.shields.io/github/actions/workflow/status/mayijie/DataCube-AI-Space/ci.yml?label=CI)](https://github.com/mayijie/DataCube-AI-Space/actions)
+[![CI](https://img.shields.io/github/actions/workflow/status/Rswcf/DataCube-AI-Space/ci.yml?label=CI)](https://github.com/Rswcf/DataCube-AI-Space/actions)
 
 [English](../README.md) | [简体中文](README.zh-CN.md) | **Deutsch** | [Français](README.fr.md) | [Español](README.es.md) | [Português](README.pt-BR.md) | [日本語](README.ja.md) | [한국어](README.ko.md)
 
@@ -237,7 +237,7 @@ Dieses Projekt ist unter der MIT-Lizenz lizenziert — siehe die Datei [LICENSE]
 
 <div align="center">
 
-**[Live-Demo](https://www.datacubeai.space)** · **[Fehler melden](https://github.com/mayijie/DataCube-AI-Space/issues)** · **[Feature anfragen](https://github.com/mayijie/DataCube-AI-Space/issues)**
+**[Live-Demo](https://www.datacubeai.space)** · **[Fehler melden](https://github.com/Rswcf/DataCube-AI-Space/issues)** · **[Feature anfragen](https://github.com/Rswcf/DataCube-AI-Space/issues)**
 
 Wenn du dieses Projekt nützlich findest, hinterlasse gerne einen Stern!
 

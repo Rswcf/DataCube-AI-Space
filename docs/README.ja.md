@@ -8,7 +8,7 @@
 
 [![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Live Demo](https://img.shields.io/badge/demo-datacubeai.space-brightgreen)](https://www.datacubeai.space)
-[![CI](https://img.shields.io/github/actions/workflow/status/mayijie/DataCube-AI-Space/ci.yml?label=CI)](https://github.com/mayijie/DataCube-AI-Space/actions)
+[![CI](https://img.shields.io/github/actions/workflow/status/Rswcf/DataCube-AI-Space/ci.yml?label=CI)](https://github.com/Rswcf/DataCube-AI-Space/actions)
 
 [English](../README.md) | [简体中文](README.zh-CN.md) | [Deutsch](README.de.md) | [Français](README.fr.md) | [Español](README.es.md) | [Português](README.pt-BR.md) | **日本語** | [한국어](README.ko.md)
 
@@ -237,7 +237,7 @@ CI チェックをパスすることを確認してください:
 
 <div align="center">
 
-**[ライブデモ](https://www.datacubeai.space)** · **[バグ報告](https://github.com/mayijie/DataCube-AI-Space/issues)** · **[機能リクエスト](https://github.com/mayijie/DataCube-AI-Space/issues)**
+**[ライブデモ](https://www.datacubeai.space)** · **[バグ報告](https://github.com/Rswcf/DataCube-AI-Space/issues)** · **[機能リクエスト](https://github.com/Rswcf/DataCube-AI-Space/issues)**
 
 このプロジェクトが役に立ったら、ぜひスターをお願いします！
 
