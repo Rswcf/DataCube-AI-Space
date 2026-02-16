@@ -4,8 +4,9 @@ LLM processing service using DeepSeek via OpenRouter.
 
 import json
 import re
+import time
 import logging
-from openai import OpenAI
+from openai import OpenAI, RateLimitError
 
 from app.config import get_settings
 
@@ -64,6 +65,17 @@ def parse_llm_json(text: str, fallback=None):
 class LLMProcessor:
     """LLM processing service for content generation."""
 
+    # Free classifier models in priority order (fallback chain).
+    # When one is rate-limited (429), the next one is tried automatically.
+    CLASSIFIER_MODELS = [
+        "z-ai/glm-4.5-air:free",
+        "arcee-ai/trinity-large-preview:free",
+        "stepfun/step-3.5-flash:free",
+        "nvidia/nemotron-3-nano-30b-a3b:free",
+        "openrouter/aurora-alpha",
+        "arcee-ai/trinity-mini:free",
+    ]
+
     def __init__(self):
         settings = get_settings()
         if not settings.openrouter_api_key:
@@ -73,43 +85,101 @@ class LLMProcessor:
             base_url="https://openrouter.ai/api/v1",
             api_key=settings.openrouter_api_key,
         )
-        # Free model for classification (simple task)
-        self.classifier_model = "z-ai/glm-4.5-air:free"
-        # High-quality model for content processing
+        # High-quality model for content processing (unchanged)
         self.processor_model = "deepseek/deepseek-v3.2"
 
     def _call_llm(self, prompt: str, temperature: float = 0.3, use_classifier: bool = False, timeout: float = 120.0) -> str:
-        """Make an LLM API call.
+        """Make an LLM API call with retry and fallback logic for rate limits.
+
+        For classifier calls: tries each model in CLASSIFIER_MODELS in order.
+        Each model gets 2 retries with exponential backoff before moving to the next.
+        For processor calls: retries the processor model 3 times.
 
         Args:
             prompt: The prompt to send
             temperature: Sampling temperature
-            use_classifier: If True, use free classifier model; otherwise use processor model
+            use_classifier: If True, use free classifier models; otherwise use processor model
             timeout: Request timeout in seconds (default 120s)
 
         Returns:
             LLM response content string
 
         Raises:
-            Exception: Re-raises after logging if API call fails
+            Exception: Re-raises after all models/retries are exhausted
         """
-        model = self.classifier_model if use_classifier else self.processor_model
-        # BUG-H6: Add try/except and timeout to LLM API calls
-        try:
-            response = self.client.chat.completions.create(
-                model=model,
-                messages=[{"role": "user", "content": prompt}],
-                temperature=temperature,
-                timeout=timeout,
-            )
-            # Handle empty response
-            if not response.choices or not response.choices[0].message:
-                logger.warning(f"Empty response from LLM model {model}")
-                return ""
-            return response.choices[0].message.content or ""
-        except Exception as e:
-            logger.error(f"LLM API call failed (model={model}): {e}")
-            raise
+        if use_classifier:
+            return self._call_with_fallback(prompt, temperature, timeout)
+
+        # Processor model: simple retry
+        model = self.processor_model
+        max_retries = 3
+        base_delay = 2
+
+        for attempt in range(max_retries):
+            try:
+                response = self.client.chat.completions.create(
+                    model=model,
+                    messages=[{"role": "user", "content": prompt}],
+                    temperature=temperature,
+                    timeout=timeout,
+                )
+                if not response.choices or not response.choices[0].message:
+                    logger.warning(f"Empty response from LLM model {model}")
+                    return ""
+                return response.choices[0].message.content or ""
+            except RateLimitError:
+                delay = base_delay * (2 ** attempt)
+                logger.warning(f"Rate limited (429) on {model}, attempt {attempt + 1}/{max_retries}. "
+                               f"Retrying in {delay}s...")
+                if attempt < max_retries - 1:
+                    time.sleep(delay)
+                else:
+                    raise
+            except Exception as e:
+                logger.error(f"LLM API call failed (model={model}): {e}")
+                raise
+
+    def _call_with_fallback(self, prompt: str, temperature: float, timeout: float) -> str:
+        """Try classifier models in order, falling back on rate limits.
+
+        Each model gets 2 retry attempts with exponential backoff before
+        moving to the next model in the chain.
+        """
+        retries_per_model = 2
+        base_delay = 2
+        last_error = None
+
+        for model in self.CLASSIFIER_MODELS:
+            for attempt in range(retries_per_model):
+                try:
+                    response = self.client.chat.completions.create(
+                        model=model,
+                        messages=[{"role": "user", "content": prompt}],
+                        temperature=temperature,
+                        timeout=timeout,
+                    )
+                    if not response.choices or not response.choices[0].message:
+                        logger.warning(f"Empty response from classifier model {model}")
+                        return ""
+                    logger.info(f"Classifier succeeded with model: {model}")
+                    return response.choices[0].message.content or ""
+                except RateLimitError as e:
+                    last_error = e
+                    delay = base_delay * (2 ** attempt)
+                    logger.warning(f"Rate limited (429) on {model}, attempt {attempt + 1}/{retries_per_model}. "
+                                   f"Retrying in {delay}s...")
+                    if attempt < retries_per_model - 1:
+                        time.sleep(delay)
+                    else:
+                        logger.warning(f"Model {model} exhausted, trying next fallback...")
+                except Exception as e:
+                    logger.error(f"Classifier call failed on {model}: {e}")
+                    last_error = e
+                    # Non-rate-limit error: skip to next model immediately
+                    break
+
+        logger.error(f"All {len(self.CLASSIFIER_MODELS)} classifier models exhausted")
+        raise last_error or RuntimeError("All classifier models failed")
 
     def classify_articles(self, articles: list[dict]) -> list[dict]:
         """Classify articles into sections (tech/investment/tips)."""

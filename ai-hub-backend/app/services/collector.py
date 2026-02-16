@@ -505,17 +505,23 @@ def stage2_classify_articles(db: Session, week_id: str, processor: LLMProcessor)
             for a in articles_to_classify
         ]
 
-        # Classify articles
-        classified = processor.classify_articles(articles_for_llm)
+        try:
+            # Classify articles
+            classified = processor.classify_articles(articles_for_llm)
 
-        # Update database with classification results
-        classification_map = {a["title"]: a for a in classified}
+            # Update database with classification results
+            classification_map = {a["title"]: a for a in classified}
 
-        for raw_article in articles_to_classify:
-            classification = classification_map.get(raw_article.title)
-            if classification:
-                raw_article.section = classification.get("section", raw_article.original_section)
-                raw_article.relevance = classification.get("relevance", 0.5)
+            for raw_article in articles_to_classify:
+                classification = classification_map.get(raw_article.title)
+                if classification:
+                    raw_article.section = classification.get("section", raw_article.original_section)
+                    raw_article.relevance = classification.get("relevance", 0.5)
+        except Exception as e:
+            logger.error(f"Classification failed, falling back to original_section hints: {e}")
+            for raw_article in articles_to_classify:
+                raw_article.section = raw_article.original_section or "tech"
+                raw_article.relevance = 0.5
 
     db.commit()
     logger.info(f"Classification complete: {len(tips_articles)} tips preserved, "
