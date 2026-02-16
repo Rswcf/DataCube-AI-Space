@@ -126,6 +126,7 @@ export const translations = {
     emailPlaceholder: "E-Mail-Adresse",
     subscribe: "Abonnieren",
     subscribed: "Abonniert!",
+    subscribeError: "Fehler beim Abonnieren. Bitte erneut versuchen.",
     newsletterDescription: "W\u00f6chentliche KI-News direkt in Ihr Postfach",
 
     // Support
@@ -281,6 +282,7 @@ export const translations = {
     emailPlaceholder: "Email address",
     subscribe: "Subscribe",
     subscribed: "Subscribed!",
+    subscribeError: "Subscription failed. Please try again.",
     newsletterDescription: "Weekly AI news straight to your inbox",
 
     // Support

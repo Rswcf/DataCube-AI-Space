@@ -6,7 +6,7 @@ import { Feed } from "@/components/feed";
 import { RightSidebar } from "@/components/right-sidebar";
 import { ChatWidget } from "@/components/chat-widget";
 import { ReportGenerator } from "@/components/report-generator";
-import { Cpu, TrendingUp, Lightbulb, Search, X, Settings, Sun, Moon, Languages, Heart, Mail, Check } from "lucide-react";
+import { Cpu, TrendingUp, Lightbulb, Search, X, Settings, Sun, Moon, Languages, Heart, Mail, Check, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSettings } from "@/lib/settings-context";
 
@@ -361,7 +361,7 @@ function MobileSettingsDrawer({
 }) {
   const { theme, setTheme, language, setLanguage, t } = useSettings();
   const [email, setEmail] = useState("");
-  const [subscribeState, setSubscribeState] = useState<"idle" | "success">("idle");
+  const [subscribeState, setSubscribeState] = useState<"idle" | "loading" | "success" | "error">("idle");
 
   useEffect(() => {
     if (!isOpen) return;
@@ -472,15 +472,24 @@ function MobileSettingsDrawer({
               </div>
             ) : (
               <form
-                onSubmit={(e) => {
+                onSubmit={async (e) => {
                   e.preventDefault();
-                  if (!email.trim()) return;
-                  const existing = JSON.parse(localStorage.getItem("datacube_newsletter_signups") || "[]");
-                  existing.push({ email: email.trim(), language, date: new Date().toISOString() });
-                  localStorage.setItem("datacube_newsletter_signups", JSON.stringify(existing));
-                  setEmail("");
-                  setSubscribeState("success");
-                  setTimeout(() => setSubscribeState("idle"), 3000);
+                  if (!email.trim() || subscribeState === "loading") return;
+                  setSubscribeState("loading");
+                  try {
+                    const res = await fetch("/api/subscribe", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ email: email.trim() }),
+                    });
+                    if (!res.ok) throw new Error();
+                    setEmail("");
+                    setSubscribeState("success");
+                    setTimeout(() => setSubscribeState("idle"), 4000);
+                  } catch {
+                    setSubscribeState("error");
+                    setTimeout(() => setSubscribeState("idle"), 3000);
+                  }
                 }}
                 className="flex flex-col gap-2"
               >
@@ -492,11 +501,19 @@ function MobileSettingsDrawer({
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                 />
+                {subscribeState === "error" && (
+                  <p className="text-xs text-red-500">{t("subscribeError")}</p>
+                )}
                 <button
                   type="submit"
-                  className="w-full rounded-full bg-gradient-to-r from-primary to-accent px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 transition-opacity focus-visible:ring-2 focus-visible:ring-ring"
+                  disabled={subscribeState === "loading"}
+                  className="w-full rounded-full bg-gradient-to-r from-primary to-accent px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 transition-opacity focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
                 >
-                  {t("subscribe")}
+                  {subscribeState === "loading" ? (
+                    <Loader2 className="h-4 w-4 animate-spin mx-auto" aria-hidden="true" />
+                  ) : (
+                    t("subscribe")
+                  )}
                 </button>
               </form>
             )}

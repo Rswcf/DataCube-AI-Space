@@ -3,7 +3,7 @@
 import React from "react"
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { Search, Mail, Check, TrendingUp } from "lucide-react";
+import { Search, Mail, Check, TrendingUp, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useSettings } from "@/lib/settings-context";
@@ -58,7 +58,7 @@ export function RightSidebar({ weekId, onSearchChange }: RightSidebarProps) {
   const [searchValue, setSearchValue] = useState("");
   const [trends, setTrends] = useState<TrendItem[]>(fallbackTrends[language]);
   const [email, setEmail] = useState("");
-  const [subscribeState, setSubscribeState] = useState<"idle" | "success">("idle");
+  const [subscribeState, setSubscribeState] = useState<"idle" | "loading" | "success" | "error">("idle");
 
   useEffect(() => {
     const processData = (data: any) => {
@@ -183,15 +183,24 @@ export function RightSidebar({ weekId, onSearchChange }: RightSidebarProps) {
             </div>
           ) : (
             <form
-              onSubmit={(e) => {
+              onSubmit={async (e) => {
                 e.preventDefault();
-                if (!email.trim()) return;
-                const existing = JSON.parse(localStorage.getItem("datacube_newsletter_signups") || "[]");
-                existing.push({ email: email.trim(), language, date: new Date().toISOString() });
-                localStorage.setItem("datacube_newsletter_signups", JSON.stringify(existing));
-                setEmail("");
-                setSubscribeState("success");
-                setTimeout(() => setSubscribeState("idle"), 3000);
+                if (!email.trim() || subscribeState === "loading") return;
+                setSubscribeState("loading");
+                try {
+                  const res = await fetch("/api/subscribe", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email: email.trim() }),
+                  });
+                  if (!res.ok) throw new Error();
+                  setEmail("");
+                  setSubscribeState("success");
+                  setTimeout(() => setSubscribeState("idle"), 4000);
+                } catch {
+                  setSubscribeState("error");
+                  setTimeout(() => setSubscribeState("idle"), 3000);
+                }
               }}
               className="flex flex-col gap-2"
             >
@@ -203,8 +212,20 @@ export function RightSidebar({ weekId, onSearchChange }: RightSidebarProps) {
                 onChange={(e) => setEmail(e.target.value)}
                 className="bg-background border-0 focus-visible:ring-1 focus-visible:ring-primary text-sm"
               />
-              <Button type="submit" size="sm" className="w-full rounded-full bg-gradient-to-r from-primary to-accent text-primary-foreground hover:opacity-90 transition-opacity">
-                {t("subscribe")}
+              {subscribeState === "error" && (
+                <p className="text-xs text-red-500">{t("subscribeError")}</p>
+              )}
+              <Button
+                type="submit"
+                size="sm"
+                disabled={subscribeState === "loading"}
+                className="w-full rounded-full bg-gradient-to-r from-primary to-accent text-primary-foreground hover:opacity-90 transition-opacity"
+              >
+                {subscribeState === "loading" ? (
+                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                ) : (
+                  t("subscribe")
+                )}
               </Button>
             </form>
           )}
