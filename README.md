@@ -4,23 +4,24 @@
 
 ### Your daily AI news, curated by AI.
 
-**Bilingual (DE/EN) AI news aggregator** that curates tech breakthroughs, investment deals, practical tips, and YouTube videos — powered by a 4-stage LLM pipeline.
+The open-source alternative to Feedly AI and Google News — a bilingual (DE/EN) AI news aggregator that curates tech breakthroughs, investment deals, practical tips, and YouTube videos through a 4-stage LLM pipeline.
 
+[![GitHub stars](https://img.shields.io/github/stars/Rswcf/DataCube-AI-Space?style=social)](https://github.com/Rswcf/DataCube-AI-Space/stargazers)
 [![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Live Demo](https://img.shields.io/badge/demo-datacubeai.space-brightgreen)](https://www.datacubeai.space)
 [![CI](https://img.shields.io/github/actions/workflow/status/Rswcf/DataCube-AI-Space/ci.yml?label=CI)](https://github.com/Rswcf/DataCube-AI-Space/actions)
+[![Last Commit](https://img.shields.io/github/last-commit/Rswcf/DataCube-AI-Space)](https://github.com/Rswcf/DataCube-AI-Space/commits/main)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/Rswcf/DataCube-AI-Space/pulls)
 
 [English](README.md) | [简体中文](docs/README.zh-CN.md) | [Deutsch](docs/README.de.md) | [Français](docs/README.fr.md) | [Español](docs/README.es.md) | [Português](docs/README.pt-BR.md) | [日本語](docs/README.ja.md) | [한국어](docs/README.ko.md)
+
+**[Live Demo](https://www.datacubeai.space)** · **[Report Bug](https://github.com/Rswcf/DataCube-AI-Space/issues)** · **[Request Feature](https://github.com/Rswcf/DataCube-AI-Space/discussions)**
 
 </div>
 
 ---
 
-## What is Data Cube AI?
-
-Data Cube AI automatically collects, classifies, and summarizes AI news from **22 RSS feeds**, **Hacker News**, and **YouTube** — then presents it in a clean bilingual (German/English) interface with daily and weekly views.
-
-**Live at [datacubeai.space](https://www.datacubeai.space)** — no login required.
+## Demo
 
 <div align="center">
 
@@ -28,18 +29,30 @@ https://github.com/user-attachments/assets/a2a94ed6-a55c-4e76-9ecc-9eef2625188f
 
 </div>
 
+## Why Data Cube AI?
+
+| Problem | Solution |
+|---------|----------|
+| 500+ AI articles published daily — you read 3 | **22 sources scanned automatically**, top stories surface |
+| Scattered across Hacker News, Reddit, ArXiv, RSS | **One unified dashboard** with tech, investment, tips |
+| English-only or single-language tools | **Bilingual DE/EN** — every article in both languages |
+| Paid tools (Feedly AI $18/mo, etc.) | **Free & open source**, MIT licensed, self-hostable |
+| No actionable context | **AI Chat** to ask questions, **AI Reports** with one-click export |
+
 ## Features
 
-- **Tech Feed** — AI/ML breakthroughs with embedded YouTube videos and impact ratings
-- **Investment Tracker** — Primary funding rounds, secondary market data (live stock prices via Polygon.io), and M&A deals
-- **Practical Tips** — Curated from 14 Reddit communities and expert blogs
-- **Bilingual** — Every article in both German and English
-- **Daily + Weekly** — Automated daily collection with weekly rollup views
-- **AI Chat** — Ask questions about the current week's AI news
-- **AI Reports** — One-click streaming report with export to Word, HTML, Markdown, Text, or JSON
-- **SEO/GEO Optimized** — SSR pages, JSON-LD structured data, Atom feed, llms.txt, sitemap
-- **Accessible** — WCAG-compliant: 44px touch targets, focus-visible, ARIA, prefers-reduced-motion, skip links
-- **Mobile-First** — Dynamic viewport, safe area insets, touch-optimized navigation, body scroll lock on overlays
+| | Feature | Description |
+|---|---------|-------------|
+| 📡 | **Tech Feed** | AI/ML breakthroughs with embedded YouTube videos and impact ratings |
+| 💰 | **Investment Tracker** | Funding rounds, live stock prices (Polygon.io), M&A deals |
+| 💡 | **Practical Tips** | Curated from 14 Reddit communities and expert blogs |
+| 🌐 | **Bilingual** | Every article in both German and English |
+| 📅 | **Daily + Weekly** | Automated daily collection with weekly rollup views |
+| 🤖 | **AI Chat** | Ask questions about the current week's AI news |
+| 📊 | **AI Reports** | One-click streaming report — export to Word, HTML, Markdown, Text, JSON |
+| 🔍 | **SEO/GEO** | SSR pages, JSON-LD, Atom feed, llms.txt, sitemap |
+| ♿ | **Accessible** | WCAG-compliant: focus-visible, ARIA, reduced-motion, skip links |
+| 📱 | **Mobile-First** | Dynamic viewport, safe area insets, touch-optimized navigation |
 
 ## Architecture
 
@@ -65,10 +78,8 @@ Frontend (Vercel)                    Backend (Railway)
 
 ### Prerequisites
 
-- Node.js 18+
-- Python 3.11+
-- PostgreSQL
-- API keys: [OpenRouter](https://openrouter.ai), [YouTube Data API v3](https://console.cloud.google.com), [Polygon.io](https://polygon.io) (optional, for live stock data)
+- Node.js 18+, Python 3.11+, PostgreSQL
+- API keys: [OpenRouter](https://openrouter.ai), [YouTube Data API v3](https://console.cloud.google.com), [Polygon.io](https://polygon.io) (optional)
 
 ### Frontend
 
@@ -94,15 +105,10 @@ uvicorn app.main:app --reload # http://localhost:8000/docs
 ### Run Data Collection
 
 ```bash
-# Daily collection (today)
-python -m scripts.daily_collect
-
-# Weekly collection (current week)
-python -m scripts.weekly_collect
-
-# Specific date/week
-python -m scripts.daily_collect --date 2026-02-07
-python -m scripts.weekly_collect --week 2026-kw06
+python -m scripts.daily_collect              # Today
+python -m scripts.daily_collect --date 2026-02-07  # Specific date
+python -m scripts.weekly_collect             # Current week
+python -m scripts.weekly_collect --week 2026-kw06  # Specific week
 ```
 
 ## Tech Stack
@@ -150,7 +156,8 @@ Full API docs available at `/docs` (Swagger UI) when running the backend.
 
 ## Environment Variables
 
-### Frontend (`ai-information-hub/.env.local`)
+<details>
+<summary>Frontend (<code>ai-information-hub/.env.local</code>)</summary>
 
 ```bash
 OPENROUTER_API_KEY=sk-or-v1-...     # For chat & report features
@@ -158,7 +165,10 @@ YOUTUBE_API_KEY=AIza...              # For video metadata
 NEXT_PUBLIC_API_URL=http://localhost:8000/api  # Backend URL
 ```
 
-### Backend (`ai-hub-backend/.env`)
+</details>
+
+<details>
+<summary>Backend (<code>ai-hub-backend/.env</code>)</summary>
 
 ```bash
 DATABASE_URL=postgresql://user:pass@localhost:5432/aihub
@@ -169,25 +179,21 @@ ADMIN_API_KEY=your-secret-key       # Protects admin endpoints
 CORS_ORIGINS=["http://localhost:3000"]
 ```
 
+</details>
+
 ## Deployment
 
-### Frontend → Vercel
+**Frontend → Vercel** — Set environment variables in dashboard. Auto-deploys on push to `main`.
 
 ```bash
-cd ai-information-hub
-vercel --prod
+cd ai-information-hub && vercel --prod
 ```
 
-Set environment variables in the Vercel dashboard. Auto-deploys on push to `main`.
-
-### Backend → Railway
+**Backend → Railway** — Auto-applies Alembic migrations on startup. Configure cron for daily collection at 22:00 UTC.
 
 ```bash
-cd ai-hub-backend
-railway up
+cd ai-hub-backend && railway up
 ```
-
-Railway auto-applies Alembic migrations on startup. Configure a cron job for daily collection at 22:00 UTC.
 
 ## Project Structure
 
@@ -217,13 +223,15 @@ DataCube-AI-Space/
 │   ├── scripts/                 # CLI tools (daily/weekly collect)
 │   └── Dockerfile
 │
-├── docs/                        # Translated READMEs
+├── docs/                        # Translated READMEs (8 languages)
 └── LICENSE
 ```
 
 ## Contributing
 
-Contributions are welcome! Here's how to get started:
+Contributions are welcome! See the [Contributing Guide](CONTRIBUTING.md) for details.
+
+**Quick version:**
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
@@ -231,9 +239,15 @@ Contributions are welcome! Here's how to get started:
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-Please make sure your code passes the CI checks:
-- **Frontend**: `tsc --noEmit` + `next build`
-- **Backend**: `ruff check`
+Check out our [good first issues](https://github.com/Rswcf/DataCube-AI-Space/labels/good%20first%20issue) to get started.
+
+## Star History
+
+<div align="center">
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Rswcf/DataCube-AI-Space&type=Date)](https://star-history.com/#Rswcf/DataCube-AI-Space&Date)
+
+</div>
 
 ## License
 
@@ -243,8 +257,8 @@ This project is licensed under the MIT License — see the [LICENSE](LICENSE) fi
 
 <div align="center">
 
-**[Live Demo](https://www.datacubeai.space)** · **[Report Bug](https://github.com/Rswcf/DataCube-AI-Space/issues)** · **[Request Feature](https://github.com/Rswcf/DataCube-AI-Space/issues)**
+**If you find this project useful, please consider giving it a ⭐**
 
-If you find this project useful, please consider giving it a star!
+**[Live Demo](https://www.datacubeai.space)** · **[Report Bug](https://github.com/Rswcf/DataCube-AI-Space/issues)** · **[Request Feature](https://github.com/Rswcf/DataCube-AI-Space/discussions)** · **[Discussions](https://github.com/Rswcf/DataCube-AI-Space/discussions)**
 
 </div>
