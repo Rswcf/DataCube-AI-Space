@@ -55,6 +55,22 @@ def _run_collection_with_new_session(week_id: Optional[str] = None):
         db.close()
 
 
+def _send_newsletter_with_new_session(period_id: Optional[str] = None):
+    """Background task wrapper for newsletter sending with its own session."""
+    from app.services.newsletter_sender import send_newsletter
+
+    db = get_session_local()()
+    try:
+        logger.info(f"Starting newsletter for {period_id or 'yesterday'}")
+        send_newsletter(db, period_id)
+        logger.info(f"Newsletter completed for {period_id or 'yesterday'}")
+    except Exception as e:
+        logger.error(f"Newsletter failed: {e}")
+        raise
+    finally:
+        db.close()
+
+
 def _run_ma_collection_with_new_session(week_id: Optional[str] = None):
     """Background task wrapper for M&A-only collection with its own session."""
     from app.services.collector import run_ma_collection
@@ -337,6 +353,33 @@ async def initialize_database(
     except Exception as e:
         logger.error(f"Database initialization failed: {e}")
         raise HTTPException(status_code=500, detail="Database initialization failed")
+
+
+@router.post("/newsletter")
+async def trigger_newsletter(
+    background_tasks: BackgroundTasks,
+    period_id: Optional[str] = None,
+    wait: bool = False,
+    db: Session = Depends(get_db),
+    _: bool = Depends(verify_api_key),
+):
+    """
+    Send newsletter for a period.
+
+    Defaults to yesterday's content. Set wait=true for synchronous mode.
+    Requires X-API-Key header.
+    """
+    if wait:
+        from app.services.newsletter_sender import send_newsletter
+
+        try:
+            send_newsletter(db, period_id)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+        return {"status": "completed", "period_id": period_id or "yesterday"}
+
+    background_tasks.add_task(_send_newsletter_with_new_session, period_id)
+    return {"status": "started", "period_id": period_id or "yesterday"}
 
 
 @router.get("/health")

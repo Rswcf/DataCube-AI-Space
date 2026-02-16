@@ -21,6 +21,12 @@ class Settings(BaseSettings):
     admin_api_key: str = ""
     app_timezone: str = "Europe/Berlin"
 
+    # Newsletter
+    resend_api_key: str = ""
+    beehiiv_api_key: str = ""
+    beehiiv_publication_id: str = ""
+    newsletter_from_email: str = "Data Cube AI <newsletter@datacubeai.space>"
+
     # CORS
     cors_origins: list[str] = [
         "http://localhost:3000",
