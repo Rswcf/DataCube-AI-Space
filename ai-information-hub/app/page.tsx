@@ -25,10 +25,7 @@ interface WeeksResponse {
 }
 
 interface TrendsResponse {
-  trends?: {
-    de?: { title?: string }[]
-    en?: { title?: string }[]
-  }
+  trends?: Record<string, { title?: string }[]>
 }
 
 async function getWeeksFromApi(): Promise<WeekEntry[]> {

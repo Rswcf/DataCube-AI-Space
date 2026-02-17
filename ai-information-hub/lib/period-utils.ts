@@ -17,7 +17,7 @@ export function isWeeklyId(id: string): boolean {
  * Weekly: "KW 05" (DE) / "W 05" (EN)
  * Daily: "07.02." (DE) / "Feb 7" (EN)
  */
-export function getPeriodLabel(id: string, language: "de" | "en"): string {
+export function getPeriodLabel(id: string, language: string): string {
   if (isDailyId(id)) {
     const [year, month, day] = id.split("-").map(Number);
     if (language === "de") {
@@ -36,7 +36,7 @@ export function getPeriodLabel(id: string, language: "de" | "en"): string {
  * Weekly: "KW 05" (DE) / "Week 05" (EN)
  * Daily: "07.02.2026" (DE) / "Feb 7, 2026" (EN)
  */
-export function formatPeriodTitle(id: string, language: "de" | "en"): string {
+export function formatPeriodTitle(id: string, language: string): string {
   if (isDailyId(id)) {
     const [year, month, day] = id.split("-").map(Number);
     if (language === "de") {

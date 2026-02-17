@@ -35,7 +35,9 @@ class TechPostResponse(BaseModel):
 
 
 class TechFeedResponse(BaseModel):
-    """Bilingual tech feed response."""
+    """Multilingual tech feed response (de, en + translated languages)."""
 
-    de: list[TechPostResponse]
-    en: list[TechPostResponse]
+    model_config = {"extra": "allow"}
+
+    de: list[TechPostResponse] = []
+    en: list[TechPostResponse] = []

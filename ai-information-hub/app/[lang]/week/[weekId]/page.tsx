@@ -4,7 +4,7 @@ import LegacyWeekPage, {
   generateMetadata as generateLegacyMetadata,
   generateStaticParams as generateLegacyStaticParams,
 } from '../../../week/[weekId]/page'
-import { isSupportedLanguage } from '@/lib/i18n'
+import { isSupportedLanguage, SUPPORTED_LANGUAGES } from '@/lib/i18n'
 
 export const revalidate = 3600
 
@@ -16,18 +16,33 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { lang, weekId } = await params
   if (!isSupportedLanguage(lang)) return {}
 
-  return generateLegacyMetadata({
+  const baseMeta = await generateLegacyMetadata({
     params: Promise.resolve({ weekId }),
     searchParams: Promise.resolve({ lang }),
   })
+
+  // Override hreflang alternates to include all 8 languages
+  const hreflangEntries: Record<string, string> = {
+    'x-default': `https://www.datacubeai.space/de/week/${weekId}`,
+  }
+  for (const code of SUPPORTED_LANGUAGES) {
+    hreflangEntries[code] = `https://www.datacubeai.space/${code}/week/${weekId}`
+  }
+
+  return {
+    ...baseMeta,
+    alternates: {
+      canonical: `https://www.datacubeai.space/${lang}/week/${weekId}`,
+      languages: hreflangEntries,
+    },
+  }
 }
 
 export async function generateStaticParams() {
   const periods = (await generateLegacyStaticParams()) as { weekId: string }[]
-  return periods.flatMap((period) => [
-    { lang: 'de', weekId: period.weekId },
-    { lang: 'en', weekId: period.weekId },
-  ])
+  return periods.flatMap((period) =>
+    SUPPORTED_LANGUAGES.map((lang) => ({ lang, weekId: period.weekId }))
+  )
 }
 
 export default async function LocalizedWeekPage({ params }: Props) {

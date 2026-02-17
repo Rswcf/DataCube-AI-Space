@@ -181,6 +181,81 @@ class LLMProcessor:
         logger.error(f"All {len(self.CLASSIFIER_MODELS)} classifier models exhausted")
         raise last_error or RuntimeError("All classifier models failed")
 
+    def translate_batch(
+        self,
+        items: list[dict],
+        target_lang: str,
+        fields: list[str],
+        batch_size: int = 10,
+    ) -> list[dict]:
+        """Translate specific fields of items from English to target language.
+
+        Uses the free classifier model chain (_call_with_fallback) for zero-cost translation.
+
+        Args:
+            items: List of dicts with English field values to translate.
+            target_lang: Target language code (zh, fr, es, pt, ja, ko).
+            fields: List of field names to translate in each item.
+            batch_size: Number of items per LLM call.
+
+        Returns:
+            List of dicts containing only the translated fields for each item.
+        """
+        from app.services.i18n_utils import LANGUAGE_NAMES
+
+        lang_name = LANGUAGE_NAMES.get(target_lang, target_lang)
+        all_translated: list[dict] = []
+
+        for start in range(0, len(items), batch_size):
+            batch = items[start:start + batch_size]
+
+            # Build compact JSON with only the translatable fields
+            source_items = []
+            for i, item in enumerate(batch):
+                entry = {"_idx": i}
+                for f in fields:
+                    val = item.get(f)
+                    if val is not None:
+                        entry[f] = val
+                source_items.append(entry)
+
+            source_json = json.dumps(source_items, ensure_ascii=False)
+
+            prompt = f"""Translate the following JSON items from English to {lang_name}.
+Translate ONLY the text values. Keep these unchanged: _idx, numbers, URLs, proper nouns (company names, person names, ticker symbols), JSON structure.
+For array fields (like tags), translate each element.
+
+Input:
+{source_json}
+
+Output the translated JSON array with the same structure. Output ONLY the JSON array, no explanation."""
+
+            try:
+                response = self._call_with_fallback(prompt, temperature=0.2, timeout=120.0)
+                translated = parse_llm_json(response, fallback=None)
+
+                if translated and isinstance(translated, list):
+                    # Map by _idx for robustness
+                    idx_map = {}
+                    for t in translated:
+                        if isinstance(t, dict) and "_idx" in t:
+                            idx_map[t["_idx"]] = t
+
+                    for i in range(len(batch)):
+                        t = idx_map.get(i, {})
+                        # Remove _idx from result
+                        t.pop("_idx", None)
+                        all_translated.append(t)
+                else:
+                    # Translation failed for this batch, append empty dicts
+                    logger.warning(f"Translation to {target_lang} failed for batch starting at {start}")
+                    all_translated.extend([{} for _ in batch])
+            except Exception as e:
+                logger.error(f"Translation to {target_lang} error: {e}")
+                all_translated.extend([{} for _ in batch])
+
+        return all_translated
+
     def classify_articles(self, articles: list[dict]) -> list[dict]:
         """Classify articles into sections (tech/investment/tips)."""
         if not articles:

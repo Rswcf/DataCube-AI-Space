@@ -7,6 +7,7 @@ import { RightSidebar } from "@/components/right-sidebar";
 import { ChatWidget } from "@/components/chat-widget";
 import { ReportGenerator } from "@/components/report-generator";
 import { Cpu, TrendingUp, Lightbulb, Search, X, Settings, Sun, Moon, Languages, Heart, Mail, Check, Loader2 } from "lucide-react";
+import { LANGUAGE_OPTIONS } from "@/lib/translations";
 import { cn } from "@/lib/utils";
 import { useSettings } from "@/lib/settings-context";
 
@@ -179,8 +180,15 @@ function MobileNav({
   );
 }
 
-// Fallback trends data
-const fallbackTrends = {
+// Fallback trends data (used when API is unavailable)
+const fallbackTrendsEN = [
+  { category: "AI · Trending", title: "GPT-5" },
+  { category: "Technology · Trending", title: "NVIDIA Blackwell" },
+  { category: "Finance · Trending", title: "AI Stocks" },
+  { category: "Science · Trending", title: "AlphaFold 3" },
+  { category: "Startups · Trending", title: "Anthropic" },
+];
+const fallbackTrends: Record<string, { category: string; title: string }[]> = {
   de: [
     { category: "KI · Trend", title: "GPT-5" },
     { category: "Technologie · Trend", title: "NVIDIA Blackwell" },
@@ -188,14 +196,12 @@ const fallbackTrends = {
     { category: "Wissenschaft · Trend", title: "AlphaFold 3" },
     { category: "Startups · Trend", title: "Anthropic" },
   ],
-  en: [
-    { category: "AI · Trending", title: "GPT-5" },
-    { category: "Technology · Trending", title: "NVIDIA Blackwell" },
-    { category: "Finance · Trending", title: "AI Stocks" },
-    { category: "Science · Trending", title: "AlphaFold 3" },
-    { category: "Startups · Trending", title: "Anthropic" },
-  ],
+  en: fallbackTrendsEN,
 };
+
+function getFallbackTrends(lang: string) {
+  return fallbackTrends[lang] || fallbackTrendsEN;
+}
 
 function MobileSearchDrawer({
   isOpen,
@@ -210,7 +216,7 @@ function MobileSearchDrawer({
 }) {
   const { language, t } = useSettings();
   const [searchValue, setSearchValue] = useState("");
-  const [trends, setTrends] = useState<{ category: string; title: string }[]>(fallbackTrends[language]);
+  const [trends, setTrends] = useState<{ category: string; title: string }[]>(getFallbackTrends(language));
 
   useEffect(() => {
     if (!isOpen) return;
@@ -233,7 +239,7 @@ function MobileSearchDrawer({
 
     const processData = (data: { trends?: Record<string, { category: string; title: string }[]> }) => {
       if (data.trends) {
-        setTrends(data.trends[language] || data.trends["de"] || fallbackTrends[language]);
+        setTrends(data.trends[language] || data.trends["de"] || getFallbackTrends(language));
       }
     };
 
@@ -246,7 +252,7 @@ function MobileSearchDrawer({
         return res.json();
       })
       .then(processData)
-      .catch(() => setTrends(fallbackTrends[language]));
+      .catch(() => setTrends(getFallbackTrends(language)));
   }, [weekId, language]);
 
   const handleSearch = (value: string) => {
@@ -427,21 +433,30 @@ function MobileSettingsDrawer({
             </div>
           </button>
 
-          {/* Language Toggle */}
-          <button
-            onClick={() => {
-              setLanguage(language === "de" ? "en" : "de");
-            }}
-            className="flex w-full items-center gap-4 rounded-xl p-4 hover:bg-secondary transition-colors focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            <Languages className="h-6 w-6 text-primary" aria-hidden="true" />
-            <div className="flex-1 text-left">
-              <p className="font-semibold">{language === "de" ? "English" : "Deutsch"}</p>
-              <p className="text-sm text-muted-foreground">
-                {language === "de" ? t("switchToEnglish") : t("switchToGerman")}
-              </p>
+          {/* Language Selector */}
+          <div className="rounded-xl p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <Languages className="h-5 w-5 text-primary" aria-hidden="true" />
+              <p className="font-semibold">{t("language")}</p>
             </div>
-          </button>
+            <div className="grid grid-cols-2 gap-2">
+              {LANGUAGE_OPTIONS.map((opt) => (
+                <button
+                  key={opt.code}
+                  onClick={() => setLanguage(opt.code)}
+                  className={cn(
+                    "flex items-center justify-between rounded-lg px-3 py-2.5 text-sm transition-colors focus-visible:ring-2 focus-visible:ring-ring",
+                    opt.code === language
+                      ? "bg-primary/10 text-primary font-semibold border border-primary/30"
+                      : "hover:bg-secondary border border-transparent"
+                  )}
+                >
+                  <span>{opt.nativeName}</span>
+                  {opt.code === language && <Check className="h-4 w-4 shrink-0" aria-hidden="true" />}
+                </button>
+              ))}
+            </div>
+          </div>
 
           {/* Support (Ko-fi) */}
           <button

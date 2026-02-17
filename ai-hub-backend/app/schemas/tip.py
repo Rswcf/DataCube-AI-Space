@@ -27,7 +27,9 @@ class TipPostResponse(BaseModel):
 
 
 class TipsFeedResponse(BaseModel):
-    """Bilingual tips feed response."""
+    """Multilingual tips feed response (de, en + translated languages)."""
 
-    de: list[TipPostResponse]
-    en: list[TipPostResponse]
+    model_config = {"extra": "allow"}
+
+    de: list[TipPostResponse] = []
+    en: list[TipPostResponse] = []

@@ -3,6 +3,7 @@ Trend and team member models.
 """
 
 from sqlalchemy import String, Integer, ForeignKey
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import Base
@@ -24,6 +25,9 @@ class Trend(Base):
 
     # Optional post count
     posts: Mapped[int | None] = mapped_column(Integer, nullable=True)
+
+    # Multilingual translations (JSONB)
+    translations: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
 
     def __repr__(self) -> str:
         return f"<Trend {self.title_en}>"

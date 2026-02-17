@@ -648,6 +648,131 @@ def stage3_parallel_processing(db: Session, week_id: str, processor: LLMProcesso
     return results
 
 
+def _build_translation_tasks(results: dict) -> list:
+    """Build list of (section_name, en_items, fields_to_translate, field_name_map).
+
+    field_name_map converts LLM output keys (camelCase) to DB column names (snake_case).
+    """
+    tasks: list[tuple] = []
+
+    # Tech
+    en_tech = results.get("tech", {}).get("en", [])
+    if en_tech:
+        tasks.append(("tech", en_tech, ["content", "category", "tags"], {}))
+
+    # Videos
+    en_videos = results.get("videos", {}).get("en", [])
+    if en_videos:
+        tasks.append(("video", en_videos, ["title", "summary"], {}))
+
+    # Tips
+    en_tips = results.get("tips", {}).get("en", [])
+    if en_tips:
+        tasks.append(("tip", en_tips, ["content", "tip", "category", "difficulty"], {}))
+
+    # Investment subcategories
+    inv = results.get("investment", {})
+    if isinstance(inv, dict):
+        pm = inv.get("primaryMarket", {})
+        en_pm = pm.get("en", []) if isinstance(pm, dict) else []
+        if en_pm:
+            tasks.append(("primary_market", en_pm, ["content", "amount", "valuation"], {}))
+
+        sm = inv.get("secondaryMarket", {})
+        en_sm = sm.get("en", []) if isinstance(sm, dict) else []
+        if en_sm:
+            tasks.append(("secondary_market", en_sm, ["content"], {}))
+
+        ma = inv.get("ma", {})
+        en_ma = ma.get("en", []) if isinstance(ma, dict) else []
+        if en_ma:
+            tasks.append(("ma", en_ma, ["content", "dealValue", "dealType"],
+                         {"dealValue": "deal_value", "dealType": "deal_type"}))
+
+    # Trends
+    trends = results.get("trends", {})
+    if isinstance(trends, dict):
+        trends_section = trends.get("trends", {})
+        en_trends = trends_section.get("en", []) if isinstance(trends_section, dict) else []
+        if en_trends:
+            tasks.append(("trend", en_trends, ["category", "title"], {}))
+
+    return tasks
+
+
+def stage3_5_translate_content(results: dict) -> dict:
+    """
+    Stage 3.5: Translate EN content to 6 additional languages using free models.
+
+    Adds ``_translations`` dict to each EN item in the results. Format:
+    ``{"zh": {"content": "...", ...}, "fr": {...}, ...}``
+
+    Translation failures are gracefully skipped (field just won't exist).
+
+    Args:
+        results: The results dict from stage 3
+
+    Returns:
+        The same results dict, mutated with _translations on EN items
+    """
+    from app.services.i18n_utils import TRANSLATION_LANGUAGES
+
+    logger.info("=== Stage 3.5: Translating Content to 6 Languages ===")
+
+    translation_tasks = _build_translation_tasks(results)
+
+    if not translation_tasks:
+        logger.warning("No EN content found to translate")
+        return results
+
+    # Initialize _translations on every EN item
+    for _, items, _, _ in translation_tasks:
+        for item in items:
+            if isinstance(item, dict):
+                item.setdefault("_translations", {})
+
+    total_items = sum(len(items) for _, items, _, _ in translation_tasks)
+    logger.info(f"Translating {total_items} items across {len(translation_tasks)} sections "
+                f"into {len(TRANSLATION_LANGUAGES)} languages")
+
+    def do_translate(section_idx: int, target_lang: str):
+        section_name, items, fields, name_map = translation_tasks[section_idx]
+        thread_processor = LLMProcessor()
+        translated = thread_processor.translate_batch(items, target_lang, fields)
+
+        for i, item in enumerate(items):
+            if i < len(translated) and translated[i] and isinstance(item, dict):
+                mapped = {}
+                for k, v in translated[i].items():
+                    db_name = name_map.get(k, k)
+                    mapped[db_name] = v
+                item["_translations"][target_lang] = mapped
+
+    # Run translations in parallel (3 workers to respect free model rate limits)
+    work_units = [
+        (si, lang)
+        for si in range(len(translation_tasks))
+        for lang in TRANSLATION_LANGUAGES
+    ]
+
+    with ThreadPoolExecutor(max_workers=3) as executor:
+        futures = {}
+        for si, lang in work_units:
+            future = executor.submit(do_translate, si, lang)
+            futures[future] = f"{translation_tasks[si][0]}→{lang}"
+
+        for future in as_completed(futures):
+            task_name = futures[future]
+            try:
+                future.result()
+                logger.info(f"Translation done: {task_name}")
+            except Exception as e:
+                logger.warning(f"Translation failed (skipping): {task_name}: {e}")
+
+    logger.info("Stage 3.5 complete")
+    return results
+
+
 def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos: list) -> None:
     """
     Stage 4: Save processed data to database.
@@ -711,10 +836,19 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
             like_count=meta.get("like_count", 0),
             transcript=raw_video.transcript if raw_video else None,
             category=de_v.get("category") or en_v.get("category"),
+            translations=en_v.get("_translations") or None,
         )
         db.add(video)
 
         # Create video post for tech feed
+        # Map video translations (summary→content) for TechPost
+        video_trans = en_v.get("_translations")
+        tech_video_trans = None
+        if video_trans:
+            tech_video_trans = {}
+            for lang, fields in video_trans.items():
+                tech_video_trans[lang] = {"content": fields.get("summary", "")}
+
         video_post = TechPost(
             week_id=week_id,
             content_de=de_v.get("summary", ""),
@@ -735,6 +869,7 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
             video_duration=meta.get("duration_formatted"),
             video_view_count=meta.get("view_count_formatted"),
             video_thumbnail_url=meta.get("thumbnail_url"),
+            translations=tech_video_trans,
         )
         video_posts.append(video_post)
 
@@ -761,6 +896,7 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
             source_url=de_p.get("sourceUrl"),
             metrics=de_p.get("metrics", {}),
             is_video=False,
+            translations=en_p.get("_translations") or None,
         )
         regular_posts.append(post)
 
@@ -806,6 +942,7 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
                     timestamp=de_p.get("timestamp", ""),
                     source_url=de_p.get("sourceUrl"),
                     metrics=de_p.get("metrics", {}),
+                    translations=en_p.get("_translations") or None,
                 )
             elif model_class == SecondaryMarketPost:
                 # Note: price, change, marketCap are now fetched from real-time API
@@ -824,6 +961,7 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
                     timestamp=de_p.get("timestamp", ""),
                     source_url=de_p.get("sourceUrl"),
                     metrics=de_p.get("metrics", {}),
+                    translations=en_p.get("_translations") or None,
                 )
             else:  # MAPost
                 post = MAPost(
@@ -841,6 +979,7 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
                     timestamp=de_p.get("timestamp", ""),
                     source_url=de_p.get("sourceUrl"),
                     metrics=de_p.get("metrics", {}),
+                    translations=en_p.get("_translations") or None,
                 )
             db.add(post)
 
@@ -861,6 +1000,7 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
             timestamp=de_p.get("timestamp", ""),
             source_url=de_p.get("sourceUrl"),
             metrics=de_p.get("metrics", {}),
+            translations=en_p.get("_translations") or None,
         )
         db.add(post)
 
@@ -883,6 +1023,7 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
             title_de=de_t.get("title", ""),
             title_en=en_t.get("title", ""),
             posts=de_t.get("posts"),
+            translations=en_t.get("_translations") or None,
         )
         db.add(trend)
 
@@ -961,6 +1102,9 @@ def run_process_only(db: Session, week_id: Optional[str] = None) -> dict:
     # Stage 3: Parallel processing
     results = stage3_parallel_processing(db, week_id, processor)
 
+    # Stage 3.5: Translate EN content to 6 additional languages
+    stage3_5_translate_content(results)
+
     # Load raw videos for metadata
     raw_videos = db.query(RawVideo).filter(RawVideo.week_id == week_id).all()
 
@@ -999,6 +1143,9 @@ def run_collection(db: Session, week_id: Optional[str] = None):
 
     # Stage 3: Parallel processing
     results = stage3_parallel_processing(db, week_id, processor)
+
+    # Stage 3.5: Translate EN content to 6 additional languages
+    stage3_5_translate_content(results)
 
     # Load raw videos for metadata
     raw_videos = db.query(RawVideo).filter(RawVideo.week_id == week_id).all()

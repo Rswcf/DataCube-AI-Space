@@ -86,11 +86,9 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     const currentPath = pathname || "/";
     const isLocalizablePath =
       currentPath === "/" ||
-      currentPath === "/de" ||
-      currentPath === "/en" ||
+      /^\/(de|en|zh|fr|es|pt|ja|ko)$/.test(currentPath) ||
       currentPath.startsWith("/week/") ||
-      currentPath.startsWith("/de/week/") ||
-      currentPath.startsWith("/en/week/");
+      /^\/(de|en|zh|fr|es|pt|ja|ko)\/week\//.test(currentPath);
 
     if (!isLocalizablePath) return;
 

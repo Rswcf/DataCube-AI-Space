@@ -37,7 +37,7 @@ const impactBorderColors: Record<string, string> = {
   low: "border-l-transparent",
 };
 
-const impactLabels = {
+const impactLabels: Record<string, Record<string, string>> = {
   de: { critical: "Kritisch", high: "Hoch", medium: "Mittel", low: "Niedrig" },
   en: { critical: "Critical", high: "High", medium: "Medium", low: "Low" },
 };
@@ -64,7 +64,7 @@ export function TechFeed({ weekId, searchQuery }: TechFeedProps) {
   const { language, t } = useSettings();
   const [posts, setPosts] = useState<TechPost[]>([]);
   const [loading, setLoading] = useState(true);
-  const impacts = impactLabels[language];
+  const impacts = impactLabels[language] || impactLabels.en;
 
   const filteredPosts = posts.filter((post) => {
     if (!searchQuery) return true;

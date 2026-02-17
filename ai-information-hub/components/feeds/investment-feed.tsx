@@ -104,7 +104,7 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
 
   // Get display name for AI application domain (shown on M&A cards)
   const getIndustryDisplayName = (industry: string): string => {
-    const names: Record<string, { de: string; en: string }> = {
+    const names: Record<string, Record<string, string>> = {
       "AI Healthcare": { de: "AI Gesundheit", en: "AI Healthcare" },
       "AI Finance": { de: "AI Finanzen", en: "AI Finance" },
       "AI Enterprise": { de: "AI Enterprise", en: "AI Enterprise" },

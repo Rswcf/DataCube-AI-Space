@@ -28,7 +28,9 @@ class VideoResponse(BaseModel):
 
 
 class VideoFeedResponse(BaseModel):
-    """Bilingual video feed response."""
+    """Multilingual video feed response (de, en + translated languages)."""
 
-    de: list[VideoResponse]
-    en: list[VideoResponse]
+    model_config = {"extra": "allow"}
+
+    de: list[VideoResponse] = []
+    en: list[VideoResponse] = []

@@ -36,5 +36,8 @@ class TipPost(Base):
     source_url: Mapped[str | None] = mapped_column(Text, nullable=True)
     metrics: Mapped[dict] = mapped_column(JSONB, default=dict)
 
+    # Multilingual translations (JSONB)
+    translations: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+
     def __repr__(self) -> str:
         return f"<TipPost {self.id} week={self.week_id}>"

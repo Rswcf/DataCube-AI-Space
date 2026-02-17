@@ -8,18 +8,27 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import Week, Video
 from app.schemas.video import VideoResponse, VideoFeedResponse
+from app.services.i18n_utils import get_field, SUPPORTED_LANGUAGES
 
 router = APIRouter(prefix="/videos", tags=["videos"])
 
 
+def _langs_with_data(videos: list[Video]) -> list[str]:
+    """Return language codes that have content."""
+    langs = {"de", "en"}
+    for v in videos:
+        if v.translations and isinstance(v.translations, dict):
+            langs.update(v.translations.keys())
+    return [lang for lang in SUPPORTED_LANGUAGES if lang in langs]
+
+
 def video_to_response(video: Video, language: str) -> VideoResponse:
     """Convert video to API response."""
-    is_german = language == "de"
     return VideoResponse(
         id=video.id,
         videoId=video.video_id,
-        title=video.title_de if is_german else video.title_en,
-        summary=video.summary_de if is_german else video.summary_en,
+        title=get_field(video, "title", language) or "",
+        summary=get_field(video, "summary", language) or "",
         channelName=video.channel_name,
         thumbnailUrl=video.thumbnail_url,
         publishedAt=video.published_at,
@@ -43,10 +52,9 @@ def get_videos(week_id: str, db: Session = Depends(get_db)):
     # Get videos for this week
     videos = db.query(Video).filter(Video.week_id == week_id).all()
 
-    return VideoFeedResponse(
-        de=[video_to_response(v, "de") for v in videos],
-        en=[video_to_response(v, "en") for v in videos],
-    )
+    available_langs = _langs_with_data(videos)
+    result = {lang: [video_to_response(v, lang) for v in videos] for lang in available_langs}
+    return result
 
 
 @router.get("/{week_id}/{video_id}", response_model=VideoResponse)

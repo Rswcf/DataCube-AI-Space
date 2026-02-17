@@ -52,5 +52,8 @@ class TechPost(Base):
     # Display order (for sorting)
     display_order: Mapped[int] = mapped_column(Integer, default=0)
 
+    # Multilingual translations (JSONB: {"zh": {"content": "...", ...}, "fr": {...}, ...})
+    translations: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+
     def __repr__(self) -> str:
         return f"<TechPost {self.id} week={self.week_id}>"

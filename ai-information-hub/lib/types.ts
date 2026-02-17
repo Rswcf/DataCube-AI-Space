@@ -128,9 +128,9 @@ export interface MAPost {
 
 /** Full investment.json structure */
 export interface InvestmentData {
-  primaryMarket: { de: PrimaryMarketPost[]; en: PrimaryMarketPost[] };
-  secondaryMarket: { de: SecondaryMarketPost[]; en: SecondaryMarketPost[] };
-  ma: { de: MAPost[]; en: MAPost[] };
+  primaryMarket: MultilingualData<PrimaryMarketPost>;
+  secondaryMarket: MultilingualData<SecondaryMarketPost>;
+  ma: MultilingualData<MAPost>;
 }
 
 // =============================================================================
@@ -179,7 +179,7 @@ export interface TeamMember {
 
 /** Full trends.json structure */
 export interface TrendsData {
-  trends: { de: TrendItem[]; en: TrendItem[] };
+  trends: MultilingualData<TrendItem>;
   teamMembers: { de: TeamMember[]; en: TeamMember[] };
 }
 
@@ -213,11 +213,18 @@ export interface WeeksData {
 }
 
 // =============================================================================
-// Bilingual Data Wrapper
+// Multilingual Data Wrapper
 // =============================================================================
 
-/** Generic bilingual data structure used by tech.json, tips.json */
-export interface BilingualData<T> {
-  de: T[];
-  en: T[];
+/** Generic multilingual data structure used by tech, tips, trends feeds */
+export interface MultilingualData<T> {
+  de?: T[];
+  en?: T[];
+  zh?: T[];
+  fr?: T[];
+  es?: T[];
+  pt?: T[];
+  ja?: T[];
+  ko?: T[];
+  [key: string]: T[] | undefined;
 }

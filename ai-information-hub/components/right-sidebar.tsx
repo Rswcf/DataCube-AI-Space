@@ -14,7 +14,7 @@ interface TrendItem {
 }
 
 // Fallback data in case JSON fetch fails
-const fallbackTrends = {
+const fallbackTrends: Record<string, TrendItem[]> = {
   de: [
     { category: "KI · Trend", title: "GPT-5" },
     { category: "Technologie · Trend", title: "NVIDIA Blackwell" },
@@ -56,14 +56,14 @@ export function RightSidebar({ weekId, onSearchChange }: RightSidebarProps) {
   const { language, t } = useSettings();
 
   const [searchValue, setSearchValue] = useState("");
-  const [trends, setTrends] = useState<TrendItem[]>(fallbackTrends[language]);
+  const [trends, setTrends] = useState<TrendItem[]>(fallbackTrends[language] || fallbackTrends.en);
   const [email, setEmail] = useState("");
   const [subscribeState, setSubscribeState] = useState<"idle" | "loading" | "success" | "error">("idle");
 
   useEffect(() => {
     const processData = (data: any) => {
       if (data.trends) {
-        setTrends(data.trends[language] || data.trends["de"] || fallbackTrends[language]);
+        setTrends(data.trends[language] || data.trends["de"] || fallbackTrends[language] || fallbackTrends.en);
       }
     };
 
@@ -82,9 +82,9 @@ export function RightSidebar({ weekId, onSearchChange }: RightSidebarProps) {
           fetch(`/data/${weekId}/trends.json`)
             .then((res) => res.json())
             .then(processData)
-            .catch(() => setTrends(fallbackTrends[language]));
+            .catch(() => setTrends(fallbackTrends[language] || fallbackTrends.en));
         } else {
-          setTrends(fallbackTrends[language]);
+          setTrends(fallbackTrends[language] || fallbackTrends.en);
         }
       });
   }, [weekId, language]);

@@ -9,8 +9,19 @@ from app.database import get_db
 from app.models import Week, PrimaryMarketPost, SecondaryMarketPost, MAPost
 from app.schemas import InvestmentFeedResponse, PrimaryMarketResponse, SecondaryMarketResponse, MAResponse
 from app.schemas.common import Author, Metrics
+from app.services.i18n_utils import get_field, SUPPORTED_LANGUAGES
 
 router = APIRouter(prefix="/investment", tags=["investment"])
+
+
+def _langs_with_data(*post_lists) -> list[str]:
+    """Return language codes that have content across multiple post lists."""
+    langs = {"de", "en"}
+    for posts in post_lists:
+        for p in posts:
+            if p.translations and isinstance(p.translations, dict):
+                langs.update(p.translations.keys())
+    return [lang for lang in SUPPORTED_LANGUAGES if lang in langs]
 
 
 def safe_author(author_dict: dict) -> Author:
@@ -25,17 +36,16 @@ def safe_author(author_dict: dict) -> Author:
 
 def primary_to_response(post: PrimaryMarketPost, language: str) -> PrimaryMarketResponse:
     """Convert primary market post to API response."""
-    is_german = language == "de"
     return PrimaryMarketResponse(
         id=post.id,
         author=safe_author(post.author),
-        content=post.content_de if is_german else post.content_en,
+        content=get_field(post, "content", language) or "",
         company=post.company,
-        amount=post.amount_de if is_german else post.amount_en,
+        amount=get_field(post, "amount", language) or "N/A",
         round=post.round,
         roundCategory=post.round_category,
         investors=post.investors,
-        valuation=post.valuation_de if is_german else post.valuation_en,
+        valuation=get_field(post, "valuation", language),
         timestamp=post.timestamp,
         metrics=Metrics(**post.metrics) if post.metrics else Metrics(),
         sourceUrl=post.source_url,
@@ -44,16 +54,15 @@ def primary_to_response(post: PrimaryMarketPost, language: str) -> PrimaryMarket
 
 def secondary_to_response(post: SecondaryMarketPost, language: str) -> SecondaryMarketResponse:
     """Convert secondary market post to API response."""
-    is_german = language == "de"
     return SecondaryMarketResponse(
         id=post.id,
         author=safe_author(post.author),
-        content=post.content_de if is_german else post.content_en,
+        content=get_field(post, "content", language) or "",
         ticker=post.ticker,
         price=post.price,
         change=post.change,
         direction=post.direction,
-        marketCap=post.market_cap_de if is_german else post.market_cap_en,
+        marketCap=get_field(post, "market_cap", language),
         timestamp=post.timestamp,
         metrics=Metrics(**post.metrics) if post.metrics else Metrics(),
         sourceUrl=post.source_url,
@@ -62,15 +71,14 @@ def secondary_to_response(post: SecondaryMarketPost, language: str) -> Secondary
 
 def ma_to_response(post: MAPost, language: str) -> MAResponse:
     """Convert M&A post to API response."""
-    is_german = language == "de"
     return MAResponse(
         id=post.id,
         author=safe_author(post.author),
-        content=post.content_de if is_german else post.content_en,
+        content=get_field(post, "content", language) or "",
         acquirer=post.acquirer,
         target=post.target,
-        dealValue=post.deal_value_de if is_german else post.deal_value_en,
-        dealType=post.deal_type_de if is_german else post.deal_type_en,
+        dealValue=get_field(post, "deal_value", language),
+        dealType=get_field(post, "deal_type", language) or "",
         industry=post.industry,
         timestamp=post.timestamp,
         metrics=Metrics(**post.metrics) if post.metrics else Metrics(),
@@ -91,17 +99,19 @@ def get_investment_feed(week_id: str, db: Session = Depends(get_db)):
     secondary_posts = db.query(SecondaryMarketPost).filter(SecondaryMarketPost.week_id == week_id).all()
     ma_posts = db.query(MAPost).filter(MAPost.week_id == week_id).all()
 
+    available_langs = _langs_with_data(primary_posts, secondary_posts, ma_posts)
+
     return InvestmentFeedResponse(
         primaryMarket={
-            "de": [primary_to_response(p, "de") for p in primary_posts],
-            "en": [primary_to_response(p, "en") for p in primary_posts],
+            lang: [primary_to_response(p, lang) for p in primary_posts]
+            for lang in available_langs
         },
         secondaryMarket={
-            "de": [secondary_to_response(p, "de") for p in secondary_posts],
-            "en": [secondary_to_response(p, "en") for p in secondary_posts],
+            lang: [secondary_to_response(p, lang) for p in secondary_posts]
+            for lang in available_langs
         },
         ma={
-            "de": [ma_to_response(p, "de") for p in ma_posts],
-            "en": [ma_to_response(p, "en") for p in ma_posts],
+            lang: [ma_to_response(p, lang) for p in ma_posts]
+            for lang in available_langs
         },
     )

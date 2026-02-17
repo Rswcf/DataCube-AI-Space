@@ -9,20 +9,29 @@ from app.database import get_db
 from app.models import Week, TechPost
 from app.schemas import TechFeedResponse, TechPostResponse
 from app.schemas.common import Author, Metrics
+from app.services.i18n_utils import get_field, SUPPORTED_LANGUAGES
 
 router = APIRouter(prefix="/tech", tags=["tech"])
 
 
+def _langs_with_data(posts: list[TechPost]) -> list[str]:
+    """Return language codes that have content (de/en always, others if translations exist)."""
+    langs = {"de", "en"}
+    for p in posts:
+        if p.translations and isinstance(p.translations, dict):
+            langs.update(p.translations.keys())
+    # Return in canonical order
+    return [lang for lang in SUPPORTED_LANGUAGES if lang in langs]
+
+
 def db_post_to_response(post: TechPost, language: str) -> TechPostResponse:
     """Convert database post to API response for given language."""
-    is_german = language == "de"
-
     return TechPostResponse(
         id=post.id,
         author=Author(**post.author),
-        content=post.content_de if is_german else post.content_en,
-        tags=post.tags_de if is_german else post.tags_en,
-        category=post.category_de if is_german else post.category_en,
+        content=get_field(post, "content", language) or "",
+        tags=get_field(post, "tags", language) or [],
+        category=get_field(post, "category", language) or "",
         iconType=post.icon_type,
         impact=post.impact,
         timestamp=post.timestamp,
@@ -42,7 +51,7 @@ def get_tech_feed(week_id: str, db: Session = Depends(get_db)):
     """
     Get tech feed for a specific week.
 
-    Returns bilingual data with video posts interspersed among regular posts.
+    Returns multilingual data with video posts interspersed among regular posts.
     Video posts are positioned at indices 3, 8, 13, 18, 23 (every 5 posts starting at 3).
     """
     # Verify week exists
@@ -58,7 +67,6 @@ def get_tech_feed(week_id: str, db: Session = Depends(get_db)):
         .all()
     )
 
-    return TechFeedResponse(
-        de=[db_post_to_response(p, "de") for p in posts],
-        en=[db_post_to_response(p, "en") for p in posts],
-    )
+    available_langs = _langs_with_data(posts)
+    result = {lang: [db_post_to_response(p, lang) for p in posts] for lang in available_langs}
+    return result

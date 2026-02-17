@@ -26,7 +26,7 @@ function condenseWeekData(
   investment: any,
   tips: any,
   trends: any,
-  lang: "de" | "en"
+  lang: string
 ): string {
   const lines: string[] = [];
 

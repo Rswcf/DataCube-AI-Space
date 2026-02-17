@@ -57,29 +57,29 @@ function isLikelyHumanBrowser(request: NextRequest): boolean {
   return hasBrowserSignature && !hasAutomationHint
 }
 
+const LANG_RE = '(?:de|en|zh|fr|es|pt|ja|ko)'
+
 function isLocalizablePath(pathname: string): boolean {
   return (
     pathname === '/' ||
-    pathname === '/de' ||
-    pathname === '/en' ||
+    new RegExp(`^\\/${LANG_RE}$`).test(pathname) ||
     /^\/week\/[^/]+$/.test(pathname) ||
     /^\/topic\/[^/]+$/.test(pathname) ||
-    /^\/(de|en)\/week\/[^/]+$/.test(pathname) ||
-    /^\/(de|en)\/topic\/[^/]+$/.test(pathname)
+    new RegExp(`^\\/${LANG_RE}\\/week\\/[^/]+$`).test(pathname) ||
+    new RegExp(`^\\/${LANG_RE}\\/topic\\/[^/]+$`).test(pathname)
   )
 }
 
 function isSeoAlwaysAllowedPath(pathname: string): boolean {
   return (
     pathname === '/' ||
-    pathname === '/de' ||
-    pathname === '/en' ||
+    new RegExp(`^\\/${LANG_RE}$`).test(pathname) ||
     pathname === '/impressum' ||
     pathname === '/datenschutz' ||
     /^\/week\/[^/]+$/.test(pathname) ||
     /^\/topic\/[^/]+$/.test(pathname) ||
-    /^\/(de|en)\/week\/[^/]+$/.test(pathname) ||
-    /^\/(de|en)\/topic\/[^/]+$/.test(pathname)
+    new RegExp(`^\\/${LANG_RE}\\/week\\/[^/]+$`).test(pathname) ||
+    new RegExp(`^\\/${LANG_RE}\\/topic\\/[^/]+$`).test(pathname)
   )
 }
 

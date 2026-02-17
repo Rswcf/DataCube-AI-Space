@@ -11,7 +11,7 @@ import type {
   InvestmentData,
   TipPost,
   TrendsData,
-  BilingualData,
+  MultilingualData,
 } from "@/lib/types";
 
 // API base URL - configurable via environment variable
@@ -79,8 +79,8 @@ export async function fetchCurrentWeek(): Promise<{ id: string }> {
 /**
  * Fetch tech feed for a specific week.
  */
-export async function fetchTechFeed(weekId: string): Promise<BilingualData<TechPost>> {
-  return fetchWithFallback<BilingualData<TechPost>>(
+export async function fetchTechFeed(weekId: string): Promise<MultilingualData<TechPost>> {
+  return fetchWithFallback<MultilingualData<TechPost>>(
     `/tech/${weekId}`,
     `/data/${weekId}/tech.json`
   );
@@ -99,8 +99,8 @@ export async function fetchInvestmentFeed(weekId: string): Promise<InvestmentDat
 /**
  * Fetch tips feed for a specific week.
  */
-export async function fetchTipsFeed(weekId: string): Promise<BilingualData<TipPost>> {
-  return fetchWithFallback<BilingualData<TipPost>>(
+export async function fetchTipsFeed(weekId: string): Promise<MultilingualData<TipPost>> {
+  return fetchWithFallback<MultilingualData<TipPost>>(
     `/tips/${weekId}`,
     `/data/${weekId}/tips.json`
   );

@@ -1,8 +1,9 @@
 import type { Metadata } from 'next'
 import { ArticleSchema, VideoSchema, BreadcrumbListSchema } from '@/components/structured-data'
 import { formatPeriodTitle } from '@/lib/period-utils'
-import type { TechPost, BilingualData, InvestmentData, TipPost, ImpactLevel } from '@/lib/types'
+import type { TechPost, MultilingualData, InvestmentData, TipPost, ImpactLevel } from '@/lib/types'
 import { toTopicSlug } from '@/lib/topic-utils'
+import { isSupportedLanguage } from '@/lib/i18n'
 
 // API base URL with production fallback
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api-production-3ee5.up.railway.app/api'
@@ -18,7 +19,8 @@ export type Props = {
 
 export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
   const { weekId } = await params
-  const lang = (await searchParams)?.lang === 'en' ? 'en' : 'de'
+  const rawLang = (await searchParams)?.lang || 'de'
+  const lang = isSupportedLanguage(rawLang) ? rawLang : 'de'
   const periodLabel = formatPeriodTitle(weekId, lang)
   const localizedUrl = `https://www.datacubeai.space/${lang}/week/${weekId}`
 
@@ -90,7 +92,8 @@ function snippetFromContent(content: string, max = 100) {
 
 export default async function WeekPage({ params, searchParams }: Props) {
   const { weekId } = await params
-  const lang = (await searchParams)?.lang === 'en' ? 'en' : 'de'
+  const rawLang = (await searchParams)?.lang || 'de'
+  const lang = isSupportedLanguage(rawLang) ? rawLang : 'de'
   const periodLabel = formatPeriodTitle(weekId, lang)
 
   // Fetch the three feeds in parallel
@@ -100,9 +103,9 @@ export default async function WeekPage({ params, searchParams }: Props) {
     fetch(`${API_BASE}/tips/${weekId}`, { next: { revalidate: 3600 } }),
   ])
 
-  let techData: BilingualData<TechPost> | null = null
+  let techData: MultilingualData<TechPost> | null = null
   let investmentData: InvestmentData | null = null
-  let tipsData: BilingualData<TipPost> | null = null
+  let tipsData: MultilingualData<TipPost> | null = null
 
   try {
     if (techRes.ok) techData = await techRes.json()

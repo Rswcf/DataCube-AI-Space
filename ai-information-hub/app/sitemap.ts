@@ -2,6 +2,7 @@ import { MetadataRoute } from 'next'
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import { toTopicSlug } from '@/lib/topic-utils'
+import { SUPPORTED_LANGUAGES } from '@/lib/i18n'
 
 interface WeeksResponse {
   weeks: { id: string; days?: { id: string }[] }[]
@@ -94,22 +95,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     )
   )
 
+  const langPriority: Record<string, number> = { de: 0.8, en: 0.7 }
+  const defaultPriority = 0.5
+
   const periodEntries = periodIds.flatMap((periodId) => {
     const lastModified = lastModFromId(periodId)
-    return [
-      {
-        url: `${baseUrl}/de/week/${periodId}`,
-        lastModified,
-        changeFrequency: 'daily' as const,
-        priority: 0.8,
-      },
-      {
-        url: `${baseUrl}/en/week/${periodId}`,
-        lastModified,
-        changeFrequency: 'daily' as const,
-        priority: 0.7,
-      },
-    ]
+    return SUPPORTED_LANGUAGES.map((lang) => ({
+      url: `${baseUrl}/${lang}/week/${periodId}`,
+      lastModified,
+      changeFrequency: 'daily' as const,
+      priority: langPriority[lang] ?? defaultPriority,
+    }))
   })
 
   const deTopicSet = new Set<string>()
@@ -144,6 +140,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })),
   ]
 
+  const homePriority: Record<string, number> = { de: 0.9, en: 0.9 }
+  const homeDefault = 0.7
+
+  const langHomeEntries = SUPPORTED_LANGUAGES.map((lang) => ({
+    url: `${baseUrl}/${lang}`,
+    lastModified: new Date(),
+    changeFrequency: 'daily' as const,
+    priority: homePriority[lang] ?? homeDefault,
+  }))
+
   return [
     {
       url: baseUrl,
@@ -151,18 +157,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'daily',
       priority: 1,
     },
-    {
-      url: `${baseUrl}/de`,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/en`,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.9,
-    },
+    ...langHomeEntries,
     ...topicEntries,
     ...periodEntries,
   ]

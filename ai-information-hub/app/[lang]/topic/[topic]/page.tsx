@@ -315,10 +315,12 @@ export async function generateStaticParams() {
     }
   } catch {}
 
-  return [
-    ...Array.from(deSlugs).slice(0, 40).map((topic) => ({ lang: 'de', topic })),
-    ...Array.from(enSlugs).slice(0, 40).map((topic) => ({ lang: 'en', topic })),
-  ]
+  // Generate params for all supported languages; non-DE languages use EN slugs as fallback
+  const { SUPPORTED_LANGUAGES } = await import('@/lib/i18n')
+  return SUPPORTED_LANGUAGES.flatMap((lang) => {
+    const slugs = lang === 'de' ? deSlugs : enSlugs
+    return Array.from(slugs).slice(0, 40).map((topic) => ({ lang, topic }))
+  })
 }
 
 export default async function TopicPage({ params, searchParams }: Props) {

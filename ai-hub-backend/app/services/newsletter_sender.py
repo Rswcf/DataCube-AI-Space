@@ -28,6 +28,7 @@ from app.models.investment import PrimaryMarketPost, MAPost
 from app.models.tip import TipPost
 from app.models.week import Week
 from app.services.period_utils import current_day_id
+from app.services.i18n_utils import get_field, SUPPORTED_LANGUAGES
 
 logger = logging.getLogger(__name__)
 
@@ -69,6 +70,180 @@ FONT_SANS = (
     "-apple-system, BlinkMacSystemFont, 'Segoe UI', "
     "Roboto, 'Helvetica Neue', Arial, sans-serif"
 )
+
+# ---------------------------------------------------------------------------
+# Localized email strings for all 8 languages
+# ---------------------------------------------------------------------------
+
+EMAIL_STRINGS: dict[str, dict[str, str]] = {
+    "de": {
+        "tagline": "Dein t\u00e4gliches KI-Briefing",
+        "view_in_browser": "Im Browser ansehen",
+        "tldr_label": "Heute im \u00dcberblick",
+        "tech_label": "\U0001f52c TECHNOLOGIE",
+        "invest_label": "\U0001f4b0 INVESTMENT",
+        "tips_label": "\U0001f4a1 TIPPS",
+        "videos_label": "\U0001f3ac VIDEOS",
+        "primary_market": "Prim\u00e4rmarkt",
+        "header_company": "Unternehmen",
+        "header_amount": "Betrag",
+        "header_round": "Runde",
+        "watch_label": "Auf YouTube ansehen",
+        "cta": "Alle News vom {date} lesen \u2192",
+        "footer_msg": "Du erh\u00e4ltst diese E-Mail, weil du den Data Cube AI Newsletter abonniert hast.",
+        "unsubscribe": "Abmelden",
+        "subject_week": "KI-News KW {num}",
+        "subject_daily": "KI-News {date}",
+        "week_prefix": "KW",
+    },
+    "en": {
+        "tagline": "Your daily AI briefing",
+        "view_in_browser": "View in browser",
+        "tldr_label": "Today at a Glance",
+        "tech_label": "\U0001f52c TECHNOLOGY",
+        "invest_label": "\U0001f4b0 INVESTMENT",
+        "tips_label": "\U0001f4a1 TIPS",
+        "videos_label": "\U0001f3ac VIDEOS",
+        "primary_market": "Primary Market",
+        "header_company": "Company",
+        "header_amount": "Amount",
+        "header_round": "Round",
+        "watch_label": "Watch on YouTube",
+        "cta": "Read all news from {date} \u2192",
+        "footer_msg": "You received this email because you subscribed to the Data Cube AI newsletter.",
+        "unsubscribe": "Unsubscribe",
+        "subject_week": "AI News Week {num}",
+        "subject_daily": "AI News {date}",
+        "week_prefix": "Week",
+    },
+    "zh": {
+        "tagline": "\u6bcf\u65e5AI\u7b80\u62a5",
+        "view_in_browser": "\u5728\u6d4f\u89c8\u5668\u4e2d\u67e5\u770b",
+        "tldr_label": "\u4eca\u65e5\u6982\u89c8",
+        "tech_label": "\U0001f52c \u79d1\u6280",
+        "invest_label": "\U0001f4b0 \u6295\u8d44",
+        "tips_label": "\U0001f4a1 \u5b9e\u7528\u6280\u5de7",
+        "videos_label": "\U0001f3ac \u89c6\u9891",
+        "primary_market": "\u4e00\u7ea7\u5e02\u573a",
+        "header_company": "\u516c\u53f8",
+        "header_amount": "\u91d1\u989d",
+        "header_round": "\u8f6e\u6b21",
+        "watch_label": "\u5728YouTube\u89c2\u770b",
+        "cta": "\u9605\u8bfb{date}\u7684\u6240\u6709\u65b0\u95fb \u2192",
+        "footer_msg": "\u60a8\u6536\u5230\u6b64\u90ae\u4ef6\u662f\u56e0\u4e3a\u60a8\u8ba2\u9605\u4e86Data Cube AI\u901a\u8baf\u3002",
+        "unsubscribe": "\u53d6\u6d88\u8ba2\u9605",
+        "subject_week": "AI\u65b0\u95fb \u7b2c{num}\u5468",
+        "subject_daily": "AI\u65b0\u95fb {date}",
+        "week_prefix": "\u7b2c{num}\u5468",
+    },
+    "fr": {
+        "tagline": "Votre briefing IA quotidien",
+        "view_in_browser": "Voir dans le navigateur",
+        "tldr_label": "En bref aujourd'hui",
+        "tech_label": "\U0001f52c TECHNOLOGIE",
+        "invest_label": "\U0001f4b0 INVESTISSEMENT",
+        "tips_label": "\U0001f4a1 ASTUCES",
+        "videos_label": "\U0001f3ac VID\u00c9OS",
+        "primary_market": "March\u00e9 primaire",
+        "header_company": "Entreprise",
+        "header_amount": "Montant",
+        "header_round": "Tour",
+        "watch_label": "Voir sur YouTube",
+        "cta": "Lire toutes les actualit\u00e9s du {date} \u2192",
+        "footer_msg": "Vous recevez cet e-mail car vous \u00eates abonn\u00e9(e) \u00e0 la newsletter Data Cube AI.",
+        "unsubscribe": "Se d\u00e9sabonner",
+        "subject_week": "Actu IA Semaine {num}",
+        "subject_daily": "Actu IA {date}",
+        "week_prefix": "Sem.",
+    },
+    "es": {
+        "tagline": "Tu resumen diario de IA",
+        "view_in_browser": "Ver en el navegador",
+        "tldr_label": "Resumen del d\u00eda",
+        "tech_label": "\U0001f52c TECNOLOG\u00cdA",
+        "invest_label": "\U0001f4b0 INVERSI\u00d3N",
+        "tips_label": "\U0001f4a1 CONSEJOS",
+        "videos_label": "\U0001f3ac VIDEOS",
+        "primary_market": "Mercado primario",
+        "header_company": "Empresa",
+        "header_amount": "Monto",
+        "header_round": "Ronda",
+        "watch_label": "Ver en YouTube",
+        "cta": "Leer todas las noticias del {date} \u2192",
+        "footer_msg": "Recibes este correo porque te suscribiste al bolet\u00edn de Data Cube AI.",
+        "unsubscribe": "Cancelar suscripci\u00f3n",
+        "subject_week": "Noticias IA Semana {num}",
+        "subject_daily": "Noticias IA {date}",
+        "week_prefix": "Sem.",
+    },
+    "pt": {
+        "tagline": "Seu resumo di\u00e1rio de IA",
+        "view_in_browser": "Ver no navegador",
+        "tldr_label": "Resumo do dia",
+        "tech_label": "\U0001f52c TECNOLOGIA",
+        "invest_label": "\U0001f4b0 INVESTIMENTO",
+        "tips_label": "\U0001f4a1 DICAS",
+        "videos_label": "\U0001f3ac V\u00cdDEOS",
+        "primary_market": "Mercado prim\u00e1rio",
+        "header_company": "Empresa",
+        "header_amount": "Valor",
+        "header_round": "Rodada",
+        "watch_label": "Assistir no YouTube",
+        "cta": "Ler todas as not\u00edcias de {date} \u2192",
+        "footer_msg": "Voc\u00ea recebeu este e-mail por estar inscrito na newsletter Data Cube AI.",
+        "unsubscribe": "Cancelar inscri\u00e7\u00e3o",
+        "subject_week": "Not\u00edcias IA Semana {num}",
+        "subject_daily": "Not\u00edcias IA {date}",
+        "week_prefix": "Sem.",
+    },
+    "ja": {
+        "tagline": "\u6bce\u65e5\u306eAI\u30d6\u30ea\u30fc\u30d5\u30a3\u30f3\u30b0",
+        "view_in_browser": "\u30d6\u30e9\u30a6\u30b6\u3067\u8868\u793a",
+        "tldr_label": "\u4eca\u65e5\u306e\u6982\u8981",
+        "tech_label": "\U0001f52c \u30c6\u30af\u30ce\u30ed\u30b8\u30fc",
+        "invest_label": "\U0001f4b0 \u6295\u8cc7",
+        "tips_label": "\U0001f4a1 \u30d2\u30f3\u30c8",
+        "videos_label": "\U0001f3ac \u52d5\u753b",
+        "primary_market": "\u30d7\u30e9\u30a4\u30de\u30ea\u30fc\u30de\u30fc\u30b1\u30c3\u30c8",
+        "header_company": "\u4f1a\u793e",
+        "header_amount": "\u91d1\u984d",
+        "header_round": "\u30e9\u30a6\u30f3\u30c9",
+        "watch_label": "YouTube\u3067\u898b\u308b",
+        "cta": "{date}\u306e\u5168\u30cb\u30e5\u30fc\u30b9\u3092\u8aad\u3080 \u2192",
+        "footer_msg": "Data Cube AI\u30cb\u30e5\u30fc\u30b9\u30ec\u30bf\u30fc\u3092\u8cfc\u8aad\u3057\u3066\u3044\u308b\u305f\u3081\u3053\u306e\u30e1\u30fc\u30eb\u304c\u5c4a\u3044\u3066\u3044\u307e\u3059\u3002",
+        "unsubscribe": "\u8cfc\u8aad\u89e3\u9664",
+        "subject_week": "AI\u30cb\u30e5\u30fc\u30b9 \u7b2c{num}\u9031",
+        "subject_daily": "AI\u30cb\u30e5\u30fc\u30b9 {date}",
+        "week_prefix": "\u7b2c{num}\u9031",
+    },
+    "ko": {
+        "tagline": "\ub9e4\uc77c AI \ube0c\ub9ac\ud551",
+        "view_in_browser": "\ube0c\ub77c\uc6b0\uc800\uc5d0\uc11c \ubcf4\uae30",
+        "tldr_label": "\uc624\ub298\uc758 \uc694\uc57d",
+        "tech_label": "\U0001f52c \uae30\uc220",
+        "invest_label": "\U0001f4b0 \ud22c\uc790",
+        "tips_label": "\U0001f4a1 \ud301",
+        "videos_label": "\U0001f3ac \ub3d9\uc601\uc0c1",
+        "primary_market": "\ud504\ub77c\uc774\uba38\ub9ac \ub9c8\ucf13",
+        "header_company": "\ud68c\uc0ac",
+        "header_amount": "\uae08\uc561",
+        "header_round": "\ub77c\uc6b4\ub4dc",
+        "watch_label": "YouTube\uc5d0\uc11c \ubcf4\uae30",
+        "cta": "{date} \ubaa8\ub4e0 \ub274\uc2a4 \uc77d\uae30 \u2192",
+        "footer_msg": "Data Cube AI \ub274\uc2a4\ub808\ud130\ub97c \uad6c\ub3c5\ud558\uc168\uae30 \ub54c\ubb38\uc5d0 \uc774 \uc774\uba54\uc77c\uc744 \ubc1b\uc73c\uc168\uc2b5\ub2c8\ub2e4.",
+        "unsubscribe": "\uad6c\ub3c5 \ud574\uc9c0",
+        "subject_week": "AI \ub274\uc2a4 {num}\uc8fc\ucc28",
+        "subject_daily": "AI \ub274\uc2a4 {date}",
+        "week_prefix": "{num}\uc8fc\ucc28",
+    },
+}
+
+
+def _s(lang: str, key: str) -> str:
+    """Get a localized email string, falling back to English."""
+    return EMAIL_STRINGS.get(lang, EMAIL_STRINGS["en"]).get(
+        key, EMAIL_STRINGS["en"].get(key, "")
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -160,7 +335,7 @@ def _build_preheader(data: dict, lang: str) -> str:
     """Build hidden preheader text for inbox preview."""
     items = []
     for post in data["tech"][:3]:
-        content = getattr(post, f"content_{lang}")
+        content = get_field(post, "content", lang)
         if content:
             items.append(content[:60].split(".")[0])
     if not items:
@@ -173,7 +348,7 @@ def _build_tldr(data: dict, lang: str) -> str:
     """Build a quick TLDR summary of today's highlights."""
     highlights = []
     for post in data["tech"][:3]:
-        content = getattr(post, f"content_{lang}")
+        content = get_field(post, "content", lang)
         if content:
             first_sentence = content.split(".")[0] + "."
             if len(first_sentence) > 80:
@@ -183,7 +358,7 @@ def _build_tldr(data: dict, lang: str) -> str:
     if not highlights:
         return ""
 
-    label = "Heute im \u00dcberblick" if lang == "de" else "Today at a Glance"
+    label = _s(lang, "tldr_label")
     bullets = ""
     for h in highlights:
         bullets += f"""
@@ -210,25 +385,31 @@ def _build_tldr(data: dict, lang: str) -> str:
     </table>"""
 
 
+def _format_date_label(period_id: str, lang: str) -> str:
+    """Format a period ID into a human-readable date label."""
+    if "-kw" in period_id:
+        week_num = period_id.split("-kw")[1]
+        prefix = _s(lang, "week_prefix")
+        if "{num}" in prefix:
+            return prefix.format(num=week_num)
+        return f"{prefix} {week_num}"
+    else:
+        parts = period_id.split("-")
+        if lang == "de":
+            return f"{parts[2]}.{parts[1]}.{parts[0]}"
+        else:
+            d = date(int(parts[0]), int(parts[1]), int(parts[2]))
+            return d.strftime("%b %d, %Y")
+
+
 def _build_email_html(data: dict, lang: str) -> str:
     """Build a professional HTML newsletter email."""
     period_id = data["period_id"]
     week_url = f"{SITE_URL}/{lang}/week/{period_id}"
+    date_label = _format_date_label(period_id, lang)
 
-    # Date label
-    if "-kw" in period_id:
-        week_num = period_id.split("-kw")[1]
-        date_label = f"KW {week_num}" if lang == "de" else f"Week {week_num}"
-    else:
-        parts = period_id.split("-")
-        if lang == "de":
-            date_label = f"{parts[2]}.{parts[1]}.{parts[0]}"
-        else:
-            d = date(int(parts[0]), int(parts[1]), int(parts[2]))
-            date_label = d.strftime("%b %d, %Y")
-
-    title = f"KI-News \u2014 {date_label}" if lang == "de" else f"AI News \u2014 {date_label}"
-    tagline = "Dein t\u00e4gliches KI-Briefing" if lang == "de" else "Your daily AI briefing"
+    title = f"{'KI' if lang == 'de' else 'AI'}-News \u2014 {date_label}"
+    tagline = _s(lang, "tagline")
 
     sections: list[str] = []
 
@@ -236,12 +417,11 @@ def _build_email_html(data: dict, lang: str) -> str:
     sections.append(_build_preheader(data, lang))
 
     # ── View in Browser ───────────────────────────────────────────
-    view_in_browser = "Im Browser ansehen" if lang == "de" else "View in browser"
     sections.append(f"""
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
       <tr>
         <td align="center" style="padding:8px;background-color:#f3f4f6;font-family:{FONT_SANS};font-size:12px;color:#6b7280;">
-          <a href="{week_url}" style="color:#6b7280;text-decoration:underline;">{view_in_browser}</a>
+          <a href="{week_url}" style="color:#6b7280;text-decoration:underline;">{_s(lang, "view_in_browser")}</a>
         </td>
       </tr>
     </table>""")
@@ -283,17 +463,16 @@ def _build_email_html(data: dict, lang: str) -> str:
     # ── Tech Section ─────────────────────────────────────────────
     tech = data["tech"]
     if tech:
-        label = "\U0001f52c TECHNOLOGIE" if lang == "de" else "\U0001f52c TECHNOLOGY"
         sections.append(f"""
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
       <tr><td style="padding:24px 24px 0;">
-        {_section_header(label, ACCENT_TECH, TEXT_TECH, BG_TECH)}
+        {_section_header(_s(lang, "tech_label"), ACCENT_TECH, TEXT_TECH, BG_TECH)}
       </td></tr>
     </table>""")
 
         for post in tech:
-            content = _esc(getattr(post, f"content_{lang}"))
-            category = _esc(getattr(post, f"category_{lang}"))
+            content = _esc(get_field(post, "content", lang) or "")
+            category = _esc(get_field(post, "category", lang) or "")
             impact = _esc(post.impact)
 
             # Impact dot color
@@ -353,23 +532,18 @@ def _build_email_html(data: dict, lang: str) -> str:
     funding = data["funding"]
     ma = data["ma"]
     if funding or ma:
-        label = "\U0001f4b0 INVESTMENT"
         sections.append(f"""
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
       <tr><td style="padding:0 24px;">
-        {_section_header(label, ACCENT_INVEST, TEXT_INVEST, BG_INVEST)}
+        {_section_header(_s(lang, "invest_label"), ACCENT_INVEST, TEXT_INVEST, BG_INVEST)}
       </td></tr>
     </table>""")
 
     # Funding table
     if funding:
-        sub_label = "Prim\u00e4rmarkt" if lang == "de" else "Primary Market"
-        header_company = "Unternehmen" if lang == "de" else "Company"
-        header_amount = "Betrag" if lang == "de" else "Amount"
-        header_round = "Runde" if lang == "de" else "Round"
         rows = ""
         for p in funding:
-            amount = _esc(getattr(p, f"amount_{lang}"))
+            amount = _esc(get_field(p, "amount", lang) or "N/A")
             rows += f"""
               <tr>
                 <td style="padding:8px 10px;border-bottom:1px solid #f3f4f6;font-family:{FONT_SANS};font-size:14px;color:{TEXT_BODY};">{_esc(p.company)}</td>
@@ -384,16 +558,16 @@ def _build_email_html(data: dict, lang: str) -> str:
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
             <tr>
               <td style="padding:0 0 8px 0;font-family:{FONT_SANS};font-size:13px;font-weight:600;color:{TEXT_INVEST};">
-                {_esc(sub_label)}
+                {_esc(_s(lang, "primary_market"))}
               </td>
             </tr>
           </table>
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
                  style="border:1px solid {BORDER_DIVIDER};border-radius:6px;">
             <tr style="background-color:{BG_INVEST};">
-              <th style="text-align:left;padding:10px;font-family:{FONT_SANS};font-size:12px;font-weight:700;color:{TEXT_INVEST};border-bottom:2px solid {ACCENT_INVEST};">{header_company}</th>
-              <th style="text-align:left;padding:10px;font-family:{FONT_SANS};font-size:12px;font-weight:700;color:{TEXT_INVEST};border-bottom:2px solid {ACCENT_INVEST};">{header_amount}</th>
-              <th style="text-align:left;padding:10px;font-family:{FONT_SANS};font-size:12px;font-weight:700;color:{TEXT_INVEST};border-bottom:2px solid {ACCENT_INVEST};">{header_round}</th>
+              <th style="text-align:left;padding:10px;font-family:{FONT_SANS};font-size:12px;font-weight:700;color:{TEXT_INVEST};border-bottom:2px solid {ACCENT_INVEST};">{_s(lang, "header_company")}</th>
+              <th style="text-align:left;padding:10px;font-family:{FONT_SANS};font-size:12px;font-weight:700;color:{TEXT_INVEST};border-bottom:2px solid {ACCENT_INVEST};">{_s(lang, "header_amount")}</th>
+              <th style="text-align:left;padding:10px;font-family:{FONT_SANS};font-size:12px;font-weight:700;color:{TEXT_INVEST};border-bottom:2px solid {ACCENT_INVEST};">{_s(lang, "header_round")}</th>
             </tr>
             {rows}
           </table>
@@ -403,7 +577,6 @@ def _build_email_html(data: dict, lang: str) -> str:
 
     # M&A deals
     if ma:
-        sub_label = "M&A"
         sections.append(f"""
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
       <tr>
@@ -411,7 +584,7 @@ def _build_email_html(data: dict, lang: str) -> str:
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
             <tr>
               <td style="padding:0 0 8px 0;font-family:{FONT_SANS};font-size:13px;font-weight:600;color:{TEXT_INVEST};">
-                {sub_label}
+                M&amp;A
               </td>
             </tr>
           </table>
@@ -420,8 +593,8 @@ def _build_email_html(data: dict, lang: str) -> str:
     </table>""")
 
         for m in ma:
-            content = _esc(getattr(m, f"content_{lang}"))
-            deal_val = _esc(getattr(m, f"deal_value_{lang}") or "")
+            content = _esc(get_field(m, "content", lang) or "")
+            deal_val = _esc(get_field(m, "deal_value", lang) or "")
             deal_info = f" ({deal_val})" if deal_val else ""
             sections.append(f"""
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
@@ -454,17 +627,16 @@ def _build_email_html(data: dict, lang: str) -> str:
     # ── Tips Section ─────────────────────────────────────────────
     tips = data["tips"]
     if tips:
-        label = "\U0001f4a1 TIPPS" if lang == "de" else "\U0001f4a1 TIPS"
         sections.append(f"""
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
       <tr><td style="padding:0 24px;">
-        {_section_header(label, ACCENT_TIPS, TEXT_TIPS, BG_TIPS)}
+        {_section_header(_s(lang, "tips_label"), ACCENT_TIPS, TEXT_TIPS, BG_TIPS)}
       </td></tr>
     </table>""")
 
         for t in tips:
-            content = _esc(getattr(t, f"content_{lang}"))
-            category = _esc(getattr(t, f"category_{lang}"))
+            content = _esc(get_field(t, "content", lang) or "")
+            category = _esc(get_field(t, "category", lang) or "")
             sections.append(f"""
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
       <tr>
@@ -502,20 +674,18 @@ def _build_email_html(data: dict, lang: str) -> str:
     # ── Videos Section (vertical card layout) ────────────────────
     videos = data["videos"]
     if videos:
-        label = "\U0001f3ac VIDEOS"
         sections.append(f"""
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
       <tr><td style="padding:0 24px;">
-        {_section_header(label, ACCENT_VIDEO, TEXT_VIDEO, BG_VIDEO)}
+        {_section_header(_s(lang, "videos_label"), ACCENT_VIDEO, TEXT_VIDEO, BG_VIDEO)}
       </td></tr>
     </table>""")
 
         for v in videos:
-            content = _esc(getattr(v, f"content_{lang}"))
+            content = _esc(get_field(v, "content", lang) or "")
             yt_url = f"https://youtube.com/watch?v={_esc(v.video_id)}"
             thumb = f"https://img.youtube.com/vi/{_esc(v.video_id)}/hqdefault.jpg"
             channel = _esc(getattr(v, "source", "") or "")
-            watch_label = "Auf YouTube ansehen" if lang == "de" else "Watch on YouTube"
 
             sections.append(f"""
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
@@ -552,7 +722,7 @@ def _build_email_html(data: dict, lang: str) -> str:
                     <td style="padding:10px 0 0;">
                       <a href="{yt_url}" target="_blank"
                          style="font-family:{FONT_SANS};font-size:13px;font-weight:600;color:{TEXT_VIDEO};text-decoration:none;">
-                        &#9654; {watch_label}
+                        &#9654; {_s(lang, "watch_label")}
                       </a>
                     </td>
                   </tr>
@@ -565,11 +735,7 @@ def _build_email_html(data: dict, lang: str) -> str:
     </table>""")
 
     # ── CTA Button ───────────────────────────────────────────────
-    cta_text = (
-        f"Alle News vom {date_label} lesen \u2192"
-        if lang == "de"
-        else f"Read all news from {date_label} \u2192"
-    )
+    cta_text = _s(lang, "cta").format(date=date_label)
     sections.append(f"""
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
       <tr>
@@ -589,11 +755,6 @@ def _build_email_html(data: dict, lang: str) -> str:
     </table>""")
 
     # ── Dark Footer ──────────────────────────────────────────────
-    footer_msg = (
-        "Du erh\u00e4ltst diese E-Mail, weil du den Data Cube AI Newsletter abonniert hast."
-        if lang == "de"
-        else "You received this email because you subscribed to the Data Cube AI newsletter."
-    )
     sections.append(f"""
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
       <tr>
@@ -611,7 +772,7 @@ def _build_email_html(data: dict, lang: str) -> str:
             </tr>
             <tr>
               <td style="font-family:{FONT_SANS};font-size:12px;color:#9ca3af;line-height:1.6;">
-                {_esc(footer_msg)}
+                {_esc(_s(lang, "footer_msg"))}
               </td>
             </tr>
             <tr>
@@ -626,7 +787,7 @@ def _build_email_html(data: dict, lang: str) -> str:
             </tr>
             <tr>
               <td style="padding-top:8px;font-family:{FONT_SANS};font-size:12px;">
-                <a href="{SITE_URL}/unsubscribe" style="color:#9ca3af;text-decoration:underline;">{"Abmelden" if lang == "de" else "Unsubscribe"}</a>
+                <a href="{SITE_URL}/unsubscribe" style="color:#9ca3af;text-decoration:underline;">{_s(lang, "unsubscribe")}</a>
               </td>
             </tr>
           </table>
@@ -782,7 +943,7 @@ def send_newsletter(db: Session, period_id: str | None = None):
         if not week:
             period_id = current_day_id()
             if not db.query(Week).filter(Week.id == period_id).first():
-                logger.warning(f"No recent period found, skipping newsletter")
+                logger.warning("No recent period found, skipping newsletter")
                 return
             logger.info(f"Yesterday not found, using {period_id}")
 
@@ -807,21 +968,19 @@ def send_newsletter(db: Session, period_id: str | None = None):
 
     logger.info(f"Sending to {len(subscribers)} subscriber(s)")
 
-    # Group subscribers by language preference
-    by_lang: dict[str, list[str]] = {"de": [], "en": []}
+    # Group subscribers by language preference (8 languages supported)
+    by_lang: dict[str, list[str]] = {lang: [] for lang in SUPPORTED_LANGUAGES}
     for sub in subscribers:
-        lang = sub["language"] if sub["language"] in ("de", "en") else "de"
+        lang = sub["language"] if sub["language"] in SUPPORTED_LANGUAGES else "de"
         by_lang[lang].append(sub["email"])
 
-    logger.info(
-        f"Language split: {len(by_lang['de'])} DE, {len(by_lang['en'])} EN"
-    )
+    lang_counts = {lang: len(addrs) for lang, addrs in by_lang.items() if addrs}
+    logger.info(f"Language split: {lang_counts}")
 
     # Build and send per language (only to subscribers who chose that language)
     total_sent = 0
     for lang, addrs in by_lang.items():
         if not addrs:
-            logger.info(f"No {lang.upper()} subscribers, skipping")
             continue
 
         html_content = _build_email_html(data, lang)
@@ -829,7 +988,7 @@ def send_newsletter(db: Session, period_id: str | None = None):
         # Build subject line with lead story preview
         lead_preview = ""
         if data["tech"]:
-            first_content = getattr(data["tech"][0], f"content_{lang}")
+            first_content = get_field(data["tech"][0], "content", lang)
             if first_content:
                 first_sentence = first_content.split(".")[0]
                 if len(first_sentence) > 30:
@@ -838,17 +997,10 @@ def send_newsletter(db: Session, period_id: str | None = None):
 
         if "-kw" in period_id:
             week_num = period_id.split("-kw")[1]
-            subject = (
-                f"KI-News KW {week_num}" if lang == "de"
-                else f"AI News Week {week_num}"
-            )
+            subject = _s(lang, "subject_week").format(num=week_num)
         else:
-            parts = period_id.split("-")
-            if lang == "de":
-                subject = f"KI-News {parts[2]}.{parts[1]}."
-            else:
-                d = date(int(parts[0]), int(parts[1]), int(parts[2]))
-                subject = f"AI News {d.strftime('%b %d')}"
+            date_label = _format_date_label(period_id, lang)
+            subject = _s(lang, "subject_daily").format(date=date_label)
 
         subject = f"\U0001f9ca {subject}{lead_preview}"
 
