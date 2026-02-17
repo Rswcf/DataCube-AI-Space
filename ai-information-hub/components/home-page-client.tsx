@@ -480,7 +480,7 @@ function MobileSettingsDrawer({
                     const res = await fetch("/api/subscribe", {
                       method: "POST",
                       headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ email: email.trim() }),
+                      body: JSON.stringify({ email: email.trim(), language }),
                     });
                     if (!res.ok) throw new Error();
                     setEmail("");

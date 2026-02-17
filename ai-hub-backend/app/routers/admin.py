@@ -374,6 +374,8 @@ async def trigger_newsletter(
 
         try:
             send_newsletter(db, period_id)
+        except ValueError as e:
+            raise HTTPException(status_code=404, detail=str(e))
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
         return {"status": "completed", "period_id": period_id or "yesterday"}

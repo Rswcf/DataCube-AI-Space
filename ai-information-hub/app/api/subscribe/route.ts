@@ -1,6 +1,7 @@
 export async function POST(req: Request) {
   try {
-    const { email } = await req.json();
+    const { email, language } = await req.json();
+    const lang = language === "en" ? "en" : "de";
 
     if (!email || typeof email !== "string") {
       return Response.json({ error: "Email is required" }, { status: 400 });
@@ -29,6 +30,7 @@ export async function POST(req: Request) {
           email: email.trim(),
           reactivate_existing: true,
           send_welcome_email: true,
+          custom_fields: [{ name: "language", value: lang }],
         }),
       }
     );
