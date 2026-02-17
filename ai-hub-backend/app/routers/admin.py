@@ -384,6 +384,131 @@ async def trigger_newsletter(
     return {"status": "started", "period_id": period_id or "yesterday"}
 
 
+def _run_backfill_translations_with_new_session(
+    period_id: str | None = None,
+):
+    """Background task wrapper for translation backfill."""
+    from app.models import (
+        Week, TechPost, PrimaryMarketPost, SecondaryMarketPost,
+        MAPost, TipPost, Video, Trend,
+    )
+    from app.services.i18n_utils import TRANSLATION_LANGUAGES
+    from app.services.llm_processor import LLMProcessor
+
+    CONFIGS = {
+        "tech": (TechPost, ["content", "category", "tags"], {}),
+        "video": (Video, ["title", "summary"], {}),
+        "tip": (TipPost, ["content", "tip", "category", "difficulty"], {}),
+        "primary_market": (PrimaryMarketPost, ["content", "amount", "valuation"], {}),
+        "secondary_market": (SecondaryMarketPost, ["content"], {}),
+        "ma": (MAPost, ["content", "deal_value", "deal_type"], {}),
+        "trend": (Trend, ["category", "title"], {}),
+    }
+
+    db = get_session_local()()
+    try:
+        # Resolve periods
+        if period_id:
+            week_ids = [period_id]
+        else:
+            weeks = db.query(Week).order_by(Week.id).all()
+            week_ids = [w.id for w in weeks]
+
+        logger.info(f"Backfill translations: {len(week_ids)} period(s)")
+        grand_total = 0
+
+        for wid in week_ids:
+            logger.info(f"Backfilling {wid}")
+            period_total = 0
+
+            for section_name, (model_cls, fields, name_map) in CONFIGS.items():
+                records = db.query(model_cls).filter(model_cls.week_id == wid).all()
+                to_translate = [r for r in records if not r.translations]
+
+                if not to_translate:
+                    continue
+
+                logger.info(f"  {section_name}: {len(to_translate)} records")
+
+                # Build EN dicts
+                en_items = []
+                for record in to_translate:
+                    d = {"_translations": {}}
+                    for f in fields:
+                        val = getattr(record, f"{f}_en", None)
+                        if val is not None:
+                            d[f] = val
+                    en_items.append(d)
+
+                # Translate each language sequentially
+                for lang in TRANSLATION_LANGUAGES:
+                    try:
+                        processor = LLMProcessor()
+                        translated = processor.translate_batch(en_items, lang, fields)
+
+                        for i, en_item in enumerate(en_items):
+                            if i < len(translated) and translated[i]:
+                                mapped = {}
+                                for k, v in translated[i].items():
+                                    db_name = name_map.get(k, k)
+                                    mapped[db_name] = v
+                                en_item["_translations"][lang] = mapped
+
+                        logger.info(f"    {section_name} → {lang}: done")
+                    except Exception as e:
+                        logger.warning(f"    {section_name} → {lang}: failed ({e})")
+
+                # Write back
+                for i, record in enumerate(to_translate):
+                    t = en_items[i].get("_translations")
+                    if t:
+                        record.translations = t
+                        period_total += 1
+
+            if period_total > 0:
+                db.commit()
+            grand_total += period_total
+            logger.info(f"  {wid}: {period_total} records updated")
+
+        logger.info(f"Backfill complete: {grand_total} total records across {len(week_ids)} periods")
+    except Exception as e:
+        logger.error(f"Backfill failed: {e}")
+        db.rollback()
+        raise
+    finally:
+        db.close()
+
+
+@router.post("/backfill-translations")
+async def trigger_backfill_translations(
+    period_id: str | None = None,
+    _: bool = Depends(verify_api_key),
+):
+    """
+    Backfill translations for existing content that only has DE/EN.
+
+    Translates EN content to ZH, FR, ES, PT, JA, KO using free model chain.
+    If period_id is specified, only backfill that period. Otherwise all periods.
+
+    Runs in a daemon thread so the event loop stays responsive.
+
+    Requires X-API-Key header.
+    """
+    import threading
+
+    thread = threading.Thread(
+        target=_run_backfill_translations_with_new_session,
+        args=(period_id,),
+        daemon=True,
+    )
+    thread.start()
+    return {
+        "status": "started",
+        "period_id": period_id or "all",
+        "message": "Translation backfill started in background thread",
+    }
+
+
 @router.get("/health")
 async def health_check():
     """Health check endpoint."""
