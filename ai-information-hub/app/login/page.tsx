@@ -40,7 +40,8 @@ const translations = {
     welcome: "Willkommen",
     enterCredentials: "Entdecken Sie die neuesten KI-Trends und Insights",
     enter: "Eintreten",
-    beta: "Beta-Version",
+    newsletterPitch: "Erhalte täglich KI-News in 3 Minuten — kostenlos",
+    emailPlaceholder: "E-Mail-Adresse",
   },
   en: {
     badge: "AI-Powered Intelligence",
@@ -67,7 +68,8 @@ const translations = {
     welcome: "Welcome",
     enterCredentials: "Discover the latest AI trends and insights",
     enter: "Enter",
-    beta: "Beta Version",
+    newsletterPitch: "Get daily AI news in 3 minutes — free",
+    emailPlaceholder: "Email address",
   },
 };
 
@@ -157,11 +159,20 @@ function FloatingParticles() {
 
 export default function LoginPage() {
   const [language, setLanguage] = useState<"de" | "en">("de");
+  const [email, setEmail] = useState("");
   const router = useRouter();
 
   const t = translations[language];
 
   const handleEnter = () => {
+    // Subscribe if email provided (fire-and-forget)
+    if (email.trim()) {
+      fetch("/api/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email.trim(), language }),
+      }).catch(() => {});
+    }
     // Set visited cookie (expires in 30 days)
     document.cookie = "visited=true; path=/; max-age=2592000";
     router.push("/");
@@ -292,6 +303,18 @@ export default function LoginPage() {
               </p>
             </div>
 
+            {/* Newsletter Capture */}
+            <div className="mb-6">
+              <p className="text-sm text-muted-foreground mb-3 text-center">{t.newsletterPitch}</p>
+              <input
+                type="email"
+                placeholder={t.emailPlaceholder}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full h-11 rounded-xl border border-input bg-background px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary mb-2"
+              />
+            </div>
+
             {/* Enter Button */}
             <button
               onClick={handleEnter}
@@ -312,10 +335,6 @@ export default function LoginPage() {
               </button>
             </div>
 
-            {/* Footer */}
-            <p className="text-muted-foreground text-xs text-center mt-6">
-              {t.beta}
-            </p>
           </div>
         </div>
       </div>

@@ -16,6 +16,7 @@ FastAPI backend for the AI Information Hub — bilingual daily + weekly AI news 
 - Tips sources bypass classification (Reddit, Simon Willison)
 - Bilingual content support (DE/EN)
 - Period ID support: daily `YYYY-MM-DD` or weekly `YYYY-kwWW`
+- **Automated newsletter** via Resend + Beehiiv with per-subscriber language preference
 
 ## LLM Models
 
@@ -540,6 +541,7 @@ alembic downgrade -1
 | `/api/admin/collect/fetch` | POST | Stage 1 only |
 | `/api/admin/collect/process` | POST | Stages 2-4 only |
 | `/api/admin/collect/ma` | POST | M&A-only reprocessing |
+| `/api/admin/newsletter` | POST | Send newsletter (per-subscriber language) |
 | `/api/admin/migrate` | POST | Migrate JSON data |
 | `/health` | GET | Health check |
 
@@ -564,6 +566,10 @@ railway variables set OPENROUTER_API_KEY=sk-or-v1-xxxxx
 railway variables set YOUTUBE_API_KEY=AIzaSyxxxxx
 railway variables set POLYGON_API_KEY=xxxxx              # For real-time stock data
 railway variables set ADMIN_API_KEY=$ADMIN_API_KEY
+railway variables set RESEND_API_KEY=re_xxxxx
+railway variables set BEEHIIV_API_KEY=xxxxx
+railway variables set BEEHIIV_PUBLICATION_ID=pub_xxxxx
+railway variables set NEWSLETTER_FROM_EMAIL=newsletter@datacubeai.space
 railway variables set CORS_ORIGINS='["http://localhost:3000","https://www.datacubeai.space","https://ai-information-hub.vercel.app"]'
 ```
 
@@ -741,6 +747,7 @@ ai-hub-backend/
 │       ├── hn_fetcher.py    # Hacker News
 │       ├── youtube_fetcher.py  # YouTube API
 │       ├── llm_processor.py # Two-model LLM
+│       ├── newsletter_sender.py # Resend + Beehiiv newsletter
 │       └── migrator.py      # JSON migration
 ├── alembic/                 # DB migrations
 ├── scripts/                 # CLI scripts

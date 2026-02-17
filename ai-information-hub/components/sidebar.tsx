@@ -1,6 +1,6 @@
 "use client";
 
-import { Cpu, TrendingUp, Lightbulb, Home, Search, Users, Sun, Moon, Languages, Heart } from "lucide-react";
+import { Cpu, TrendingUp, Lightbulb, Sun, Moon, Languages, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSettings } from "@/lib/settings-context";
 import type { TranslationKey } from "@/lib/translations";
@@ -30,12 +30,6 @@ const getTabsData = (t: (key: TranslationKey) => string) => [
     icon: Lightbulb,
     description: t("handsOnAI"),
   },
-];
-
-const getNavItems = (t: (key: TranslationKey) => string) => [
-  { id: "home", label: t("home"), icon: Home },
-  { id: "search", label: t("discover"), icon: Search },
-  { id: "team", label: t("dataCube"), icon: Users },
 ];
 
 // Reusable nav button with tooltip for tablet view
@@ -94,7 +88,6 @@ function NavButton({
 export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
   const { theme, setTheme, language, setLanguage, t } = useSettings();
   const tabs = getTabsData(t);
-  const navItems = getNavItems(t);
 
   return (
     <TooltipProvider delayDuration={300}>
@@ -111,16 +104,8 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
 
         {/* Main Navigation */}
         <nav className="flex-1 space-y-1">
-          {navItems.slice(0, 2).map((item) => (
-            <NavButton
-              key={item.id}
-              icon={item.icon}
-              label={item.label}
-            />
-          ))}
-
           {/* Category Tabs */}
-          <div className="py-4">
+          <div>
             <p className="mb-2 px-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground hidden xl:block">
               {t("categories")}
             </p>
@@ -135,14 +120,6 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
               />
             ))}
           </div>
-
-          {navItems.slice(2).map((item) => (
-            <NavButton
-              key={item.id}
-              icon={item.icon}
-              label={item.label}
-            />
-          ))}
         </nav>
 
         {/* Settings Controls */}
@@ -172,25 +149,14 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
           />
         </div>
 
-        {/* User Profile */}
-        <div className="border-t border-border pt-4 mt-2">
-          <Tooltip delayDuration={300}>
-            <TooltipTrigger asChild>
-              <div className="flex items-center gap-3 rounded-full px-3 py-2 hover:bg-secondary transition-colors cursor-pointer">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent text-accent-foreground font-semibold">
-                  DC
-                </div>
-                <div className="hidden xl:block">
-                  <p className="text-sm font-semibold text-foreground">Data Cube Team</p>
-                  <p className="text-xs text-muted-foreground">@datacube_analytics</p>
-                </div>
-              </div>
-            </TooltipTrigger>
-            <TooltipContent side="right" className="xl:hidden">
-              <p className="font-semibold">Data Cube Team</p>
-              <p className="text-xs text-muted-foreground">@datacube_analytics</p>
-            </TooltipContent>
-          </Tooltip>
+        {/* Legal Links */}
+        <div className="border-t border-border pt-3 mt-2 px-4 hidden xl:flex gap-3">
+          <a href="/impressum" className="text-xs text-muted-foreground hover:text-foreground transition-colors focus-visible:ring-2 focus-visible:ring-ring rounded">
+            {language === "de" ? "Impressum" : "Legal Notice"}
+          </a>
+          <a href="/datenschutz" className="text-xs text-muted-foreground hover:text-foreground transition-colors focus-visible:ring-2 focus-visible:ring-ring rounded">
+            {language === "de" ? "Datenschutz" : "Privacy"}
+          </a>
         </div>
       </aside>
     </TooltipProvider>

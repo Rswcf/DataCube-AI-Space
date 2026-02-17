@@ -50,6 +50,7 @@ https://github.com/user-attachments/assets/a2a94ed6-a55c-4e76-9ecc-9eef2625188f
 | 📅 | **Daily + Weekly** | Automated daily collection with weekly rollup views |
 | 🤖 | **AI Chat** | Ask questions about the current week's AI news |
 | 📊 | **AI Reports** | One-click streaming report — export to Word, HTML, Markdown, Text, JSON |
+| 📧 | **Newsletter** | Automated daily digest via Resend — one email per subscriber in their preferred language |
 | 🔍 | **SEO/GEO** | SSR pages, JSON-LD, Atom feed, llms.txt, sitemap |
 | ♿ | **Accessible** | WCAG-compliant: focus-visible, ARIA, reduced-motion, skip links |
 | 📱 | **Mobile-First** | Dynamic viewport, safe area insets, touch-optimized navigation |
@@ -120,6 +121,7 @@ python -m scripts.weekly_collect --week 2026-kw06  # Specific week
 | **LLM Classification** | GLM-4.5-Air (OpenRouter, free tier) |
 | **LLM Processing** | DeepSeek V3.2 (OpenRouter) |
 | **Chat & Reports** | Aurora Alpha (OpenRouter) |
+| **Newsletter** | Resend (sending) + Beehiiv (subscribers) |
 | **Stock Data** | Polygon.io API |
 | **Hosting** | Vercel (frontend), Railway (backend + DB + cron) |
 | **Design** | Instrument Serif, section-specific color accents, staggered animations |
@@ -149,6 +151,7 @@ Daily collections produce reduced counts (10 tech, 5 investment, 5 tips, 2 video
 | `/api/stock/{ticker}` | GET | Real-time stock data |
 | `/api/stock/batch/?tickers=AAPL,NVDA` | GET | Batch stock data |
 | `/api/admin/collect` | POST | Trigger full data collection |
+| `/api/admin/newsletter` | POST | Send newsletter (per-subscriber language) |
 
 Period IDs: daily `YYYY-MM-DD` or weekly `YYYY-kwWW`
 
@@ -176,6 +179,10 @@ OPENROUTER_API_KEY=sk-or-v1-...     # For LLM classification & processing
 YOUTUBE_API_KEY=AIza...              # For video fetching
 POLYGON_API_KEY=...                  # Optional: real-time stock data
 ADMIN_API_KEY=your-secret-key       # Protects admin endpoints
+RESEND_API_KEY=re_...               # Newsletter sending
+BEEHIIV_API_KEY=...                 # Subscriber management
+BEEHIIV_PUBLICATION_ID=pub_...      # Beehiiv publication
+NEWSLETTER_FROM_EMAIL=newsletter@datacubeai.space
 CORS_ORIGINS=["http://localhost:3000"]
 ```
 
@@ -203,6 +210,7 @@ DataCube-AI-Space/
 │   ├── app/                     # Pages + API routes
 │   │   ├── api/chat/            # AI chat endpoint
 │   │   ├── api/report/          # AI report generator
+│   │   ├── api/subscribe/       # Newsletter signup (Beehiiv)
 │   │   ├── [lang]/week/         # SSR week pages (SEO)
 │   │   └── feed.xml/            # Atom 1.0 feed
 │   ├── components/              # React components
@@ -218,7 +226,8 @@ DataCube-AI-Space/
 │   │   └── services/            # Business logic
 │   │       ├── collector.py     # 4-stage pipeline
 │   │       ├── llm_processor.py # Two-model LLM approach
-│   │       └── youtube_fetcher.py
+│   │       ├── youtube_fetcher.py
+│   │       └── newsletter_sender.py  # Resend + Beehiiv
 │   ├── alembic/                 # DB migrations
 │   ├── scripts/                 # CLI tools (daily/weekly collect)
 │   └── Dockerfile

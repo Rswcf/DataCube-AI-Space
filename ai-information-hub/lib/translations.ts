@@ -123,11 +123,13 @@ export const translations = {
 
     // Newsletter
     newsletter: "Newsletter",
+    newsletterHeading: "Täglich informiert",
     emailPlaceholder: "E-Mail-Adresse",
-    subscribe: "Abonnieren",
+    subscribe: "Kostenlos abonnieren",
     subscribed: "Abonniert!",
     subscribeError: "Fehler beim Abonnieren. Bitte erneut versuchen.",
-    newsletterDescription: "W\u00f6chentliche KI-News direkt in Ihr Postfach",
+    newsletterDescription: "KI-News in 3 Minuten — täglich kuratiert, zweisprachig.",
+    newsletterSocialProof: "Schließe dich KI-Profis an",
 
     // Support
     support: "Unterst\u00fctzen",
@@ -279,11 +281,13 @@ export const translations = {
 
     // Newsletter
     newsletter: "Newsletter",
+    newsletterHeading: "Stay Informed Daily",
     emailPlaceholder: "Email address",
-    subscribe: "Subscribe",
+    subscribe: "Subscribe free",
     subscribed: "Subscribed!",
     subscribeError: "Subscription failed. Please try again.",
-    newsletterDescription: "Weekly AI news straight to your inbox",
+    newsletterDescription: "AI news in 3 minutes — daily curated, bilingual.",
+    newsletterSocialProof: "Join AI professionals staying ahead",
 
     // Support
     support: "Support",

@@ -143,39 +143,14 @@ export function RightSidebar({ weekId, onSearchChange }: RightSidebarProps) {
           />
         </div>
 
-        {/* Trends */}
-        <div className="mt-4 rounded-xl bg-secondary/50 p-4">
-          <div className="flex items-center gap-2">
-            <TrendingUp aria-hidden="true" className="h-5 w-5 text-primary" />
-            <h3 className="font-display text-xl font-bold text-foreground">{t("whatsNew")}</h3>
-          </div>
-          <div className="mt-3 space-y-1">
-            {trends.slice(0, 10).map((trend, index) => (
-              <div
-                key={index}
-                className="flex items-start gap-3 rounded-lg p-2"
-              >
-                <span className="text-2xl font-bold text-muted-foreground/30 tabular-nums w-8 shrink-0 select-none">
-                  {index + 1}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs text-muted-foreground">{trend.category}</p>
-                  <p className="font-semibold text-foreground leading-tight">
-                    {trend.title}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
         {/* Newsletter Signup */}
-        <div className="mt-4 rounded-xl border border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5 p-4">
+        <div className="mt-4 rounded-xl border border-primary/40 bg-gradient-to-br from-primary/10 to-accent/10 p-4">
           <div className="flex items-center gap-2 mb-1">
             <Mail aria-hidden="true" className="h-4 w-4 text-primary" />
-            <h3 className="font-bold text-foreground">{t("newsletter")}</h3>
+            <h3 className="font-display text-lg text-foreground">{t("newsletterHeading")}</h3>
           </div>
-          <p className="text-xs text-muted-foreground mb-3">{t("newsletterDescription")}</p>
+          <p className="text-xs text-muted-foreground mb-1">{t("newsletterDescription")}</p>
+          <p className="text-xs text-muted-foreground/80 italic mt-1 mb-3">{t("newsletterSocialProof")}</p>
           {subscribeState === "success" ? (
             <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
               <Check aria-hidden="true" className="h-4 w-4" />
@@ -210,16 +185,15 @@ export function RightSidebar({ weekId, onSearchChange }: RightSidebarProps) {
                 placeholder={t("emailPlaceholder")}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="bg-background border-0 focus-visible:ring-1 focus-visible:ring-primary text-sm"
+                className="bg-background border border-input focus-visible:ring-1 focus-visible:ring-primary text-sm"
               />
               {subscribeState === "error" && (
                 <p className="text-xs text-red-500">{t("subscribeError")}</p>
               )}
               <Button
                 type="submit"
-                size="sm"
                 disabled={subscribeState === "loading"}
-                className="w-full rounded-full bg-gradient-to-r from-primary to-accent text-primary-foreground hover:opacity-90 transition-opacity"
+                className="w-full h-10 rounded-full bg-gradient-to-r from-primary to-accent text-primary-foreground hover:opacity-90 transition-opacity"
               >
                 {subscribeState === "loading" ? (
                   <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
@@ -229,6 +203,34 @@ export function RightSidebar({ weekId, onSearchChange }: RightSidebarProps) {
               </Button>
             </form>
           )}
+        </div>
+
+        {/* Trends */}
+        <div className="mt-4 rounded-xl bg-secondary/50 p-4">
+          <div className="flex items-center gap-2">
+            <TrendingUp aria-hidden="true" className="h-5 w-5 text-primary" />
+            <h3 className="font-display text-xl font-bold text-foreground">{t("whatsNew")}</h3>
+          </div>
+          <div className="mt-3 space-y-1">
+            {trends.slice(0, 10).map((trend, index) => (
+              <button
+                key={index}
+                type="button"
+                onClick={() => onSearchChange(trend.title)}
+                className="flex items-start gap-3 cursor-pointer hover:bg-secondary transition-colors rounded-lg w-full text-left p-2"
+              >
+                <span className="text-2xl font-bold text-muted-foreground/30 tabular-nums w-8 shrink-0 select-none">
+                  {index + 1}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs text-muted-foreground">{trend.category}</p>
+                  <p className="font-semibold text-foreground leading-tight">
+                    {trend.title}
+                  </p>
+                </div>
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Footer */}
