@@ -116,7 +116,7 @@ python -m scripts.weekly_collect --week 2026-kw06
 | **Chat e Informes** | Aurora Alpha (OpenRouter) |
 | **Datos Bursatiles** | Polygon.io API |
 | **Alojamiento** | Vercel (frontend), Railway (backend + BD + cron) |
-| **Diseno** | Instrument Serif, acentos de color por seccion, animaciones escalonadas |
+| **Diseno** | Fuente Newsreader, logo cubo isométrico, acentos de color por sección, animaciones escalonadas |
 
 ## Pipeline de Datos
 

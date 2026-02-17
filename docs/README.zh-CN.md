@@ -116,7 +116,7 @@ python -m scripts.weekly_collect --week 2026-kw06
 | **对话与报告** | Aurora Alpha (OpenRouter) |
 | **股票数据** | Polygon.io API |
 | **托管** | Vercel（前端）、Railway（后端 + 数据库 + 定时任务） |
-| **设计** | Instrument Serif 字体、分区配色方案、渐进式动画 |
+| **设计** | Newsreader 字体、等距立方体 Logo、分区配色方案、渐进式动画 |
 
 ## 数据流水线
 

@@ -124,7 +124,7 @@ python -m scripts.weekly_collect --week 2026-kw06  # Specific week
 | **Newsletter** | Resend (sending) + Beehiiv (subscribers) |
 | **Stock Data** | Polygon.io API |
 | **Hosting** | Vercel (frontend), Railway (backend + DB + cron) |
-| **Design** | Instrument Serif, section-specific color accents, staggered animations |
+| **Design** | Newsreader display font, isometric cube logo, section-specific color accents, staggered animations |
 
 ## Data Pipeline
 

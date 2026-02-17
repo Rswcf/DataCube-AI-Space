@@ -3,8 +3,6 @@
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Brain,
-  Sparkles,
   Cpu,
   TrendingUp,
   Lightbulb,
@@ -13,6 +11,7 @@ import {
   Languages,
   Zap,
 } from "lucide-react";
+import { LogoCube } from "@/components/logo-cube";
 
 const translations = {
   de: {
@@ -284,14 +283,11 @@ export default function LoginPage() {
 
           {/* Card */}
           <div className="relative bg-card/80 backdrop-blur-xl border border-border/50 rounded-2xl p-8 shadow-2xl">
-            {/* AI Icon */}
+            {/* Logo */}
             <div className="flex justify-center mb-8">
               <div className="relative w-20 h-20">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary to-accent rounded-2xl animate-pulse opacity-30 blur-lg" />
-                <div className="relative w-full h-full bg-gradient-to-br from-primary to-accent rounded-2xl flex items-center justify-center shadow-lg">
-                  <Brain aria-hidden="true" className="w-10 h-10 text-primary-foreground" />
-                  <Sparkles aria-hidden="true" className="absolute -top-1 -right-1 w-5 h-5 text-accent-foreground" />
-                </div>
+                <div className="absolute inset-2 rounded-2xl blur-xl opacity-40" style={{background: 'linear-gradient(135deg, #3B82F6, #14B8A6, #F59E0B)'}} />
+                <LogoCube size={80} className="relative drop-shadow-lg" />
               </div>
             </div>
 

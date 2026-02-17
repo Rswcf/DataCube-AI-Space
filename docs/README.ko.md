@@ -116,7 +116,7 @@ python -m scripts.weekly_collect --week 2026-kw06
 | **채팅 및 보고서** | Aurora Alpha (OpenRouter) |
 | **주가 데이터** | Polygon.io API |
 | **호스팅** | Vercel (프론트엔드), Railway (백엔드 + DB + 크론) |
-| **디자인** | Instrument Serif, 섹션별 색상 강조, 시차 애니메이션 |
+| **디자인** | Newsreader 글꼴, 아이소메트릭 큐브 로고, 섹션별 색상 강조, 시차 애니메이션 |
 
 ## 데이터 파이프라인
 

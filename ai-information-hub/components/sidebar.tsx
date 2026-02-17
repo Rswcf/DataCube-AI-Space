@@ -3,6 +3,7 @@
 import { Cpu, TrendingUp, Lightbulb, Sun, Moon, Languages, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSettings } from "@/lib/settings-context";
+import { LogoCube } from "@/components/logo-cube";
 import type { TranslationKey } from "@/lib/translations";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 
@@ -95,9 +96,7 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
         {/* Logo */}
         <div className="mb-6 px-3">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-accent shadow-lg shadow-primary/25">
-              <span className="text-lg font-bold text-primary-foreground">DC</span>
-            </div>
+            <LogoCube size={40} className="shrink-0" />
             <span className="text-xl font-bold text-foreground hidden xl:block">Data Cube</span>
           </div>
         </div>
