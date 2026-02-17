@@ -24,7 +24,7 @@ Data Cube AI는 **22개 RSS 피드**, **Hacker News**, **YouTube**에서 AI 뉴�
 
 <div align="center">
 
-https://github.com/Rswcf/DataCube-AI-Space/releases/download/v1.0.0/promo.mp4
+https://github.com/user-attachments/assets/9dddaaed-e473-4350-97de-0346cacb6660
 
 </div>
 

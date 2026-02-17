@@ -25,7 +25,7 @@ The open-source alternative to Feedly AI and Google News — a bilingual (DE/EN)
 
 <div align="center">
 
-https://github.com/Rswcf/DataCube-AI-Space/releases/download/v1.0.0/promo.mp4
+https://github.com/user-attachments/assets/9dddaaed-e473-4350-97de-0346cacb6660
 
 </div>
 
