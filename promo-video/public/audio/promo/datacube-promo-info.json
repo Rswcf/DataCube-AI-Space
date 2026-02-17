@@ -1,0 +1,101 @@
+{
+  "name": "datacube-promo",
+  "voice": "George",
+  "voiceId": "JBFqnCBsd6RMkjVDRZzb",
+  "model": "eleven_multilingual_v2",
+  "totalCharacters": 1092,
+  "generatedAt": "2026-02-16T12:36:28.134Z",
+  "totalDuration": 83.5,
+  "scenes": [
+    {
+      "id": "scene1-hook",
+      "text": "Five hundred AI articles are published every single day. You read three. Maybe four on a good day.",
+      "character": "dramatic",
+      "expectedDuration": 5,
+      "actualDuration": 6.13,
+      "sceneDuration": 7,
+      "file": "datacube-promo-scene1-hook.mp3"
+    },
+    {
+      "id": "scene2-problem",
+      "text": "Hacker News. Reddit. ArXiv. TechCrunch. Dozens of RSS feeds. Scattered across tabs, buried in bookmarks. The noise is overwhelming. The signal? Lost.",
+      "character": "dramatic",
+      "expectedDuration": 8.5,
+      "actualDuration": 12.26,
+      "sceneDuration": 13,
+      "file": "datacube-promo-scene2-problem.mp3"
+    },
+    {
+      "id": "scene3-brand",
+      "text": "Meet Data Cube AI. Your daily AI intelligence briefing, curated by AI, delivered in seconds.",
+      "character": "narrator",
+      "expectedDuration": 5.5,
+      "actualDuration": 6.59,
+      "sceneDuration": 7.5,
+      "file": "datacube-promo-scene3-brand.mp3"
+    },
+    {
+      "id": "scene4-tech",
+      "text": "Every morning, twenty-two sources are scanned. The most impactful breakthroughs surface to the top. Impact-rated, summarized, and ready to read.",
+      "character": "narrator",
+      "expectedDuration": 7.5,
+      "actualDuration": 9.06,
+      "sceneDuration": 10,
+      "file": "datacube-promo-scene4-tech.mp3"
+    },
+    {
+      "id": "scene5-investment",
+      "text": "Track AI funding rounds, IPOs, and M and A deals. Real-time stock data. Primary and secondary market intelligence at a glance.",
+      "character": "expert",
+      "expectedDuration": 6.5,
+      "actualDuration": 9.43,
+      "sceneDuration": 10,
+      "file": "datacube-promo-scene5-investment.mp3"
+    },
+    {
+      "id": "scene6-tips",
+      "text": "Practical tips from fourteen Reddit communities. Actionable prompts, tools, and workflows. Rated by difficulty.",
+      "character": "conversational",
+      "expectedDuration": 5.5,
+      "actualDuration": 7.29,
+      "sceneDuration": 8,
+      "file": "datacube-promo-scene6-tips.mp3"
+    },
+    {
+      "id": "scene7-ai",
+      "text": "Ask the AI assistant anything about your weekly briefing. Or generate a full executive report with one click. Export to Word, HTML, or Markdown.",
+      "character": "narrator",
+      "expectedDuration": 9.5,
+      "actualDuration": 10.36,
+      "sceneDuration": 11,
+      "file": "datacube-promo-scene7-ai.mp3"
+    },
+    {
+      "id": "scene8-stats",
+      "text": "Twenty-two sources. Fourteen Reddit communities. Two languages. Updated daily. All completely free.",
+      "character": "expert",
+      "expectedDuration": 5.5,
+      "actualDuration": 7.06,
+      "sceneDuration": 8,
+      "file": "datacube-promo-scene8-stats.mp3"
+    },
+    {
+      "id": "scene9-cta",
+      "text": "Your daily AI news, curated by AI. Start reading at datacubeai.space. No signup required.",
+      "character": "calm",
+      "expectedDuration": 7.5,
+      "actualDuration": 7.76,
+      "sceneDuration": 8.5,
+      "file": "datacube-promo-scene9-cta.mp3"
+    },
+    {
+      "id": "scene10-end",
+      "text": "Data Cube AI. Open source. MIT licensed.",
+      "character": "calm",
+      "expectedDuration": 3.5,
+      "actualDuration": 3.99,
+      "sceneDuration": 5,
+      "file": "datacube-promo-scene10-end.mp3"
+    }
+  ]
+}

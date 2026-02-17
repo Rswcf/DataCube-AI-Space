@@ -1,0 +1,69 @@
+{
+  "name": "datacube-promo",
+  "voice": "George",
+  "model": "eleven_multilingual_v2",
+  "character": "narrator",
+  "scenes": [
+    {
+      "id": "scene1-hook",
+      "text": "Five hundred AI articles are published every single day. You read three. Maybe four on a good day.",
+      "duration": 5.0,
+      "character": "dramatic"
+    },
+    {
+      "id": "scene2-problem",
+      "text": "Hacker News. Reddit. ArXiv. TechCrunch. Dozens of RSS feeds. Scattered across tabs, buried in bookmarks. The noise is overwhelming. The signal? Lost.",
+      "duration": 8.5,
+      "character": "dramatic"
+    },
+    {
+      "id": "scene3-brand",
+      "text": "Meet Data Cube AI. Your daily AI intelligence briefing, curated by AI, delivered in seconds.",
+      "duration": 5.5,
+      "character": "narrator"
+    },
+    {
+      "id": "scene4-tech",
+      "text": "Every morning, twenty-two sources are scanned. The most impactful breakthroughs surface to the top. Impact-rated, summarized, and ready to read.",
+      "duration": 7.5,
+      "character": "narrator"
+    },
+    {
+      "id": "scene5-investment",
+      "text": "Track AI funding rounds, IPOs, and M and A deals. Real-time stock data. Primary and secondary market intelligence at a glance.",
+      "duration": 6.5,
+      "character": "expert"
+    },
+    {
+      "id": "scene6-tips",
+      "text": "Practical tips from fourteen Reddit communities. Actionable prompts, tools, and workflows. Rated by difficulty.",
+      "duration": 5.5,
+      "character": "conversational"
+    },
+    {
+      "id": "scene7-ai",
+      "text": "Ask the AI assistant anything about your weekly briefing. Or generate a full executive report with one click. Export to Word, HTML, or Markdown.",
+      "duration": 9.5,
+      "character": "narrator"
+    },
+    {
+      "id": "scene8-stats",
+      "text": "Twenty-two sources. Fourteen Reddit communities. Two languages. Updated daily. All completely free.",
+      "duration": 5.5,
+      "character": "expert"
+    },
+    {
+      "id": "scene9-cta",
+      "text": "Your daily AI news, curated by AI. Start reading at datacubeai.space. No signup required.",
+      "duration": 7.5,
+      "character": "calm"
+    },
+    {
+      "id": "scene10-end",
+      "text": "Data Cube AI. Open source. MIT licensed.",
+      "duration": 3.5,
+      "character": "calm",
+      "delay": 0.5
+    }
+  ]
+}
