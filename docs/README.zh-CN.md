@@ -24,7 +24,7 @@ Data Cube AI 自动从 **22 个 RSS 订阅源**、**Hacker News** 和 **YouTube*
 
 <div align="center">
 
-https://github.com/user-attachments/assets/a2a94ed6-a55c-4e76-9ecc-9eef2625188f
+https://github.com/Rswcf/DataCube-AI-Space/releases/download/v1.0.0/promo.mp4
 
 </div>
 

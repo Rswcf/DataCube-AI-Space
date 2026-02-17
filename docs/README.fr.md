@@ -24,7 +24,7 @@ Data Cube AI collecte, classe et résume automatiquement les actualités IA prov
 
 <div align="center">
 
-https://github.com/user-attachments/assets/a2a94ed6-a55c-4e76-9ecc-9eef2625188f
+https://github.com/Rswcf/DataCube-AI-Space/releases/download/v1.0.0/promo.mp4
 
 </div>
 
