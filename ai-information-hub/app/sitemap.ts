@@ -152,6 +152,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'daily',
       priority: 1,
     },
+    {
+      url: `${baseUrl}/about`,
+      lastModified: new Date('2026-02-18T00:00:00Z'),
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
     ...langHomeEntries,
     ...topicEntries,
     ...periodEntries,

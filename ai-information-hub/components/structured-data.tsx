@@ -9,7 +9,8 @@ export function OrganizationSchema() {
     logo: 'https://www.datacubeai.space/icon.svg',
     description: 'Multilingual AI news aggregator providing daily tech, investment, and tips content in 8 languages.',
     foundingDate: '2026-01',
-    publishingPrinciples: 'https://www.datacubeai.space/impressum',
+    publishingPrinciples: 'https://www.datacubeai.space/about',
+    ethicsPolicy: 'https://www.datacubeai.space/about',
     sameAs: [],
   }
 
@@ -59,6 +60,7 @@ export function ArticleSchema({ post, inLanguage = 'de', url }: { post: TechPost
     author: {
       '@type': 'Organization',
       name: 'Data Cube AI',
+      url: 'https://www.datacubeai.space/about',
     },
     publisher: {
       '@type': 'Organization',
@@ -95,6 +97,11 @@ export function VideoSchema({ video }: { video: TechPost }) {
     publisher: {
       '@type': 'Organization',
       name: 'Data Cube AI',
+    },
+    author: {
+      '@type': 'Organization',
+      name: 'Data Cube AI',
+      url: 'https://www.datacubeai.space/about',
     },
   }
 
