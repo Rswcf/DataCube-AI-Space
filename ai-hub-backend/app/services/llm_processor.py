@@ -139,11 +139,19 @@ class LLMProcessor:
                 logger.error(f"LLM API call failed (model={model}): {e}")
                 raise
 
-    def _call_with_fallback(self, prompt: str, temperature: float, timeout: float) -> str:
-        """Try classifier models in order, falling back on rate limits.
+    def _call_with_fallback(self, prompt: str, temperature: float, timeout: float,
+                            expect_json: bool = False) -> str:
+        """Try classifier models in order, falling back on rate limits or bad JSON.
 
         Each model gets 2 retry attempts with exponential backoff before
         moving to the next model in the chain.
+
+        Args:
+            prompt: The prompt to send.
+            temperature: Sampling temperature.
+            timeout: Request timeout in seconds.
+            expect_json: If True, validate that the response parses as JSON.
+                         Invalid JSON is treated as a retriable failure.
         """
         retries_per_model = 2
         base_delay = 2
@@ -161,8 +169,25 @@ class LLMProcessor:
                     if not response.choices or not response.choices[0].message:
                         logger.warning(f"Empty response from classifier model {model}")
                         return ""
+                    content = response.choices[0].message.content or ""
+
+                    # Validate JSON if required
+                    if expect_json and content:
+                        parsed = parse_llm_json(content, fallback=None)
+                        if parsed is None:
+                            logger.warning(
+                                f"Invalid JSON from {model}, attempt {attempt + 1}/{retries_per_model}"
+                            )
+                            last_error = ValueError(f"Invalid JSON from {model}")
+                            if attempt < retries_per_model - 1:
+                                time.sleep(base_delay * (2 ** attempt))
+                                continue  # retry same model
+                            else:
+                                logger.warning(f"Model {model} exhausted (bad JSON), trying next fallback...")
+                                break  # try next model
+
                     logger.info(f"Classifier succeeded with model: {model}")
-                    return response.choices[0].message.content or ""
+                    return content
                 except RateLimitError as e:
                     last_error = e
                     delay = base_delay * (2 ** attempt)
@@ -181,6 +206,63 @@ class LLMProcessor:
         logger.error(f"All {len(self.CLASSIFIER_MODELS)} classifier models exhausted")
         raise last_error or RuntimeError("All classifier models failed")
 
+    def _try_translate_batch(
+        self,
+        batch: list[dict],
+        target_lang: str,
+        fields: list[str],
+        lang_name: str,
+    ) -> "list[dict] | None":
+        """Attempt to translate a single batch. Returns list of translated dicts or None on failure.
+
+        Uses expect_json=True so _call_with_fallback retries on unparseable JSON.
+        """
+        source_items = []
+        for i, item in enumerate(batch):
+            entry = {"_idx": i}
+            for f in fields:
+                val = item.get(f)
+                if val is not None:
+                    entry[f] = val
+            source_items.append(entry)
+
+        source_json = json.dumps(source_items, ensure_ascii=False)
+
+        prompt = f"""Translate the following JSON items from English to {lang_name}.
+Translate ONLY the text values. Keep these unchanged: _idx, numbers, URLs, proper nouns (company names, person names, ticker symbols), JSON structure.
+For array fields (like tags), translate each element.
+
+Input:
+{source_json}
+
+Output the translated JSON array with the same structure. Output ONLY the JSON array, no explanation."""
+
+        try:
+            response = self._call_with_fallback(
+                prompt, temperature=0.2, timeout=120.0, expect_json=True,
+            )
+            translated = parse_llm_json(response, fallback=None)
+
+            if translated and isinstance(translated, list):
+                # Map by _idx for robustness
+                idx_map = {}
+                for t in translated:
+                    if isinstance(t, dict) and "_idx" in t:
+                        idx_map[t["_idx"]] = t
+
+                result = []
+                for i in range(len(batch)):
+                    t = idx_map.get(i, {})
+                    t.pop("_idx", None)
+                    result.append(t)
+                return result
+            else:
+                logger.warning(f"Translation to {target_lang} returned non-list for batch of {len(batch)}")
+                return None
+        except Exception as e:
+            logger.error(f"Translation to {target_lang} error for batch of {len(batch)}: {e}")
+            return None
+
     def translate_batch(
         self,
         items: list[dict],
@@ -191,6 +273,7 @@ class LLMProcessor:
         """Translate specific fields of items from English to target language.
 
         Uses the free classifier model chain (_call_with_fallback) for zero-cost translation.
+        On failure, retries with smaller batch chunks (size=3) for simpler JSON output.
 
         Args:
             items: List of dicts with English field values to translate.
@@ -205,53 +288,31 @@ class LLMProcessor:
 
         lang_name = LANGUAGE_NAMES.get(target_lang, target_lang)
         all_translated: list[dict] = []
+        mini_batch_size = 3
 
         for start in range(0, len(items), batch_size):
             batch = items[start:start + batch_size]
+            translated = self._try_translate_batch(batch, target_lang, fields, lang_name)
 
-            # Build compact JSON with only the translatable fields
-            source_items = []
-            for i, item in enumerate(batch):
-                entry = {"_idx": i}
-                for f in fields:
-                    val = item.get(f)
-                    if val is not None:
-                        entry[f] = val
-                source_items.append(entry)
+            # If full batch failed and it's larger than mini_batch_size, retry with smaller chunks
+            if translated is None and len(batch) > mini_batch_size:
+                logger.info(
+                    f"Retrying {target_lang} batch at offset {start} with smaller chunks (size={mini_batch_size})"
+                )
+                translated = []
+                for mini_start in range(0, len(batch), mini_batch_size):
+                    mini_batch = batch[mini_start:mini_start + mini_batch_size]
+                    mini_result = self._try_translate_batch(
+                        mini_batch, target_lang, fields, lang_name,
+                    )
+                    if mini_result:
+                        translated.extend(mini_result)
+                    else:
+                        translated.extend([{} for _ in mini_batch])
 
-            source_json = json.dumps(source_items, ensure_ascii=False)
-
-            prompt = f"""Translate the following JSON items from English to {lang_name}.
-Translate ONLY the text values. Keep these unchanged: _idx, numbers, URLs, proper nouns (company names, person names, ticker symbols), JSON structure.
-For array fields (like tags), translate each element.
-
-Input:
-{source_json}
-
-Output the translated JSON array with the same structure. Output ONLY the JSON array, no explanation."""
-
-            try:
-                response = self._call_with_fallback(prompt, temperature=0.2, timeout=120.0)
-                translated = parse_llm_json(response, fallback=None)
-
-                if translated and isinstance(translated, list):
-                    # Map by _idx for robustness
-                    idx_map = {}
-                    for t in translated:
-                        if isinstance(t, dict) and "_idx" in t:
-                            idx_map[t["_idx"]] = t
-
-                    for i in range(len(batch)):
-                        t = idx_map.get(i, {})
-                        # Remove _idx from result
-                        t.pop("_idx", None)
-                        all_translated.append(t)
-                else:
-                    # Translation failed for this batch, append empty dicts
-                    logger.warning(f"Translation to {target_lang} failed for batch starting at {start}")
-                    all_translated.extend([{} for _ in batch])
-            except Exception as e:
-                logger.error(f"Translation to {target_lang} error: {e}")
+            if translated:
+                all_translated.extend(translated)
+            else:
                 all_translated.extend([{} for _ in batch])
 
         return all_translated
