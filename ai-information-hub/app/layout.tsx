@@ -4,6 +4,8 @@ import { headers } from 'next/headers'
 import { Geist, Geist_Mono, Newsreader } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { SettingsProvider } from '@/lib/settings-context'
+import { isSupportedLanguage, toBcp47 } from '@/lib/i18n'
+import type { AppLanguage } from '@/lib/i18n'
 import { OrganizationSchema, WebsiteSchema, FAQSchema } from '@/components/structured-data'
 import './globals.css'
 
@@ -95,7 +97,7 @@ export const metadata: Metadata = {
     languages: {
       'de': 'https://www.datacubeai.space/de',
       'en': 'https://www.datacubeai.space/en',
-      'zh': 'https://www.datacubeai.space/zh',
+      'zh-Hans': 'https://www.datacubeai.space/zh',
       'fr': 'https://www.datacubeai.space/fr',
       'es': 'https://www.datacubeai.space/es',
       'pt': 'https://www.datacubeai.space/pt',
@@ -121,10 +123,11 @@ export default async function RootLayout({
   children: React.ReactNode
 }>) {
   const headersList = await headers()
-  const lang = headersList.get('x-lang') || 'de'
+  const rawLang = headersList.get('x-lang') || 'de'
+  const htmlLang = isSupportedLanguage(rawLang) ? toBcp47(rawLang as AppLanguage) : rawLang
 
   return (
-    <html lang={lang} suppressHydrationWarning>
+    <html lang={htmlLang} suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://api-production-3ee5.up.railway.app" />
         <link rel="preconnect" href="https://img.youtube.com" />

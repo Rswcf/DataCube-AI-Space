@@ -4,7 +4,7 @@ import LegacyWeekPage, {
   generateMetadata as generateLegacyMetadata,
   generateStaticParams as generateLegacyStaticParams,
 } from '../../../week/[weekId]/page'
-import { isSupportedLanguage, SUPPORTED_LANGUAGES } from '@/lib/i18n'
+import { isSupportedLanguage, SUPPORTED_LANGUAGES, toBcp47 } from '@/lib/i18n'
 
 export const revalidate = 3600
 
@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     'x-default': `https://www.datacubeai.space/de/week/${weekId}`,
   }
   for (const code of SUPPORTED_LANGUAGES) {
-    hreflangEntries[code] = `https://www.datacubeai.space/${code}/week/${weekId}`
+    hreflangEntries[toBcp47(code)] = `https://www.datacubeai.space/${code}/week/${weekId}`
   }
 
   return {

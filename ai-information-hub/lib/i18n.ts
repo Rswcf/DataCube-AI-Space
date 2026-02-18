@@ -20,6 +20,12 @@ function stripLanguagePrefix(pathname: string): string {
   return stripped || '/'
 }
 
+/** Map internal language code to BCP 47 for hreflang / html lang attributes. */
+export function toBcp47(lang: AppLanguage): string {
+  if (lang === 'zh') return 'zh-Hans'
+  return lang
+}
+
 export function toLocalizedPath(pathname: string, language: AppLanguage): string {
   const normalized = pathname.startsWith('/') ? pathname : `/${pathname}`
   const basePath = stripLanguagePrefix(normalized)

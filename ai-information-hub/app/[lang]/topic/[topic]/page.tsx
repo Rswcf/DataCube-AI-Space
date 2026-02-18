@@ -224,6 +224,61 @@ function buildBreadcrumbSchema(lang: AppLanguage, topic: string, topicTitle: str
   }
 }
 
+function buildFAQSchema(lang: AppLanguage, topicTitle: string, buckets: TopicBucket[]) {
+  const questions: { '@type': string; name: string; acceptedAnswer: { '@type': string; text: string } }[] = []
+
+  // Q1: What is [topic]?
+  const firstTech = buckets.flatMap((b) => b.tech).find((p) => p.content)
+  if (firstTech) {
+    questions.push({
+      '@type': 'Question',
+      name: lang === 'de' ? `Was ist ${topicTitle}?` : `What is ${topicTitle}?`,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: firstTech.content.slice(0, 300),
+      },
+    })
+  }
+
+  // Q2: Investment implications
+  const firstInvest = buckets.flatMap((b) => [...b.primary, ...b.secondary, ...b.ma]).find((p) => p.content)
+  if (firstInvest) {
+    questions.push({
+      '@type': 'Question',
+      name: lang === 'de'
+        ? `Welche Investitionsauswirkungen hat ${topicTitle}?`
+        : `What are the investment implications of ${topicTitle}?`,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: firstInvest.content.slice(0, 300),
+      },
+    })
+  }
+
+  // Q3: Practical tips
+  const firstTip = buckets.flatMap((b) => b.tips).find((p) => p.content)
+  if (firstTip) {
+    questions.push({
+      '@type': 'Question',
+      name: lang === 'de'
+        ? `Welche praktischen Tipps gibt es für ${topicTitle}?`
+        : `What are practical tips for ${topicTitle}?`,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: (firstTip.tip || firstTip.content).slice(0, 300),
+      },
+    })
+  }
+
+  if (questions.length === 0) return null
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: questions,
+  }
+}
+
 function buildItemListSchema(lang: AppLanguage, topicTitle: string, buckets: TopicBucket[], section: TopicSection) {
   const items = buckets.slice(0, 20).map((bucket, index) => ({
     '@type': 'ListItem',
@@ -359,11 +414,13 @@ export default async function TopicPage({ params, searchParams }: Props) {
   } as const
   const breadcrumbSchema = buildBreadcrumbSchema(lang, topic, topicTitle)
   const itemListSchema = buildItemListSchema(lang, topicTitle, pagedBuckets, sectionFilter)
+  const faqSchema = buildFAQSchema(lang, topicTitle, filteredBuckets)
 
   return (
     <article className="mx-auto max-w-4xl px-4 py-8">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }} />
+      {faqSchema && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />}
 
       <header className="mb-8 border-b border-border pb-4">
         <h1 className="text-3xl font-bold">{topicTitle}</h1>

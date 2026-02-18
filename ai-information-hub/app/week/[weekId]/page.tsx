@@ -3,7 +3,7 @@ import { ArticleSchema, VideoSchema, BreadcrumbListSchema } from '@/components/s
 import { formatPeriodTitle } from '@/lib/period-utils'
 import type { TechPost, MultilingualData, InvestmentData, TipPost, ImpactLevel } from '@/lib/types'
 import { toTopicSlug } from '@/lib/topic-utils'
-import { isSupportedLanguage, SUPPORTED_LANGUAGES } from '@/lib/i18n'
+import { isSupportedLanguage, SUPPORTED_LANGUAGES, toBcp47 } from '@/lib/i18n'
 
 // API base URL with production fallback
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api-production-3ee5.up.railway.app/api'
@@ -33,7 +33,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
       canonical: localizedUrl,
       languages: {
         'x-default': `https://www.datacubeai.space/de/week/${weekId}`,
-        ...Object.fromEntries(SUPPORTED_LANGUAGES.map((code) => [code, `https://www.datacubeai.space/${code}/week/${weekId}`])),
+        ...Object.fromEntries(SUPPORTED_LANGUAGES.map((code) => [toBcp47(code), `https://www.datacubeai.space/${code}/week/${weekId}`])),
       },
     },
     openGraph: {

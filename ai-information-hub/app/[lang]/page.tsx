@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { HomePageContent } from '../page'
-import { isSupportedLanguage, SUPPORTED_LANGUAGES } from '@/lib/i18n'
+import { isSupportedLanguage, SUPPORTED_LANGUAGES, toBcp47 } from '@/lib/i18n'
 
 export const revalidate = 3600
 
@@ -73,7 +73,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const hreflangEntries: Record<string, string> = { 'x-default': 'https://www.datacubeai.space' }
   for (const code of SUPPORTED_LANGUAGES) {
-    hreflangEntries[code] = `https://www.datacubeai.space/${code}`
+    hreflangEntries[toBcp47(code)] = `https://www.datacubeai.space/${code}`
   }
 
   return {
