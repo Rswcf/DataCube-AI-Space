@@ -5,7 +5,6 @@ import type { AppLanguage } from '@/lib/i18n'
 import { toTopicSlug } from '@/lib/topic-utils'
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api-production-3ee5.up.railway.app/api'
-const SHOW_HOMEPAGE_TOP_LINKS = /^(1|true|yes|on)$/i.test(process.env.HOMEPAGE_SHOW_TOP_LINKS || '')
 
 export const revalidate = 3600
 
@@ -26,6 +25,11 @@ interface WeeksResponse {
 
 interface TrendsResponse {
   trends?: Record<string, { title?: string }[]>
+}
+
+interface TechHeadline {
+  title: string
+  summary: string
 }
 
 async function getWeeksFromApi(): Promise<WeekEntry[]> {
@@ -114,6 +118,27 @@ async function getTrendingTopicTitles(periodId: string, language: AppLanguage): 
   }
 }
 
+async function getLatestHeadlines(periodId: string, language: AppLanguage): Promise<TechHeadline[]> {
+  if (!periodId) return []
+
+  try {
+    const res = await fetch(`${API_BASE}/tech/${periodId}`, { next: { revalidate: 3600 } })
+    if (!res.ok) return []
+    const data = (await res.json()) as Record<string, { author?: { name?: string }; content?: string }[]>
+    const posts = data[language] || data.en || data.de || []
+    return posts
+      .filter((p) => !('isVideo' in p && p.isVideo))
+      .slice(0, 5)
+      .map((p) => ({
+        title: p.author?.name || '',
+        summary: (p.content || '').slice(0, 200),
+      }))
+      .filter((h) => h.title)
+  } catch {
+    return []
+  }
+}
+
 type HomePageContentProps = {
   language?: AppLanguage
 }
@@ -121,45 +146,67 @@ type HomePageContentProps = {
 export async function HomePageContent({ language = 'de' }: HomePageContentProps = {}) {
   const weeks = await getWeeks()
   const initialWeekId = getInitialPeriodId(weeks)
-  const recentPeriodIds = SHOW_HOMEPAGE_TOP_LINKS ? getRecentPeriodIds(weeks) : []
-  const trendingTopics = SHOW_HOMEPAGE_TOP_LINKS
-    ? Array.from(new Set(await getTrendingTopicTitles(initialWeekId, language))).slice(0, 8)
-    : []
-  const introDescription = SHOW_HOMEPAGE_TOP_LINKS
-    ? 'Bilingual AI intelligence hub covering technology breakthroughs, funding and market movements, practical AI workflows, and curated videos. Explore the latest periods below or jump into the interactive feed.'
-    : 'Bilingual AI intelligence hub covering technology breakthroughs, funding and market movements, practical AI workflows, and curated videos. Jump into the interactive feed.'
+  const [recentPeriodIds, trendingTopics, headlines] = await Promise.all([
+    Promise.resolve(getRecentPeriodIds(weeks)),
+    getTrendingTopicTitles(initialWeekId, language).then((t) =>
+      Array.from(new Set(t)).slice(0, 8)
+    ),
+    getLatestHeadlines(initialWeekId, language),
+  ])
 
   return (
     <main className="min-h-screen w-full">
       <section className="sr-only">
         <h1>Data Cube AI: Daily AI News, Investment Signals, and Practical Tips</h1>
-        <p>{introDescription}</p>
-        {SHOW_HOMEPAGE_TOP_LINKS && recentPeriodIds.length > 0 ? (
-          <nav aria-label="Latest AI news periods" className="mt-4 flex flex-wrap gap-2">
+        <p>
+          Multilingual AI intelligence hub covering technology breakthroughs,
+          funding and market movements, practical AI workflows, and curated
+          videos — updated daily in 8 languages (German, English, Chinese,
+          French, Spanish, Portuguese, Japanese, Korean).
+        </p>
+
+        {headlines.length > 0 && (
+          <section>
+            <h2>Latest AI News</h2>
+            <ul>
+              {headlines.map((h) => (
+                <li key={h.title}>
+                  <strong>{h.title}</strong>: {h.summary}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {recentPeriodIds.length > 0 && (
+          <nav aria-label="Latest AI news periods">
+            <h2>Recent Updates</h2>
             {recentPeriodIds.map((id) => (
               <a
                 key={id}
                 href={`/${language}/week/${id}`}
-                className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground hover:border-primary hover:text-primary focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 sm:text-sm"
+                className="mr-2 inline-block"
               >
                 {id}
               </a>
             ))}
           </nav>
-        ) : null}
-        {SHOW_HOMEPAGE_TOP_LINKS && trendingTopics.length > 0 ? (
-          <nav aria-label="Trending AI topics" className="mt-3 flex flex-wrap gap-2">
+        )}
+
+        {trendingTopics.length > 0 && (
+          <nav aria-label="Trending AI topics">
+            <h2>Trending Topics</h2>
             {trendingTopics.map((topic) => (
               <a
                 key={topic}
                 href={`/${language}/topic/${toTopicSlug(topic)}`}
-                className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground hover:border-primary hover:text-primary focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 sm:text-sm"
+                className="mr-2 inline-block"
               >
                 {topic}
               </a>
             ))}
           </nav>
-        ) : null}
+        )}
       </section>
 
       <HomePageClient initialWeekId={initialWeekId} />
