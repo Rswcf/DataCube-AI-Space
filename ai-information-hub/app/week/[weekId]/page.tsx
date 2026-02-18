@@ -45,7 +45,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
       type: 'article',
       images: [
         {
-          url: '/og-image.jpg',
+          url: `/api/og?period=${weekId}&lang=${lang}`,
           width: 1200,
           height: 630,
           alt: lang === 'de'
