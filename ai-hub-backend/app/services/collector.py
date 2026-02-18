@@ -933,7 +933,7 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
                     company=de_p.get("company", ""),
                     amount_de=de_p.get("amount", "N/A"),
                     amount_en=en_p.get("amount", "N/A"),
-                    round=de_p.get("round", ""),
+                    round=de_p.get("round") or en_p.get("round") or "Unknown",
                     round_category=de_p.get("roundCategory") or en_p.get("roundCategory"),
                     investors=de_p.get("investors", []),
                     valuation_de=de_p.get("valuation"),

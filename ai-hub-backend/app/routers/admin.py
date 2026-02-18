@@ -405,6 +405,9 @@ def _run_backfill_translations_with_new_session(
         "trend": (Trend, ["category", "title"], {}),
     }
 
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+    import threading
+
     db = get_session_local()()
     try:
         # Resolve periods
@@ -419,47 +422,86 @@ def _run_backfill_translations_with_new_session(
 
         for wid in week_ids:
             logger.info(f"Backfilling {wid}")
-            period_total = 0
 
+            # Collect all sections that need translation for this period
+            section_data = []  # (section_name, records, en_items, fields, name_map, missing_langs)
             for section_name, (model_cls, fields, name_map) in CONFIGS.items():
                 records = db.query(model_cls).filter(model_cls.week_id == wid).all()
-                to_translate = [r for r in records if not r.translations]
+
+                # Find records missing ANY language (not just records with no translations)
+                to_translate = []
+                missing_langs_per_record = []
+                for r in records:
+                    existing = r.translations or {}
+                    missing = [lang for lang in TRANSLATION_LANGUAGES if lang not in existing]
+                    if missing:
+                        to_translate.append(r)
+                        missing_langs_per_record.append(missing)
 
                 if not to_translate:
                     continue
 
-                logger.info(f"  {section_name}: {len(to_translate)} records")
+                # Figure out which languages need work across all records in this section
+                all_missing = set()
+                for ml in missing_langs_per_record:
+                    all_missing.update(ml)
 
-                # Build EN dicts
                 en_items = []
                 for record in to_translate:
-                    d = {"_translations": {}}
+                    d = {"_translations": dict(record.translations or {})}
                     for f in fields:
                         val = getattr(record, f"{f}_en", None)
                         if val is not None:
                             d[f] = val
                     en_items.append(d)
 
-                # Translate each language sequentially
-                for lang in TRANSLATION_LANGUAGES:
+                section_data.append((section_name, to_translate, en_items, fields, name_map, sorted(all_missing)))
+                logger.info(f"  {section_name}: {len(to_translate)} records, missing langs: {sorted(all_missing)}")
+
+            if not section_data:
+                logger.info(f"  {wid}: nothing to translate")
+                continue
+
+            # Build work units: only for missing languages per section
+            lock = threading.Lock()
+            work_units = [
+                (si, lang)
+                for si in range(len(section_data))
+                for lang in section_data[si][5]  # missing_langs
+            ]
+
+            def do_translate(section_idx: int, target_lang: str):
+                section_name, _, en_items, fields, name_map, _ = section_data[section_idx]
+                proc = LLMProcessor()
+                translated = proc.translate_batch(en_items, target_lang, fields)
+                with lock:
+                    for i, en_item in enumerate(en_items):
+                        if i < len(translated) and translated[i]:
+                            mapped = {}
+                            for k, v in translated[i].items():
+                                db_name = name_map.get(k, k)
+                                mapped[db_name] = v
+                            en_item["_translations"][target_lang] = mapped
+
+            # 3 parallel workers (same as stage3_5)
+            with ThreadPoolExecutor(max_workers=3) as executor:
+                futures = {}
+                for si, lang in work_units:
+                    future = executor.submit(do_translate, si, lang)
+                    futures[future] = f"{section_data[si][0]}→{lang}"
+
+                for future in as_completed(futures):
+                    task_name = futures[future]
                     try:
-                        processor = LLMProcessor()
-                        translated = processor.translate_batch(en_items, lang, fields)
-
-                        for i, en_item in enumerate(en_items):
-                            if i < len(translated) and translated[i]:
-                                mapped = {}
-                                for k, v in translated[i].items():
-                                    db_name = name_map.get(k, k)
-                                    mapped[db_name] = v
-                                en_item["_translations"][lang] = mapped
-
-                        logger.info(f"    {section_name} → {lang}: done")
+                        future.result()
+                        logger.info(f"    {task_name}: done")
                     except Exception as e:
-                        logger.warning(f"    {section_name} → {lang}: failed ({e})")
+                        logger.warning(f"    {task_name}: failed ({e})")
 
-                # Write back
-                for i, record in enumerate(to_translate):
+            # Write back to DB
+            period_total = 0
+            for section_name, records, en_items, _, _, _ in section_data:
+                for i, record in enumerate(records):
                     t = en_items[i].get("_translations")
                     if t:
                         record.translations = t
@@ -507,6 +549,47 @@ async def trigger_backfill_translations(
         "period_id": period_id or "all",
         "message": "Translation backfill started in background thread",
     }
+
+
+@router.post("/patch-translation")
+async def patch_translation(
+    table: str,
+    record_id: int,
+    lang: str,
+    translations_data: dict,
+    db: Session = Depends(get_db),
+    _: bool = Depends(verify_api_key),
+):
+    """
+    Manually patch a single record's translations for a specific language.
+
+    Body: JSON dict of field→value, e.g. {"title": "...", "summary": "..."}
+    """
+    from app.models import (
+        TechPost, PrimaryMarketPost, SecondaryMarketPost,
+        MAPost, TipPost, Video, Trend,
+    )
+
+    TABLE_MAP = {
+        "tech": TechPost, "video": Video, "tip": TipPost,
+        "primary_market": PrimaryMarketPost, "secondary_market": SecondaryMarketPost,
+        "ma": MAPost, "trend": Trend,
+    }
+
+    model_cls = TABLE_MAP.get(table)
+    if not model_cls:
+        raise HTTPException(status_code=400, detail=f"Unknown table: {table}")
+
+    record = db.query(model_cls).filter(model_cls.id == record_id).first()
+    if not record:
+        raise HTTPException(status_code=404, detail=f"Record {record_id} not found")
+
+    existing = dict(record.translations or {})
+    existing[lang] = translations_data
+    record.translations = existing
+    db.commit()
+
+    return {"status": "patched", "table": table, "id": record_id, "lang": lang}
 
 
 @router.get("/health")
