@@ -2,7 +2,7 @@
 
 [![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](../LICENSE)
 
-Bilingual (DE/EN) daily + weekly AI news aggregator with YouTube video integration.
+Multilingual (8 languages: DE/EN/ZH/FR/ES/PT/JA/KO) daily + weekly AI news aggregator with YouTube video integration.
 
 **Live**: https://www.datacubeai.space (no login required)
 
@@ -35,7 +35,7 @@ vercel --prod
 - 3 feed types: Tech, Investment, Tips — each with distinct visual identity
 - YouTube video integration
 - Daily + weekly collection modes (daily: 10 tech, 5 tips, 5 investment, 2 videos)
-- Bilingual content (DE/EN)
+- 8-language content (DE, EN, ZH, FR, ES, PT, JA, KO)
 - Dark/light theme
 - AI chat assistant
 - AI report generator (one-click streaming report with GFM table rendering, export as Word/HTML/Markdown/Text/JSON)

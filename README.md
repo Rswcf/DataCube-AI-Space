@@ -35,7 +35,7 @@ https://github.com/user-attachments/assets/9dddaaed-e473-4350-97de-0346cacb6660
 |---------|----------|
 | 500+ AI articles published daily — you read 3 | **22 sources scanned automatically**, top stories surface |
 | Scattered across Hacker News, Reddit, ArXiv, RSS | **One unified dashboard** with tech, investment, tips |
-| English-only or single-language tools | **Bilingual DE/EN** — every article in both languages |
+| English-only or single-language tools | **8 languages** (DE, EN, ZH, FR, ES, PT, JA, KO) — free-model translation |
 | Paid tools (Feedly AI $18/mo, etc.) | **Free & open source**, MIT licensed, self-hostable |
 | No actionable context | **AI Chat** to ask questions, **AI Reports** with one-click export |
 
@@ -51,7 +51,7 @@ https://github.com/user-attachments/assets/9dddaaed-e473-4350-97de-0346cacb6660
 | 🤖 | **AI Chat** | Ask questions about the current week's AI news |
 | 📊 | **AI Reports** | One-click streaming report — export to Word, HTML, Markdown, Text, JSON |
 | 📧 | **Newsletter** | Automated daily digest via Resend — one email per subscriber in their preferred language |
-| 🔍 | **SEO/GEO** | SSR pages, JSON-LD, Atom feed, llms.txt, sitemap |
+| 🔍 | **SEO/GEO** | SSR pages, JSON-LD, Atom feed (8 langs), Google News Sitemap, llms.txt, security headers |
 | ♿ | **Accessible** | WCAG-compliant: focus-visible, ARIA, reduced-motion, skip links |
 | 📱 | **Mobile-First** | Dynamic viewport, safe area insets, touch-optimized navigation |
 
@@ -214,12 +214,13 @@ DataCube-AI-Space/
 │   │   ├── api/report/          # AI report generator
 │   │   ├── api/subscribe/       # Newsletter signup (Beehiiv)
 │   │   ├── [lang]/week/         # SSR week pages (SEO)
-│   │   └── feed.xml/            # Atom 1.0 feed
+│   │   ├── feed.xml/            # Atom 1.0 feed (8 languages)
+│   │   └── news-sitemap.xml/   # Google News Sitemap
 │   ├── components/              # React components
 │   │   ├── feeds/               # Tech, Investment, Tips feeds
 │   │   └── video-embed.tsx      # YouTube player
 │   ├── lib/                     # Utils, types, API client
-│   └── middleware.ts            # Crawler bypass + welcome gate
+│   └── middleware.ts            # Dynamic html lang + crawler bypass + welcome gate
 │
 ├── ai-hub-backend/              # Backend (FastAPI)
 │   ├── app/

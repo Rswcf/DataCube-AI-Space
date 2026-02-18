@@ -2,7 +2,7 @@
 
 [![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](../LICENSE)
 
-FastAPI backend for the AI Information Hub — bilingual daily + weekly AI news aggregator with YouTube video integration.
+FastAPI backend for the AI Information Hub — multilingual (8 languages) daily + weekly AI news aggregator with YouTube video integration.
 
 ## Features
 
@@ -23,7 +23,7 @@ FastAPI backend for the AI Information Hub — bilingual daily + weekly AI news 
 | Purpose | Model | Notes |
 |---------|-------|-------|
 | **Classification** | `z-ai/glm-4.5-air:free` | Free tier, classifies tech/investment |
-| **Content Processing** | `deepseek/deepseek-v3.2` | Generates bilingual content (DE/EN) |
+| **Content Processing** | `deepseek/deepseek-v3.2` | Generates bilingual content (DE/EN), translated to 6 more via free chain |
 | **Translation** | Free model chain (6 models) | Translates EN → ZH, FR, ES, PT, JA, KO at zero cost |
 
 ## Data Collection Pipeline (Overview)
@@ -316,7 +316,7 @@ This section provides a comprehensive overview of the entire data flow from sour
 | Stage 1 (Fetch) | RSS ~150 + HN ~50 + YouTube ~10 | ~210 raw items |
 | Stage 1 (Filter) | ~210 items | ~100 articles + 10 videos |
 | Stage 2 (Classify) | ~100 articles | tech ~20 + investment ~80 + tips ~10 |
-| Stage 3 (Process) | Classified articles | tech 30 + investment 21 + tips 15 + videos 5 (bilingual) |
+| Stage 3 (Process) | Classified articles | tech 30 + investment 21 + tips 15 + videos 5 (DE/EN, translated to 6 more) |
 | Stage 4 (Save) | Processed content | 71 database records total |
 
 ### Data Volume Summary (Daily)
