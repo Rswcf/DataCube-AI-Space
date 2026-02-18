@@ -6,12 +6,23 @@ const openrouter = createOpenAI({
   apiKey: process.env.OPENROUTER_API_KEY,
 });
 
+const LANGUAGE_NAMES: Record<string, string> = {
+  de: "German",
+  en: "English",
+  zh: "Chinese",
+  fr: "French",
+  es: "Spanish",
+  pt: "Portuguese",
+  ja: "Japanese",
+  ko: "Korean",
+};
+
 function condenseWeekData(
   tech: any,
   investment: any,
   tips: any,
   trends: any,
-  lang: "de" | "en"
+  lang: string
 ): string {
   const lines: string[] = [];
 
@@ -115,8 +126,8 @@ export async function POST(req: Request) {
       return new Response("Missing or invalid weekId", { status: 400 });
     }
 
-    const lang: "de" | "en" =
-      language === "en" ? "en" : "de";
+    const lang: string =
+      typeof language === "string" && language in LANGUAGE_NAMES ? language : "en";
 
     const { tech, investment, tips, trends } = await fetchPeriodData(weekId);
     const context = condenseWeekData(tech, investment, tips, trends, lang);
@@ -125,7 +136,7 @@ export async function POST(req: Request) {
       return new Response("No data available for this period", { status: 404 });
     }
 
-    const systemPrompt = `You are a senior AI industry analyst writing a comprehensive weekly briefing report. Write in ${lang === "de" ? "German" : "English"}.
+    const systemPrompt = `You are a senior AI industry analyst writing a comprehensive weekly briefing report. Write in ${LANGUAGE_NAMES[lang] || "English"}.
 
 Generate a well-structured Markdown report based on the provided data. Use the following sections:
 

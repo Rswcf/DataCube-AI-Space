@@ -14,7 +14,7 @@ interface ReportGeneratorProps {
 }
 
 /** Convert markdown to styled HTML document */
-function markdownToHtml(md: string, title: string): string {
+function markdownToHtml(md: string, title: string, lang: string = "en"): string {
   const lines = md.split('\n');
   const output: string[] = [];
   let inList = false;
@@ -72,7 +72,7 @@ function markdownToHtml(md: string, title: string): string {
   if (inTable) output.push('</table>');
 
   return `<!DOCTYPE html>
-<html lang="en">
+<html lang="${lang}">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -279,7 +279,7 @@ export function ReportGenerator({ weekId }: ReportGeneratorProps) {
   };
 
   const exportHtml = () => {
-    const html = markdownToHtml(reportContent, reportTitle);
+    const html = markdownToHtml(reportContent, reportTitle, language);
     downloadFile(html, `ai-report-${weekId}-${language}.html`, "text/html");
     setShowExportMenu(false);
   };

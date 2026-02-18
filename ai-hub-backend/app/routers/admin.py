@@ -5,6 +5,7 @@ Admin endpoints for triggering data collection.
 import logging
 from fastapi import APIRouter, Depends, HTTPException, Header, BackgroundTasks
 from sqlalchemy.orm import Session
+from sqlalchemy.orm.attributes import flag_modified
 from typing import Optional
 
 from app.database import get_db, get_session_local
@@ -590,6 +591,44 @@ async def patch_translation(
     db.commit()
 
     return {"status": "patched", "table": table, "id": record_id, "lang": lang}
+
+
+@router.post("/delete-translation")
+async def delete_translation(
+    table: str,
+    record_id: int,
+    lang: str,
+    db: Session = Depends(get_db),
+    _: bool = Depends(verify_api_key),
+):
+    """Remove a specific language key from a record's translations JSONB."""
+    from app.models import (
+        TechPost, PrimaryMarketPost, SecondaryMarketPost,
+        MAPost, TipPost, Video, Trend,
+    )
+
+    TABLE_MAP = {
+        "tech": TechPost, "video": Video, "tip": TipPost,
+        "primary_market": PrimaryMarketPost, "secondary_market": SecondaryMarketPost,
+        "ma": MAPost, "trend": Trend,
+    }
+
+    model_cls = TABLE_MAP.get(table)
+    if not model_cls:
+        raise HTTPException(status_code=400, detail=f"Unknown table: {table}")
+
+    record = db.query(model_cls).filter(model_cls.id == record_id).first()
+    if not record:
+        raise HTTPException(status_code=404, detail=f"Record {record_id} not found")
+
+    existing = dict(record.translations or {})
+    if lang in existing:
+        del existing[lang]
+        record.translations = existing
+        flag_modified(record, "translations")
+        db.commit()
+        return {"status": "deleted", "table": table, "id": record_id, "lang": lang}
+    return {"status": "not_found", "table": table, "id": record_id, "lang": lang}
 
 
 @router.get("/health")

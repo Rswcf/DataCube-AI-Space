@@ -13,6 +13,17 @@ const openrouter = createOpenAI({
 // SEC-H3: Allowed message roles - filter out any other roles (e.g., "system")
 const ALLOWED_ROLES = new Set(["user", "assistant"]);
 
+const LANGUAGE_NAMES: Record<string, string> = {
+  de: "German",
+  en: "English",
+  zh: "Chinese",
+  fr: "French",
+  es: "Spanish",
+  pt: "Portuguese",
+  ja: "Japanese",
+  ko: "Korean",
+};
+
 export async function POST(req: Request) {
   try {
     const { messages, weekContext, language } = await req.json();
@@ -30,7 +41,7 @@ OFF-TOPIC:
 STYLE:
 - Be concise: 2-3 short paragraphs max, never exceed 300 words.
 - Cite specific news items from the context when relevant.
-- Respond in ${language === "de" ? "German" : "English"}.
+- Respond in ${LANGUAGE_NAMES[language] || "English"}.
 
 CONTEXT — This week's AI data:
 ${weekContext || "No data available for this week."}`;
