@@ -102,6 +102,8 @@ export async function GET(request: NextRequest) {
     });
   }
 
+  const generatedTimestamp = new Date().toISOString();
+
   const [techRes, investmentRes, tipsRes] = await Promise.all([
     fetch(`${API_BASE}/tech/${periodId}`, { next: { revalidate: 3600 } }).catch(() => null),
     fetch(`${API_BASE}/investment/${periodId}`, { next: { revalidate: 3600 } }).catch(() => null),
@@ -113,98 +115,140 @@ export async function GET(request: NextRequest) {
   const tipsData = tipsRes?.ok ? await tipsRes.json() : null;
 
   const isDayId = /^\d{4}-\d{2}-\d{2}$/.test(periodId);
-  let title: string;
+  let periodLabel: string;
   if (isDayId) {
     const [y, m, d] = periodId.split('-').map(Number);
-    const deLabel = `${String(d).padStart(2, '0')}.${String(m).padStart(2, '0')}.${y}`;
     const enLabel = new Date(Date.UTC(y, m - 1, d)).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
-    title = lang === 'de'
-      ? `Data Cube AI - KI-News ${deLabel}`
-      : `Data Cube AI - AI News ${enLabel}`;
+    periodLabel = lang === 'de'
+      ? `${String(d).padStart(2, '0')}.${String(m).padStart(2, '0')}.${y}`
+      : enLabel;
   } else {
     const weekLabel = periodId.replace(/^\d{4}-kw/, 'KW ');
-    title = lang === 'de'
-      ? `Data Cube AI - KI-News ${weekLabel}`
-      : `Data Cube AI - AI News Week ${weekLabel.replace('KW ', '')}`;
+    periodLabel = lang === 'de'
+      ? weekLabel
+      : `Week ${weekLabel.replace('KW ', '')}`;
   }
 
-  let md = `# ${title}\n\n`;
+  const title = lang === 'de'
+    ? `Data Cube AI - KI-News ${periodLabel}`
+    : `Data Cube AI - AI News ${periodLabel}`;
 
+  // --- Pre-compute all filtered data for statistics and content ---
+
+  const techPosts: TechPost[] = techData?.[lang]
+    ? (techData[lang] || []).filter((post: TechPost) =>
+        matchTopic([post.content, post.category, post.source], topic)
+      )
+    : [];
+  const techArticles = techPosts.filter((p) => !p.isVideo);
+  const techVideos = techPosts.filter((p) => p.isVideo);
+  const techCategories = new Set(techArticles.map((p) => p.category).filter(Boolean));
+
+  const pmPosts: PrimaryMarketPost[] = (investmentData?.primaryMarket?.[lang] || []).filter((post: PrimaryMarketPost) =>
+    matchTopic([post.company, post.round, post.content], topic)
+  );
+  const smPosts: SecondaryMarketPost[] = (investmentData?.secondaryMarket?.[lang] || []).filter((post: SecondaryMarketPost) =>
+    matchTopic([post.ticker, post.content], topic)
+  );
+  const maPosts: MAPost[] = (investmentData?.ma?.[lang] || []).filter((post: MAPost) =>
+    matchTopic([post.acquirer, post.target, post.dealType, post.content], topic)
+  );
+
+  const tipsPosts: TipPost[] = (tipsData?.[lang] || []).filter((tip: TipPost) =>
+    matchTopic([tip.content, tip.category, tip.tip], topic)
+  );
+
+  // --- Build funding summary ---
+  let fundingSummary = `${pmPosts.length} rounds`;
+  if (pmPosts.length > 0) {
+    const amounts = pmPosts
+      .map((p) => p.amount)
+      .filter((a) => a && a !== '-' && a !== 'N/A' && a !== 'n/a');
+    if (amounts.length > 0) {
+      fundingSummary += ` (${amounts.join(', ')})`;
+    }
+  }
+
+  // --- Structured metadata header (YAML frontmatter) ---
+  let md = `---\ntitle: "Data Cube AI - AI News ${periodLabel}"\nlanguage: ${lang}\nperiod: ${periodId}\ngenerated: ${generatedTimestamp}\nsource: https://www.datacubeai.space\nlicense: CC BY 4.0\n---\n\n`;
+
+  md += `# ${title}\n\n`;
+
+  // --- Summary Statistics ---
+  if (section === 'all') {
+    md += `## Summary Statistics\n`;
+    md += `- **Tech articles**: ${techArticles.length} posts covering ${techCategories.size} categories\n`;
+    md += `- **Funding rounds**: ${fundingSummary}\n`;
+    md += `- **Stock movements**: ${smPosts.length} tickers tracked\n`;
+    md += `- **M&A deals**: ${maPosts.length} deals\n`;
+    md += `- **Tips**: ${tipsPosts.length} practical tips\n`;
+    md += `- **Videos**: ${techVideos.length} curated videos\n`;
+    md += `- **Period**: ${periodId}\n`;
+    md += `- **Last updated**: ${generatedTimestamp}\n`;
+    md += '\n';
+  }
+
+  // --- Tech section ---
   if ((section === 'all' || section === 'tech') && techData?.[lang]) {
-    const posts: TechPost[] = (techData[lang] || []).filter((post: TechPost) =>
-      matchTopic([post.content, post.category, post.source], topic)
-    );
-
-    const articles = posts.filter((p) => !p.isVideo);
-    const videos = posts.filter((p) => p.isVideo);
-
-    if (articles.length > 0) {
+    if (techArticles.length > 0) {
       md += lang === 'de' ? `## Technologie\n\n` : `## Technology\n\n`;
-      for (const post of articles) {
+      for (const post of techArticles) {
         md += `### ${post.category} (${post.impact})\n`;
-        md += `${post.content}\n`;
-        if (post.sourceUrl) md += `Source: [${post.source}](${post.sourceUrl})\n`;
+        if (post.sourceUrl) {
+          md += `${post.content} ([Source: ${post.source}](${post.sourceUrl}))\n`;
+        } else {
+          md += `${post.content}\n`;
+        }
         md += '\n';
       }
     }
 
-    if (videos.length > 0) {
+    if (techVideos.length > 0) {
       md += `## Videos\n\n`;
-      for (const v of videos) {
+      for (const v of techVideos) {
         md += `- [${v.content.slice(0, 100)}](https://youtube.com/watch?v=${v.videoId})\n`;
       }
       md += '\n';
     }
   }
 
+  // --- Investment section ---
   if (section === 'all' || section === 'investment') {
     md += `## Investment\n\n`;
 
-    const pm: PrimaryMarketPost[] = (investmentData?.primaryMarket?.[lang] || []).filter((post: PrimaryMarketPost) =>
-      matchTopic([post.company, post.round, post.content], topic)
-    );
-    if (pm.length > 0) {
+    if (pmPosts.length > 0) {
       md += `### Primary Market\n\n`;
       md += `| Company | Amount | Round |\n|---------|--------|-------|\n`;
-      for (const p of pm) {
+      for (const p of pmPosts) {
         md += `| ${p.company} | ${p.amount} | ${p.round} |\n`;
       }
       md += '\n';
     }
 
-    const sm: SecondaryMarketPost[] = (investmentData?.secondaryMarket?.[lang] || []).filter((post: SecondaryMarketPost) =>
-      matchTopic([post.ticker, post.content], topic)
-    );
-    if (sm.length > 0) {
+    if (smPosts.length > 0) {
       md += `### Secondary Market\n\n`;
       md += `| Ticker | Price | Change |\n|--------|-------|--------|\n`;
-      for (const s of sm) {
+      for (const s of smPosts) {
         md += `| ${s.ticker} | ${s.price} | ${s.change} |\n`;
       }
       md += '\n';
     }
 
-    const ma: MAPost[] = (investmentData?.ma?.[lang] || []).filter((post: MAPost) =>
-      matchTopic([post.acquirer, post.target, post.dealType, post.content], topic)
-    );
-    if (ma.length > 0) {
+    if (maPosts.length > 0) {
       md += `### M&A\n\n`;
       md += `| Acquirer | Target | Value | Type |\n|----------|--------|-------|------|\n`;
-      for (const m of ma) {
+      for (const m of maPosts) {
         md += `| ${m.acquirer} | ${m.target} | ${m.dealValue} | ${m.dealType} |\n`;
       }
       md += '\n';
     }
   }
 
+  // --- Tips section ---
   if (section === 'all' || section === 'tips') {
-    const tips: TipPost[] = (tipsData?.[lang] || []).filter((tip: TipPost) =>
-      matchTopic([tip.content, tip.category, tip.tip], topic)
-    );
-
-    if (tips.length > 0) {
+    if (tipsPosts.length > 0) {
       md += `## Tips\n\n`;
-      for (const t of tips) {
+      for (const t of tipsPosts) {
         md += `### ${t.category}\n`;
         md += `${t.content}\n\n`;
         if (t.tip) {
@@ -215,13 +259,17 @@ export async function GET(request: NextRequest) {
     }
   }
 
+  // --- Enhanced footer ---
   const permalinkParams = new URLSearchParams({ lang, periodId });
   if (section !== 'all') permalinkParams.set('section', section);
   if (topic) permalinkParams.set('topic', topic);
 
   md += `---\n\n`;
-  md += `Canonical summary URL: https://www.datacubeai.space/api/content-summary?${permalinkParams.toString()}\n\n`;
-  md += `*Updated daily. Visit [Data Cube AI](https://www.datacubeai.space) for the interactive version.*\n`;
+  md += `## About Data Cube AI\n`;
+  md += `Data Cube AI is a multilingual (8 languages) daily AI news aggregator curating content from 40+ sources including RSS feeds, Hacker News, YouTube, and Reddit communities. Content is AI-assisted and updated daily at 22:00 UTC.\n\n`;
+  md += `Source: [Data Cube AI](https://www.datacubeai.space) | [Editorial Standards](https://www.datacubeai.space/about) | [API Documentation](https://www.datacubeai.space/llms.txt)\n\n`;
+  md += `Canonical URL: https://www.datacubeai.space/api/content-summary?${permalinkParams.toString()}\n\n`;
+  md += `*Citation: Data Cube AI (datacubeai.space), ${periodId}*\n`;
 
   return new Response(md, {
     headers: {

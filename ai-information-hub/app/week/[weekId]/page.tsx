@@ -176,6 +176,12 @@ export default async function WeekPage({ params, searchParams }: Props) {
       {/* Tech Section */}
       <section className="mb-10">
         <h2 className="text-2xl font-semibold mb-4">{lang === 'de' ? 'Was sind die wichtigsten KI-Durchbrüche?' : 'What are the top AI breakthroughs?'}</h2>
+        <p className="mb-4 text-gray-700 leading-relaxed">
+          {lang === 'de'
+            ? `Diese ${periodLabel} umfasst ${nonVideoTechPosts.length} kuratierte KI-Nachrichten aus Technologie, Forschung und Produktentwicklung.`
+            : `This ${periodLabel} covers ${nonVideoTechPosts.length} curated AI news items spanning technology, research, and product developments.`}
+          {nonVideoTechPosts.length > 0 && ` ${nonVideoTechPosts[0].content.slice(0, 120)}...`}
+        </p>
         {nonVideoTechPosts.length === 0 ? (
           <p className="text-gray-600">No technology posts available.</p>
         ) : (
@@ -234,6 +240,11 @@ export default async function WeekPage({ params, searchParams }: Props) {
       {/* Video Section */}
       <section className="mb-10">
         <h2 className="text-2xl font-semibold mb-4">{lang === 'de' ? 'Top KI-Videos' : 'Top AI Videos'}</h2>
+        <p className="mb-4 text-gray-700 leading-relaxed">
+          {lang === 'de'
+            ? `${videoTechPosts.length} kuratierte YouTube-Videos über KI-Entwicklungen.`
+            : `${videoTechPosts.length} curated YouTube videos about AI developments.`}
+        </p>
         {videoTechPosts.length === 0 ? (
           <p className="text-gray-600">No video posts available.</p>
         ) : (
@@ -271,6 +282,11 @@ export default async function WeekPage({ params, searchParams }: Props) {
       {/* Investment Section */}
       <section className="mb-10">
         <h2 className="text-2xl font-semibold mb-4">{lang === 'de' ? 'Was sind die neuesten KI-Investment-Signale?' : 'What are the latest AI investment signals?'}</h2>
+        <p className="mb-4 text-gray-700 leading-relaxed">
+          {lang === 'de'
+            ? `Aktuelle KI-Investment-Signale: ${primaryMarket.length} Finanzierungsrunden, ${secondaryMarket.length} Aktienbewegungen und ${maDeals.length} M&A-Transaktionen.`
+            : `Latest AI investment signals: ${primaryMarket.length} funding rounds, ${secondaryMarket.length} stock movements, and ${maDeals.length} M&A transactions.`}
+        </p>
 
         <h3 className="text-xl font-semibold mb-2">Primary Market</h3>
         {primaryMarket.length === 0 ? (
@@ -358,6 +374,12 @@ export default async function WeekPage({ params, searchParams }: Props) {
       {/* Tips Section */}
       <section className="mb-10">
         <h2 className="text-2xl font-semibold mb-4">{lang === 'de' ? 'Welche praktischen KI-Tipps gibt es diese Woche?' : 'What are practical AI tips this week?'}</h2>
+        <p className="mb-4 text-gray-700 leading-relaxed">
+          {lang === 'de'
+            ? `${tips.length} praktische KI-Tipps aus Reddit-Communities und Experten-Blogs.`
+            : `${tips.length} practical AI tips curated from Reddit communities and expert blogs.`}
+          {tips.length > 0 && ` ${(tips[0] as any).content?.slice(0, 100)}...`}
+        </p>
         {tips.length === 0 ? (
           <p className="text-gray-600">No tips available.</p>
         ) : (
