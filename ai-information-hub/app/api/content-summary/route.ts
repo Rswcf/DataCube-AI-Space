@@ -62,7 +62,10 @@ function matchTopic(fields: Array<string | undefined>, topic: string): boolean {
 }
 
 export async function GET(request: NextRequest) {
-  const lang = request.nextUrl.searchParams.get('lang') === 'en' ? 'en' : 'de';
+  const SUPPORTED_LANGS = ['de', 'en', 'zh', 'fr', 'es', 'pt', 'ja', 'ko'] as const;
+  type Lang = typeof SUPPORTED_LANGS[number];
+  const rawLang = request.nextUrl.searchParams.get('lang') || 'de';
+  const lang: Lang = SUPPORTED_LANGS.includes(rawLang as Lang) ? (rawLang as Lang) : 'de';
   const requestedPeriodId = request.nextUrl.searchParams.get('periodId')?.trim() || '';
   const section = parseSection(request.nextUrl.searchParams.get('section'));
   const topic = (request.nextUrl.searchParams.get('topic') || '').trim().toLowerCase();

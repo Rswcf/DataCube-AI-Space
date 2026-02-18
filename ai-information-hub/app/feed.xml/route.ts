@@ -29,7 +29,10 @@ function escapeXml(str: string): string {
 }
 
 export async function GET(request: NextRequest) {
-  const lang = request.nextUrl.searchParams.get('lang') === 'en' ? 'en' : 'de';
+  const SUPPORTED_LANGS = ['de', 'en', 'zh', 'fr', 'es', 'pt', 'ja', 'ko'] as const;
+  type Lang = typeof SUPPORTED_LANGS[number];
+  const rawLang = request.nextUrl.searchParams.get('lang') || 'de';
+  const lang: Lang = SUPPORTED_LANGS.includes(rawLang as Lang) ? (rawLang as Lang) : 'de';
 
   // Fetch weeks to get the latest 7 periods
   let weekIds: string[] = [];

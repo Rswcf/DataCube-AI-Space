@@ -7,7 +7,7 @@ export function OrganizationSchema() {
     name: 'Data Cube AI',
     url: 'https://www.datacubeai.space',
     logo: 'https://www.datacubeai.space/icon.svg',
-    description: 'Bilingual AI news aggregator providing daily tech, investment, and tips content.',
+    description: 'Multilingual AI news aggregator providing daily tech, investment, and tips content in 8 languages.',
     foundingDate: '2026-01',
     publishingPrinciples: 'https://www.datacubeai.space/impressum',
     sameAs: [],
@@ -27,7 +27,7 @@ export function WebsiteSchema() {
     '@type': 'WebSite',
     name: 'Data Cube AI',
     url: 'https://www.datacubeai.space',
-    inLanguage: ['en', 'de'],
+    inLanguage: ['de', 'en', 'zh', 'fr', 'es', 'pt', 'ja', 'ko'],
     description: 'Daily AI news aggregator with tech breakthroughs, investment news, and practical tips.',
     potentialAction: {
       '@type': 'SearchAction',
@@ -116,7 +116,7 @@ export function FAQSchema() {
         name: 'What is Data Cube AI?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Data Cube AI is a bilingual (German/English) daily AI news aggregator that curates tech breakthroughs, investment news, practical tips, and YouTube videos from RSS feeds, Hacker News, and YouTube.',
+          text: 'Data Cube AI is a multilingual (8 languages: DE, EN, ZH, FR, ES, PT, JA, KO) daily AI news aggregator that curates tech breakthroughs, investment news, practical tips, and YouTube videos from RSS feeds, Hacker News, and YouTube.',
         },
       },
       {
@@ -132,7 +132,7 @@ export function FAQSchema() {
         name: 'What languages does Data Cube AI support?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Data Cube AI supports both German (DE) and English (EN). Users can switch between languages using the language toggle.',
+          text: 'Data Cube AI supports 8 languages: German (DE), English (EN), Chinese (ZH), French (FR), Spanish (ES), Portuguese (PT), Japanese (JA), and Korean (KO). Users can switch between languages using the language selector.',
         },
       },
       {

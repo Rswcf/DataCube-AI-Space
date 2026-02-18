@@ -83,6 +83,17 @@ function isSeoAlwaysAllowedPath(pathname: string): boolean {
   )
 }
 
+function nextWithLang(request: NextRequest): NextResponse {
+  const { pathname } = request.nextUrl
+  const segments = pathname.split('/')
+  const langSegment = segments[1]
+  const lang = isSupportedLanguage(langSegment) ? langSegment : 'de'
+
+  const requestHeaders = new Headers(request.headers)
+  requestHeaders.set('x-lang', lang)
+  return NextResponse.next({ request: { headers: requestHeaders } })
+}
+
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
@@ -93,7 +104,7 @@ export function middleware(request: NextRequest) {
     pathname.startsWith('/_next') ||
     pathname.includes('.')
   ) {
-    return NextResponse.next()
+    return nextWithLang(request)
   }
 
   // Keep login for normal browsers, but let crawlers/automation reach SEO paths.
@@ -132,7 +143,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL(target, request.url), 308)
   }
 
-  return NextResponse.next()
+  return nextWithLang(request)
 }
 
 export const config = {

@@ -1,6 +1,11 @@
 User-agent: *
 Allow: /
 
+# Block API routes (except content-summary) and login page
+Disallow: /api/
+Allow: /api/content-summary
+Disallow: /login
+
 # LLM content description
 # https://www.datacubeai.space/llms.txt
 
@@ -29,3 +34,4 @@ Allow: /
 
 # Sitemap
 Sitemap: https://www.datacubeai.space/sitemap.xml
+Sitemap: https://www.datacubeai.space/news-sitemap.xml

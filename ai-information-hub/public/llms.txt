@@ -1,13 +1,13 @@
 # Data Cube AI
 
-> Bilingual (German/English) daily AI news aggregator curating tech breakthroughs,
+> Multilingual (DE, EN, ZH, FR, ES, PT, JA, KO) daily AI news aggregator curating tech breakthroughs,
 > investment news, practical tips, and YouTube videos from 40+ sources.
 
 ## Content Sections
 
 ### Technology Feed
 Daily curated AI technology news (10-25 posts per day). Each post includes
-impact level, category, source attribution, and bilingual content.
+impact level, category, source attribution, and multilingual content (8 languages).
 
 ### Investment Feed
 - Primary Market: VC funding rounds
@@ -25,9 +25,9 @@ Practical AI tips from Reddit communities and expert blogs.
 Base URL: https://api-production-3ee5.up.railway.app/api
 
 - GET /api/weeks — List all available periods (weeks and days)
-- GET /api/tech/{periodId} — Technology feed (bilingual JSON)
-- GET /api/investment/{periodId} — Investment feed (bilingual JSON)
-- GET /api/tips/{periodId} — Tips feed (bilingual JSON)
+- GET /api/tech/{periodId} — Technology feed (multilingual JSON, 8 languages)
+- GET /api/investment/{periodId} — Investment feed (multilingual JSON, 8 languages)
+- GET /api/tips/{periodId} — Tips feed (multilingual JSON, 8 languages)
 - GET /api/videos/{periodId} — Video summaries
 
 Period ID format: YYYY-kwWW (weekly) or YYYY-MM-DD (daily)
@@ -37,7 +37,7 @@ Each period has a dedicated page at /week/{periodId} with full HTML content.
 Example: https://www.datacubeai.space/week/2026-kw06
 
 ## Languages
-German (de) — default | English (en)
+German (de) — default | English (en) | Chinese (zh) | French (fr) | Spanish (es) | Portuguese (pt) | Japanese (ja) | Korean (ko)
 
 ## Authority
 Published daily since January 2026, curating 40+ sources including
@@ -53,6 +53,9 @@ Data Cube AI (datacubeai.space)
 For structured AI-consumable content, use the Markdown summary API:
 GET https://www.datacubeai.space/api/content-summary?lang=en
 GET https://www.datacubeai.space/api/content-summary?lang=de
+GET https://www.datacubeai.space/api/content-summary?lang=zh
+GET https://www.datacubeai.space/api/content-summary?lang=fr
+GET https://www.datacubeai.space/api/content-summary?lang=ja
 GET https://www.datacubeai.space/api/content-summary?lang=en&periodId=2026-kw06
 GET https://www.datacubeai.space/api/content-summary?lang=en&periodId=2026-kw06&section=tech
 GET https://www.datacubeai.space/api/content-summary?lang=en&periodId=2026-kw06&section=investment&topic=nvidia

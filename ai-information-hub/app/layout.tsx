@@ -1,5 +1,6 @@
 import React from "react"
 import type { Metadata } from 'next'
+import { headers } from 'next/headers'
 import { Geist, Geist_Mono, Newsreader } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { SettingsProvider } from '@/lib/settings-context'
@@ -16,7 +17,7 @@ export const metadata: Metadata = {
     default: 'Data Cube AI | Daily AI News & Insights',
     template: '%s | Data Cube AI',
   },
-  description: 'Bilingual (DE/EN) daily AI news aggregator. Tech breakthroughs, investment news, practical tips, and curated YouTube videos.',
+  description: 'Multilingual daily AI news aggregator. Tech breakthroughs, investment news, practical tips, and curated YouTube videos — in 8 languages.',
   keywords: ['AI news', 'artificial intelligence', 'machine learning', 'AI investment', 'AI tips', 'KI Nachrichten', 'daily AI digest', 'AI trends', 'tech news'],
   authors: [{ name: 'Data Cube Team' }],
   creator: 'Data Cube AI',
@@ -44,11 +45,11 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    alternateLocale: 'de_DE',
+    alternateLocale: ['de_DE', 'zh_CN', 'fr_FR', 'es_ES', 'pt_BR', 'ja_JP', 'ko_KR'],
     url: 'https://www.datacubeai.space',
     siteName: 'Data Cube AI',
     title: 'Data Cube AI | Daily AI News & Insights',
-    description: 'Curated AI news, investment updates, and practical tips - updated daily in German and English.',
+    description: 'Curated AI news, investment updates, and practical tips - updated daily in 8 languages.',
     images: [
       {
         url: '/og-image.jpg',
@@ -88,12 +89,18 @@ export const metadata: Metadata = {
     },
   },
 
-  // Alternates for bilingual
+  // Alternates for multilingual
   alternates: {
     canonical: 'https://www.datacubeai.space',
     languages: {
-      'en': 'https://www.datacubeai.space/en',
       'de': 'https://www.datacubeai.space/de',
+      'en': 'https://www.datacubeai.space/en',
+      'zh': 'https://www.datacubeai.space/zh',
+      'fr': 'https://www.datacubeai.space/fr',
+      'es': 'https://www.datacubeai.space/es',
+      'pt': 'https://www.datacubeai.space/pt',
+      'ja': 'https://www.datacubeai.space/ja',
+      'ko': 'https://www.datacubeai.space/ko',
       'x-default': 'https://www.datacubeai.space',
     },
   },
@@ -108,13 +115,16 @@ export const viewport = {
   viewportFit: 'cover' as const,
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const headersList = await headers()
+  const lang = headersList.get('x-lang') || 'de'
+
   return (
-    <html lang="de" suppressHydrationWarning>
+    <html lang={lang} suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://api-production-3ee5.up.railway.app" />
         <link rel="preconnect" href="https://img.youtube.com" />
@@ -122,8 +132,9 @@ export default function RootLayout({
         <OrganizationSchema />
         <WebsiteSchema />
         <FAQSchema />
-        <link rel="alternate" type="application/atom+xml" title="Data Cube AI (DE)" href="/feed.xml?lang=de" />
-        <link rel="alternate" type="application/atom+xml" title="Data Cube AI (EN)" href="/feed.xml?lang=en" />
+        {['de', 'en', 'zh', 'fr', 'es', 'pt', 'ja', 'ko'].map((l) => (
+          <link key={l} rel="alternate" type="application/atom+xml" title={`Data Cube AI (${l.toUpperCase()})`} href={`/feed.xml?lang=${l}`} />
+        ))}
       </head>
       <body className={`${geist.variable} ${geistMono.variable} ${newsreader.variable} font-sans antialiased`}>
         <a

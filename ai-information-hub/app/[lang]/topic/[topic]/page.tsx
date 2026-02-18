@@ -252,11 +252,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   const section = parseSection(query.section)
   const period = isValidPeriodId(query.period) ? query.period : ''
 
-  const canonicalParams = new URLSearchParams()
-  if (section !== 'all') canonicalParams.set('section', section)
-  if (period) canonicalParams.set('period', period)
-  const canonicalQuery = canonicalParams.toString()
-  const canonicalUrl = canonicalQuery ? `${localizedUrl}?${canonicalQuery}` : localizedUrl
+  const canonicalUrl = localizedUrl
 
   return {
     title: lang === 'de' ? `${topicTitle} KI-News` : `${topicTitle} AI News`,

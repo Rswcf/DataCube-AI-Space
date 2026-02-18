@@ -125,20 +125,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const deSlugs = Array.from(deTopicSet).slice(0, 30)
   const enSlugs = Array.from(enTopicSet).slice(0, 30)
 
-  const topicEntries = [
-    ...deSlugs.map((topic) => ({
-      url: `${baseUrl}/de/topic/${topic}`,
+  const topicEntries = SUPPORTED_LANGUAGES.flatMap((lang) => {
+    const slugs = lang === 'de' ? deSlugs : enSlugs
+    return slugs.map((topic) => ({
+      url: `${baseUrl}/${lang}/topic/${topic}`,
       lastModified: new Date(),
       changeFrequency: 'weekly' as const,
       priority: 0.5,
-    })),
-    ...enSlugs.map((topic) => ({
-      url: `${baseUrl}/en/topic/${topic}`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly' as const,
-      priority: 0.5,
-    })),
-  ]
+    }))
+  })
 
   const homePriority: Record<string, number> = { de: 0.9, en: 0.9 }
   const homeDefault = 0.7
