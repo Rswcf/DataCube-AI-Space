@@ -14,7 +14,7 @@ FastAPI backend for the AI Information Hub — bilingual daily + weekly AI news 
 - 4-stage data collection pipeline
 - Two-model LLM approach (classifier + processor)
 - Tips sources bypass classification (Reddit, Simon Willison)
-- Bilingual content support (DE/EN)
+- **8-language support** (DE, EN, ZH, FR, ES, PT, JA, KO) with resilient free-model translation pipeline
 - Period ID support: daily `YYYY-MM-DD` or weekly `YYYY-kwWW`
 - **Automated newsletter** via Resend + Beehiiv with per-subscriber language preference
 
@@ -23,7 +23,8 @@ FastAPI backend for the AI Information Hub — bilingual daily + weekly AI news 
 | Purpose | Model | Notes |
 |---------|-------|-------|
 | **Classification** | `z-ai/glm-4.5-air:free` | Free tier, classifies tech/investment |
-| **Content Processing** | `deepseek/deepseek-v3.2` | Generates bilingual content |
+| **Content Processing** | `deepseek/deepseek-v3.2` | Generates bilingual content (DE/EN) |
+| **Translation** | Free model chain (6 models) | Translates EN → ZH, FR, ES, PT, JA, KO at zero cost |
 
 ## Data Collection Pipeline (Overview)
 
@@ -43,7 +44,12 @@ Stage 3: Parallel LLM processing
     • Tips: 15 per language (weekly) / 5 (daily)
     • Videos: 5 summaries (weekly) / 2 (daily)
     ↓
-Stage 4: Save to PostgreSQL
+Stage 3.5: Translate EN → 6 languages (free model chain)
+    • ZH, FR, ES, PT, JA, KO
+    • Resilient: JSON validation retries across 6-model chain
+    • Smaller batch fallback (size=3) on parse failure
+    ↓
+Stage 4: Save to PostgreSQL (translations in JSONB column)
 ```
 
 ---
@@ -746,7 +752,8 @@ ai-hub-backend/
 │       ├── rss_fetcher.py   # RSS feeds
 │       ├── hn_fetcher.py    # Hacker News
 │       ├── youtube_fetcher.py  # YouTube API
-│       ├── llm_processor.py # Two-model LLM
+│       ├── llm_processor.py # LLM processing + resilient translation (JSON validation + small-batch retry)
+│       ├── i18n_utils.py    # Language constants, get_field() helper
 │       ├── newsletter_sender.py # Resend + Beehiiv newsletter
 │       └── migrator.py      # JSON migration
 ├── alembic/                 # DB migrations

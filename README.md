@@ -4,7 +4,7 @@
 
 ### Your daily AI news, curated by AI.
 
-The open-source alternative to Feedly AI and Google News — a bilingual (DE/EN) AI news aggregator that curates tech breakthroughs, investment deals, practical tips, and YouTube videos through a 4-stage LLM pipeline.
+The open-source alternative to Feedly AI and Google News — a multilingual (8 languages) AI news aggregator that curates tech breakthroughs, investment deals, practical tips, and YouTube videos through a 4.5-stage LLM pipeline.
 
 [![GitHub stars](https://img.shields.io/github/stars/Rswcf/DataCube-AI-Space?style=social)](https://github.com/Rswcf/DataCube-AI-Space/stargazers)
 [![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
@@ -46,7 +46,7 @@ https://github.com/user-attachments/assets/9dddaaed-e473-4350-97de-0346cacb6660
 | 📡 | **Tech Feed** | AI/ML breakthroughs with embedded YouTube videos and impact ratings |
 | 💰 | **Investment Tracker** | Funding rounds, live stock prices (Polygon.io), M&A deals |
 | 💡 | **Practical Tips** | Curated from 14 Reddit communities and expert blogs |
-| 🌐 | **Bilingual** | Every article in both German and English |
+| 🌐 | **8 Languages** | DE, EN, ZH, FR, ES, PT, JA, KO — free-model translation pipeline |
 | 📅 | **Daily + Weekly** | Automated daily collection with weekly rollup views |
 | 🤖 | **AI Chat** | Ask questions about the current week's AI news |
 | 📊 | **AI Reports** | One-click streaming report — export to Word, HTML, Markdown, Text, JSON |
@@ -120,6 +120,7 @@ python -m scripts.weekly_collect --week 2026-kw06  # Specific week
 | **Backend** | FastAPI, SQLAlchemy, Alembic, PostgreSQL |
 | **LLM Classification** | GLM-4.5-Air (OpenRouter, free tier) |
 | **LLM Processing** | DeepSeek V3.2 (OpenRouter) |
+| **Translation** | Free model chain: 6 models (OpenRouter, zero cost) |
 | **Chat & Reports** | Aurora Alpha (OpenRouter) |
 | **Newsletter** | Resend (sending) + Beehiiv (subscribers) |
 | **Stock Data** | Polygon.io API |
@@ -135,6 +136,7 @@ The backend processes news through a 4-stage pipeline:
 | **1. Fetch** | Collect from RSS, Hacker News, YouTube; filter by period boundaries | ~210 raw items |
 | **2. Classify** | LLM classifies into tech/investment/tips (tips sources skip this) | Categorized pool |
 | **3. Process** | Parallel LLM processing: generate bilingual summaries, extract entities | 30 tech + 21 investment + 15 tips + 5 videos |
+| **3.5. Translate** | Translate EN → ZH, FR, ES, PT, JA, KO via free model chain (resilient: JSON validation + small-batch retry) | 6 extra languages per item |
 | **4. Save** | Store in PostgreSQL, intersperse videos into tech feed | Database records |
 
 Daily collections produce reduced counts (10 tech, 5 investment, 5 tips, 2 videos).
@@ -225,7 +227,7 @@ DataCube-AI-Space/
 │   │   ├── routers/             # API endpoints
 │   │   └── services/            # Business logic
 │   │       ├── collector.py     # 4-stage pipeline
-│   │       ├── llm_processor.py # Two-model LLM approach
+│   │       ├── llm_processor.py # LLM processing + resilient translation
 │   │       ├── youtube_fetcher.py
 │   │       └── newsletter_sender.py  # Resend + Beehiiv
 │   ├── alembic/                 # DB migrations
