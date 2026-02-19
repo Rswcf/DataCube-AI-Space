@@ -51,8 +51,9 @@ https://github.com/user-attachments/assets/9dddaaed-e473-4350-97de-0346cacb6660
 | 🤖 | **AI Chat** | Ask questions about the current week's AI news |
 | 📊 | **AI Reports** | One-click streaming report — export to Word, HTML, Markdown, Text, JSON |
 | 📧 | **Newsletter** | Automated daily digest via Resend — one email per subscriber in their preferred language |
-| 🔍 | **SEO/GEO** | SSR pages, JSON-LD, Atom feed (8 langs), Google News Sitemap, llms.txt, security headers |
+| 🔍 | **SEO/GEO** | SSR pages, JSON-LD, Atom feed (8 langs), Google News Sitemap, llms.txt, dynamic OG images, security headers |
 | ♿ | **Accessible** | WCAG-compliant: focus-visible, ARIA, reduced-motion, skip links |
+| 📝 | **Editorial Standards** | Transparent AI methodology, data sources, pipeline documentation |
 | 📱 | **Mobile-First** | Dynamic viewport, safe area insets, touch-optimized navigation |
 
 ## Architecture
@@ -62,16 +63,17 @@ Frontend (Vercel)                    Backend (Railway)
 ┌─────────────────────┐             ┌──────────────────────────────┐
 │  Next.js 16         │    REST     │  FastAPI + PostgreSQL        │
 │  React 19           │◄───────────►│                              │
-│  Tailwind CSS 4     │    API      │  4-Stage Pipeline:           │
-│  Shadcn/ui          │             │  1. Fetch (RSS, HN, YouTube) │
-│                     │             │  2. Classify (LLM)           │
-│  Pages:             │             │  3. Process (LLM, parallel)  │
-│  • Tech Feed        │             │  4. Save to PostgreSQL       │
-│  • Investment Feed  │             │                              │
-│  • Tips Feed        │             │  Data Sources:               │
-│  • AI Chat          │             │  • 22 RSS Feeds              │
-│  • AI Reports       │             │  • Hacker News (Algolia)     │
-│  • SSR Week Pages   │             │  • YouTube Data API v3       │
+│  Tailwind CSS 4     │    API      │  4.5-Stage Pipeline:          │
+│  Shadcn/ui          │             │  1. Fetch (RSS, HN, YouTube)  │
+│                     │             │  2. Classify (LLM)            │
+│  Pages:             │             │  3. Process (LLM, parallel)   │
+│  • Tech Feed        │             │  3.5 Translate (6 languages)  │
+│  • Investment Feed  │             │  4. Save to PostgreSQL        │
+│  • Tips Feed        │             │                              │
+│  • AI Chat          │             │  Data Sources:               │
+│  • AI Reports       │             │  • 22 RSS Feeds              │
+│  • SSR Week Pages   │             │  • Hacker News (Algolia)     │
+│                     │             │  • YouTube Data API v3       │
 └─────────────────────┘             └──────────────────────────────┘
 ```
 
@@ -213,13 +215,16 @@ DataCube-AI-Space/
 │   │   ├── api/chat/            # AI chat endpoint
 │   │   ├── api/report/          # AI report generator
 │   │   ├── api/subscribe/       # Newsletter signup (Beehiiv)
+│   │   ├── api/og/             # Dynamic OG images
 │   │   ├── [lang]/week/         # SSR week pages (SEO)
 │   │   ├── feed.xml/            # Atom 1.0 feed (8 languages)
+│   │   ├── about/              # Editorial standards
 │   │   └── news-sitemap.xml/   # Google News Sitemap
 │   ├── components/              # React components
 │   │   ├── feeds/               # Tech, Investment, Tips feeds
 │   │   └── video-embed.tsx      # YouTube player
 │   ├── lib/                     # Utils, types, API client
+│   ├── vercel.json              # Non-www → www redirect
 │   └── middleware.ts            # Dynamic html lang + crawler bypass + welcome gate
 │
 ├── ai-hub-backend/              # Backend (FastAPI)
