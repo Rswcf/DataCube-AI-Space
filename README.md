@@ -51,7 +51,7 @@ https://github.com/user-attachments/assets/9dddaaed-e473-4350-97de-0346cacb6660
 | 🤖 | **AI Chat** | Ask questions about the current week's AI news |
 | 📊 | **AI Reports** | One-click streaming report — export to Word, HTML, Markdown, Text, JSON |
 | 📧 | **Newsletter** | Two-step subscribe with 8-language selector — one email per subscriber in their preferred language |
-| 🔍 | **SEO/GEO** | SSR pages, JSON-LD, Atom feed (8 langs), Google News Sitemap, llms.txt, dynamic OG images, security headers |
+| 🔍 | **SEO/GEO** | SSR pages, JSON-LD, Atom feed (8 langs), Google News Sitemap, llms.txt, dynamic OG images, security headers, keyword-localized metadata in all 8 languages |
 | ♿ | **Accessible** | WCAG-compliant: focus-visible, ARIA, reduced-motion, skip links |
 | 📝 | **Editorial Standards** | Transparent AI methodology, data sources, pipeline documentation |
 | 📱 | **Mobile-First** | Dynamic viewport, safe area insets, touch-optimized navigation |

@@ -38,7 +38,8 @@ vercel --prod
 - Accessible UI (44px touch targets, focus-visible, aria-hidden, skip-to-content, prefers-reduced-motion, ARIA dialog on mobile drawers, body scroll lock, safe-area-inset support)
 - Editorial standards page (/about) with methodology, data sources, AI disclosure
 - Dynamic OG images per week page via @vercel/og (edge runtime)
-- FAQ structured data on topic pages
+- FAQ structured data on topic pages (localized in all 8 languages)
+- Keyword-optimized SEO: localized metadata, H1/H2/H3 headings, lead paragraphs, and breadcrumbs across all 8 languages
 - Login page supports all 8 languages with language selector row
 - Unsubscribe page (/unsubscribe) with instructions
 - Non-www → www permanent redirect via vercel.json
