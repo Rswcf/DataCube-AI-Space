@@ -50,7 +50,7 @@ https://github.com/user-attachments/assets/9dddaaed-e473-4350-97de-0346cacb6660
 | 📅 | **Daily + Weekly** | Automated daily collection with weekly rollup views |
 | 🤖 | **AI Chat** | Ask questions about the current week's AI news |
 | 📊 | **AI Reports** | One-click streaming report — export to Word, HTML, Markdown, Text, JSON |
-| 📧 | **Newsletter** | Automated daily digest via Resend — one email per subscriber in their preferred language |
+| 📧 | **Newsletter** | Two-step subscribe with 8-language selector — one email per subscriber in their preferred language |
 | 🔍 | **SEO/GEO** | SSR pages, JSON-LD, Atom feed (8 langs), Google News Sitemap, llms.txt, dynamic OG images, security headers |
 | ♿ | **Accessible** | WCAG-compliant: focus-visible, ARIA, reduced-motion, skip links |
 | 📝 | **Editorial Standards** | Transparent AI methodology, data sources, pipeline documentation |
@@ -214,17 +214,19 @@ DataCube-AI-Space/
 │   ├── app/                     # Pages + API routes
 │   │   ├── api/chat/            # AI chat endpoint
 │   │   ├── api/report/          # AI report generator
-│   │   ├── api/subscribe/       # Newsletter signup (Beehiiv)
+│   │   ├── api/subscribe/       # Newsletter signup (Beehiiv, 8 langs)
 │   │   ├── api/og/             # Dynamic OG images
 │   │   ├── [lang]/week/         # SSR week pages (SEO)
 │   │   ├── feed.xml/            # Atom 1.0 feed (8 languages)
 │   │   ├── about/              # Editorial standards
+│   │   ├── unsubscribe/        # Newsletter unsubscribe
 │   │   └── news-sitemap.xml/   # Google News Sitemap
 │   ├── components/              # React components
 │   │   ├── feeds/               # Tech, Investment, Tips feeds
 │   │   └── video-embed.tsx      # YouTube player
 │   ├── lib/                     # Utils, types, API client
 │   ├── vercel.json              # Non-www → www redirect
+│   ├── login/                  # Welcome gate (8 languages)
 │   └── middleware.ts            # Dynamic html lang + crawler bypass + welcome gate
 │
 ├── ai-hub-backend/              # Backend (FastAPI)
