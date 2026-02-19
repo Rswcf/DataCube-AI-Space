@@ -63,10 +63,26 @@ export async function GET(request: NextRequest) {
     } catch {}
   }
 
-  const feedTitle = lang === 'de' ? 'Data Cube AI - Tägliche KI-News' : 'Data Cube AI - Daily AI News';
-  const feedSubtitle = lang === 'de'
-    ? 'Kuratierte KI-Nachrichten: Technologie, Investment und Tipps'
-    : 'Curated AI news: Technology, Investment, and Tips';
+  const feedTitle = ({
+    de: 'Data Cube AI – Tägliche KI-News',
+    en: 'Data Cube AI – Daily AI News',
+    zh: 'Data Cube AI – 每日AI新闻',
+    fr: 'Data Cube AI – Actualités IA quotidiennes',
+    es: 'Data Cube AI – Noticias diarias de IA',
+    pt: 'Data Cube AI – Notícias diárias de IA',
+    ja: 'Data Cube AI – 毎日のAIニュース',
+    ko: 'Data Cube AI – 매일 AI 뉴스',
+  } as Record<string, string>)[lang] || 'Data Cube AI – Daily AI News';
+  const feedSubtitle = ({
+    de: 'Kuratierte KI-Nachrichten: Technologie, Investment und Tipps',
+    en: 'Curated AI news: Technology, Investment, and Tips',
+    zh: '精选AI新闻：技术、投资与实用技巧',
+    fr: "Actualités IA sélectionnées : technologie, investissement et astuces",
+    es: 'Noticias de IA seleccionadas: tecnología, inversión y consejos',
+    pt: 'Notícias de IA selecionadas: tecnologia, investimento e dicas',
+    ja: '厳選AIニュース：テクノロジー、投資、実践ヒント',
+    ko: '엄선된 AI 뉴스: 기술, 투자, 실용 팁',
+  } as Record<string, string>)[lang] || 'Curated AI news: Technology, Investment, and Tips';
 
   const now = new Date().toISOString();
 

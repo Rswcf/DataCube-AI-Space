@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
-import { isSupportedLanguage, type AppLanguage } from '@/lib/i18n'
+import { isSupportedLanguage, toBcp47, SUPPORTED_LANGUAGES, type AppLanguage } from '@/lib/i18n'
 import { toTopicSlug, topicSlugToQuery, topicSlugToTitle } from '@/lib/topic-utils'
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api-production-3ee5.up.railway.app/api'
@@ -227,12 +227,24 @@ function buildBreadcrumbSchema(lang: AppLanguage, topic: string, topicTitle: str
 function buildFAQSchema(lang: AppLanguage, topicTitle: string, buckets: TopicBucket[]) {
   const questions: { '@type': string; name: string; acceptedAnswer: { '@type': string; text: string } }[] = []
 
+  const l = (translations: Record<string, string>): string =>
+    translations[lang] || translations.en
+
   // Q1: What is [topic]?
   const firstTech = buckets.flatMap((b) => b.tech).find((p) => p.content)
   if (firstTech) {
     questions.push({
       '@type': 'Question',
-      name: lang === 'de' ? `Was ist ${topicTitle}?` : `What is ${topicTitle}?`,
+      name: l({
+        de: `Was ist ${topicTitle}?`,
+        en: `What is ${topicTitle}?`,
+        zh: `什么是${topicTitle}？`,
+        fr: `Qu'est-ce que ${topicTitle} ?`,
+        es: `¿Qué es ${topicTitle}?`,
+        pt: `O que é ${topicTitle}?`,
+        ja: `${topicTitle}とは？`,
+        ko: `${topicTitle}란 무엇인가요?`,
+      }),
       acceptedAnswer: {
         '@type': 'Answer',
         text: firstTech.content.slice(0, 300),
@@ -245,9 +257,16 @@ function buildFAQSchema(lang: AppLanguage, topicTitle: string, buckets: TopicBuc
   if (firstInvest) {
     questions.push({
       '@type': 'Question',
-      name: lang === 'de'
-        ? `Welche Investitionsauswirkungen hat ${topicTitle}?`
-        : `What are the investment implications of ${topicTitle}?`,
+      name: l({
+        de: `Welche Investitionsauswirkungen hat ${topicTitle}?`,
+        en: `What are the investment implications of ${topicTitle}?`,
+        zh: `${topicTitle}的投资影响有哪些？`,
+        fr: `Quelles sont les implications d'investissement de ${topicTitle} ?`,
+        es: `¿Cuáles son las implicaciones de inversión de ${topicTitle}?`,
+        pt: `Quais são as implicações de investimento de ${topicTitle}?`,
+        ja: `${topicTitle}の投資への影響は？`,
+        ko: `${topicTitle}의 투자 영향은 무엇인가요?`,
+      }),
       acceptedAnswer: {
         '@type': 'Answer',
         text: firstInvest.content.slice(0, 300),
@@ -260,9 +279,16 @@ function buildFAQSchema(lang: AppLanguage, topicTitle: string, buckets: TopicBuc
   if (firstTip) {
     questions.push({
       '@type': 'Question',
-      name: lang === 'de'
-        ? `Welche praktischen Tipps gibt es für ${topicTitle}?`
-        : `What are practical tips for ${topicTitle}?`,
+      name: l({
+        de: `Welche praktischen Tipps gibt es für ${topicTitle}?`,
+        en: `What are practical tips for ${topicTitle}?`,
+        zh: `关于${topicTitle}有哪些实用技巧？`,
+        fr: `Quels sont les conseils pratiques pour ${topicTitle} ?`,
+        es: `¿Cuáles son los consejos prácticos para ${topicTitle}?`,
+        pt: `Quais são as dicas práticas para ${topicTitle}?`,
+        ja: `${topicTitle}の実践的なヒントは？`,
+        ko: `${topicTitle}에 대한 실용적인 팁은 무엇인가요?`,
+      }),
       acceptedAnswer: {
         '@type': 'Answer',
         text: (firstTip.tip || firstTip.content).slice(0, 300),
@@ -309,22 +335,46 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
 
   const canonicalUrl = localizedUrl
 
+  const metaTitle = ({
+    de: `${topicTitle} KI-News – Aktuelle Berichte & Analysen`,
+    en: `${topicTitle} AI News – Latest Coverage & Analysis`,
+    zh: `${topicTitle} AI新闻 – 最新报道与分析`,
+    fr: `${topicTitle} Actualités IA – Dernières analyses`,
+    es: `${topicTitle} Noticias IA – Últimos informes y análisis`,
+    pt: `${topicTitle} Notícias IA – Últimas análises`,
+    ja: `${topicTitle} AIニュース – 最新レポート＆分析`,
+    ko: `${topicTitle} AI 뉴스 – 최신 보도 & 분석`,
+  } as Record<string, string>)[lang] || `${topicTitle} AI News – Latest Coverage & Analysis`
+
+  const metaDescription = ({
+    de: `Kuratierte KI-Berichterstattung zu ${topicTitle}: Technologie-Updates, Investment-Signale und praktische Tipps.`,
+    en: `Curated AI coverage for ${topicTitle}: technology updates, investment signals, and practical tips.`,
+    zh: `${topicTitle}精选AI报道：技术动态、投资信号和实用技巧。`,
+    fr: `Couverture IA sélectionnée pour ${topicTitle} : actualités tech, signaux d'investissement et conseils pratiques.`,
+    es: `Cobertura de IA seleccionada para ${topicTitle}: noticias tecnológicas, señales de inversión y consejos prácticos.`,
+    pt: `Cobertura de IA selecionada para ${topicTitle}: notícias de tecnologia, sinais de investimento e dicas práticas.`,
+    ja: `${topicTitle}のAI厳選記事：テクノロジー、投資シグナル、実践ヒント。`,
+    ko: `${topicTitle} AI 큐레이션: 기술 뉴스, 투자 신호, 실용 팁.`,
+  } as Record<string, string>)[lang] || `Curated AI coverage for ${topicTitle}: technology updates, investment signals, and practical tips.`
+
   return {
-    title: lang === 'de' ? `${topicTitle} KI-News` : `${topicTitle} AI News`,
-    description: lang === 'de'
-      ? `Kuratierte KI-Berichterstattung und Investment-/Tipps-Updates zum Thema ${topicTitle}.`
-      : `Curated AI coverage and investment/tips updates for: ${topicTitle}.`,
+    title: metaTitle,
+    description: metaDescription,
     alternates: {
       canonical: canonicalUrl,
       languages: {
-        'x-default': canonicalUrl,
+        'x-default': `https://www.datacubeai.space/de/topic/${topic}`,
+        ...Object.fromEntries(
+          SUPPORTED_LANGUAGES.map((code) => [
+            toBcp47(code),
+            `https://www.datacubeai.space/${code}/topic/${topic}`,
+          ])
+        ),
       },
     },
     openGraph: {
-      title: lang === 'de' ? `${topicTitle} KI-News` : `${topicTitle} AI News`,
-      description: lang === 'de'
-        ? `KI-Berichterstattung: ${topicTitle}.`
-        : `AI coverage: ${topicTitle}.`,
+      title: metaTitle,
+      description: metaDescription,
       url: canonicalUrl,
       type: 'article',
       images: [
@@ -332,9 +382,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
           url: '/og-image.jpg',
           width: 1200,
           height: 630,
-          alt: lang === 'de'
-            ? `Data Cube AI – ${topicTitle}`
-            : `Data Cube AI – ${topicTitle}`,
+          alt: `Data Cube AI – ${topicTitle}`,
         },
       ],
     },

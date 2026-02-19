@@ -16,11 +16,21 @@ const newsreader = Newsreader({ subsets: ["latin"], variable: "--font-display" }
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.datacubeai.space'),
   title: {
-    default: 'Data Cube AI | Daily AI News & Insights',
+    default: 'Data Cube AI | Daily AI News, Investment Signals & Practical Tips',
     template: '%s | Data Cube AI',
   },
-  description: 'Multilingual daily AI news aggregator. Tech breakthroughs, investment news, practical tips, and curated YouTube videos — in 8 languages.',
-  keywords: ['AI news', 'artificial intelligence', 'machine learning', 'AI investment', 'AI tips', 'KI Nachrichten', 'daily AI digest', 'AI trends', 'tech news'],
+  description: 'Free multilingual AI news aggregator covering generative AI breakthroughs, LLM updates, AI investment signals, and practical tips — curated daily from 40+ sources in 8 languages.',
+  keywords: [
+    'AI news', 'artificial intelligence', 'machine learning', 'AI investment', 'AI tips',
+    'generative AI', 'LLM news', 'ChatGPT', 'AI weekly digest', 'AI newsletter',
+    'AI stocks', 'AI funding', 'AI tools', 'deep learning', 'AI breakthroughs',
+    'KI Nachrichten', 'KI News', 'künstliche Intelligenz', 'KI Investment', 'KI Tipps',
+    'AI新闻', '人工智能', 'AI投资', 'AI工具推荐',
+    'actualités IA', 'intelligence artificielle', 'investissement IA',
+    'noticias IA', 'inteligencia artificial',
+    'AIニュース', '人工知能ニュース',
+    'AI 뉴스', '인공지능 뉴스',
+  ],
   authors: [{ name: 'Data Cube Team' }],
   creator: 'Data Cube AI',
   publisher: 'Data Cube AI',
@@ -51,7 +61,7 @@ export const metadata: Metadata = {
     url: 'https://www.datacubeai.space',
     siteName: 'Data Cube AI',
     title: 'Data Cube AI | Daily AI News & Insights',
-    description: 'Curated AI news, investment updates, and practical tips - updated daily in 8 languages.',
+    description: 'Free AI news aggregator: generative AI breakthroughs, investment signals, and practical tips – curated daily from 40+ sources in 8 languages.',
     images: [
       {
         url: '/og-image.jpg',
@@ -67,7 +77,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Data Cube AI | Daily AI News',
-    description: 'Your daily dose of AI news, investments, and tips.',
+    description: 'Daily AI news digest: tech breakthroughs, investment signals, and practical tips – free in 8 languages.',
     images: [
       {
         url: '/og-image.jpg',
@@ -134,7 +144,7 @@ export default async function RootLayout({
         <link rel="dns-prefetch" href="https://www.youtube.com" />
         <OrganizationSchema />
         <WebsiteSchema />
-        <FAQSchema />
+        <FAQSchema lang={rawLang} />
         {['de', 'en', 'zh', 'fr', 'es', 'pt', 'ja', 'ko'].map((l) => (
           <link key={l} rel="alternate" type="application/atom+xml" title={`Data Cube AI (${l.toUpperCase()})`} href={`/feed.xml?lang=${l}`} />
         ))}
