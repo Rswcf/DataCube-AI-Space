@@ -6,7 +6,7 @@ import { Feed } from "@/components/feed";
 import { RightSidebar } from "@/components/right-sidebar";
 import { ChatWidget } from "@/components/chat-widget";
 import { ReportGenerator } from "@/components/report-generator";
-import { Cpu, TrendingUp, Lightbulb, Search, X, Settings, Sun, Moon, Languages, Heart, Mail, Check, Loader2 } from "lucide-react";
+import { Cpu, TrendingUp, Lightbulb, Search, X, Settings, Sun, Moon, Languages, Heart, Mail, Check, Loader2, ArrowLeft } from "lucide-react";
 import { LANGUAGE_OPTIONS } from "@/lib/translations";
 import { cn } from "@/lib/utils";
 import { useSettings } from "@/lib/settings-context";
@@ -367,7 +367,8 @@ function MobileSettingsDrawer({
 }) {
   const { theme, setTheme, language, setLanguage, t } = useSettings();
   const [email, setEmail] = useState("");
-  const [subscribeState, setSubscribeState] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [subscribeState, setSubscribeState] = useState<"idle" | "selectLang" | "loading" | "success" | "error">("idle");
+  const [newsletterLang, setNewsletterLang] = useState(language);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -485,26 +486,67 @@ function MobileSettingsDrawer({
                 <Check className="h-4 w-4" aria-hidden="true" />
                 <span>{t("subscribed")}</span>
               </div>
+            ) : subscribeState === "selectLang" ? (
+              <div className="flex flex-col gap-2">
+                <p className="text-xs font-medium text-foreground">{t("chooseNewsletterLang")}</p>
+                <div className="grid grid-cols-4 gap-1.5">
+                  {LANGUAGE_OPTIONS.map((opt) => (
+                    <button
+                      key={opt.code}
+                      type="button"
+                      onClick={() => setNewsletterLang(opt.code)}
+                      className={cn(
+                        "rounded-md px-2 py-1.5 text-xs transition-colors",
+                        opt.code === newsletterLang
+                          ? "bg-primary/10 text-primary font-semibold border border-primary/30"
+                          : "bg-secondary hover:bg-secondary/80 text-muted-foreground border border-transparent"
+                      )}
+                    >
+                      {opt.nativeName}
+                    </button>
+                  ))}
+                </div>
+                <div className="flex items-center justify-between mt-1">
+                  <button
+                    type="button"
+                    onClick={() => setSubscribeState("idle")}
+                    className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    <ArrowLeft className="h-3 w-3" aria-hidden="true" />
+                    {t("back")}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      setSubscribeState("loading");
+                      try {
+                        const res = await fetch("/api/subscribe", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ email: email.trim(), language: newsletterLang }),
+                        });
+                        if (!res.ok) throw new Error();
+                        setEmail("");
+                        setSubscribeState("success");
+                        setTimeout(() => setSubscribeState("idle"), 4000);
+                      } catch {
+                        setSubscribeState("error");
+                        setTimeout(() => setSubscribeState("idle"), 3000);
+                      }
+                    }}
+                    className="rounded-full bg-gradient-to-r from-primary to-accent px-4 py-1.5 text-xs font-medium text-primary-foreground hover:opacity-90 transition-opacity focus-visible:ring-2 focus-visible:ring-ring"
+                  >
+                    {t("confirm")}
+                  </button>
+                </div>
+              </div>
             ) : (
               <form
-                onSubmit={async (e) => {
+                onSubmit={(e) => {
                   e.preventDefault();
                   if (!email.trim() || subscribeState === "loading") return;
-                  setSubscribeState("loading");
-                  try {
-                    const res = await fetch("/api/subscribe", {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ email: email.trim(), language }),
-                    });
-                    if (!res.ok) throw new Error();
-                    setEmail("");
-                    setSubscribeState("success");
-                    setTimeout(() => setSubscribeState("idle"), 4000);
-                  } catch {
-                    setSubscribeState("error");
-                    setTimeout(() => setSubscribeState("idle"), 3000);
-                  }
+                  setNewsletterLang(language);
+                  setSubscribeState("selectLang");
                 }}
                 className="flex flex-col gap-2"
               >

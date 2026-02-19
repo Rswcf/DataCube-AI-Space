@@ -3,10 +3,12 @@
 import React from "react"
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { Search, Mail, Check, TrendingUp, Loader2 } from "lucide-react";
+import { Search, Mail, Check, TrendingUp, Loader2, ArrowLeft } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useSettings } from "@/lib/settings-context";
+import { LANGUAGE_OPTIONS } from "@/lib/translations";
+import { cn } from "@/lib/utils";
 
 interface TrendItem {
   category: string;
@@ -58,7 +60,8 @@ export function RightSidebar({ weekId, onSearchChange }: RightSidebarProps) {
   const [searchValue, setSearchValue] = useState("");
   const [trends, setTrends] = useState<TrendItem[]>(fallbackTrends[language] || fallbackTrends.en);
   const [email, setEmail] = useState("");
-  const [subscribeState, setSubscribeState] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [subscribeState, setSubscribeState] = useState<"idle" | "selectLang" | "loading" | "success" | "error">("idle");
+  const [newsletterLang, setNewsletterLang] = useState(language);
 
   useEffect(() => {
     const processData = (data: any) => {
@@ -156,26 +159,67 @@ export function RightSidebar({ weekId, onSearchChange }: RightSidebarProps) {
               <Check aria-hidden="true" className="h-4 w-4" />
               <span>{t("subscribed")}</span>
             </div>
+          ) : subscribeState === "selectLang" ? (
+            <div className="flex flex-col gap-2">
+              <p className="text-xs font-medium text-foreground">{t("chooseNewsletterLang")}</p>
+              <div className="grid grid-cols-4 gap-1.5">
+                {LANGUAGE_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.code}
+                    type="button"
+                    onClick={() => setNewsletterLang(opt.code)}
+                    className={cn(
+                      "rounded-md px-2 py-1.5 text-xs transition-colors",
+                      opt.code === newsletterLang
+                        ? "bg-primary/10 text-primary font-semibold border border-primary/30"
+                        : "bg-secondary hover:bg-secondary/80 text-muted-foreground border border-transparent"
+                    )}
+                  >
+                    {opt.nativeName}
+                  </button>
+                ))}
+              </div>
+              <div className="flex items-center justify-between mt-1">
+                <button
+                  type="button"
+                  onClick={() => setSubscribeState("idle")}
+                  className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <ArrowLeft className="h-3 w-3" aria-hidden="true" />
+                  {t("back")}
+                </button>
+                <Button
+                  type="button"
+                  onClick={async () => {
+                    setSubscribeState("loading");
+                    try {
+                      const res = await fetch("/api/subscribe", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ email: email.trim(), language: newsletterLang }),
+                      });
+                      if (!res.ok) throw new Error();
+                      setEmail("");
+                      setSubscribeState("success");
+                      setTimeout(() => setSubscribeState("idle"), 4000);
+                    } catch {
+                      setSubscribeState("error");
+                      setTimeout(() => setSubscribeState("idle"), 3000);
+                    }
+                  }}
+                  className="h-8 rounded-full bg-gradient-to-r from-primary to-accent text-primary-foreground hover:opacity-90 transition-opacity text-xs px-4"
+                >
+                  {t("confirm")}
+                </Button>
+              </div>
+            </div>
           ) : (
             <form
-              onSubmit={async (e) => {
+              onSubmit={(e) => {
                 e.preventDefault();
                 if (!email.trim() || subscribeState === "loading") return;
-                setSubscribeState("loading");
-                try {
-                  const res = await fetch("/api/subscribe", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ email: email.trim(), language }),
-                  });
-                  if (!res.ok) throw new Error();
-                  setEmail("");
-                  setSubscribeState("success");
-                  setTimeout(() => setSubscribeState("idle"), 4000);
-                } catch {
-                  setSubscribeState("error");
-                  setTimeout(() => setSubscribeState("idle"), 3000);
-                }
+                setNewsletterLang(language);
+                setSubscribeState("selectLang");
               }}
               className="flex flex-col gap-2"
             >

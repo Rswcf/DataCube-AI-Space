@@ -1,7 +1,8 @@
 export async function POST(req: Request) {
   try {
     const { email, language } = await req.json();
-    const lang = language === "en" ? "en" : "de";
+    const SUPPORTED = ["de", "en", "zh", "fr", "es", "pt", "ja", "ko"];
+    const lang = SUPPORTED.includes(language) ? language : "en";
 
     if (!email || typeof email !== "string") {
       return Response.json({ error: "Email is required" }, { status: 400 });

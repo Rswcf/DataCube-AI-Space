@@ -139,8 +139,11 @@ export const translations = {
     subscribe: "Kostenlos abonnieren",
     subscribed: "Abonniert!",
     subscribeError: "Fehler beim Abonnieren. Bitte erneut versuchen.",
-    newsletterDescription: "KI-News in 3 Minuten \u2014 t\u00e4glich kuratiert, zweisprachig.",
+    newsletterDescription: "KI-News in 3 Minuten \u2014 t\u00e4glich kuratiert, mehrsprachig.",
     newsletterSocialProof: "Schlie\u00dfe dich KI-Profis an",
+    chooseNewsletterLang: "Newsletter-Sprache w\u00e4hlen:",
+    confirm: "Best\u00e4tigen",
+    back: "Zur\u00fcck",
 
     // Support
     support: "Unterst\u00fctzen",
@@ -297,8 +300,11 @@ export const translations = {
     subscribe: "Subscribe free",
     subscribed: "Subscribed!",
     subscribeError: "Subscription failed. Please try again.",
-    newsletterDescription: "AI news in 3 minutes \u2014 daily curated, bilingual.",
+    newsletterDescription: "AI news in 3 minutes \u2014 daily curated, multilingual.",
     newsletterSocialProof: "Join AI professionals staying ahead",
+    chooseNewsletterLang: "Choose newsletter language:",
+    confirm: "Confirm",
+    back: "Back",
 
     // Support
     support: "Support",
@@ -457,6 +463,9 @@ export const translations = {
     subscribeError: "\u8ba2\u9605\u5931\u8d25\uff0c\u8bf7\u91cd\u8bd5\u3002",
     newsletterDescription: "3 \u5206\u949f\u638c\u63e1 AI \u65b0\u95fb \u2014 \u6bcf\u65e5\u7cbe\u9009\uff0c\u591a\u8bed\u8a00\u652f\u6301\u3002",
     newsletterSocialProof: "\u52a0\u5165 AI \u4e13\u4e1a\u4eba\u58eb\u7684\u884c\u5217",
+    chooseNewsletterLang: "\u9009\u62e9\u8ba2\u9605\u8bed\u8a00\uff1a",
+    confirm: "\u786e\u8ba4",
+    back: "\u8fd4\u56de",
 
     // Support
     support: "\u652f\u6301\u6211\u4eec",
@@ -615,6 +624,9 @@ export const translations = {
     subscribeError: "\u00c9chec de l\u2019abonnement. Veuillez r\u00e9essayer.",
     newsletterDescription: "L\u2019actu IA en 3 minutes \u2014 s\u00e9lection quotidienne, multilingue.",
     newsletterSocialProof: "Rejoignez les professionnels de l\u2019IA",
+    chooseNewsletterLang: "Choisir la langue\u00a0:",
+    confirm: "Confirmer",
+    back: "Retour",
 
     // Support
     support: "Soutenir",
@@ -773,6 +785,9 @@ export const translations = {
     subscribeError: "Error en la suscripci\u00f3n. Int\u00e9ntalo de nuevo.",
     newsletterDescription: "Noticias de IA en 3 minutos \u2014 selecci\u00f3n diaria, multiling\u00fce.",
     newsletterSocialProof: "\u00danete a los profesionales de la IA",
+    chooseNewsletterLang: "Elegir idioma:",
+    confirm: "Confirmar",
+    back: "Volver",
 
     // Support
     support: "Apoyar",
@@ -931,6 +946,9 @@ export const translations = {
     subscribeError: "Falha na assinatura. Tente novamente.",
     newsletterDescription: "Not\u00edcias de IA em 3 minutos \u2014 sele\u00e7\u00e3o di\u00e1ria, multilingual.",
     newsletterSocialProof: "Junte-se aos profissionais de IA",
+    chooseNewsletterLang: "Escolher idioma:",
+    confirm: "Confirmar",
+    back: "Voltar",
 
     // Support
     support: "Apoiar",
@@ -1089,6 +1107,9 @@ export const translations = {
     subscribeError: "\u8cfc\u8aad\u306b\u5931\u6557\u3057\u307e\u3057\u305f\u3002\u3082\u3046\u4e00\u5ea6\u304a\u8a66\u3057\u304f\u3060\u3055\u3044\u3002",
     newsletterDescription: "AI\u30cb\u30e5\u30fc\u30b9\u30923\u5206\u3067 \u2014 \u6bce\u65e5\u53b3\u9078\u3001\u591a\u8a00\u8a9e\u5bfe\u5fdc\u3002",
     newsletterSocialProof: "AI\u30d7\u30ed\u30d5\u30a7\u30c3\u30b7\u30e7\u30ca\u30eb\u306e\u8f2a\u306b\u52a0\u308f\u308d\u3046",
+    chooseNewsletterLang: "\u8a00\u8a9e\u3092\u9078\u629e\uff1a",
+    confirm: "\u78ba\u8a8d",
+    back: "\u623b\u308b",
 
     // Support
     support: "\u30b5\u30dd\u30fc\u30c8",
@@ -1247,6 +1268,9 @@ export const translations = {
     subscribeError: "\uad6c\ub3c5\uc5d0 \uc2e4\ud328\ud588\uc2b5\ub2c8\ub2e4. \ub2e4\uc2dc \uc2dc\ub3c4\ud574 \uc8fc\uc138\uc694.",
     newsletterDescription: "3\ubd84 AI \ub274\uc2a4 \u2014 \ub9e4\uc77c \uc5c4\uc120, \ub2e4\uad6d\uc5b4 \uc9c0\uc6d0.",
     newsletterSocialProof: "AI \uc804\ubb38\uac00\ub4e4\uacfc \ud568\uaed8\ud558\uc138\uc694",
+    chooseNewsletterLang: "\uc5b8\uc5b4 \uc120\ud0dd:",
+    confirm: "\ud655\uc778",
+    back: "\ub4a4\ub85c",
 
     // Support
     support: "\ud6c4\uc6d0",

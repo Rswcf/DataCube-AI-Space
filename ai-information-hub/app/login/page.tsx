@@ -8,25 +8,51 @@ import {
   Lightbulb,
   Youtube,
   ArrowRight,
-  Languages,
   Zap,
 } from "lucide-react";
 import { LogoCube } from "@/components/logo-cube";
 
-const translations = {
+const LANG_OPTIONS = [
+  { code: "de", nativeName: "DE" },
+  { code: "en", nativeName: "EN" },
+  { code: "zh", nativeName: "\u4e2d\u6587" },
+  { code: "fr", nativeName: "FR" },
+  { code: "es", nativeName: "ES" },
+  { code: "pt", nativeName: "PT" },
+  { code: "ja", nativeName: "\u65e5\u672c\u8a9e" },
+  { code: "ko", nativeName: "\ud55c\uad6d\uc5b4" },
+] as const;
+
+type LoginLanguage = (typeof LANG_OPTIONS)[number]["code"];
+
+const translations: Record<LoginLanguage, {
+  badge: string;
+  title1: string;
+  title2: string;
+  tagline: string;
+  features: string[];
+  aiPipeline: string;
+  aiProcess: string;
+  sourceCategories: string[];
+  welcome: string;
+  enterCredentials: string;
+  enter: string;
+  newsletterPitch: string;
+  emailPlaceholder: string;
+}> = {
   de: {
-    badge: "KI-gestützte Intelligenz",
+    badge: "KI-gest\u00fctzte Intelligenz",
     title1: "Data Cube",
     title2: "AI Hub",
     tagline:
-      "Ihr intelligentes Gateway zu kuratierten KI-Nachrichten, Investment-Insights und praktischen Tipps – täglich von KI analysiert und kuratiert.",
+      "Ihr intelligentes Gateway zu kuratierten KI-Nachrichten, Investment-Insights und praktischen Tipps \u2013 t\u00e4glich von KI analysiert und kuratiert.",
     features: [
-      "Tech-Durchbrüche",
+      "Tech-Durchbr\u00fcche",
       "Investment-News",
       "Praktische Tipps",
       "KI-Videos",
     ],
-    aiPipeline: "40+ Quellen täglich",
+    aiPipeline: "40+ Quellen t\u00e4glich",
     aiProcess: "KI-kuratiert zu den wichtigsten Insights",
     sourceCategories: [
       "MIT Tech Review",
@@ -39,7 +65,7 @@ const translations = {
     welcome: "Willkommen",
     enterCredentials: "Entdecken Sie die neuesten KI-Trends und Insights",
     enter: "Eintreten",
-    newsletterPitch: "Erhalte täglich KI-News in 3 Minuten — kostenlos",
+    newsletterPitch: "Erhalte t\u00e4glich KI-News in 3 Minuten \u2014 kostenlos",
     emailPlaceholder: "E-Mail-Adresse",
   },
   en: {
@@ -47,7 +73,7 @@ const translations = {
     title1: "Data Cube",
     title2: "AI Hub",
     tagline:
-      "Your intelligent gateway to curated AI news, investment insights, and practical tips – analyzed daily by AI.",
+      "Your intelligent gateway to curated AI news, investment insights, and practical tips \u2013 analyzed daily by AI.",
     features: [
       "Tech Breakthroughs",
       "Investment News",
@@ -67,8 +93,161 @@ const translations = {
     welcome: "Welcome",
     enterCredentials: "Discover the latest AI trends and insights",
     enter: "Enter",
-    newsletterPitch: "Get daily AI news in 3 minutes — free",
+    newsletterPitch: "Get daily AI news in 3 minutes \u2014 free",
     emailPlaceholder: "Email address",
+  },
+  zh: {
+    badge: "AI \u667a\u80fd\u9a71\u52a8",
+    title1: "Data Cube",
+    title2: "AI Hub",
+    tagline:
+      "\u60a8\u7684\u667a\u80fd\u5165\u53e3\uff0c\u83b7\u53d6\u7cbe\u9009 AI \u65b0\u95fb\u3001\u6295\u8d44\u6d1e\u5bdf\u548c\u5b9e\u7528\u6280\u5de7 \u2013 \u6bcf\u65e5\u7531 AI \u5206\u6790\u548c\u7b5b\u9009\u3002",
+    features: ["\u6280\u672f\u7a81\u7834", "\u6295\u8d44\u65b0\u95fb", "\u5b9e\u7528\u6280\u5de7", "AI \u89c6\u9891"],
+    aiPipeline: "\u6bcf\u65e5 40+ \u6765\u6e90",
+    aiProcess: "AI \u7cbe\u9009\u5173\u952e\u6d1e\u5bdf",
+    sourceCategories: [
+      "MIT Tech Review",
+      "Crunchbase",
+      "Financial Times",
+      "YouTube",
+      "Reddit",
+      "& 30+ \u66f4\u591a",
+    ],
+    welcome: "\u6b22\u8fce",
+    enterCredentials: "\u53d1\u73b0\u6700\u65b0\u7684 AI \u8d8b\u52bf\u548c\u6d1e\u5bdf",
+    enter: "\u8fdb\u5165",
+    newsletterPitch: "\u6bcf\u65e5 3 \u5206\u949f\u638c\u63e1 AI \u65b0\u95fb \u2014 \u514d\u8d39",
+    emailPlaceholder: "\u7535\u5b50\u90ae\u7bb1\u5730\u5740",
+  },
+  fr: {
+    badge: "Intelligence aliment\u00e9e par l\u2019IA",
+    title1: "Data Cube",
+    title2: "AI Hub",
+    tagline:
+      "Votre passerelle intelligente vers l\u2019actu IA, les investissements et les astuces pratiques \u2013 analys\u00e9e quotidiennement par l\u2019IA.",
+    features: [
+      "Perc\u00e9es tech",
+      "Investissements",
+      "Astuces pratiques",
+      "Vid\u00e9os IA",
+    ],
+    aiPipeline: "40+ sources par jour",
+    aiProcess: "S\u00e9lection IA des insights cl\u00e9s",
+    sourceCategories: [
+      "MIT Tech Review",
+      "Crunchbase",
+      "Financial Times",
+      "YouTube",
+      "Reddit",
+      "& 30+ autres",
+    ],
+    welcome: "Bienvenue",
+    enterCredentials: "D\u00e9couvrez les derni\u00e8res tendances et insights IA",
+    enter: "Entrer",
+    newsletterPitch: "Recevez l\u2019actu IA en 3 minutes \u2014 gratuit",
+    emailPlaceholder: "Adresse e-mail",
+  },
+  es: {
+    badge: "Inteligencia impulsada por IA",
+    title1: "Data Cube",
+    title2: "AI Hub",
+    tagline:
+      "Tu puerta inteligente a noticias de IA curadas, insights de inversi\u00f3n y consejos pr\u00e1cticos \u2013 analizado diariamente por IA.",
+    features: [
+      "Avances tech",
+      "Inversiones",
+      "Consejos pr\u00e1cticos",
+      "V\u00eddeos IA",
+    ],
+    aiPipeline: "40+ fuentes diarias",
+    aiProcess: "IA selecciona insights clave",
+    sourceCategories: [
+      "MIT Tech Review",
+      "Crunchbase",
+      "Financial Times",
+      "YouTube",
+      "Reddit",
+      "& 30+ m\u00e1s",
+    ],
+    welcome: "Bienvenido",
+    enterCredentials: "Descubre las \u00faltimas tendencias e insights de IA",
+    enter: "Entrar",
+    newsletterPitch: "Recibe noticias de IA en 3 minutos \u2014 gratis",
+    emailPlaceholder: "Correo electr\u00f3nico",
+  },
+  pt: {
+    badge: "Intelig\u00eancia impulsionada por IA",
+    title1: "Data Cube",
+    title2: "AI Hub",
+    tagline:
+      "Seu portal inteligente para not\u00edcias de IA curadas, insights de investimento e dicas pr\u00e1ticas \u2013 analisado diariamente por IA.",
+    features: [
+      "Avan\u00e7os tech",
+      "Investimentos",
+      "Dicas pr\u00e1ticas",
+      "V\u00eddeos IA",
+    ],
+    aiPipeline: "40+ fontes di\u00e1rias",
+    aiProcess: "IA seleciona insights principais",
+    sourceCategories: [
+      "MIT Tech Review",
+      "Crunchbase",
+      "Financial Times",
+      "YouTube",
+      "Reddit",
+      "& 30+ mais",
+    ],
+    welcome: "Bem-vindo",
+    enterCredentials: "Descubra as \u00faltimas tend\u00eancias e insights de IA",
+    enter: "Entrar",
+    newsletterPitch: "Receba not\u00edcias de IA em 3 minutos \u2014 gr\u00e1tis",
+    emailPlaceholder: "Endere\u00e7o de e-mail",
+  },
+  ja: {
+    badge: "AI\u99c6\u52d5\u306e\u30a4\u30f3\u30c6\u30ea\u30b8\u30a7\u30f3\u30b9",
+    title1: "Data Cube",
+    title2: "AI Hub",
+    tagline:
+      "\u53b3\u9078\u3055\u308c\u305fAI\u30cb\u30e5\u30fc\u30b9\u3001\u6295\u8cc7\u30a4\u30f3\u30b5\u30a4\u30c8\u3001\u5b9f\u8df5\u7684\u306a\u30c6\u30a3\u30c3\u30d7\u30b9\u3078\u306e\u30b9\u30de\u30fc\u30c8\u306a\u30b2\u30fc\u30c8\u30a6\u30a7\u30a4 \u2013 AI\u304c\u6bce\u65e5\u5206\u6790\u30fb\u53b3\u9078\u3002",
+    features: ["\u6280\u8853\u7a81\u7834", "\u6295\u8cc7\u30cb\u30e5\u30fc\u30b9", "\u5b9f\u8df5\u30c6\u30a3\u30c3\u30d7\u30b9", "AI\u52d5\u753b"],
+    aiPipeline: "\u6bce\u65e540\u4ee5\u4e0a\u306e\u30bd\u30fc\u30b9",
+    aiProcess: "AI\u304c\u91cd\u8981\u306a\u30a4\u30f3\u30b5\u30a4\u30c8\u3092\u53b3\u9078",
+    sourceCategories: [
+      "MIT Tech Review",
+      "Crunchbase",
+      "Financial Times",
+      "YouTube",
+      "Reddit",
+      "& 30+ \u4ee5\u4e0a",
+    ],
+    welcome: "\u3088\u3046\u3053\u305d",
+    enterCredentials: "\u6700\u65b0\u306eAI\u30c8\u30ec\u30f3\u30c9\u3068\u30a4\u30f3\u30b5\u30a4\u30c8\u3092\u767a\u898b",
+    enter: "\u5165\u308b",
+    newsletterPitch: "AI\u30cb\u30e5\u30fc\u30b9\u30923\u5206\u3067 \u2014 \u7121\u6599",
+    emailPlaceholder: "\u30e1\u30fc\u30eb\u30a2\u30c9\u30ec\u30b9",
+  },
+  ko: {
+    badge: "AI \uae30\ubc18 \uc778\ud154\ub9ac\uc804\uc2a4",
+    title1: "Data Cube",
+    title2: "AI Hub",
+    tagline:
+      "\uc5c4\uc120\ub41c AI \ub274\uc2a4, \ud22c\uc790 \uc778\uc0ac\uc774\ud2b8, \uc2e4\uc6a9\uc801\uc778 \ud301\uc73c\ub85c \uac00\ub294 \uc2a4\ub9c8\ud2b8 \uac8c\uc774\ud2b8\uc6e8\uc774 \u2013 \ub9e4\uc77c AI\uac00 \ubd84\uc11d\u00b7\uc5c4\uc120.",
+    features: ["\uae30\uc220 \ub3cc\ud30c\uad6c", "\ud22c\uc790 \ub274\uc2a4", "\uc2e4\uc6a9 \ud301", "AI \ub3d9\uc601\uc0c1"],
+    aiPipeline: "\ub9e4\uc77c 40+ \uc18c\uc2a4",
+    aiProcess: "AI\uac00 \ud575\uc2ec \uc778\uc0ac\uc774\ud2b8 \uc5c4\uc120",
+    sourceCategories: [
+      "MIT Tech Review",
+      "Crunchbase",
+      "Financial Times",
+      "YouTube",
+      "Reddit",
+      "& 30+ \ub354",
+    ],
+    welcome: "\ud658\uc601\ud569\ub2c8\ub2e4",
+    enterCredentials: "\ucd5c\uc2e0 AI \ud2b8\ub80c\ub4dc\uc640 \uc778\uc0ac\uc774\ud2b8\ub97c \ubc1c\uacac\ud558\uc138\uc694",
+    enter: "\uc785\uc7a5",
+    newsletterPitch: "3\ubd84 AI \ub274\uc2a4 \u2014 \ubb34\ub8cc",
+    emailPlaceholder: "\uc774\uba54\uc77c \uc8fc\uc18c",
   },
 };
 
@@ -157,7 +336,7 @@ function FloatingParticles() {
 }
 
 export default function LoginPage() {
-  const [language, setLanguage] = useState<"de" | "en">("de");
+  const [language, setLanguage] = useState<LoginLanguage>("de");
   const [email, setEmail] = useState("");
   const router = useRouter();
 
@@ -320,15 +499,21 @@ export default function LoginPage() {
               <ArrowRight aria-hidden="true" className="w-5 h-5" />
             </button>
 
-            {/* Language Toggle */}
-            <div className="flex justify-center mt-6">
-              <button
-                onClick={() => setLanguage(language === "de" ? "en" : "de")}
-                className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none rounded"
-              >
-                <Languages aria-hidden="true" className="w-4 h-4" />
-                {language === "de" ? "English" : "Deutsch"}
-              </button>
+            {/* Language Selector */}
+            <div className="flex flex-wrap justify-center gap-2 mt-6">
+              {LANG_OPTIONS.map((opt) => (
+                <button
+                  key={opt.code}
+                  onClick={() => setLanguage(opt.code)}
+                  className={`px-2 py-1 rounded-md text-xs transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none ${
+                    opt.code === language
+                      ? "bg-primary/10 text-primary font-semibold"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {opt.nativeName}
+                </button>
+              ))}
             </div>
 
           </div>
