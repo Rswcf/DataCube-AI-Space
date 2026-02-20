@@ -39,6 +39,11 @@ def main():
         default=None,
         help="Week ID (YYYY-kwWW) for backward compatibility",
     )
+    parser.add_argument(
+        "--no-newsletter",
+        action="store_true",
+        help="Skip newsletter sending after collection",
+    )
     args = parser.parse_args()
 
     period_id = args.date or args.week  # --date takes precedence
@@ -57,6 +62,17 @@ def main():
     try:
         run_collection(db, period_id)  # defaults to current_day_id() if None
         logger.info("Collection completed successfully!")
+
+        # Send newsletter after successful collection
+        if not args.no_newsletter:
+            try:
+                from app.services.newsletter_sender import send_newsletter
+
+                logger.info("Sending newsletter...")
+                send_newsletter(db, period_id)
+                logger.info("Newsletter sent successfully!")
+            except Exception as e:
+                logger.warning(f"Newsletter failed (non-fatal): {e}")
     except Exception as e:
         logger.error(f"Collection failed: {e}")
         sys.exit(1)

@@ -17,7 +17,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Trigger collection via API
+        id: collect
         run: |
+          # Disable errexit so curl failures don't abort the script
+          # (GitHub Actions defaults to bash -e which kills retry logic)
+          set +e
+
           if [ "${{ github.event_name }}" = "schedule" ]; then
             BERLIN_HOUR=$(TZ=Europe/Berlin date +%H)
             if [ "$BERLIN_HOUR" != "23" ]; then
@@ -43,13 +48,33 @@ jobs:
             HTTP_CODE=$(curl -sS -o response.json -w "%{http_code}" \
               -X POST "$URL" \
               -H "X-API-Key: ${{ secrets.ADMIN_API_KEY }}" \
+              --http1.1 \
               --max-time 7200)
+            CURL_EXIT=$?
 
-            cat response.json
-            echo ""
+            if [ -f response.json ]; then
+              cat response.json
+              echo ""
+            fi
+
+            # Handle curl-level failure (e.g. HTTP/2 stream error, timeout)
+            if [ "$CURL_EXIT" -ne 0 ]; then
+              echo "WARNING: curl failed with exit code $CURL_EXIT (no HTTP response)"
+
+              if [ "$ATTEMPT" -lt "$MAX_RETRIES" ]; then
+                echo "Retrying in ${RETRY_DELAY}s..."
+                sleep $RETRY_DELAY
+                RETRY_DELAY=$((RETRY_DELAY * 2))
+                continue
+              fi
+
+              echo "All $MAX_RETRIES attempts failed at transport level"
+              exit 1
+            fi
 
             if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
               echo "Collection triggered successfully (HTTP $HTTP_CODE)"
+              echo "PERIOD=$PERIOD" >> "$GITHUB_OUTPUT"
               exit 0
             fi
 
@@ -64,3 +89,32 @@ jobs:
 
           echo "All $MAX_RETRIES attempts failed"
           exit 1
+
+      - name: Send newsletter
+        if: success()
+        run: |
+          set +e
+          PERIOD="${{ steps.collect.outputs.PERIOD }}"
+          if [ -z "$PERIOD" ]; then
+            PERIOD=$(TZ=Europe/Berlin date +%F)
+          fi
+          echo "Sending newsletter for period: $PERIOD"
+          HTTP_CODE=$(curl -sS -o nl-response.json -w "%{http_code}" \
+            -X POST "${{ secrets.API_BASE_URL }}/admin/newsletter?period_id=${PERIOD}&wait=true" \
+            -H "X-API-Key: ${{ secrets.ADMIN_API_KEY }}" \
+            --http1.1 \
+            --max-time 300)
+          CURL_EXIT=$?
+          if [ -f nl-response.json ]; then
+            cat nl-response.json
+            echo ""
+          fi
+          if [ "$CURL_EXIT" -ne 0 ]; then
+            echo "WARNING: Newsletter curl failed (exit $CURL_EXIT) — non-fatal"
+            exit 0
+          fi
+          if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
+            echo "Newsletter sent successfully (HTTP $HTTP_CODE)"
+          else
+            echo "WARNING: Newsletter API returned HTTP $HTTP_CODE — non-fatal"
+          fi
