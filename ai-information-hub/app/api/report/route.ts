@@ -176,7 +176,7 @@ DATA:
 ${context}`;
 
     const result = streamText({
-      model: openrouter.chat("openrouter/aurora-alpha"),
+      model: openrouter.chat("openrouter/free"),
       system: systemPrompt,
       messages: [
         {

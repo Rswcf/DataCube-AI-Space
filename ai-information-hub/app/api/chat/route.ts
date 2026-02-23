@@ -57,7 +57,7 @@ ${weekContext || "No data available for this week."}`;
       }));
 
     const result = streamText({
-      model: openrouter.chat("openrouter/aurora-alpha"),
+      model: openrouter.chat("openrouter/free"),
       system: systemPrompt,
       messages: coreMessages,
       maxOutputTokens: 500,

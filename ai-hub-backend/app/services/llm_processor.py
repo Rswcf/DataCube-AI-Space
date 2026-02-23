@@ -72,7 +72,7 @@ class LLMProcessor:
         "arcee-ai/trinity-large-preview:free",
         "stepfun/step-3.5-flash:free",
         "nvidia/nemotron-3-nano-30b-a3b:free",
-        "openrouter/aurora-alpha",
+        "upstage/solar-pro-3:free",
         "arcee-ai/trinity-mini:free",
     ]
 
