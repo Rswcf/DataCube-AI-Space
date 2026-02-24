@@ -187,7 +187,7 @@ cd ai-hub-backend
 railway up
 ```
 
-Railway는 시작 시 Alembic 마이그레이션을 자동으로 적용합니다. 매일 22:00 UTC에 일간 수집을 실행하는 크론 작업을 설정하세요.
+Railway는 시작 시 Alembic 마이그레이션을 자동으로 적용합니다. 일간 수집은 GitHub Actions를 통해 자동화됩니다 (베를린 시간 23:xx).
 
 ## 프로젝트 구조
 

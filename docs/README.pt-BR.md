@@ -187,7 +187,7 @@ cd ai-hub-backend
 railway up
 ```
 
-O Railway aplica automaticamente as migracoes do Alembic na inicializacao. Configure um cron job para coleta diaria as 22:00 UTC.
+O Railway aplica automaticamente as migracoes do Alembic na inicializacao. A coleta diaria e automatizada via GitHub Actions (23:xx horario de Berlim).
 
 ## Estrutura do Projeto
 

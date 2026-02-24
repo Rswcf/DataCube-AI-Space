@@ -187,7 +187,7 @@ cd ai-hub-backend
 railway up
 ```
 
-Railway 在启动时自动执行 Alembic 迁移。配置定时任务以在每天 22:00 UTC 进行每日采集。
+Railway 在启动时自动执行 Alembic 迁移。每日采集通过 GitHub Actions 自动化（柏林时间 23:xx）。
 
 ## 项目结构
 

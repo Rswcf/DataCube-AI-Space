@@ -187,7 +187,7 @@ cd ai-hub-backend
 railway up
 ```
 
-Railway wendet Alembic-Migrationen beim Start automatisch an. Einen Cron-Job für die tägliche Erfassung um 22:00 UTC einrichten.
+Railway wendet Alembic-Migrationen beim Start automatisch an. Die tägliche Erfassung wird via GitHub Actions automatisiert (23:xx Berliner Zeit).
 
 ## Projektstruktur
 

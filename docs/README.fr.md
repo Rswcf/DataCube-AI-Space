@@ -187,7 +187,7 @@ cd ai-hub-backend
 railway up
 ```
 
-Railway applique automatiquement les migrations Alembic au démarrage. Configurez une tâche cron pour la collecte quotidienne à 22h00 UTC.
+Railway applique automatiquement les migrations Alembic au démarrage. La collecte quotidienne est automatisée via GitHub Actions (23h heure de Berlin).
 
 ## Structure du projet
 

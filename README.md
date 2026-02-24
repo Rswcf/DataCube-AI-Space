@@ -123,10 +123,10 @@ python -m scripts.weekly_collect --week 2026-kw06  # Specific week
 | **LLM Classification** | GLM-4.5-Air (OpenRouter, free tier) |
 | **LLM Processing** | DeepSeek V3.2 (OpenRouter) |
 | **Translation** | Free model chain: 6 models (OpenRouter, zero cost) |
-| **Chat & Reports** | Aurora Alpha (OpenRouter) |
+| **Chat & Reports** | openrouter/free (OpenRouter, smart router) |
 | **Newsletter** | Resend (sending) + Beehiiv (subscribers) |
 | **Stock Data** | Polygon.io API |
-| **Hosting** | Vercel (frontend), Railway (backend + DB + cron) |
+| **Hosting** | Vercel (frontend), Railway (backend + DB), GitHub Actions (cron) |
 | **Design** | Newsreader display font, isometric cube logo, section-specific color accents, staggered animations |
 
 ## Data Pipeline
@@ -156,6 +156,7 @@ Daily collections produce reduced counts (10 tech, 5 investment, 5 tips, 2 video
 | `/api/stock/batch/?tickers=AAPL,NVDA` | GET | Batch stock data |
 | `/api/admin/collect` | POST | Trigger full data collection |
 | `/api/admin/newsletter` | POST | Send newsletter (per-subscriber language) |
+| `/api/admin/newsletter/diagnose` | POST | Diagnostic: test Beehiiv, Resend, content |
 
 Period IDs: daily `YYYY-MM-DD` or weekly `YYYY-kwWW`
 
@@ -200,7 +201,7 @@ CORS_ORIGINS=["http://localhost:3000"]
 cd ai-information-hub && vercel --prod
 ```
 
-**Backend → Railway** — Auto-applies Alembic migrations on startup. Configure cron for daily collection at 22:00 UTC.
+**Backend → Railway** — Auto-applies Alembic migrations on startup. Daily collection automated via GitHub Actions (23:xx Berlin time).
 
 ```bash
 cd ai-hub-backend && railway up

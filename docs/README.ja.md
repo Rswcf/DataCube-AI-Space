@@ -187,7 +187,7 @@ cd ai-hub-backend
 railway up
 ```
 
-Railway は起動時に Alembic マイグレーションを自動適用します。毎日 22:00 UTC にデイリー収集を行う cron ジョブを設定してください。
+Railway は起動時に Alembic マイグレーションを自動適用します。デイリー収集は GitHub Actions で自動化されています（ベルリン時間 23:xx）。
 
 ## プロジェクト構成
 
