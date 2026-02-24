@@ -631,6 +631,172 @@ async def delete_translation(
     return {"status": "not_found", "table": table, "id": record_id, "lang": lang}
 
 
+@router.post("/newsletter/diagnose")
+async def diagnose_newsletter(
+    period_id: Optional[str] = None,
+    test_email: Optional[str] = None,
+    db: Session = Depends(get_db),
+    _: bool = Depends(verify_api_key),
+):
+    """
+    Diagnostic endpoint that tests each step of the newsletter pipeline independently.
+
+    Returns a JSON report with results for:
+    1. Environment variable checks
+    2. Beehiiv subscriber fetch (raw first-page response)
+    3. Content availability for the given period
+    4. Test email send via Resend
+
+    Requires X-API-Key header.
+    """
+    import requests as http_requests
+    import resend
+    from datetime import date, timedelta
+    from app.models.week import Week
+    from app.services.period_utils import current_day_id
+
+    settings = get_settings()
+    report = {
+        "period_id": None,
+        "env_check": {},
+        "beehiiv_subscribers": {},
+        "content_check": {},
+        "resend_test": {},
+    }
+
+    # ---- Step 1: Check env vars ----
+    logger.info("[diagnose] Step 1: Checking environment variables")
+    env_vars = {
+        "RESEND_API_KEY": bool(settings.resend_api_key),
+        "BEEHIIV_API_KEY": bool(settings.beehiiv_api_key),
+        "BEEHIIV_PUBLICATION_ID": bool(settings.beehiiv_publication_id),
+        "NEWSLETTER_FROM_EMAIL": settings.newsletter_from_email,
+    }
+    all_set = all([
+        settings.resend_api_key,
+        settings.beehiiv_api_key,
+        settings.beehiiv_publication_id,
+    ])
+    report["env_check"] = {"variables": env_vars, "all_required_set": all_set}
+    logger.info(f"[diagnose] Env check: {env_vars}")
+
+    # ---- Resolve period_id ----
+    if not period_id:
+        yesterday = date.today() - timedelta(days=1)
+        period_id = yesterday.strftime("%Y-%m-%d")
+    report["period_id"] = period_id
+    logger.info(f"[diagnose] Using period_id: {period_id}")
+
+    # ---- Step 2: Fetch Beehiiv subscribers (first page only, raw response) ----
+    logger.info("[diagnose] Step 2: Fetching Beehiiv subscribers (page 1)")
+    if settings.beehiiv_api_key and settings.beehiiv_publication_id:
+        try:
+            resp = http_requests.get(
+                f"https://api.beehiiv.com/v2/publications/{settings.beehiiv_publication_id}/subscriptions",
+                headers={"Authorization": f"Bearer {settings.beehiiv_api_key}"},
+                params={"status": "active", "limit": 100, "page": 1, "expand[]": "custom_fields"},
+                timeout=30,
+            )
+            report["beehiiv_subscribers"] = {
+                "status_code": resp.status_code,
+                "ok": resp.ok,
+                "raw_response": resp.json() if resp.ok else resp.text,
+            }
+            if resp.ok:
+                data = resp.json()
+                subs = data.get("data", [])
+                report["beehiiv_subscribers"]["subscriber_count_page1"] = len(subs)
+                report["beehiiv_subscribers"]["total_pages"] = data.get("total_pages", 1)
+                # Extract emails + languages for readability
+                parsed = []
+                for sub in subs:
+                    email = sub.get("email", "?")
+                    lang = "de"
+                    for field in sub.get("custom_fields", []):
+                        if field.get("name", "").lower() == "language":
+                            lang = field.get("value", "de")
+                    parsed.append({"email": email, "language": lang})
+                report["beehiiv_subscribers"]["parsed_subscribers"] = parsed
+            logger.info(f"[diagnose] Beehiiv response: {resp.status_code}, {len(resp.text)} bytes")
+        except Exception as e:
+            report["beehiiv_subscribers"] = {"error": str(e)}
+            logger.error(f"[diagnose] Beehiiv fetch failed: {e}", exc_info=True)
+    else:
+        report["beehiiv_subscribers"] = {"error": "BEEHIIV_API_KEY or BEEHIIV_PUBLICATION_ID not set"}
+        logger.warning("[diagnose] Skipping Beehiiv — missing credentials")
+
+    # ---- Step 3: Check content exists ----
+    logger.info(f"[diagnose] Step 3: Checking content for {period_id}")
+    try:
+        week = db.query(Week).filter(Week.id == period_id).first()
+        if week:
+            from app.models.tech import TechPost
+            from app.models.investment import PrimaryMarketPost, MAPost
+            from app.models.tip import TipPost
+
+            tech_count = db.query(TechPost).filter(
+                TechPost.week_id == period_id, TechPost.is_video == False  # noqa: E712
+            ).count()
+            video_count = db.query(TechPost).filter(
+                TechPost.week_id == period_id, TechPost.is_video == True  # noqa: E712
+            ).count()
+            funding_count = db.query(PrimaryMarketPost).filter(
+                PrimaryMarketPost.week_id == period_id
+            ).count()
+            ma_count = db.query(MAPost).filter(MAPost.week_id == period_id).count()
+            tip_count = db.query(TipPost).filter(TipPost.week_id == period_id).count()
+
+            report["content_check"] = {
+                "period_exists": True,
+                "tech": tech_count,
+                "videos": video_count,
+                "funding": funding_count,
+                "ma": ma_count,
+                "tips": tip_count,
+                "total": tech_count + video_count + funding_count + ma_count + tip_count,
+            }
+        else:
+            report["content_check"] = {"period_exists": False, "total": 0}
+        logger.info(f"[diagnose] Content check: {report['content_check']}")
+    except Exception as e:
+        report["content_check"] = {"error": str(e)}
+        logger.error(f"[diagnose] Content check failed: {e}", exc_info=True)
+
+    # ---- Step 4: Send test email via Resend ----
+    recipient = test_email or settings.newsletter_from_email
+    logger.info(f"[diagnose] Step 4: Sending test email to {recipient}")
+    if settings.resend_api_key:
+        try:
+            resend.api_key = settings.resend_api_key
+            result = resend.Emails.send({
+                "from": settings.newsletter_from_email,
+                "to": [recipient],
+                "subject": f"[DIAGNOSTIC] Newsletter pipeline test — {period_id}",
+                "html": (
+                    "<h2>Newsletter Diagnostic Test</h2>"
+                    f"<p>This is a test email from the newsletter diagnostic endpoint.</p>"
+                    f"<p><strong>Period:</strong> {period_id}</p>"
+                    f"<p><strong>Timestamp:</strong> {date.today().isoformat()}</p>"
+                    "<p>If you received this, Resend is working correctly.</p>"
+                ),
+            })
+            report["resend_test"] = {
+                "ok": True,
+                "recipient": recipient,
+                "result": result,
+            }
+            logger.info(f"[diagnose] Resend test result: {result}")
+        except Exception as e:
+            report["resend_test"] = {"ok": False, "recipient": recipient, "error": str(e)}
+            logger.error(f"[diagnose] Resend test failed: {e}", exc_info=True)
+    else:
+        report["resend_test"] = {"ok": False, "error": "RESEND_API_KEY not set"}
+        logger.warning("[diagnose] Skipping Resend — missing API key")
+
+    logger.info(f"[diagnose] Diagnosis complete for {period_id}")
+    return report
+
+
 @router.get("/health")
 async def health_check():
     """Health check endpoint."""

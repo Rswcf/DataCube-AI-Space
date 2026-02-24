@@ -846,7 +846,7 @@ def _fetch_beehiiv_subscribers(api_key: str, publication_id: str) -> list[dict]:
         resp = requests.get(
             f"https://api.beehiiv.com/v2/publications/{publication_id}/subscriptions",
             headers={"Authorization": f"Bearer {api_key}"},
-            params={"status": "active", "limit": 100, "page": page},
+            params={"status": "active", "limit": 100, "page": page, "expand[]": "custom_fields"},
             timeout=30,
         )
         if not resp.ok:
@@ -863,9 +863,11 @@ def _fetch_beehiiv_subscribers(api_key: str, publication_id: str) -> list[dict]:
             if email:
                 lang = "de"  # default
                 for field in sub.get("custom_fields", []):
-                    if field.get("name") == "language":
+                    if field.get("name", "").lower() == "language":
                         lang = field.get("value", "de")
                 subscribers.append({"email": email, "language": lang})
+            else:
+                logger.warning(f"Subscriber without email: {sub.get('id', 'unknown')}")
 
         # Check pagination
         total_pages = data.get("total_pages", 1)
@@ -905,11 +907,11 @@ def _send_via_resend(
         ]
 
         try:
-            resend.Batch.send(emails)
+            result = resend.Batch.send(emails)
+            logger.info(f"Resend batch {i // batch_size + 1} result: {result}")
             sent += len(batch)
-            logger.info(f"Sent batch {i // batch_size + 1}: {len(batch)} emails")
         except Exception as e:
-            logger.error(f"Resend batch error: {e}")
+            logger.error(f"Resend batch error for {[addr for addr in batch]}: {e}", exc_info=True)
             failed += len(batch)
 
     if failed:
