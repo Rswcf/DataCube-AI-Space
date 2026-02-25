@@ -211,7 +211,16 @@ function buildBreadcrumbSchema(lang: AppLanguage, topic: string, topicTitle: str
       {
         '@type': 'ListItem',
         position: 1,
-        name: lang === 'de' ? 'Startseite' : 'Home',
+        name: ({
+          de: 'Startseite',
+          en: 'Home',
+          zh: '首页',
+          fr: 'Accueil',
+          es: 'Inicio',
+          pt: 'Início',
+          ja: 'ホーム',
+          ko: '홈',
+        } as Record<string, string>)[lang] || 'Home',
         item: `https://www.datacubeai.space/${lang}`,
       },
       {
@@ -363,7 +372,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
     alternates: {
       canonical: canonicalUrl,
       languages: {
-        'x-default': `https://www.datacubeai.space/de/topic/${topic}`,
+        'x-default': `https://www.datacubeai.space/en/topic/${topic}`,
         ...Object.fromEntries(
           SUPPORTED_LANGUAGES.map((code) => [
             toBcp47(code),
@@ -453,12 +462,13 @@ export default async function TopicPage({ params, searchParams }: Props) {
 
   const total = filteredBuckets.reduce((acc, item) => acc + bucketResultCount(item), 0)
 
-  const sectionLabel = (de: string, en: string): string => (lang === 'de' ? de : en)
+  const t = (translations: Record<string, string>): string =>
+    translations[lang] || translations.en
   const sectionTitle = {
-    all: sectionLabel('Alle Bereiche', 'All sections'),
-    tech: sectionLabel('Technologie', 'Technology'),
-    investment: sectionLabel('Investment', 'Investment'),
-    tips: sectionLabel('Tipps', 'Tips'),
+    all: t({ de: 'Alle Bereiche', en: 'All sections', zh: '所有板块', fr: 'Toutes les sections', es: 'Todas las secciones', pt: 'Todas as seções', ja: '全セクション', ko: '모든 섹션' }),
+    tech: t({ de: 'Technologie', en: 'Technology', zh: '科技', fr: 'Technologie', es: 'Tecnología', pt: 'Tecnologia', ja: 'テクノロジー', ko: '기술' }),
+    investment: t({ de: 'Investitionen', en: 'Investment', zh: '投资', fr: 'Investissement', es: 'Inversión', pt: 'Investimento', ja: '投資', ko: '투자' }),
+    tips: t({ de: 'Tipps', en: 'Tips', zh: '技巧', fr: 'Conseils', es: 'Consejos', pt: 'Dicas', ja: 'ヒント', ko: '팁' }),
   } as const
   const breadcrumbSchema = buildBreadcrumbSchema(lang, topic, topicTitle)
   const itemListSchema = buildItemListSchema(lang, topicTitle, pagedBuckets, sectionFilter)
@@ -473,10 +483,10 @@ export default async function TopicPage({ params, searchParams }: Props) {
       <header className="mb-8 border-b border-border pb-4">
         <h1 className="text-3xl font-bold">{topicTitle}</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          {sectionLabel('Themen-Archiv', 'Topic archive')} • {total} {sectionLabel('Treffer', 'matches')}
+          {t({ de: 'Themen-Archiv', en: 'Topic archive', zh: '主题归档', fr: 'Archive thématique', es: 'Archivo temático', pt: 'Arquivo temático', ja: 'トピックアーカイブ', ko: '주제 아카이브' })} • {total} {t({ de: 'Treffer', en: 'matches', zh: '条结果', fr: 'résultats', es: 'resultados', pt: 'resultados', ja: '件', ko: '건' })}
         </p>
         <p className="mt-3 text-sm text-muted-foreground">
-          <a className="underline" href={`/${lang}`}>{sectionLabel('Zur Startseite', 'Back to home')}</a>
+          <a className="underline" href={`/${lang}`}>{t({ de: 'Zur Startseite', en: 'Back to home', zh: '返回首页', fr: "Retour à l'accueil", es: 'Volver al inicio', pt: 'Voltar ao início', ja: 'ホームに戻る', ko: '홈으로 돌아가기' })}</a>
           <span> • </span>
           <a
             className="underline"
@@ -504,7 +514,7 @@ export default async function TopicPage({ params, searchParams }: Props) {
               href={buildTopicHref(lang, topic, { section: sectionFilter })}
               className={`rounded-full border px-3 py-1 text-xs focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${periodFilter ? 'border-border text-muted-foreground' : 'border-primary text-primary'}`}
             >
-              {sectionLabel('Alle Zeiträume', 'All periods')}
+              {t({ de: 'Alle Zeiträume', en: 'All periods', zh: '所有时段', fr: 'Toutes les périodes', es: 'Todos los periodos', pt: 'Todos os períodos', ja: '全期間', ko: '전체 기간' })}
             </a>
             {availablePeriods.slice(0, 12).map((periodId) => (
               <a
@@ -520,7 +530,7 @@ export default async function TopicPage({ params, searchParams }: Props) {
       </header>
 
       {pagedBuckets.length === 0 ? (
-        <p className="text-muted-foreground">{sectionLabel('Keine Einträge für dieses Thema gefunden.', 'No entries found for this topic.')}</p>
+        <p className="text-muted-foreground">{t({ de: 'Keine Einträge für dieses Thema gefunden.', en: 'No entries found for this topic.', zh: '未找到该主题的内容。', fr: 'Aucune entrée trouvée pour ce sujet.', es: 'No se encontraron entradas para este tema.', pt: 'Nenhuma entrada encontrada para este tópico.', ja: 'このトピックに関するエントリは見つかりませんでした。', ko: '이 주제에 대한 항목을 찾을 수 없습니다.' })}</p>
       ) : (
         <div className="space-y-10">
           {pagedBuckets.map((bucket) => (
@@ -533,7 +543,7 @@ export default async function TopicPage({ params, searchParams }: Props) {
 
               {bucket.tech.length > 0 ? (
                 <div>
-                  <h3 className="mb-2 text-lg font-semibold">Technology</h3>
+                  <h3 className="mb-2 text-lg font-semibold">{sectionTitle.tech}</h3>
                   <ul className="space-y-3">
                     {bucket.tech.slice(0, 8).map((post) => {
                       const anchorId = entryAnchorId(bucket.periodId, 'tech', post.id)
@@ -545,7 +555,7 @@ export default async function TopicPage({ params, searchParams }: Props) {
                             className="text-xs text-muted-foreground underline"
                             href={buildTopicHref(lang, topic, { period: bucket.periodId, section: sectionFilter, hash: anchorId })}
                           >
-                            {sectionLabel('Direktlink', 'Permalink')}
+                            {t({ de: 'Direktlink', en: 'Permalink', zh: '永久链接', fr: 'Lien permanent', es: 'Enlace permanente', pt: 'Link permanente', ja: 'パーマリンク', ko: '퍼머링크' })}
                           </a>
                         </li>
                       )
@@ -556,7 +566,7 @@ export default async function TopicPage({ params, searchParams }: Props) {
 
               {bucket.primary.length + bucket.secondary.length + bucket.ma.length > 0 ? (
                 <div>
-                  <h3 className="mb-2 text-lg font-semibold">Investment</h3>
+                  <h3 className="mb-2 text-lg font-semibold">{sectionTitle.investment}</h3>
                   <ul className="space-y-3">
                     {bucket.primary.slice(0, 4).map((post) => {
                       const anchorId = entryAnchorId(bucket.periodId, 'pm', post.id)
@@ -565,7 +575,7 @@ export default async function TopicPage({ params, searchParams }: Props) {
                           <p className="font-medium">{post.company} • {post.round}</p>
                           <p className="text-sm text-muted-foreground">{post.content}</p>
                           <a className="text-xs text-muted-foreground underline" href={buildTopicHref(lang, topic, { period: bucket.periodId, section: sectionFilter, hash: anchorId })}>
-                            {sectionLabel('Direktlink', 'Permalink')}
+                            {t({ de: 'Direktlink', en: 'Permalink', zh: '永久链接', fr: 'Lien permanent', es: 'Enlace permanente', pt: 'Link permanente', ja: 'パーマリンク', ko: '퍼머링크' })}
                           </a>
                         </li>
                       )
@@ -577,7 +587,7 @@ export default async function TopicPage({ params, searchParams }: Props) {
                           <p className="font-medium">{post.ticker}</p>
                           <p className="text-sm text-muted-foreground">{post.content}</p>
                           <a className="text-xs text-muted-foreground underline" href={buildTopicHref(lang, topic, { period: bucket.periodId, section: sectionFilter, hash: anchorId })}>
-                            {sectionLabel('Direktlink', 'Permalink')}
+                            {t({ de: 'Direktlink', en: 'Permalink', zh: '永久链接', fr: 'Lien permanent', es: 'Enlace permanente', pt: 'Link permanente', ja: 'パーマリンク', ko: '퍼머링크' })}
                           </a>
                         </li>
                       )
@@ -589,7 +599,7 @@ export default async function TopicPage({ params, searchParams }: Props) {
                           <p className="font-medium">{post.acquirer} → {post.target}</p>
                           <p className="text-sm text-muted-foreground">{post.content}</p>
                           <a className="text-xs text-muted-foreground underline" href={buildTopicHref(lang, topic, { period: bucket.periodId, section: sectionFilter, hash: anchorId })}>
-                            {sectionLabel('Direktlink', 'Permalink')}
+                            {t({ de: 'Direktlink', en: 'Permalink', zh: '永久链接', fr: 'Lien permanent', es: 'Enlace permanente', pt: 'Link permanente', ja: 'パーマリンク', ko: '퍼머링크' })}
                           </a>
                         </li>
                       )
@@ -600,7 +610,7 @@ export default async function TopicPage({ params, searchParams }: Props) {
 
               {bucket.tips.length > 0 ? (
                 <div>
-                  <h3 className="mb-2 text-lg font-semibold">Tips</h3>
+                  <h3 className="mb-2 text-lg font-semibold">{sectionTitle.tips}</h3>
                   <ul className="space-y-3">
                     {bucket.tips.slice(0, 6).map((tip) => {
                       const anchorId = entryAnchorId(bucket.periodId, 'tips', tip.id)
@@ -609,7 +619,7 @@ export default async function TopicPage({ params, searchParams }: Props) {
                           <p className="font-medium">{tip.category}</p>
                           <p className="text-sm text-muted-foreground">{tip.content}</p>
                           <a className="text-xs text-muted-foreground underline" href={buildTopicHref(lang, topic, { period: bucket.periodId, section: sectionFilter, hash: anchorId })}>
-                            {sectionLabel('Direktlink', 'Permalink')}
+                            {t({ de: 'Direktlink', en: 'Permalink', zh: '永久链接', fr: 'Lien permanent', es: 'Enlace permanente', pt: 'Link permanente', ja: 'パーマリンク', ko: '퍼머링크' })}
                           </a>
                         </li>
                       )
@@ -626,22 +636,22 @@ export default async function TopicPage({ params, searchParams }: Props) {
         <nav className="mt-10 flex items-center justify-between border-t border-border pt-4" aria-label="Topic pagination">
           {currentPage > 1 ? (
             <a className="underline focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded" href={buildTopicHref(lang, topic, { period: periodFilter || undefined, section: sectionFilter, page: currentPage - 1 })}>
-              {sectionLabel('← Vorherige', '← Previous')}
+              {t({ de: '← Vorherige', en: '← Previous', zh: '← 上一页', fr: '← Précédent', es: '← Anterior', pt: '← Anterior', ja: '← 前へ', ko: '← 이전' })}
             </a>
           ) : (
-            <span className="text-muted-foreground">{sectionLabel('← Vorherige', '← Previous')}</span>
+            <span className="text-muted-foreground">{t({ de: '← Vorherige', en: '← Previous', zh: '← 上一页', fr: '← Précédent', es: '← Anterior', pt: '← Anterior', ja: '← 前へ', ko: '← 이전' })}</span>
           )}
 
           <span className="text-sm text-muted-foreground">
-            {sectionLabel('Seite', 'Page')} {currentPage} / {totalPages}
+            {t({ de: 'Seite', en: 'Page', zh: '页', fr: 'Page', es: 'Página', pt: 'Página', ja: 'ページ', ko: '페이지' })} {currentPage} / {totalPages}
           </span>
 
           {currentPage < totalPages ? (
             <a className="underline focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded" href={buildTopicHref(lang, topic, { period: periodFilter || undefined, section: sectionFilter, page: currentPage + 1 })}>
-              {sectionLabel('Nächste →', 'Next →')}
+              {t({ de: 'Nächste →', en: 'Next →', zh: '下一页 →', fr: 'Suivant →', es: 'Siguiente →', pt: 'Próximo →', ja: '次へ →', ko: '다음 →' })}
             </a>
           ) : (
-            <span className="text-muted-foreground">{sectionLabel('Nächste →', 'Next →')}</span>
+            <span className="text-muted-foreground">{t({ de: 'Nächste →', en: 'Next →', zh: '下一页 →', fr: 'Suivant →', es: 'Siguiente →', pt: 'Próximo →', ja: '次へ →', ko: '다음 →' })}</span>
           )}
         </nav>
       ) : null}

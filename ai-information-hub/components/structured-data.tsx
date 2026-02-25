@@ -46,10 +46,15 @@ export function WebsiteSchema() {
 }
 
 export function ArticleSchema({ post, inLanguage = 'de', url }: { post: TechPost; inLanguage?: string; url?: string }) {
+  // Use the first line of content as the headline (it acts as the article title),
+  // truncated to 110 chars for schema.org compliance. Falls back to sliced content.
+  const firstLine = (post.content || '').split('\n')[0]?.trim()
+  const headline = (firstLine && firstLine.length > 0 ? firstLine : post.content).slice(0, 110)
+
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'NewsArticle',
-    headline: post.content.slice(0, 110),
+    headline,
     description: post.content,
     datePublished: post.timestamp,
     dateModified: post.timestamp,
@@ -194,9 +199,35 @@ export function BreadcrumbListSchema({ weekId, weekLabel, lang = 'en' }: { weekI
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: homeLabel, item: 'https://www.datacubeai.space' },
-      { '@type': 'ListItem', position: 2, name: weekLabel, item: `https://www.datacubeai.space/week/${weekId}` },
+      { '@type': 'ListItem', position: 1, name: homeLabel, item: `https://www.datacubeai.space/${lang}` },
+      { '@type': 'ListItem', position: 2, name: weekLabel, item: `https://www.datacubeai.space/${lang}/week/${weekId}` },
     ],
   }
   return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
+}
+
+/** Reusable ItemList schema with empty-guard: returns null when items array is empty */
+export function ItemListSchema({ items, name, lang }: { items: Array<{ url: string; name: string }>; name: string; lang?: string }) {
+  if (!items || items.length === 0) return null
+
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name,
+    itemListOrder: 'https://schema.org/ItemListOrderAscending',
+    numberOfItems: items.length,
+    itemListElement: items.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      url: item.url,
+      name: item.name,
+    })),
+  }
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+    />
+  )
 }

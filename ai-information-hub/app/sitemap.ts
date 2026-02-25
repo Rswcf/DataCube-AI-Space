@@ -98,12 +98,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const langPriority: Record<string, number> = { de: 0.8, en: 0.7 }
   const defaultPriority = 0.5
 
+  const now = new Date()
+  const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+
   const periodEntries = periodIds.flatMap((periodId) => {
     const lastModified = lastModFromId(periodId)
+    // Older periods are unlikely to change daily — use "weekly" for accuracy.
+    const changeFrequency: 'daily' | 'weekly' = lastModified < sevenDaysAgo ? 'weekly' : 'daily'
     return SUPPORTED_LANGUAGES.map((lang) => ({
       url: `${baseUrl}/${lang}/week/${periodId}`,
       lastModified,
-      changeFrequency: 'daily' as const,
+      changeFrequency,
       priority: langPriority[lang] ?? defaultPriority,
     }))
   })
@@ -122,11 +127,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
 
-  const deSlugs = Array.from(deTopicSet).slice(0, 30)
-  const enSlugs = Array.from(enTopicSet).slice(0, 30)
+  // Filter out empty or invalid slugs to avoid sitemap entries pointing to empty topic pages.
+  // Note: Topics with 0 matching articles may still appear if trends data includes them
+  // but actual article matching yields nothing. A full fix would require querying article
+  // counts per topic, which is too expensive at sitemap generation time.
+  const deSlugs = Array.from(deTopicSet).filter((s) => s.length > 1).slice(0, 30)
+  const enSlugs = Array.from(enTopicSet).filter((s) => s.length > 1).slice(0, 30)
 
   const topicEntries = SUPPORTED_LANGUAGES.flatMap((lang) => {
     const slugs = lang === 'de' ? deSlugs : enSlugs
+    // Skip languages with no topic data to avoid empty topic pages in sitemap.
+    if (slugs.length === 0) return []
     return slugs.map((topic) => ({
       url: `${baseUrl}/${lang}/topic/${topic}`,
       lastModified: new Date(),
@@ -156,7 +167,49 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${baseUrl}/about`,
       lastModified: new Date('2026-02-18T00:00:00Z'),
       changeFrequency: 'monthly',
+      priority: 0.4,
+    },
+    {
+      url: `${baseUrl}/impressum`,
+      lastModified: new Date('2026-02-18T00:00:00Z'),
+      changeFrequency: 'monthly',
+      priority: 0.3,
+    },
+    {
+      url: `${baseUrl}/datenschutz`,
+      lastModified: new Date('2026-02-18T00:00:00Z'),
+      changeFrequency: 'monthly',
+      priority: 0.3,
+    },
+    {
+      url: `${baseUrl}/developers`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
       priority: 0.6,
+    },
+    {
+      url: `${baseUrl}/pricing`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.6,
+    },
+    {
+      url: `${baseUrl}/for-teams`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.5,
+    },
+    {
+      url: `${baseUrl}/jobs`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.6,
+    },
+    {
+      url: `${baseUrl}/premium`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.5,
     },
     ...langHomeEntries,
     ...topicEntries,

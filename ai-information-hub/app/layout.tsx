@@ -21,15 +21,25 @@ export const metadata: Metadata = {
   },
   description: 'Free multilingual AI news aggregator covering generative AI breakthroughs, LLM updates, AI investment signals, and practical tips — curated daily from 40+ sources in 8 languages.',
   keywords: [
+    // English
     'AI news', 'artificial intelligence', 'machine learning', 'AI investment', 'AI tips',
-    'generative AI', 'LLM news', 'ChatGPT', 'AI weekly digest', 'AI newsletter',
+    'generative AI', 'LLM news', 'ChatGPT updates', 'AI weekly digest', 'AI newsletter',
     'AI stocks', 'AI funding', 'AI tools', 'deep learning', 'AI breakthroughs',
-    'KI Nachrichten', 'KI News', 'künstliche Intelligenz', 'KI Investment', 'KI Tipps',
-    'AI新闻', '人工智能', 'AI投资', 'AI工具推荐',
+    'prompt engineering', 'AI startups', 'AI daily digest',
+    // German
+    'künstliche Intelligenz', 'KI-Nachrichten', 'KI-Investitionen', 'KI News', 'KI Tipps',
+    // Chinese
+    '人工智能', '大模型', 'AI投资', 'AI新闻', 'AI工具推荐',
+    // French
     'actualités IA', 'intelligence artificielle', 'investissement IA',
-    'noticias IA', 'inteligencia artificial',
-    'AIニュース', '人工知能ニュース',
-    'AI 뉴스', '인공지능 뉴스',
+    // Spanish
+    'noticias IA', 'inteligencia artificial', 'inversiones IA',
+    // Portuguese
+    'notícias IA', 'inteligência artificial',
+    // Japanese
+    'AIニュース', '人工知能ニュース', '機械学習',
+    // Korean
+    'AI 뉴스', '인공지능 뉴스', 'AI 투자',
   ],
   authors: [{ name: 'Data Cube Team' }],
   creator: 'Data Cube AI',
@@ -73,19 +83,11 @@ export const metadata: Metadata = {
     ],
   },
 
-  // Twitter Card
+  // Twitter Card — no static images so child pages' openGraph.images propagate automatically
   twitter: {
     card: 'summary_large_image',
     title: 'Data Cube AI | Daily AI News',
     description: 'Daily AI news digest: tech breakthroughs, investment signals, and practical tips – free in 8 languages.',
-    images: [
-      {
-        url: '/og-image.jpg',
-        width: 1200,
-        height: 630,
-        alt: 'Data Cube AI – Where AI meets human insight',
-      },
-    ],
   },
 
   // Robots

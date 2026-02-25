@@ -70,12 +70,24 @@ function isLocalizablePath(pathname: string): boolean {
   )
 }
 
+// Paths that bypass the login gate entirely — accessible to ALL visitors,
+// not just crawlers or users with the `visited` cookie.
+const LOGIN_BYPASS_PATHS = new Set([
+  '/impressum',
+  '/datenschutz',
+  '/about',
+  '/developers',
+  '/pricing',
+  '/for-teams',
+  '/jobs',
+  '/premium',
+])
+
 function isSeoAlwaysAllowedPath(pathname: string): boolean {
   return (
     pathname === '/' ||
     new RegExp(`^\\/${LANG_RE}$`).test(pathname) ||
-    pathname === '/impressum' ||
-    pathname === '/datenschutz' ||
+    LOGIN_BYPASS_PATHS.has(pathname) ||
     /^\/week\/[^/]+$/.test(pathname) ||
     /^\/topic\/[^/]+$/.test(pathname) ||
     new RegExp(`^\\/${LANG_RE}\\/week\\/[^/]+$`).test(pathname) ||
@@ -107,9 +119,11 @@ export function middleware(request: NextRequest) {
     return nextWithLang(request)
   }
 
-  // Keep login for normal browsers, but let crawlers/automation reach SEO paths.
+  // Informational/marketing pages bypass login gate for ALL visitors (human or bot).
+  // SEO content paths bypass for crawlers and non-human browsers only.
+  const isPublicInfoPage = LOGIN_BYPASS_PATHS.has(pathname)
   const isSeoAutomationPass = isSeoAlwaysAllowedPath(pathname) && !isLikelyHumanBrowser(request)
-  const shouldBypassLoginGate = isCrawler(request) || isSeoAutomationPass
+  const shouldBypassLoginGate = isPublicInfoPage || isCrawler(request) || isSeoAutomationPass
   if (!shouldBypassLoginGate) {
     const hasVisited = request.cookies.get('visited')
     if (!hasVisited) {
