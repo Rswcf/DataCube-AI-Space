@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Cpu, TrendingUp, Lightbulb, Sun, Moon, Languages, Heart, Check, Wrench } from "lucide-react";
+import { Cpu, TrendingUp, Lightbulb, Sun, Moon, Languages, Heart, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSettings } from "@/lib/settings-context";
 import { LogoCube } from "@/components/logo-cube";
@@ -194,15 +194,6 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
 
           {/* Language Selector */}
           <LanguageDropdown language={language} setLanguage={setLanguage} />
-
-          {/* AI Tools */}
-          <NavButton
-            icon={Wrench}
-            label={t("aiTools")}
-            description={t("aiToolsDescription")}
-            onClick={() => window.open("/tools", "_blank", "noopener,noreferrer")}
-            iconClassName="text-orange-500"
-          />
 
           {/* Support */}
           <NavButton

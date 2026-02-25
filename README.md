@@ -55,6 +55,7 @@ https://github.com/user-attachments/assets/9dddaaed-e473-4350-97de-0346cacb6660
 | ♿ | **Accessible** | WCAG-compliant: focus-visible, ARIA, reduced-motion, skip links |
 | 📝 | **Editorial Standards** | Transparent AI methodology, data sources, pipeline documentation |
 | 📱 | **Mobile-First** | Dynamic viewport, safe area insets, touch-optimized navigation |
+| 💸 | **Monetization** | Developer API portal, Stripe premium tier, AI job board (DACH) |
 
 ## Architecture
 
@@ -157,6 +158,9 @@ Daily collections produce reduced counts (10 tech, 5 investment, 5 tips, 2 video
 | `/api/admin/collect` | POST | Trigger full data collection |
 | `/api/admin/newsletter` | POST | Send newsletter (per-subscriber language) |
 | `/api/admin/newsletter/diagnose` | POST | Diagnostic: test Beehiiv, Resend, content |
+| `/api/developer/register` | POST | Register for developer API key |
+| `/api/jobs` | GET | AI job listings (DACH region) |
+| `/api/stripe/create-checkout` | POST | Create Stripe checkout session |
 
 Period IDs: daily `YYYY-MM-DD` or weekly `YYYY-kwWW`
 
@@ -189,6 +193,11 @@ BEEHIIV_API_KEY=...                 # Subscriber management
 BEEHIIV_PUBLICATION_ID=pub_...      # Beehiiv publication
 NEWSLETTER_FROM_EMAIL=newsletter@datacubeai.space
 CORS_ORIGINS=["http://localhost:3000"]
+STRIPE_SECRET_KEY=               # Stripe payments
+STRIPE_WEBHOOK_SECRET=           # Stripe webhook verification
+STRIPE_PREMIUM_PRICE_ID=         # Stripe Premium subscription price
+STRIPE_API_DEVELOPER_PRICE_ID=   # Stripe Developer API tier price
+STRIPE_API_BUSINESS_PRICE_ID=    # Stripe Business API tier price
 ```
 
 </details>
@@ -221,7 +230,13 @@ DataCube-AI-Space/
 │   │   ├── feed.xml/            # Atom 1.0 feed (8 languages)
 │   │   ├── about/              # Editorial standards
 │   │   ├── unsubscribe/        # Newsletter unsubscribe
-│   │   └── news-sitemap.xml/   # Google News Sitemap
+│   │   ├── news-sitemap.xml/   # Google News Sitemap
+│   │   ├── developers/         # API developer portal
+│   │   ├── pricing/            # Pricing page
+│   │   ├── for-teams/          # Enterprise landing
+│   │   ├── jobs/               # AI job board
+│   │   ├── premium/            # Premium upgrade
+│   │   └── api/checkout/       # Stripe checkout
 │   ├── components/              # React components
 │   │   ├── feeds/               # Tech, Investment, Tips feeds
 │   │   └── video-embed.tsx      # YouTube player
@@ -233,7 +248,13 @@ DataCube-AI-Space/
 ├── ai-hub-backend/              # Backend (FastAPI)
 │   ├── app/
 │   │   ├── models/              # SQLAlchemy models
+│   │   │   ├── developer.py    # ApiKey model
+│   │   │   ├── job.py          # JobListing model
+│   │   │   └── subscription.py # Subscription model
 │   │   ├── routers/             # API endpoints
+│   │   │   ├── developer.py    # Developer API keys + rate limiting
+│   │   │   ├── jobs.py         # Job board CRUD
+│   │   │   └── stripe_webhook.py  # Stripe payments
 │   │   └── services/            # Business logic
 │   │       ├── collector.py     # 4-stage pipeline
 │   │       ├── llm_processor.py # LLM processing + resilient translation

@@ -172,14 +172,6 @@ export const translations = {
     reportClose: "Schlie\u00dfen",
     reportError: "Fehler beim Erstellen des Berichts. Bitte versuche es erneut.",
     reportRegenerate: "Neu generieren",
-
-    // Monetization
-    aiTools: "KI-Tools",
-    aiToolsDescription: "Kuratierte KI-Tools und Ressourcen",
-    affiliateDisclosure: "Affiliate-Hinweis",
-    advertisingNotice: "Anzeige",
-    tryTool: "Ausprobieren",
-    freeAvailable: "Kostenloses Paket verf\u00fcgbar",
   },
   en: {
     // Navigation
@@ -341,14 +333,6 @@ export const translations = {
     reportClose: "Close",
     reportError: "Failed to generate report. Please try again.",
     reportRegenerate: "Regenerate",
-
-    // Monetization
-    aiTools: "AI Tools",
-    aiToolsDescription: "Curated AI tools and resources",
-    affiliateDisclosure: "Affiliate Disclosure",
-    advertisingNotice: "Ad",
-    tryTool: "Try it",
-    freeAvailable: "Free tier available",
   },
   zh: {
     // Navigation
@@ -510,14 +494,6 @@ export const translations = {
     reportClose: "\u5173\u95ed",
     reportError: "\u62a5\u544a\u751f\u6210\u5931\u8d25\uff0c\u8bf7\u91cd\u8bd5\u3002",
     reportRegenerate: "\u91cd\u65b0\u751f\u6210",
-
-    // Monetization
-    aiTools: "AI \u5de5\u5177",
-    aiToolsDescription: "\u7cbe\u9009 AI \u5de5\u5177\u548c\u8d44\u6e90",
-    affiliateDisclosure: "\u8054\u76df\u63a8\u5e7f\u58f0\u660e",
-    advertisingNotice: "\u5e7f\u544a",
-    tryTool: "\u7acb\u5373\u4f53\u9a8c",
-    freeAvailable: "\u63d0\u4f9b\u514d\u8d39\u7248\u672c",
   },
   fr: {
     // Navigation
@@ -679,14 +655,6 @@ export const translations = {
     reportClose: "Fermer",
     reportError: "\u00c9chec de la g\u00e9n\u00e9ration du rapport. Veuillez r\u00e9essayer.",
     reportRegenerate: "Reg\u00e9n\u00e9rer",
-
-    // Monetization
-    aiTools: "Outils IA",
-    aiToolsDescription: "Outils et ressources IA s\u00e9lectionn\u00e9s",
-    affiliateDisclosure: "Divulgation d\u2019affiliation",
-    advertisingNotice: "Publicit\u00e9",
-    tryTool: "Essayer",
-    freeAvailable: "Version gratuite disponible",
   },
   es: {
     // Navigation
@@ -848,14 +816,6 @@ export const translations = {
     reportClose: "Cerrar",
     reportError: "Error al generar el informe. Int\u00e9ntalo de nuevo.",
     reportRegenerate: "Regenerar",
-
-    // Monetization (es)
-    aiTools: "Herramientas IA",
-    aiToolsDescription: "Herramientas y recursos de IA seleccionados",
-    affiliateDisclosure: "Aviso de afiliaci\u00f3n",
-    advertisingNotice: "Publicidad",
-    tryTool: "Probar",
-    freeAvailable: "Versi\u00f3n gratuita disponible",
   },
   pt: {
     // Navigation
@@ -1017,14 +977,6 @@ export const translations = {
     reportClose: "Fechar",
     reportError: "Falha ao gerar o relat\u00f3rio. Tente novamente.",
     reportRegenerate: "Regenerar",
-
-    // Monetization
-    aiTools: "Ferramentas IA",
-    aiToolsDescription: "Ferramentas e recursos de IA selecionados",
-    affiliateDisclosure: "Aviso de afilia\u00e7\u00e3o",
-    advertisingNotice: "Publicidade",
-    tryTool: "Experimentar",
-    freeAvailable: "Vers\u00e3o gratuita dispon\u00edvel",
   },
   ja: {
     // Navigation
@@ -1186,14 +1138,6 @@ export const translations = {
     reportClose: "\u9589\u3058\u308b",
     reportError: "\u30ec\u30dd\u30fc\u30c8\u306e\u751f\u6210\u306b\u5931\u6557\u3057\u307e\u3057\u305f\u3002\u3082\u3046\u4e00\u5ea6\u304a\u8a66\u3057\u304f\u3060\u3055\u3044\u3002",
     reportRegenerate: "\u518d\u751f\u6210",
-
-    // Monetization
-    aiTools: "AI \u30c4\u30fc\u30eb",
-    aiToolsDescription: "\u53b3\u9078\u3055\u308c\u305fAI\u30c4\u30fc\u30eb\u3068\u30ea\u30bd\u30fc\u30b9",
-    affiliateDisclosure: "\u30a2\u30d5\u30a3\u30ea\u30a8\u30a4\u30c8\u958b\u793a",
-    advertisingNotice: "\u5e83\u544a",
-    tryTool: "\u8a66\u3057\u3066\u307f\u308b",
-    freeAvailable: "\u7121\u6599\u30d7\u30e9\u30f3\u3042\u308a",
   },
   ko: {
     // Navigation
@@ -1355,14 +1299,6 @@ export const translations = {
     reportClose: "\ub2eb\uae30",
     reportError: "\ub9ac\ud3ec\ud2b8 \uc0dd\uc131\uc5d0 \uc2e4\ud328\ud588\uc2b5\ub2c8\ub2e4. \ub2e4\uc2dc \uc2dc\ub3c4\ud574 \uc8fc\uc138\uc694.",
     reportRegenerate: "\uc7ac\uc0dd\uc131",
-
-    // Monetization
-    aiTools: "AI \ub3c4\uad6c",
-    aiToolsDescription: "\uc5c4\uc120\ub41c AI \ub3c4\uad6c \ubc0f \ub9ac\uc18c\uc2a4",
-    affiliateDisclosure: "\uc81c\ud734 \uacf5\uc2dc",
-    advertisingNotice: "\uad11\uace0",
-    tryTool: "\uc0ac\uc6a9\ud574 \ubcf4\uae30",
-    freeAvailable: "\ubb34\ub8cc \ud50c\ub79c \uc81c\uacf5",
   },
 } as const;
 

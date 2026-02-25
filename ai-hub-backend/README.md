@@ -17,6 +17,9 @@ FastAPI backend for the AI Information Hub — multilingual (8 languages) daily 
 - **8-language support** (DE, EN, ZH, FR, ES, PT, JA, KO) with resilient free-model translation pipeline
 - Period ID support: daily `YYYY-MM-DD` or weekly `YYYY-kwWW`
 - **Automated newsletter** via Resend + Beehiiv with per-subscriber language preference
+- **Developer API** with tiered rate limiting (free/premium/business API keys)
+- **AI Job Board** for DACH region (job listings CRUD with admin controls)
+- **Stripe Premium Subscriptions** (checkout, webhooks, subscription management)
 
 ## LLM Models
 
@@ -493,6 +496,7 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 2. Install dependencies:
 ```bash
 pip install -r requirements.txt
+# Key dependencies include: stripe>=8.0.0, slowapi>=0.1.9
 ```
 
 3. Configure environment:
@@ -528,6 +532,16 @@ alembic revision --autogenerate -m "description"
 alembic downgrade -1
 ```
 
+#### Migration History (Monetization)
+
+| Migration | Description |
+|-----------|-------------|
+| `0007_add_developer_api_keys` | `api_keys` table (email, api_key, tier, calls_today, calls_total, is_active) |
+| `0008_add_job_listings` | `job_listings` table (title, company, location, salary, tags, listing_type) |
+| `0009_add_subscriptions` | `subscriptions` table (email, stripe IDs, tier, status, period dates) |
+
+Chain: 0006 -> 0007 -> 0008 -> 0009
+
 ## API Endpoints
 
 | Endpoint | Method | Description |
@@ -549,6 +563,18 @@ alembic downgrade -1
 | `/api/admin/collect/ma` | POST | M&A-only reprocessing |
 | `/api/admin/newsletter` | POST | Send newsletter (per-subscriber language) |
 | `/api/admin/migrate` | POST | Migrate JSON data |
+| `/api/developer/register` | POST | Register for API key (returns `dcai_xxx`) |
+| `/api/developer/usage` | GET | API key usage stats (requires `X-API-Key`) |
+| `/api/developer/rotate-key` | POST | Rotate API key (requires `X-API-Key`) |
+| `/api/jobs` | GET | List active job listings (filters: job_type, location, level, search) |
+| `/api/jobs/{id}` | GET | Single job listing |
+| `/api/jobs` | POST | Create job listing (admin `X-API-Key`) |
+| `/api/jobs/{id}` | PUT | Update job listing (admin `X-API-Key`) |
+| `/api/jobs/{id}` | DELETE | Soft-delete job listing (admin `X-API-Key`) |
+| `/api/stripe/webhook` | POST | Stripe webhook handler (Stripe signature) |
+| `/api/stripe/create-checkout` | POST | Create Stripe checkout session |
+| `/api/stripe/subscription/{email}` | GET | Subscription status by email |
+| `/api/stripe/cancel` | POST | Cancel subscription |
 | `/health` | GET | Health check |
 
 ## Deployment to Railway
@@ -576,6 +602,11 @@ railway variables set RESEND_API_KEY=re_xxxxx
 railway variables set BEEHIIV_API_KEY=xxxxx
 railway variables set BEEHIIV_PUBLICATION_ID=pub_xxxxx
 railway variables set NEWSLETTER_FROM_EMAIL=newsletter@datacubeai.space
+railway variables set STRIPE_SECRET_KEY=sk_xxxxx
+railway variables set STRIPE_WEBHOOK_SECRET=whsec_xxxxx
+railway variables set STRIPE_PREMIUM_PRICE_ID=price_xxxxx
+railway variables set STRIPE_API_DEVELOPER_PRICE_ID=price_xxxxx
+railway variables set STRIPE_API_BUSINESS_PRICE_ID=price_xxxxx
 railway variables set CORS_ORIGINS='["http://localhost:3000","https://www.datacubeai.space","https://ai-information-hub.vercel.app"]'
 ```
 
@@ -740,11 +771,17 @@ ai-hub-backend/
 │   ├── database.py          # DB connection
 │   ├── models/              # SQLAlchemy models
 │   │   ├── __init__.py      # All models
-│   │   └── raw.py           # Raw article/video storage
+│   │   ├── raw.py           # Raw article/video storage
+│   │   ├── developer.py     # ApiKey model (email, api_key, tier, rate limits)
+│   │   ├── job.py           # JobListing model (title, company, location, salary, tags)
+│   │   └── subscription.py  # Subscription model (Stripe IDs, tier, status, period dates)
 │   ├── schemas/             # Pydantic schemas
 │   ├── routers/             # API routes
 │   │   ├── admin.py         # Collection endpoints
 │   │   ├── stock.py         # Real-time stock data (Polygon.io)
+│   │   ├── developer.py     # Developer API (register, usage, rotate-key)
+│   │   ├── jobs.py          # Job board CRUD endpoints
+│   │   ├── stripe_webhook.py  # Stripe payments (webhook, checkout, subscriptions)
 │   │   └── ...
 │   └── services/            # Business logic
 │       ├── collector.py     # 4-stage pipeline

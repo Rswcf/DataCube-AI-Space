@@ -45,4 +45,6 @@ vercel --prod
 - Non-www → www permanent redirect via vercel.json
 - Mobile optimized (overflow-x-hidden, dynamic viewport height, conditional search trends, flex-wrap investment cards, touch-action on scroll containers, mobile feature parity with Support + Newsletter in settings drawer)
 - Distinctive design: Isometric cube logo (3 brand-colored faces: blue/tech, teal/tips, amber/invest), Newsreader display font on all section headers, section-specific color accents and hover states, staggered card entrance animations, shimmer loading skeletons, gradient section headers, trend rankings, tabular-nums on financial data
+- Monetization: Developer portal (/developers), pricing page (/pricing), enterprise page (/for-teams), AI job board (/jobs), premium upgrade (/premium), Stripe checkout integration
+- Subscription badge component for tier display
 - No authentication required
