@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { useSettings } from "@/lib/settings-context";
 import { LANGUAGE_OPTIONS } from "@/lib/translations";
 import { cn } from "@/lib/utils";
+import { EthicalAds } from "@/components/ethical-ads";
 
 interface TrendItem {
   category: string;
@@ -247,6 +248,11 @@ export function RightSidebar({ weekId, onSearchChange }: RightSidebarProps) {
               </Button>
             </form>
           )}
+        </div>
+
+        {/* EthicalAds */}
+        <div className="mt-4">
+          <EthicalAds placement="sidebar" />
         </div>
 
         {/* Trends */}

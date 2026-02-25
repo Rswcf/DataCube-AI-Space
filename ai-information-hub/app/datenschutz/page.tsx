@@ -301,6 +301,34 @@ export default function DatenschutzPage() {
         </div>
       </section>
 
+      {/* Affiliate & Advertising Disclosure */}
+      <section className="mb-10">
+        <h2 className="text-2xl font-semibold mb-4">
+          Affiliate- &amp; Werbehinweis / Affiliate &amp; Advertising Disclosure
+        </h2>
+
+        <div className="space-y-6">
+          <div>
+            <h3 className="text-lg font-semibold mb-2">Deutsch</h3>
+            <p className="leading-relaxed text-sm">
+              Einige Links auf dieser Seite sind Affiliate-Links. Wenn Sie &uuml;ber diese
+              Links kaufen, erhalten wir eine Provision, ohne dass Ihnen zus&auml;tzliche
+              Kosten entstehen. Wir empfehlen nur Produkte und Dienste, die wir f&uuml;r
+              n&uuml;tzlich halten.
+            </p>
+          </div>
+
+          <div>
+            <h3 className="text-lg font-semibold mb-2">English</h3>
+            <p className="leading-relaxed text-sm">
+              Some links on this site are affiliate links. If you purchase through these
+              links, we earn a commission at no additional cost to you. We only recommend
+              products and services we find genuinely useful.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <footer className="mt-12 border-t border-gray-200 pt-6">
         <div className="flex gap-4 text-sm">
           <a href="/" className="underline hover:no-underline focus-visible:ring-2 focus-visible:ring-primary rounded">Startseite / Home</a>

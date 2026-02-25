@@ -9,6 +9,9 @@ from app.models.investment import PrimaryMarketPost, SecondaryMarketPost, MAPost
 from app.models.tip import TipPost
 from app.models.trend import Trend, TeamMember
 from app.models.raw import RawArticle, RawVideo
+from app.models.developer import ApiKey
+from app.models.job import JobListing
+from app.models.subscription import Subscription
 
 __all__ = [
     "Week",
@@ -22,4 +25,7 @@ __all__ = [
     "TeamMember",
     "RawArticle",
     "RawVideo",
+    "ApiKey",
+    "JobListing",
+    "Subscription",
 ]

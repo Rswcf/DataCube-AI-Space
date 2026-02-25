@@ -27,6 +27,13 @@ class Settings(BaseSettings):
     beehiiv_publication_id: str = ""
     newsletter_from_email: str = "Data Cube AI <newsletter@datacubeai.space>"
 
+    # Stripe
+    stripe_secret_key: str = ""
+    stripe_webhook_secret: str = ""
+    stripe_premium_price_id: str = ""  # Stripe Price ID for premium subscription
+    stripe_api_developer_price_id: str = ""
+    stripe_api_business_price_id: str = ""
+
     # CORS
     cors_origins: list[str] = [
         "http://localhost:3000",

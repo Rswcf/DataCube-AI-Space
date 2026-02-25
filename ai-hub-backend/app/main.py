@@ -19,6 +19,9 @@ from app.routers import (
     videos_router,
     admin_router,
     stock_router,
+    developer_router,
+    jobs_router,
+    stripe_router,
 )
 
 # Configure logging
@@ -64,6 +67,49 @@ app.include_router(trends_router, prefix="/api")
 app.include_router(videos_router, prefix="/api")
 app.include_router(admin_router, prefix="/api")
 app.include_router(stock_router, prefix="/api")
+app.include_router(developer_router, prefix="/api")
+app.include_router(jobs_router, prefix="/api")
+app.include_router(stripe_router, prefix="/api")
+
+
+# ---------------------------------------------------------------------------
+# Rate-limiting middleware for developer API keys
+# ---------------------------------------------------------------------------
+
+@app.middleware("http")
+async def developer_rate_limit_middleware(request, call_next):
+    """
+    Check developer API key rate limits on public data endpoints.
+
+    Only applies when an X-API-Key header is present and matches a developer key.
+    Requests without a key (e.g. from the frontend) pass through unchanged.
+    """
+    path = request.url.path
+    public_prefixes = (
+        "/api/weeks", "/api/tech/", "/api/investment/", "/api/tips/",
+        "/api/trends/", "/api/videos/", "/api/stock/",
+    )
+    if any(path.startswith(p) for p in public_prefixes):
+        api_key_header = request.headers.get("X-API-Key")
+        if api_key_header:
+            from app.routers.developer import check_developer_rate_limit
+            from app.database import get_session_local
+            db = get_session_local()()
+            try:
+                check_developer_rate_limit(request, db)
+            except Exception as exc:
+                from fastapi.responses import JSONResponse
+                if hasattr(exc, "status_code"):
+                    return JSONResponse(
+                        status_code=exc.status_code,
+                        content={"detail": exc.detail},
+                    )
+                raise
+            finally:
+                db.close()
+
+    response = await call_next(request)
+    return response
 
 
 @app.get("/")
@@ -82,6 +128,9 @@ async def root():
             "videos": "/api/videos/{weekId}",
             "stock": "/api/stock/{ticker}",
             "stockBatch": "/api/stock/batch/?tickers=AAPL,NVDA",
+            "jobs": "/api/jobs",
+            "developerRegister": "/api/developer/register",
+            "developerUsage": "/api/developer/usage",
         },
     }
 

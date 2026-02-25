@@ -27,6 +27,12 @@ youtube-transcript-api>=0.6.0
 # Email
 resend>=2.0.0
 
+# Payments
+stripe>=8.0.0
+
+# Rate Limiting
+slowapi>=0.1.9
+
 # Config
 pyyaml>=6.0.0
 

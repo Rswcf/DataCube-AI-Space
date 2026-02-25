@@ -15,7 +15,7 @@ from app.database import Base
 from app.config import get_settings
 from app.models import (
     Week, TechPost, Video, PrimaryMarketPost, SecondaryMarketPost,
-    MAPost, TipPost, Trend, TeamMember,
+    MAPost, TipPost, Trend, TeamMember, ApiKey, JobListing, Subscription,
 )
 
 # Alembic Config object
