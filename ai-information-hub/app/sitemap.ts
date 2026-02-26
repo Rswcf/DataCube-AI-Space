@@ -156,13 +156,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: homePriority[lang] ?? homeDefault,
   }))
 
-  // Tool pages - all 8 languages (index + individual tools)
-  const toolIndexEntries = SUPPORTED_LANGUAGES.map((lang) => ({
-    url: `${baseUrl}/${lang}/tools`,
-    lastModified: now,
-    changeFrequency: 'weekly' as const,
-    priority: 0.8,
-  }))
+  // Tool pages - all 8 languages (individual tools)
   const toolSlugs = ['ai-news-aggregator', 'ai-report-generator', 'ai-stock-tracker', 'ai-news-api']
   const toolEntries = toolSlugs.flatMap((slug) =>
     SUPPORTED_LANGUAGES.map((lang) => ({
@@ -181,12 +175,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1,
     },
     {
-      url: `${baseUrl}/about`,
-      lastModified: new Date('2026-02-18T00:00:00Z'),
-      changeFrequency: 'monthly',
-      priority: 0.4,
-    },
-    {
       url: `${baseUrl}/impressum`,
       lastModified: new Date('2026-02-18T00:00:00Z'),
       changeFrequency: 'monthly',
@@ -198,38 +186,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'monthly',
       priority: 0.3,
     },
-    {
-      url: `${baseUrl}/developers`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.6,
-    },
-    {
-      url: `${baseUrl}/pricing`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.6,
-    },
-    {
-      url: `${baseUrl}/for-teams`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.5,
-    },
-    {
-      url: `${baseUrl}/jobs`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.6,
-    },
-    {
-      url: `${baseUrl}/premium`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.5,
-    },
     ...langHomeEntries,
-    ...toolIndexEntries,
     ...toolEntries,
     ...topicEntries,
     ...periodEntries,

@@ -76,11 +76,7 @@ function isLocalizablePath(pathname: string): boolean {
 const LOGIN_BYPASS_PATHS = new Set([
   '/impressum',
   '/datenschutz',
-  '/about',
-  '/developers',
-  '/pricing',
   '/for-teams',
-  '/jobs',
   '/premium',
 ])
 

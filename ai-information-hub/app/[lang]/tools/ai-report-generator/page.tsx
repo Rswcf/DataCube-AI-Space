@@ -597,7 +597,7 @@ export default async function AIReportGeneratorToolPage({ params }: Props) {
     author: {
       '@type': 'Organization',
       name: 'DataCube AI',
-      url: `${BASE_URL}/about`,
+      url: BASE_URL,
     },
     inLanguage: ['de', 'en', 'zh-Hans', 'fr', 'es', 'pt', 'ja', 'ko'],
     featureList: [

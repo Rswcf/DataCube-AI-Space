@@ -267,7 +267,7 @@ export async function GET(request: NextRequest) {
   md += `---\n\n`;
   md += `## About Data Cube AI\n`;
   md += `Data Cube AI is a multilingual (8 languages) daily AI news aggregator curating content from 40+ sources including RSS feeds, Hacker News, YouTube, and Reddit communities. Content is AI-assisted and updated daily at 22:00 UTC.\n\n`;
-  md += `Source: [Data Cube AI](https://www.datacubeai.space) | [Editorial Standards](https://www.datacubeai.space/about) | [API Documentation](https://www.datacubeai.space/llms.txt)\n\n`;
+  md += `Source: [Data Cube AI](https://www.datacubeai.space) | [API Documentation](https://www.datacubeai.space/llms.txt)\n\n`;
   md += `Canonical URL: https://www.datacubeai.space/api/content-summary?${permalinkParams.toString()}\n\n`;
   md += `*Citation: Data Cube AI (datacubeai.space), ${periodId}*\n`;
 

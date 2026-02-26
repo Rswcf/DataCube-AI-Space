@@ -566,7 +566,7 @@ export default async function AIStockTrackerToolPage({ params }: Props) {
     author: {
       '@type': 'Organization',
       name: 'DataCube AI',
-      url: `${BASE_URL}/about`,
+      url: BASE_URL,
     },
     inLanguage: ['de', 'en', 'zh-Hans', 'fr', 'es', 'pt', 'ja', 'ko'],
     featureList: [
@@ -807,7 +807,7 @@ export default async function AIStockTrackerToolPage({ params }: Props) {
 
           <div className="mt-8 text-center">
             <Link
-              href={`/${lang}/developers`}
+              href={`/${lang}`}
               className="inline-flex items-center gap-2 font-medium text-primary hover:underline focus-visible:ring-2 focus-visible:ring-primary rounded"
             >
               {t(API_DOC_LINK, lang)} <ArrowRight className="h-4 w-4" />
@@ -899,7 +899,7 @@ export default async function AIStockTrackerToolPage({ params }: Props) {
               {t(CTA_INVESTMENT, lang)} <ArrowRight className="h-4 w-4" />
             </Link>
             <Link
-              href={`/${lang}/developers`}
+              href={`/${lang}`}
               className="inline-flex items-center gap-2 rounded-lg border border-border px-6 py-3 font-medium hover:bg-accent transition-colors focus-visible:ring-2 focus-visible:ring-primary"
             >
               {t(CTA_API, lang)}

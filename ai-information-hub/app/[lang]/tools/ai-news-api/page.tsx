@@ -518,7 +518,7 @@ export default async function AINewsAPIToolPage({ params }: Props) {
     author: {
       '@type': 'Organization',
       name: 'DataCube AI',
-      url: `${BASE_URL}/about`,
+      url: BASE_URL,
     },
     inLanguage: ['de', 'en', 'zh-Hans', 'fr', 'es', 'pt', 'ja', 'ko'],
     featureList: [
@@ -597,7 +597,7 @@ export default async function AINewsAPIToolPage({ params }: Props) {
           {/* CTA buttons */}
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <Link
-              href="/developers"
+              href={`/${lang}`}
               className="inline-flex items-center gap-2 rounded-lg bg-primary text-primary-foreground px-6 py-3 font-medium hover:bg-primary/90 transition-colors focus-visible:ring-2 focus-visible:ring-primary"
             >
               {t(CTA_GET_KEY, lang)} <ArrowRight className="h-4 w-4" />
@@ -874,7 +874,7 @@ for article in data['en']:
 
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <Link
-              href="/developers"
+              href={`/${lang}`}
               className="inline-flex items-center gap-2 rounded-lg bg-primary text-primary-foreground px-6 py-3 font-medium hover:bg-primary/90 transition-colors focus-visible:ring-2 focus-visible:ring-primary"
             >
               {t(CTA_GET_KEY, lang)} <ArrowRight className="h-4 w-4" />

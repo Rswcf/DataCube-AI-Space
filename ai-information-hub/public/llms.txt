@@ -33,7 +33,6 @@ DataCube AI offers free, multilingual AI-powered tools:
 - AI News API: https://www.datacubeai.space/en/tools/ai-news-api
   Free REST API for curated AI news data in 8 languages. JSON responses, no auth required.
 
-All tools: https://www.datacubeai.space/en/tools
 
 ## Public API
 Base URL: https://api-production-3ee5.up.railway.app/api
