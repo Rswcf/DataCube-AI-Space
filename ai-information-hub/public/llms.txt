@@ -21,6 +21,20 @@ Practical AI tips from Reddit communities and expert blogs.
 ### Video Feed
 2-5 curated YouTube videos about AI developments per day.
 
+## Free AI Tools
+DataCube AI offers free, multilingual AI-powered tools:
+
+- AI News Aggregator: https://www.datacubeai.space/en/tools/ai-news-aggregator
+  Curates daily AI news from 22+ sources in 8 languages.
+- AI Report Generator: https://www.datacubeai.space/en/tools/ai-report-generator
+  Generate structured AI reports with streaming output and 5 export formats (DOCX, HTML, MD, TXT, JSON).
+- AI Stock Tracker: https://www.datacubeai.space/en/tools/ai-stock-tracker
+  Real-time stock data for AI companies. Funding rounds, M&A, market movements.
+- AI News API: https://www.datacubeai.space/en/tools/ai-news-api
+  Free REST API for curated AI news data in 8 languages. JSON responses, no auth required.
+
+All tools: https://www.datacubeai.space/en/tools
+
 ## Public API
 Base URL: https://api-production-3ee5.up.railway.app/api
 

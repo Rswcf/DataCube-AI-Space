@@ -527,6 +527,34 @@ const TOOL_LABEL: L = { de: 'KI-News-Aggregator', en: 'AI News Aggregator', zh: 
 
 const SOURCE_LABEL: L = { de: 'Quelle', en: 'Source', zh: '\u6765\u6e90', fr: 'Source', es: 'Fuente', pt: 'Fonte', ja: '\u30bd\u30fc\u30b9', ko: '\uc18c\uc2a4' }
 
+// Cross-tool navigation
+const H2_OTHER_TOOLS: L = {
+  de: 'Weitere kostenlose KI-Tools',
+  en: 'More Free AI Tools',
+  zh: '\u66f4\u591a\u514d\u8d39AI\u5de5\u5177',
+  fr: "Plus d'outils IA gratuits",
+  es: 'M\u00e1s herramientas IA gratuitas',
+  pt: 'Mais ferramentas IA gratuitas',
+  ja: '\u305d\u306e\u4ed6\u306e\u7121\u6599AI\u30c4\u30fc\u30eb',
+  ko: '\ub354 \ub9ce\uc740 \ubb34\ub8cc AI \ub3c4\uad6c',
+}
+const ALL_TOOLS_LABEL: L = {
+  de: 'Alle Tools ansehen',
+  en: 'View All Tools',
+  zh: '\u67e5\u770b\u6240\u6709\u5de5\u5177',
+  fr: 'Voir tous les outils',
+  es: 'Ver todas las herramientas',
+  pt: 'Ver todas as ferramentas',
+  ja: '\u3059\u3079\u3066\u306e\u30c4\u30fc\u30eb\u3092\u898b\u308b',
+  ko: '\ubaa8\ub4e0 \ub3c4\uad6c \ubcf4\uae30',
+}
+const CROSS_REPORT_NAME: L = { de: 'KI-Bericht-Generator', en: 'AI Report Generator', zh: 'AI\u62a5\u544a\u751f\u6210\u5668', fr: 'G\u00e9n\u00e9rateur de rapports IA', es: 'Generador de informes IA', pt: 'Gerador de relat\u00f3rios IA', ja: 'AI\u30ec\u30dd\u30fc\u30c8\u30b8\u30a7\u30cd\u30ec\u30fc\u30bf\u30fc', ko: 'AI \ubcf4\uace0\uc11c \uc0dd\uc131\uae30' }
+const CROSS_REPORT_DESC: L = { de: 'Streaming-Berichte, 5 Exportformate.', en: 'Streaming reports, 5 export formats.', zh: '\u6d41\u5f0f\u62a5\u544a\uff0c5\u79cd\u5bfc\u51fa\u683c\u5f0f\u3002', fr: 'Rapports en streaming, 5 formats.', es: 'Informes en streaming, 5 formatos.', pt: 'Relat\u00f3rios em streaming, 5 formatos.', ja: '\u30b9\u30c8\u30ea\u30fc\u30df\u30f3\u30b0\u30ec\u30dd\u30fc\u30c8\u30015\u3064\u306e\u30a8\u30af\u30b9\u30dd\u30fc\u30c8\u5f62\u5f0f\u3002', ko: '\uc2a4\ud2b8\ub9ac\ubc0d \ubcf4\uace0\uc11c, 5\uac00\uc9c0 \ub0b4\ubcf4\ub0b4\uae30 \ud615\uc2dd.' }
+const CROSS_STOCK_NAME: L = { de: 'KI-Aktien-Tracker', en: 'AI Stock Tracker', zh: 'AI\u80a1\u7968\u8ffd\u8e2a\u5668', fr: 'Tracker actions IA', es: 'Rastreador acciones IA', pt: 'Rastreador a\u00e7\u00f5es IA', ja: 'AI\u682a\u5f0f\u30c8\u30e9\u30c3\u30ab\u30fc', ko: 'AI \uc8fc\uc2dd \ucd94\uc801\uae30' }
+const CROSS_STOCK_DESC: L = { de: 'Echtzeit-Kurse, Finanzierungsrunden, M&A.', en: 'Real-time stocks, funding rounds, M&A.', zh: '\u5b9e\u65f6\u80a1\u4ef7\u3001\u878d\u8d44\u8f6e\u6b21\u3001\u5e76\u8d2d\u3002', fr: 'Actions en temps r\u00e9el, lev\u00e9es de fonds, M&A.', es: 'Acciones en tiempo real, rondas de financiaci\u00f3n, M&A.', pt: 'A\u00e7\u00f5es em tempo real, rodadas de financiamento, M&A.', ja: '\u30ea\u30a2\u30eb\u30bf\u30a4\u30e0\u682a\u4fa1\u3001\u8cc7\u91d1\u8abf\u9054\u3001M&A\u3002', ko: '\uc2e4\uc2dc\uac04 \uc8fc\uac00, \ud380\ub529 \ub77c\uc6b4\ub4dc, M&A.' }
+const CROSS_API_NAME: L = { de: 'KI-News-API', en: 'AI News API', zh: 'AI\u65b0\u95fbAPI', fr: 'API actualit\u00e9s IA', es: 'API noticias IA', pt: 'API not\u00edcias IA', ja: 'AI\u30cb\u30e5\u30fc\u30b9API', ko: 'AI \ub274\uc2a4 API' }
+const CROSS_API_DESC: L = { de: 'REST API, JSON, keine Authentifizierung.', en: 'REST API, JSON, no authentication required.', zh: 'REST API\u3001JSON\u3001\u65e0\u9700\u8ba4\u8bc1\u3002', fr: 'API REST, JSON, sans authentification.', es: 'API REST, JSON, sin autenticaci\u00f3n.', pt: 'API REST, JSON, sem autentica\u00e7\u00e3o.', ja: 'REST API\u3001JSON\u3001\u8a8d\u8a3c\u4e0d\u8981\u3002', ko: 'REST API, JSON, \uc778\uc99d \ubd88\ud544\uc694.' }
+
 // ---------------------------------------------------------------------------
 // Page component
 // ---------------------------------------------------------------------------
@@ -858,6 +886,48 @@ export default async function AINewsAggregatorToolPage({ params }: Props) {
                 </div>
               </details>
             ))}
+          </div>
+        </section>
+
+        {/* ================================================================= */}
+        {/* Cross-Tool Navigation                                             */}
+        {/* ================================================================= */}
+        <section className="py-12 sm:py-16">
+          <h2 className="text-2xl sm:text-3xl font-bold font-[family-name:var(--font-display)] text-center">
+            {t(H2_OTHER_TOOLS, lang)}
+          </h2>
+
+          <div className="mt-10 grid gap-6 md:grid-cols-3">
+            <Link
+              href={`/${lang}/tools/ai-report-generator`}
+              className="rounded-xl border border-border/50 bg-card/50 p-6 transition-colors hover:bg-card/80 focus-visible:ring-2 focus-visible:ring-primary"
+            >
+              <h3 className="text-lg font-semibold">{t(CROSS_REPORT_NAME, lang)}</h3>
+              <p className="mt-2 text-sm text-muted-foreground">{t(CROSS_REPORT_DESC, lang)}</p>
+            </Link>
+            <Link
+              href={`/${lang}/tools/ai-stock-tracker`}
+              className="rounded-xl border border-border/50 bg-card/50 p-6 transition-colors hover:bg-card/80 focus-visible:ring-2 focus-visible:ring-primary"
+            >
+              <h3 className="text-lg font-semibold">{t(CROSS_STOCK_NAME, lang)}</h3>
+              <p className="mt-2 text-sm text-muted-foreground">{t(CROSS_STOCK_DESC, lang)}</p>
+            </Link>
+            <Link
+              href={`/${lang}/tools/ai-news-api`}
+              className="rounded-xl border border-border/50 bg-card/50 p-6 transition-colors hover:bg-card/80 focus-visible:ring-2 focus-visible:ring-primary"
+            >
+              <h3 className="text-lg font-semibold">{t(CROSS_API_NAME, lang)}</h3>
+              <p className="mt-2 text-sm text-muted-foreground">{t(CROSS_API_DESC, lang)}</p>
+            </Link>
+          </div>
+
+          <div className="mt-8 text-center">
+            <Link
+              href={`/${lang}/tools`}
+              className="inline-flex items-center gap-2 font-medium text-primary hover:underline focus-visible:ring-2 focus-visible:ring-primary rounded"
+            >
+              {t(ALL_TOOLS_LABEL, lang)} <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
         </section>
 

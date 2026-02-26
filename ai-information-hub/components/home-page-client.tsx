@@ -474,6 +474,18 @@ function MobileSettingsDrawer({
           {/* Divider */}
           <div className="border-t border-border my-2" />
 
+          {/* Quick Links */}
+          <div className="flex flex-wrap gap-3 px-2 py-2 text-sm">
+            <a href={`/${language}/tools`} className="text-muted-foreground hover:text-foreground transition-colors focus-visible:ring-2 focus-visible:ring-primary rounded">Tools</a>
+            <a href="/about" className="text-muted-foreground hover:text-foreground transition-colors focus-visible:ring-2 focus-visible:ring-primary rounded">About</a>
+            <a href="/developers" className="text-muted-foreground hover:text-foreground transition-colors focus-visible:ring-2 focus-visible:ring-primary rounded">API</a>
+            <a href="/pricing" className="text-muted-foreground hover:text-foreground transition-colors focus-visible:ring-2 focus-visible:ring-primary rounded">Pricing</a>
+            <a href="/jobs" className="text-muted-foreground hover:text-foreground transition-colors focus-visible:ring-2 focus-visible:ring-primary rounded">Jobs</a>
+          </div>
+
+          {/* Divider */}
+          <div className="border-t border-border my-2" />
+
           {/* Newsletter */}
           <div className="rounded-xl border border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5 p-4">
             <div className="flex items-center gap-2 mb-1">

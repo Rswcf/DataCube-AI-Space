@@ -279,7 +279,18 @@ export function RightSidebar({ weekId, onSearchChange }: RightSidebarProps) {
         </div>
 
         {/* Footer */}
-        <div className="mt-4 px-2">
+        <div className="mt-4 px-2 space-y-3">
+          <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs">
+            <a href="/about" className="text-muted-foreground hover:text-foreground transition-colors focus-visible:ring-2 focus-visible:ring-primary rounded">About</a>
+            <a href="/developers" className="text-muted-foreground hover:text-foreground transition-colors focus-visible:ring-2 focus-visible:ring-primary rounded">API</a>
+            <a href="/pricing" className="text-muted-foreground hover:text-foreground transition-colors focus-visible:ring-2 focus-visible:ring-primary rounded">Pricing</a>
+            <a href="/jobs" className="text-muted-foreground hover:text-foreground transition-colors focus-visible:ring-2 focus-visible:ring-primary rounded">Jobs</a>
+            <a href={`/${language}/tools`} className="text-muted-foreground hover:text-foreground transition-colors focus-visible:ring-2 focus-visible:ring-primary rounded">Tools</a>
+          </div>
+          <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs">
+            <a href="/impressum" className="text-muted-foreground hover:text-foreground transition-colors focus-visible:ring-2 focus-visible:ring-primary rounded">Impressum</a>
+            <a href="/datenschutz" className="text-muted-foreground hover:text-foreground transition-colors focus-visible:ring-2 focus-visible:ring-primary rounded">Datenschutz</a>
+          </div>
           <p className="text-xs text-muted-foreground">&copy; 2026 Data Cube, All Rights Reserved</p>
         </div>
       </div>
