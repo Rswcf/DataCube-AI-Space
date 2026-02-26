@@ -66,7 +66,8 @@ function isLocalizablePath(pathname: string): boolean {
     /^\/week\/[^/]+$/.test(pathname) ||
     /^\/topic\/[^/]+$/.test(pathname) ||
     new RegExp(`^\\/${LANG_RE}\\/week\\/[^/]+$`).test(pathname) ||
-    new RegExp(`^\\/${LANG_RE}\\/topic\\/[^/]+$`).test(pathname)
+    new RegExp(`^\\/${LANG_RE}\\/topic\\/[^/]+$`).test(pathname) ||
+    new RegExp(`^\\/${LANG_RE}\\/tools\\/[^/]+$`).test(pathname)
   )
 }
 
@@ -91,7 +92,8 @@ function isSeoAlwaysAllowedPath(pathname: string): boolean {
     /^\/week\/[^/]+$/.test(pathname) ||
     /^\/topic\/[^/]+$/.test(pathname) ||
     new RegExp(`^\\/${LANG_RE}\\/week\\/[^/]+$`).test(pathname) ||
-    new RegExp(`^\\/${LANG_RE}\\/topic\\/[^/]+$`).test(pathname)
+    new RegExp(`^\\/${LANG_RE}\\/topic\\/[^/]+$`).test(pathname) ||
+    new RegExp(`^\\/${LANG_RE}\\/tools\\/[^/]+$`).test(pathname)
   )
 }
 

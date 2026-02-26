@@ -206,6 +206,63 @@ export function BreadcrumbListSchema({ weekId, weekLabel, lang = 'en' }: { weekI
   return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
 }
 
+export function SoftwareApplicationSchema({
+  name,
+  description,
+  url,
+  lang = 'en'
+}: {
+  name: string
+  description: string
+  url: string
+  lang?: string
+}) {
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name,
+    description,
+    url,
+    applicationCategory: 'NewsApplication',
+    operatingSystem: 'Web',
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'EUR',
+    },
+    author: {
+      '@type': 'Organization',
+      name: 'DataCube AI',
+      url: 'https://www.datacubeai.space/about',
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'DataCube AI',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://www.datacubeai.space/icon.svg',
+      },
+    },
+    inLanguage: ['de', 'en', 'zh-Hans', 'fr', 'es', 'pt', 'ja', 'ko'],
+    featureList: [
+      '22+ curated news sources',
+      '8 language support',
+      'Daily and weekly updates',
+      'AI investment tracking',
+      'YouTube video curation',
+      'REST API access',
+      'Newsletter delivery',
+    ],
+  }
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+    />
+  )
+}
+
 /** Reusable ItemList schema with empty-guard: returns null when items array is empty */
 export function ItemListSchema({ items, name, lang }: { items: Array<{ url: string; name: string }>; name: string; lang?: string }) {
   if (!items || items.length === 0) return null

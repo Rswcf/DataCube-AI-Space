@@ -156,6 +156,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: homePriority[lang] ?? homeDefault,
   }))
 
+  // Tool pages - all 8 languages
+  const toolSlugs = ['ai-news-aggregator', 'ai-report-generator', 'ai-stock-tracker', 'ai-news-api']
+  const toolEntries = toolSlugs.flatMap((slug) =>
+    SUPPORTED_LANGUAGES.map((lang) => ({
+      url: `${baseUrl}/${lang}/tools/${slug}`,
+      lastModified: now,
+      changeFrequency: 'weekly' as const,
+      priority: 0.8,
+    }))
+  )
+
   return [
     {
       url: baseUrl,
@@ -212,6 +223,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.5,
     },
     ...langHomeEntries,
+    ...toolEntries,
     ...topicEntries,
     ...periodEntries,
   ]
