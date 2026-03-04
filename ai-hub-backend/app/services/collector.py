@@ -6,6 +6,7 @@ import logging
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta
 from typing import Optional
+from zoneinfo import ZoneInfo
 
 import yaml
 from sqlalchemy.orm import Session
@@ -25,22 +26,71 @@ from app.services.llm_processor import LLMProcessor
 
 logger = logging.getLogger(__name__)
 
+# ---------------------------------------------------------------------------
+# In-memory collection status tracking (resets on deploy, which is acceptable)
+# ---------------------------------------------------------------------------
+_collection_status: dict[str, dict] = {}
+
+
+def set_collection_status(
+    period_id: str,
+    status: str,
+    stage: str = "",
+    counts: dict | None = None,
+    error: str | None = None,
+):
+    """Update the in-memory collection status for a period."""
+    entry = _collection_status.setdefault(period_id, {})
+    entry["status"] = status
+    if stage:
+        entry["stage"] = stage
+    if counts is not None:
+        entry["counts"] = counts
+    if error is not None:
+        entry["error"] = error
+
+
+def get_collection_status(period_id: str) -> dict | None:
+    """Return the current collection status for a period, or None if unknown."""
+    return _collection_status.get(period_id)
+
 
 def get_week_boundaries(week_id: str) -> tuple[datetime, datetime]:
     """
-    Return the start and end datetime for a given ISO week.
+    Return the start and end datetime for a given period.
+
+    For daily periods, returns UTC boundaries that cover the full Berlin-time
+    day plus a 6-hour buffer before midnight to account for timezone differences
+    in article publish dates.  The collection runs at ~22:00 UTC (23:00 Berlin),
+    so articles from the previous ~30 hours should be eligible.
 
     Args:
-        week_id: Week ID in format '2026-kw06'
+        week_id: Period ID — '2026-kw06' (weekly) or '2026-03-04' (daily)
 
     Returns:
-        Tuple of (start, end) where:
-        - start: Monday 00:00:00 of the week
-        - end: Monday 00:00:00 of the next week (exclusive)
+        Tuple of (start, end) as naive UTC datetimes where start is inclusive
+        and end is exclusive.
     """
     if is_daily_id(week_id):
+        settings = get_settings()
+        tz = ZoneInfo(settings.app_timezone)  # Europe/Berlin
+
+        # Build Berlin-time midnight for the target day
         day = datetime.strptime(week_id, "%Y-%m-%d")
-        return day, day + timedelta(days=1)
+        berlin_midnight = day.replace(tzinfo=tz)
+
+        # Convert to UTC so we compare apples-to-apples after
+        # parse_article_date normalises everything to UTC.
+        utc_start = berlin_midnight.astimezone(ZoneInfo("UTC")).replace(tzinfo=None)
+        utc_end = (berlin_midnight + timedelta(days=1)).astimezone(ZoneInfo("UTC")).replace(tzinfo=None)
+
+        # Widen the window by 6 hours before start to catch articles whose
+        # timezone was stripped (e.g. +02:00 → naive looks 2 h earlier) and
+        # articles published late the previous UTC day that belong to today
+        # in Berlin.
+        utc_start -= timedelta(hours=6)
+
+        return utc_start, utc_end
 
     parts = week_id.split("-kw")
     year = int(parts[0])
@@ -58,11 +108,15 @@ def parse_article_date(date_str: Optional[str]) -> Optional[datetime]:
     """
     Parse article published date from various formats.
 
+    Timezone-aware dates are converted to UTC before stripping tzinfo so that
+    the resulting naive datetime is always in UTC.  This ensures correct
+    comparison against the UTC-based boundaries from ``get_week_boundaries``.
+
     Args:
         date_str: Date string in various formats (RSS, ISO, etc.)
 
     Returns:
-        datetime object or None if parsing fails
+        Naive UTC datetime or None if parsing fails.
     """
     if not date_str:
         return None
@@ -70,11 +124,10 @@ def parse_article_date(date_str: Optional[str]) -> Optional[datetime]:
     from dateutil import parser as dateutil_parser
 
     try:
-        # dateutil.parser handles most formats automatically
         dt = dateutil_parser.parse(date_str)
-        # Remove timezone info for comparison (treat all as local/UTC)
         if dt.tzinfo:
-            dt = dt.replace(tzinfo=None)
+            # Convert to UTC, then drop tzinfo for naive comparison
+            dt = dt.astimezone(ZoneInfo("UTC")).replace(tzinfo=None)
         return dt
     except (ValueError, TypeError):
         pass
@@ -1131,29 +1184,46 @@ def run_collection(db: Session, week_id: Optional[str] = None):
     week_id = week_id or current_day_id()
 
     logger.info(f"Starting full collection for {week_id}")
+    set_collection_status(week_id, "running", stage="stage1")
 
-    # Stage 1: Fetch and store raw data
-    stage1_fetch_and_store(db, week_id)
+    try:
+        # Stage 1: Fetch and store raw data
+        stage1_fetch_and_store(db, week_id)
+        set_collection_status(week_id, "running", stage="stage2")
 
-    # Initialize LLM processor
-    processor = LLMProcessor()
+        # Initialize LLM processor
+        processor = LLMProcessor()
 
-    # Stage 2: Classification
-    stage2_classify_articles(db, week_id, processor)
+        # Stage 2: Classification
+        stage2_classify_articles(db, week_id, processor)
+        set_collection_status(week_id, "running", stage="stage3")
 
-    # Stage 3: Parallel processing
-    results = stage3_parallel_processing(db, week_id, processor)
+        # Stage 3: Parallel processing
+        results = stage3_parallel_processing(db, week_id, processor)
+        set_collection_status(week_id, "running", stage="stage3_5")
 
-    # Stage 3.5: Translate EN content to 6 additional languages
-    stage3_5_translate_content(results)
+        # Stage 3.5: Translate EN content to 6 additional languages
+        stage3_5_translate_content(results)
+        set_collection_status(week_id, "running", stage="stage4")
 
-    # Load raw videos for metadata
-    raw_videos = db.query(RawVideo).filter(RawVideo.week_id == week_id).all()
+        # Load raw videos for metadata
+        raw_videos = db.query(RawVideo).filter(RawVideo.week_id == week_id).all()
 
-    # Stage 4: Save to database
-    stage4_save_to_database(db, week_id, results, raw_videos)
+        # Stage 4: Save to database
+        stage4_save_to_database(db, week_id, results, raw_videos)
 
-    logger.info(f"Collection complete for {week_id}")
+        counts = {
+            "tech": len(results.get("tech", {}).get("de", [])),
+            "tips": len(results.get("tips", {}).get("de", [])),
+            "investment": len(results.get("investment", {}).get("primary_market", {}).get("de", [])),
+            "videos": len(results.get("videos", {}).get("de", [])),
+        }
+        set_collection_status(week_id, "completed", stage="done", counts=counts)
+        logger.info(f"Collection complete for {week_id}")
+    except Exception as e:
+        set_collection_status(week_id, "failed", error=str(e))
+        logger.error(f"Collection failed for {week_id}: {e}")
+        raise
 
 
 def stage4_save_ma_to_database(db: Session, week_id: str, investment_data: dict) -> None:

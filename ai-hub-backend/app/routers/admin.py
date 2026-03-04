@@ -42,7 +42,7 @@ def _resolve_period_id(week_id: Optional[str], period_id: Optional[str]) -> Opti
 
 def _run_collection_with_new_session(week_id: Optional[str] = None):
     """Background task wrapper that creates its own database session."""
-    from app.services.collector import run_collection
+    from app.services.collector import run_collection, set_collection_status
 
     db = get_session_local()()
     try:
@@ -51,6 +51,8 @@ def _run_collection_with_new_session(week_id: Optional[str] = None):
         logger.info(f"Background collection completed for {week_id or 'current week'}")
     except Exception as e:
         logger.error(f"Background collection failed: {e}")
+        if week_id:
+            set_collection_status(week_id, "failed", error=str(e))
         raise
     finally:
         db.close()
@@ -795,6 +797,27 @@ async def diagnose_newsletter(
 
     logger.info(f"[diagnose] Diagnosis complete for {period_id}")
     return report
+
+
+@router.get("/collect/status")
+async def collection_status(
+    period_id: str,
+    _: bool = Depends(verify_api_key),
+):
+    """
+    Get the current status of a collection run for a given period.
+
+    Returns status: "running", "completed", "failed", or "unknown".
+    When running, includes current stage. When completed, includes counts.
+
+    Requires X-API-Key header.
+    """
+    from app.services.collector import get_collection_status
+
+    status = get_collection_status(period_id)
+    if status is None:
+        return {"period_id": period_id, "status": "unknown"}
+    return {"period_id": period_id, **status}
 
 
 @router.get("/health")

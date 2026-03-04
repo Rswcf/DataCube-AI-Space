@@ -68,31 +68,50 @@ jobs:
           fi
 
       - name: Wait for collection to complete
+        id: poll
         if: steps.collect.outputs.COLLECTED == 'true'
         run: |
           PERIOD="${{ steps.collect.outputs.PERIOD }}"
           echo "Polling for content availability (period: $PERIOD)..."
 
           # Poll /api/tech/{period} every 60s, up to 20 minutes
+          # Check that the response contains actual articles (count > 0),
+          # not just HTTP 200 (which returns as soon as the DB row exists).
           for i in $(seq 1 20); do
-            HTTP_CODE=$(curl -sS -o /dev/null -w "%{http_code}" \
+            HTTP_CODE=$(curl -sS -o poll-response.json -w "%{http_code}" \
               "${{ secrets.API_BASE_URL }}/tech/${PERIOD}" \
               --http1.1 \
               --max-time 30)
 
-            if [ "$HTTP_CODE" -eq 200 ]; then
-              echo "Content available for $PERIOD (attempt $i)"
-              exit 0
+            if [ "$HTTP_CODE" -eq 200 ] && [ -f poll-response.json ]; then
+              # Count total items across all language arrays in the JSON response
+              TOTAL=$(python3 -c "
+          import json, sys
+          try:
+              data = json.load(open('poll-response.json'))
+              total = sum(len(v) for v in data.values() if isinstance(v, list))
+              print(total)
+          except Exception:
+              print(0)
+          ")
+              echo "Attempt $i/20: HTTP $HTTP_CODE, total articles: $TOTAL"
+              if [ "$TOTAL" -gt 0 ]; then
+                echo "Content ready for $PERIOD ($TOTAL articles)"
+                echo "CONTENT_READY=true" >> "$GITHUB_OUTPUT"
+                exit 0
+              fi
+            else
+              echo "Attempt $i/20: HTTP $HTTP_CODE (waiting for content...)"
             fi
 
-            echo "Waiting for content... attempt $i/20 (HTTP $HTTP_CODE)"
             sleep 60
           done
 
-          echo "WARNING: Content not available after 20 minutes, proceeding anyway"
+          echo "WARNING: Content not available after 20 minutes"
+          echo "CONTENT_READY=false" >> "$GITHUB_OUTPUT"
 
       - name: Send newsletter
-        if: steps.collect.outputs.COLLECTED == 'true'
+        if: steps.collect.outputs.COLLECTED == 'true' && steps.poll.outputs.CONTENT_READY == 'true'
         run: |
           set +e
           PERIOD="${{ steps.collect.outputs.PERIOD }}"
