@@ -677,7 +677,6 @@ async def diagnose_newsletter(
     import resend
     from datetime import date, timedelta
     from app.models.week import Week
-    from app.services.period_utils import current_day_id
 
     settings = get_settings()
     report = {
