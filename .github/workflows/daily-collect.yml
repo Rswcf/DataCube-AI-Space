@@ -16,16 +16,14 @@ jobs:
     name: Trigger daily collection
     runs-on: ubuntu-latest
     steps:
-      - name: Trigger collection via API
-        id: collect
+      - name: Determine period
+        id: period
         run: |
-          set +e
-
           if [ "${{ github.event_name }}" = "schedule" ]; then
             BERLIN_HOUR=$(TZ=Europe/Berlin date +%H)
             if [ "$BERLIN_HOUR" != "23" ]; then
               echo "Skip: now is not 23:xx in Europe/Berlin (hour=$BERLIN_HOUR)"
-              echo "COLLECTED=false" >> "$GITHUB_OUTPUT"
+              echo "SKIP=true" >> "$GITHUB_OUTPUT"
               exit 0
             fi
           fi
@@ -35,8 +33,15 @@ jobs:
             PERIOD=$(TZ=Europe/Berlin date +%F)
           fi
           echo "PERIOD=$PERIOD" >> "$GITHUB_OUTPUT"
+          echo "SKIP=false" >> "$GITHUB_OUTPUT"
 
-          # Async trigger (no wait=true) to avoid Varnish proxy 503 on long requests
+      - name: Trigger collection
+        id: trigger
+        if: steps.period.outputs.SKIP != 'true'
+        run: |
+          set +e
+          PERIOD="${{ steps.period.outputs.PERIOD }}"
+
           URL="${{ secrets.API_BASE_URL }}/admin/collect?week_id=${PERIOD}"
           echo "Triggering async collection: $URL"
 
@@ -45,91 +50,113 @@ jobs:
             -H "X-API-Key: ${{ secrets.ADMIN_API_KEY }}" \
             --http1.1 \
             --max-time 60)
-          CURL_EXIT=$?
 
-          if [ -f response.json ]; then
-            cat response.json
-            echo ""
-          fi
-
-          if [ "$CURL_EXIT" -ne 0 ]; then
-            echo "ERROR: curl failed with exit code $CURL_EXIT"
-            echo "COLLECTED=false" >> "$GITHUB_OUTPUT"
-            exit 1
-          fi
+          if [ -f response.json ]; then cat response.json; echo ""; fi
 
           if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
-            echo "Collection triggered successfully (HTTP $HTTP_CODE)"
-            echo "COLLECTED=true" >> "$GITHUB_OUTPUT"
+            echo "Collection triggered (HTTP $HTTP_CODE)"
+            echo "TRIGGERED=true" >> "$GITHUB_OUTPUT"
           else
             echo "ERROR: API returned HTTP $HTTP_CODE"
-            echo "COLLECTED=false" >> "$GITHUB_OUTPUT"
+            echo "TRIGGERED=false" >> "$GITHUB_OUTPUT"
             exit 1
           fi
 
       - name: Wait for collection to complete
         id: poll
-        if: steps.collect.outputs.COLLECTED == 'true'
+        if: steps.trigger.outputs.TRIGGERED == 'true'
         run: |
-          PERIOD="${{ steps.collect.outputs.PERIOD }}"
-          echo "Polling for content availability (period: $PERIOD)..."
+          PERIOD="${{ steps.period.outputs.PERIOD }}"
+          echo "Polling collection status for $PERIOD (up to 35 min)..."
 
-          # Poll /api/tech/{period} every 60s, up to 20 minutes
-          # Check that the response contains actual articles (count > 0),
-          # not just HTTP 200 (which returns as soon as the DB row exists).
-          for i in $(seq 1 20); do
-            HTTP_CODE=$(curl -sS -o poll-response.json -w "%{http_code}" \
-              "${{ secrets.API_BASE_URL }}/tech/${PERIOD}" \
+          # Poll /admin/collect/status every 60s, up to 35 minutes
+          for i in $(seq 1 35); do
+            STATUS_JSON=$(curl -sS \
+              "${{ secrets.API_BASE_URL }}/admin/collect/status?period_id=${PERIOD}" \
+              -H "X-API-Key: ${{ secrets.ADMIN_API_KEY }}" \
               --http1.1 \
               --max-time 30)
 
-            if [ "$HTTP_CODE" -eq 200 ] && [ -f poll-response.json ]; then
-              # Count total items across all language arrays in the JSON response
-              TOTAL=$(python3 -c "
-          import json, sys
-          try:
-              data = json.load(open('poll-response.json'))
-              total = sum(len(v) for v in data.values() if isinstance(v, list))
-              print(total)
-          except Exception:
-              print(0)
-          ")
-              echo "Attempt $i/20: HTTP $HTTP_CODE, total articles: $TOTAL"
-              if [ "$TOTAL" -gt 0 ]; then
-                echo "Content ready for $PERIOD ($TOTAL articles)"
-                echo "CONTENT_READY=true" >> "$GITHUB_OUTPUT"
-                exit 0
-              fi
-            else
-              echo "Attempt $i/20: HTTP $HTTP_CODE (waiting for content...)"
+            STATUS=$(echo "$STATUS_JSON" | python3 -c "import sys,json; print(json.load(sys.stdin).get('status','unknown'))" 2>/dev/null || echo "unknown")
+
+            echo "Attempt $i/35: status=$STATUS"
+
+            if [ "$STATUS" = "completed" ]; then
+              echo "Collection completed for $PERIOD"
+              echo "RESULT=completed" >> "$GITHUB_OUTPUT"
+              exit 0
+            elif [ "$STATUS" = "failed" ] || [ "$STATUS" = "empty" ]; then
+              echo "Collection $STATUS for $PERIOD"
+              echo "RESULT=$STATUS" >> "$GITHUB_OUTPUT"
+              exit 0
             fi
 
             sleep 60
           done
 
-          echo "WARNING: Content not available after 20 minutes"
-          echo "CONTENT_READY=false" >> "$GITHUB_OUTPUT"
+          echo "WARNING: Collection still running after 35 minutes"
+          echo "RESULT=timeout" >> "$GITHUB_OUTPUT"
+
+      - name: Retry on failure
+        id: retry
+        if: steps.poll.outputs.RESULT == 'failed' || steps.poll.outputs.RESULT == 'empty'
+        run: |
+          PERIOD="${{ steps.period.outputs.PERIOD }}"
+          echo "Retrying collection for $PERIOD (attempt 2)..."
+
+          HTTP_CODE=$(curl -sS -o retry-response.json -w "%{http_code}" \
+            -X POST "${{ secrets.API_BASE_URL }}/admin/collect?week_id=${PERIOD}" \
+            -H "X-API-Key: ${{ secrets.ADMIN_API_KEY }}" \
+            --http1.1 \
+            --max-time 60)
+
+          if [ -f retry-response.json ]; then cat retry-response.json; echo ""; fi
+
+          if [ "$HTTP_CODE" -lt 200 ] || [ "$HTTP_CODE" -ge 300 ]; then
+            echo "Retry trigger failed (HTTP $HTTP_CODE)"
+            echo "RETRY_OK=false" >> "$GITHUB_OUTPUT"
+            exit 1
+          fi
+
+          echo "Retry triggered, polling again (up to 35 min)..."
+          for i in $(seq 1 35); do
+            STATUS=$(curl -sS \
+              "${{ secrets.API_BASE_URL }}/admin/collect/status?period_id=${PERIOD}" \
+              -H "X-API-Key: ${{ secrets.ADMIN_API_KEY }}" \
+              --http1.1 --max-time 30 \
+              | python3 -c "import sys,json; print(json.load(sys.stdin).get('status','unknown'))" 2>/dev/null || echo "unknown")
+
+            echo "Retry attempt $i/35: status=$STATUS"
+
+            if [ "$STATUS" = "completed" ]; then
+              echo "Retry succeeded for $PERIOD"
+              echo "RETRY_OK=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            elif [ "$STATUS" = "failed" ] || [ "$STATUS" = "empty" ]; then
+              echo "Retry also $STATUS for $PERIOD"
+              echo "RETRY_OK=false" >> "$GITHUB_OUTPUT"
+              exit 1
+            fi
+
+            sleep 60
+          done
+
+          echo "Retry timed out for $PERIOD"
+          echo "RETRY_OK=false" >> "$GITHUB_OUTPUT"
+          exit 1
 
       - name: Send newsletter
-        if: steps.collect.outputs.COLLECTED == 'true' && steps.poll.outputs.CONTENT_READY == 'true'
+        if: steps.poll.outputs.RESULT == 'completed' || steps.retry.outputs.RETRY_OK == 'true'
         run: |
           set +e
-          PERIOD="${{ steps.collect.outputs.PERIOD }}"
+          PERIOD="${{ steps.period.outputs.PERIOD }}"
           echo "Sending newsletter for period: $PERIOD"
           HTTP_CODE=$(curl -sS -o nl-response.json -w "%{http_code}" \
             -X POST "${{ secrets.API_BASE_URL }}/admin/newsletter?period_id=${PERIOD}&wait=true" \
             -H "X-API-Key: ${{ secrets.ADMIN_API_KEY }}" \
             --http1.1 \
             --max-time 300)
-          CURL_EXIT=$?
-          if [ -f nl-response.json ]; then
-            cat nl-response.json
-            echo ""
-          fi
-          if [ "$CURL_EXIT" -ne 0 ]; then
-            echo "WARNING: Newsletter curl failed (exit $CURL_EXIT) — non-fatal"
-            exit 0
-          fi
+          if [ -f nl-response.json ]; then cat nl-response.json; echo ""; fi
           if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
             echo "Newsletter sent successfully (HTTP $HTTP_CODE)"
           else
