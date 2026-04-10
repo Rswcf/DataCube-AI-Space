@@ -27,9 +27,8 @@ from app.services.llm_processor import LLMProcessor
 logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
-# In-memory collection status tracking (resets on deploy, which is acceptable)
+# Persistent collection status tracking (DB-backed, survives restarts)
 # ---------------------------------------------------------------------------
-_collection_status: dict[str, dict] = {}
 
 
 def set_collection_status(
@@ -37,22 +36,72 @@ def set_collection_status(
     status: str,
     stage: str = "",
     counts: dict | None = None,
+    raw_counts: dict | None = None,
     error: str | None = None,
 ):
-    """Update the in-memory collection status for a period."""
-    entry = _collection_status.setdefault(period_id, {})
-    entry["status"] = status
-    if stage:
-        entry["stage"] = stage
-    if counts is not None:
-        entry["counts"] = counts
-    if error is not None:
-        entry["error"] = error
+    """Update the persistent collection status for a period."""
+    from app.database import get_session_local
+    from app.models.collection_run import CollectionRun
+    from datetime import datetime
+
+    db = get_session_local()()
+    try:
+        run = db.query(CollectionRun).filter(CollectionRun.period_id == period_id).first()
+        if not run:
+            run = CollectionRun(
+                period_id=period_id,
+                status=status,
+                started_at=datetime.utcnow(),
+            )
+            db.add(run)
+        run.status = status
+        if stage:
+            run.stage = stage
+        if counts is not None:
+            run.counts = counts
+        if raw_counts is not None:
+            run.raw_counts = raw_counts
+        if error is not None:
+            run.error = error[:500] if error else None
+        if status in ("completed", "failed", "empty"):
+            run.completed_at = datetime.utcnow()
+        db.commit()
+    except Exception as e:
+        logger.warning(f"Failed to persist collection status for {period_id}: {e}")
+        db.rollback()
+    finally:
+        db.close()
 
 
 def get_collection_status(period_id: str) -> dict | None:
     """Return the current collection status for a period, or None if unknown."""
-    return _collection_status.get(period_id)
+    from app.database import get_session_local
+    from app.models.collection_run import CollectionRun
+
+    db = get_session_local()()
+    try:
+        run = db.query(CollectionRun).filter(CollectionRun.period_id == period_id).first()
+        if not run:
+            return None
+        result = {"status": run.status}
+        if run.stage:
+            result["stage"] = run.stage
+        if run.counts:
+            result["counts"] = run.counts
+        if run.raw_counts:
+            result["raw_counts"] = run.raw_counts
+        if run.error:
+            result["error"] = run.error
+        if run.started_at:
+            result["started_at"] = run.started_at.isoformat()
+        if run.completed_at:
+            result["completed_at"] = run.completed_at.isoformat()
+        return result
+    except Exception as e:
+        logger.warning(f"Failed to read collection status for {period_id}: {e}")
+        return None
+    finally:
+        db.close()
 
 
 def get_week_boundaries(week_id: str) -> tuple[datetime, datetime]:
