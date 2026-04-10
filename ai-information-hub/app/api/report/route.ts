@@ -1,5 +1,6 @@
 import { createOpenAI } from "@ai-sdk/openai";
 import { streamText } from "ai";
+import { isDailyId, getParentWeekId } from "@/lib/period-utils";
 
 const openrouter = createOpenAI({
   baseURL: "https://openrouter.ai/api/v1",
@@ -94,28 +95,79 @@ function condenseWeekData(
 async function fetchPeriodData(weekId: string) {
   const apiBase = process.env.NEXT_PUBLIC_API_URL;
 
-  const fetchOne = async (apiPath: string, staticPath: string) => {
+  const fetchOne = async (apiPath: string) => {
     if (apiBase) {
       try {
         const res = await fetch(`${apiBase}${apiPath}`);
         if (res.ok) return res.json();
       } catch {
-        /* fall through to static */
+        /* fall through */
       }
     }
-    // Static fallback — construct absolute URL from headers not available server-side,
-    // so we use the API base as the primary source. Return null if unavailable.
     return null;
   };
 
   const [tech, investment, tips, trends] = await Promise.all([
-    fetchOne(`/tech/${weekId}`, `/data/${weekId}/tech.json`),
-    fetchOne(`/investment/${weekId}`, `/data/${weekId}/investment.json`),
-    fetchOne(`/tips/${weekId}`, `/data/${weekId}/tips.json`),
-    fetchOne(`/trends/${weekId}`, `/data/${weekId}/trends.json`),
+    fetchOne(`/tech/${weekId}`),
+    fetchOne(`/investment/${weekId}`),
+    fetchOne(`/tips/${weekId}`),
+    fetchOne(`/trends/${weekId}`),
   ]);
 
   return { tech, investment, tips, trends };
+}
+
+/** Check if fetched data has any content (non-empty arrays in at least one section). */
+function hasData(tech: any, investment: any, tips: any, trends: any): boolean {
+  const check = (obj: any) => {
+    if (!obj || typeof obj !== "object") return false;
+    return Object.values(obj).some(
+      (v) => Array.isArray(v) && v.length > 0
+    );
+  };
+  return check(tech) || check(investment) || check(tips) || check(trends);
+}
+
+/** Fetch data with fallback: daily → parent week → recent days in the same week. */
+async function fetchPeriodDataWithFallback(weekId: string): Promise<{
+  tech: any; investment: any; tips: any; trends: any; resolvedPeriod: string;
+}> {
+  // Try the requested period first
+  let data = await fetchPeriodData(weekId);
+  if (hasData(data.tech, data.investment, data.tips, data.trends)) {
+    return { ...data, resolvedPeriod: weekId };
+  }
+
+  // If daily period, try the parent week
+  if (isDailyId(weekId)) {
+    const parentWeek = getParentWeekId(weekId);
+    if (parentWeek) {
+      data = await fetchPeriodData(parentWeek);
+      if (hasData(data.tech, data.investment, data.tips, data.trends)) {
+        return { ...data, resolvedPeriod: parentWeek };
+      }
+    }
+
+    // Try adjacent days in the same week (newest first)
+    const [y, m, d] = weekId.split("-").map(Number);
+    const date = new Date(Date.UTC(y, m - 1, d));
+    const dayOfWeek = date.getUTCDay() || 7;
+    const monday = new Date(date);
+    monday.setUTCDate(date.getUTCDate() - (dayOfWeek - 1));
+
+    for (let offset = 6; offset >= 0; offset--) {
+      const tryDate = new Date(monday);
+      tryDate.setUTCDate(monday.getUTCDate() + offset);
+      const tryId = tryDate.toISOString().slice(0, 10);
+      if (tryId === weekId) continue; // Already tried
+      data = await fetchPeriodData(tryId);
+      if (hasData(data.tech, data.investment, data.tips, data.trends)) {
+        return { ...data, resolvedPeriod: tryId };
+      }
+    }
+  }
+
+  return { ...data, resolvedPeriod: weekId };
 }
 
 export async function POST(req: Request) {
@@ -129,12 +181,14 @@ export async function POST(req: Request) {
     const lang: string =
       typeof language === "string" && language in LANGUAGE_NAMES ? language : "en";
 
-    const { tech, investment, tips, trends } = await fetchPeriodData(weekId);
+    const { tech, investment, tips, trends, resolvedPeriod } = await fetchPeriodDataWithFallback(weekId);
     const context = condenseWeekData(tech, investment, tips, trends, lang);
 
     if (!context.trim()) {
       return new Response("No data available for this period", { status: 404 });
     }
+
+    const periodLabel = resolvedPeriod !== weekId ? `${weekId} (data from ${resolvedPeriod})` : weekId;
 
     const systemPrompt = `You are a senior AI industry analyst writing a comprehensive weekly briefing report. Write in ${LANGUAGE_NAMES[lang] || "English"}.
 
@@ -181,7 +235,7 @@ ${context}`;
       messages: [
         {
           role: "user",
-          content: `Generate the comprehensive AI briefing report for period ${weekId}.`,
+          content: `Generate the comprehensive AI briefing report for period ${periodLabel}.`,
         },
       ],
       maxOutputTokens: 4096,

@@ -59,3 +59,22 @@ export function getPeriodNum(id: string): string {
   }
   return id.split("-kw")[1];
 }
+
+/**
+ * Get the parent weekly period ID (YYYY-kwWW) for a daily period ID (YYYY-MM-DD).
+ * Uses ISO 8601 week numbering (Monday-based weeks).
+ * Returns null if the input is not a daily ID.
+ */
+export function getParentWeekId(dailyId: string): string | null {
+  if (!isDailyId(dailyId)) return null;
+  const [year, month, day] = dailyId.split("-").map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  // ISO week: Monday=1 ... Sunday=7
+  const dayOfWeek = date.getUTCDay() || 7; // Convert Sunday=0 to 7
+  // Thursday of this ISO week determines the year/week number
+  const thursday = new Date(date);
+  thursday.setUTCDate(date.getUTCDate() + (4 - dayOfWeek));
+  const jan1 = new Date(Date.UTC(thursday.getUTCFullYear(), 0, 1));
+  const weekNum = Math.ceil(((thursday.getTime() - jan1.getTime()) / 86400000 + 1) / 7);
+  return `${thursday.getUTCFullYear()}-kw${String(weekNum).padStart(2, "0")}`;
+}

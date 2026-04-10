@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { useSettings } from "@/lib/settings-context";
+import { isDailyId, getParentWeekId } from "@/lib/period-utils";
 import ReactMarkdown from "react-markdown";
 
 interface Message {
@@ -106,27 +107,45 @@ export function ChatWidget({ weekId }: ChatWidgetProps) {
   useEffect(() => {
     if (!weekId) return;
 
+    const fetchForPeriod = async (periodId: string) => {
+      const apiBase = process.env.NEXT_PUBLIC_API_URL;
+      const fetchOne = async (apiPath: string, staticPath: string) => {
+        if (apiBase) {
+          try {
+            const res = await fetch(`${apiBase}${apiPath}`);
+            if (res.ok) return res.json();
+          } catch { /* fall through to static */ }
+        }
+        const res = await fetch(staticPath);
+        return res.ok ? res.json() : null;
+      };
+      return Promise.all([
+        fetchOne(`/tech/${periodId}`, `/data/${periodId}/tech.json`),
+        fetchOne(`/investment/${periodId}`, `/data/${periodId}/investment.json`),
+        fetchOne(`/tips/${periodId}`, `/data/${periodId}/tips.json`),
+        fetchOne(`/trends/${periodId}`, `/data/${periodId}/trends.json`),
+      ]);
+    };
+
+    const hasContent = (data: any[]) =>
+      data.some(
+        (obj) =>
+          obj &&
+          typeof obj === "object" &&
+          Object.values(obj).some((v) => Array.isArray(v) && (v as any[]).length > 0)
+      );
+
     const fetchData = async () => {
       try {
-        const apiBase = process.env.NEXT_PUBLIC_API_URL;
+        let [tech, investment, tips, trends] = await fetchForPeriod(weekId);
 
-        const fetchOne = async (apiPath: string, staticPath: string) => {
-          if (apiBase) {
-            try {
-              const res = await fetch(`${apiBase}${apiPath}`);
-              if (res.ok) return res.json();
-            } catch { /* fall through to static */ }
+        // Fallback: if daily period has no data, try parent week
+        if (!hasContent([tech, investment, tips, trends]) && isDailyId(weekId)) {
+          const parentWeek = getParentWeekId(weekId);
+          if (parentWeek) {
+            [tech, investment, tips, trends] = await fetchForPeriod(parentWeek);
           }
-          const res = await fetch(staticPath);
-          return res.ok ? res.json() : null;
-        };
-
-        const [tech, investment, tips, trends] = await Promise.all([
-          fetchOne(`/tech/${weekId}`, `/data/${weekId}/tech.json`),
-          fetchOne(`/investment/${weekId}`, `/data/${weekId}/investment.json`),
-          fetchOne(`/tips/${weekId}`, `/data/${weekId}/tips.json`),
-          fetchOne(`/trends/${weekId}`, `/data/${weekId}/trends.json`),
-        ]);
+        }
 
         const condensed = condenseWeekData(tech, investment, tips, trends, language);
         setWeekContext(condensed);
