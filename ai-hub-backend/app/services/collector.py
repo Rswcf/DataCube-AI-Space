@@ -874,6 +874,83 @@ def stage3_5_translate_content(results: dict) -> dict:
     return results
 
 
+def _backfill_translations_to_db(db: Session, week_id: str, results: dict):
+    """
+    Update already-saved records with translations from Stage 3.5.
+
+    Stage 3.5 mutates results in place, adding _translations dicts
+    to each EN item. This function reads those and writes them to DB.
+    """
+    def _update_translations(model_cls, items_key, results_data):
+        en_items = results_data.get(items_key, {}).get("en", [])
+        if not en_items:
+            return
+        records = (
+            db.query(model_cls)
+            .filter(model_cls.week_id == week_id)
+            .order_by(model_cls.id)
+            .all()
+        )
+        for i, record in enumerate(records):
+            if i < len(en_items):
+                trans = en_items[i].get("_translations")
+                if trans:
+                    record.translations = trans
+
+    _update_translations(TechPost, "tech", results)
+    _update_translations(Video, "videos", results)
+    _update_translations(TipPost, "tips", results)
+
+    # Investment sub-sections
+    inv = results.get("investment", {})
+    if isinstance(inv, dict):
+        pm_en = inv.get("primaryMarket", {}).get("en", [])
+        if pm_en:
+            records = db.query(PrimaryMarketPost).filter(
+                PrimaryMarketPost.week_id == week_id
+            ).order_by(PrimaryMarketPost.id).all()
+            for i, record in enumerate(records):
+                if i < len(pm_en) and pm_en[i].get("_translations"):
+                    record.translations = pm_en[i]["_translations"]
+
+        sm_en = inv.get("secondaryMarket", {}).get("en", [])
+        if sm_en:
+            records = db.query(SecondaryMarketPost).filter(
+                SecondaryMarketPost.week_id == week_id
+            ).order_by(SecondaryMarketPost.id).all()
+            for i, record in enumerate(records):
+                if i < len(sm_en) and sm_en[i].get("_translations"):
+                    record.translations = sm_en[i]["_translations"]
+
+        ma_en = inv.get("ma", {}).get("en", [])
+        if ma_en:
+            records = db.query(MAPost).filter(
+                MAPost.week_id == week_id
+            ).order_by(MAPost.id).all()
+            for i, record in enumerate(records):
+                if i < len(ma_en) and ma_en[i].get("_translations"):
+                    record.translations = ma_en[i]["_translations"]
+
+    # Trends
+    trends = results.get("trends", {})
+    if isinstance(trends, dict):
+        trends_section = trends.get("trends", {})
+        trends_en = trends_section.get("en", []) if isinstance(trends_section, dict) else []
+        if trends_en:
+            records = db.query(Trend).filter(
+                Trend.week_id == week_id
+            ).order_by(Trend.id).all()
+            for i, record in enumerate(records):
+                if i < len(trends_en) and trends_en[i].get("_translations"):
+                    record.translations = trends_en[i]["_translations"]
+
+    try:
+        db.commit()
+    except Exception as e:
+        logger.warning(f"Failed to save translations for {week_id}: {e}")
+        db.rollback()
+
+
 def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos: list) -> None:
     """
     Stage 4: Save processed data to database.
@@ -1254,7 +1331,7 @@ def run_collection(db: Session, week_id: Optional[str] = None):
 
     Args:
         db: Database session
-        week_id: Week ID or None for current week
+        week_id: Week ID or None for current day
     """
     week_id = week_id or current_day_id()
 
@@ -1273,18 +1350,15 @@ def run_collection(db: Session, week_id: Optional[str] = None):
         stage2_classify_articles(db, week_id, processor)
         set_collection_status(week_id, "running", stage="stage3")
 
-        # Stage 3: Parallel processing
+        # Stage 3: Parallel processing (produces DE + EN)
         results = stage3_parallel_processing(db, week_id, processor)
-        set_collection_status(week_id, "running", stage="stage3_5")
-
-        # Stage 3.5: Translate EN content to 6 additional languages
-        stage3_5_translate_content(results)
-        set_collection_status(week_id, "running", stage="stage4")
+        set_collection_status(week_id, "running", stage="stage4_base")
 
         # Load raw videos for metadata
         raw_videos = db.query(RawVideo).filter(RawVideo.week_id == week_id).all()
 
-        # Stage 4: Save to database
+        # Stage 4a: Save base DE/EN content immediately
+        # This makes content visible even if translations fail
         stage4_save_to_database(db, week_id, results, raw_videos)
 
         counts = {
@@ -1293,6 +1367,24 @@ def run_collection(db: Session, week_id: Optional[str] = None):
             "investment": len(results.get("investment", {}).get("primaryMarket", {}).get("de", [])),
             "videos": len(results.get("videos", {}).get("de", [])),
         }
+
+        if sum(counts.values()) == 0:
+            set_collection_status(week_id, "empty", stage="stage4_base", counts=counts)
+            logger.warning(f"Collection produced 0 items for {week_id}")
+            return
+
+        # Stage 3.5: Translate EN content to 6 additional languages
+        # Now runs AFTER base save — failures here are non-blocking
+        set_collection_status(week_id, "running", stage="stage3_5")
+        try:
+            stage3_5_translate_content(results)
+            _backfill_translations_to_db(db, week_id, results)
+            logger.info(f"Translations saved for {week_id}")
+        except Exception as e:
+            logger.warning(f"Translation stage failed (non-fatal): {e}")
+            # Base DE/EN content is already saved — translations will be missing
+            # but content is still accessible
+
         set_collection_status(week_id, "completed", stage="done", counts=counts)
         logger.info(f"Collection complete for {week_id}")
     except Exception as e:
