@@ -116,6 +116,28 @@ async def delete_period(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@router.get("/collect/status")
+async def collection_status(
+    period_id: str,
+    _: bool = Depends(verify_api_key),
+):
+    """
+    Get the current status of a collection run for a given period.
+
+    Returns status: "running", "completed", "failed", "empty", or "unknown".
+    DB-backed — survives container restarts.
+    When running, includes current stage. When completed, includes counts.
+
+    Requires X-API-Key header.
+    """
+    from app.services.collector import get_collection_status
+
+    status = get_collection_status(period_id)
+    if status is None:
+        return {"period_id": period_id, "status": "unknown"}
+    return {"period_id": period_id, **status}
+
+
 @router.post("/collect")
 async def trigger_collection(
     background_tasks: BackgroundTasks,
@@ -797,28 +819,6 @@ async def diagnose_newsletter(
 
     logger.info(f"[diagnose] Diagnosis complete for {period_id}")
     return report
-
-
-@router.get("/collect/status")
-async def collection_status(
-    period_id: str,
-    _: bool = Depends(verify_api_key),
-):
-    """
-    Get the current status of a collection run for a given period.
-
-    Returns status: "running", "completed", "failed", "empty", or "unknown".
-    DB-backed — survives container restarts.
-    When running, includes current stage. When completed, includes counts.
-
-    Requires X-API-Key header.
-    """
-    from app.services.collector import get_collection_status
-
-    status = get_collection_status(period_id)
-    if status is None:
-        return {"period_id": period_id, "status": "unknown"}
-    return {"period_id": period_id, **status}
 
 
 @router.get("/health")
