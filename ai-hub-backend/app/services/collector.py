@@ -293,7 +293,7 @@ def ensure_week(db: Session, week_id: str) -> Week:
 
 
 def clear_week_data(db: Session, week_id: str):
-    """Clear existing data for a week (for re-collection)."""
+    """Clear existing processed data for a week. Does NOT commit — caller must commit."""
     db.query(TechPost).filter(TechPost.week_id == week_id).delete()
     db.query(Video).filter(Video.week_id == week_id).delete()
     db.query(PrimaryMarketPost).filter(PrimaryMarketPost.week_id == week_id).delete()
@@ -301,8 +301,7 @@ def clear_week_data(db: Session, week_id: str):
     db.query(MAPost).filter(MAPost.week_id == week_id).delete()
     db.query(TipPost).filter(TipPost.week_id == week_id).delete()
     db.query(Trend).filter(Trend.week_id == week_id).delete()
-    db.commit()
-    logger.info(f"Cleared existing data for {week_id}")
+    logger.info(f"Cleared existing data for {week_id} (uncommitted)")
 
 
 def clear_raw_data(db: Session, week_id: str):
@@ -890,7 +889,34 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
     """
     logger.info("=== Stage 4: Saving to Database ===")
 
-    # Clear existing processed data
+    # --- Pre-save validation: reject empty results if raw data existed ---
+    raw_article_count = db.query(RawArticle).filter(RawArticle.week_id == week_id).count()
+    raw_video_count = db.query(RawVideo).filter(RawVideo.week_id == week_id).count()
+
+    tech_count = len(results.get("tech", {}).get("de", []))
+    tips_count = len(results.get("tips", {}).get("de", []))
+    video_count = len(results.get("videos", {}).get("de", []))
+    inv = results.get("investment", {})
+    inv_count = (
+        len(inv.get("primaryMarket", {}).get("de", []))
+        + len(inv.get("secondaryMarket", {}).get("de", []))
+        + len(inv.get("ma", {}).get("de", []))
+    )
+    total_output = tech_count + tips_count + video_count + inv_count
+
+    if total_output == 0 and raw_article_count > 0:
+        logger.error(
+            f"VALIDATION FAILED: {raw_article_count} raw articles but 0 processed output. "
+            f"Refusing to clear existing data for {week_id}."
+        )
+        set_collection_status(
+            week_id, "empty",
+            stage="stage4_validation",
+            raw_counts={"articles": raw_article_count, "videos": raw_video_count},
+        )
+        return  # Do NOT clear or save — preserve existing data
+
+    # Clear existing processed data (same transaction as inserts)
     clear_week_data(db, week_id)
 
     tech_data = results.get("tech", {"de": [], "en": []})
@@ -1153,7 +1179,7 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
     # BUG-H4: Add transaction rollback handling
     try:
         db.commit()
-        logger.info(f"Saved processed data for {week_id}")
+        logger.info(f"Saved all processed data for {week_id} (atomic commit)")
     except Exception as e:
         logger.error(f"Failed to save data for {week_id}, rolling back: {e}")
         db.rollback()
@@ -1237,8 +1263,8 @@ def run_collection(db: Session, week_id: Optional[str] = None):
 
     try:
         # Stage 1: Fetch and store raw data
-        stage1_fetch_and_store(db, week_id)
-        set_collection_status(week_id, "running", stage="stage2")
+        stage1_counts = stage1_fetch_and_store(db, week_id)
+        set_collection_status(week_id, "running", stage="stage2", raw_counts=stage1_counts)
 
         # Initialize LLM processor
         processor = LLMProcessor()
@@ -1264,7 +1290,7 @@ def run_collection(db: Session, week_id: Optional[str] = None):
         counts = {
             "tech": len(results.get("tech", {}).get("de", [])),
             "tips": len(results.get("tips", {}).get("de", [])),
-            "investment": len(results.get("investment", {}).get("primary_market", {}).get("de", [])),
+            "investment": len(results.get("investment", {}).get("primaryMarket", {}).get("de", [])),
             "videos": len(results.get("videos", {}).get("de", [])),
         }
         set_collection_status(week_id, "completed", stage="done", counts=counts)
