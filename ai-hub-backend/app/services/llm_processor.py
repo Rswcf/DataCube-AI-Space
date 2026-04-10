@@ -76,6 +76,15 @@ class LLMProcessor:
         "qwen/qwen3-next-80b-a3b-instruct:free",
     ]
 
+    # Processor models in priority order (fallback chain).
+    # Primary model is paid/high-quality; fallbacks are free but capable.
+    PROCESSOR_MODELS = [
+        "deepseek/deepseek-v3.2",
+        "deepseek/deepseek-chat-v3-0324:free",
+        "google/gemma-4-31b-it:free",
+        "qwen/qwen3-next-80b-a3b-instruct:free",
+    ]
+
     def __init__(self):
         settings = get_settings()
         if not settings.openrouter_api_key:
@@ -85,20 +94,16 @@ class LLMProcessor:
             base_url="https://openrouter.ai/api/v1",
             api_key=settings.openrouter_api_key,
         )
-        # High-quality model for content processing (unchanged)
-        self.processor_model = "deepseek/deepseek-v3.2"
 
     def _call_llm(self, prompt: str, temperature: float = 0.3, use_classifier: bool = False, timeout: float = 120.0) -> str:
-        """Make an LLM API call with retry and fallback logic for rate limits.
+        """Make an LLM API call with retry and fallback logic.
 
-        For classifier calls: tries each model in CLASSIFIER_MODELS in order.
-        Each model gets 2 retries with exponential backoff before moving to the next.
-        For processor calls: retries the processor model 3 times.
+        Both classifier and processor use fallback chains.
 
         Args:
             prompt: The prompt to send
             temperature: Sampling temperature
-            use_classifier: If True, use free classifier models; otherwise use processor model
+            use_classifier: If True, use CLASSIFIER_MODELS; otherwise PROCESSOR_MODELS
             timeout: Request timeout in seconds (default 120s)
 
         Returns:
@@ -110,34 +115,48 @@ class LLMProcessor:
         if use_classifier:
             return self._call_with_fallback(prompt, temperature, timeout)
 
-        # Processor model: simple retry
-        model = self.processor_model
-        max_retries = 3
+        # Processor model: fallback chain with retries
+        models = self.PROCESSOR_MODELS
+        retries_per_model = 2
         base_delay = 2
+        last_error = None
 
-        for attempt in range(max_retries):
-            try:
-                response = self.client.chat.completions.create(
-                    model=model,
-                    messages=[{"role": "user", "content": prompt}],
-                    temperature=temperature,
-                    timeout=timeout,
-                )
-                if not response.choices or not response.choices[0].message:
-                    logger.warning(f"Empty response from LLM model {model}")
-                    return ""
-                return response.choices[0].message.content or ""
-            except RateLimitError:
-                delay = base_delay * (2 ** attempt)
-                logger.warning(f"Rate limited (429) on {model}, attempt {attempt + 1}/{max_retries}. "
-                               f"Retrying in {delay}s...")
-                if attempt < max_retries - 1:
-                    time.sleep(delay)
-                else:
-                    raise
-            except Exception as e:
-                logger.error(f"LLM API call failed (model={model}): {e}")
-                raise
+        for model in models:
+            for attempt in range(retries_per_model):
+                try:
+                    response = self.client.chat.completions.create(
+                        model=model,
+                        messages=[{"role": "user", "content": prompt}],
+                        temperature=temperature,
+                        timeout=timeout,
+                    )
+                    if not response.choices or not response.choices[0].message:
+                        logger.warning(f"Empty response from processor model {model}")
+                        last_error = RuntimeError(f"Empty response from {model}")
+                        break  # try next model
+                    content = response.choices[0].message.content or ""
+                    if not content.strip():
+                        logger.warning(f"Blank content from processor model {model}")
+                        last_error = RuntimeError(f"Blank content from {model}")
+                        break  # try next model
+                    logger.info(f"Processor succeeded with model: {model}")
+                    return content
+                except RateLimitError as e:
+                    last_error = e
+                    delay = base_delay * (2 ** attempt)
+                    logger.warning(f"Rate limited (429) on {model}, attempt {attempt + 1}/{retries_per_model}. "
+                                   f"Retrying in {delay}s...")
+                    if attempt < retries_per_model - 1:
+                        time.sleep(delay)
+                    else:
+                        logger.warning(f"Processor model {model} exhausted, trying next fallback...")
+                except Exception as e:
+                    logger.error(f"Processor call failed on {model}: {e}")
+                    last_error = e
+                    break  # non-rate-limit error: skip to next model
+
+        logger.error(f"All {len(models)} processor models exhausted")
+        raise last_error or RuntimeError("All processor models failed")
 
     def _call_with_fallback(self, prompt: str, temperature: float, timeout: float,
                             expect_json: bool = False) -> str:
