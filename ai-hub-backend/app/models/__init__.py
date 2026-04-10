@@ -12,6 +12,7 @@ from app.models.raw import RawArticle, RawVideo
 from app.models.developer import ApiKey
 from app.models.job import JobListing
 from app.models.subscription import Subscription
+from app.models.collection_run import CollectionRun
 
 __all__ = [
     "Week",
@@ -28,4 +29,5 @@ __all__ = [
     "ApiKey",
     "JobListing",
     "Subscription",
+    "CollectionRun",
 ]
