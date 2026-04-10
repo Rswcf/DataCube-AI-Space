@@ -807,7 +807,8 @@ async def collection_status(
     """
     Get the current status of a collection run for a given period.
 
-    Returns status: "running", "completed", "failed", or "unknown".
+    Returns status: "running", "completed", "failed", "empty", or "unknown".
+    DB-backed — survives container restarts.
     When running, includes current stage. When completed, includes counts.
 
     Requires X-API-Key header.
