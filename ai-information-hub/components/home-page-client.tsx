@@ -6,7 +6,7 @@ import { Feed } from "@/components/feed";
 import { RightSidebar } from "@/components/right-sidebar";
 import { ChatWidget } from "@/components/chat-widget";
 import { ReportGenerator } from "@/components/report-generator";
-import { Cpu, TrendingUp, Lightbulb, Search, X, Settings, Sun, Moon, Languages, Heart, Mail, Check, Loader2, ArrowLeft } from "lucide-react";
+import { Cpu, TrendingUp, Lightbulb, Search, X, Settings, Sun, Moon, Languages, Mail, Check, Loader2, ArrowLeft } from "lucide-react";
 import { LANGUAGE_OPTIONS } from "@/lib/translations";
 import { cn } from "@/lib/utils";
 import { useSettings } from "@/lib/settings-context";
@@ -458,21 +458,6 @@ function MobileSettingsDrawer({
               ))}
             </div>
           </div>
-
-          {/* Support (Ko-fi) */}
-          <button
-            onClick={() => window.open("https://ko-fi.com/datacubeai", "_blank", "noopener,noreferrer")}
-            className="flex w-full items-center gap-4 rounded-xl p-4 hover:bg-secondary transition-colors focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            <Heart className="h-6 w-6 text-pink-500" aria-hidden="true" />
-            <div className="flex-1 text-left">
-              <p className="font-semibold">{t("support")}</p>
-              <p className="text-sm text-muted-foreground">{t("supportDescription")}</p>
-            </div>
-          </button>
-
-          {/* Divider */}
-          <div className="border-t border-border my-2" />
 
           {/* Newsletter */}
           <div className="rounded-xl border border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5 p-4">

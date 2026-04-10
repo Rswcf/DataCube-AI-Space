@@ -462,7 +462,6 @@ Newsletter      ●────────────────────�
 | 平台 | 账号 | 头像 | 内容类型 |
 |------|------|------|---------|
 | **GitHub** | @Rswcf/DataCube-AI-Space | DC 字母标识 | 版本发布、开源更新 |
-| **Ko-fi** | @datacubeai | DC 字母标识 | 支持页面 |
 
 ### Atom Feed
 

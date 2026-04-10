@@ -145,10 +145,6 @@ export const translations = {
     confirm: "Best\u00e4tigen",
     back: "Zur\u00fcck",
 
-    // Support
-    support: "Unterst\u00fctzen",
-    supportDescription: "Unterst\u00fctze Data Cube auf Ko-fi",
-
     // Share enhanced
     copyLink: "Link kopieren",
     shareOnX: "Auf X teilen",
@@ -305,10 +301,6 @@ export const translations = {
     chooseNewsletterLang: "Choose newsletter language:",
     confirm: "Confirm",
     back: "Back",
-
-    // Support
-    support: "Support",
-    supportDescription: "Support Data Cube on Ko-fi",
 
     // Share enhanced
     copyLink: "Copy link",
@@ -467,10 +459,6 @@ export const translations = {
     confirm: "\u786e\u8ba4",
     back: "\u8fd4\u56de",
 
-    // Support
-    support: "\u652f\u6301\u6211\u4eec",
-    supportDescription: "\u5728 Ko-fi \u4e0a\u652f\u6301 Data Cube",
-
     // Share enhanced
     copyLink: "\u590d\u5236\u94fe\u63a5",
     shareOnX: "\u5206\u4eab\u5230 X",
@@ -627,10 +615,6 @@ export const translations = {
     chooseNewsletterLang: "Choisir la langue\u00a0:",
     confirm: "Confirmer",
     back: "Retour",
-
-    // Support
-    support: "Soutenir",
-    supportDescription: "Soutenez Data Cube sur Ko-fi",
 
     // Share enhanced
     copyLink: "Copier le lien",
@@ -789,10 +773,6 @@ export const translations = {
     confirm: "Confirmar",
     back: "Volver",
 
-    // Support
-    support: "Apoyar",
-    supportDescription: "Apoya a Data Cube en Ko-fi",
-
     // Share enhanced
     copyLink: "Copiar enlace",
     shareOnX: "Compartir en X",
@@ -949,10 +929,6 @@ export const translations = {
     chooseNewsletterLang: "Escolher idioma:",
     confirm: "Confirmar",
     back: "Voltar",
-
-    // Support
-    support: "Apoiar",
-    supportDescription: "Apoie o Data Cube no Ko-fi",
 
     // Share enhanced
     copyLink: "Copiar link",
@@ -1111,10 +1087,6 @@ export const translations = {
     confirm: "\u78ba\u8a8d",
     back: "\u623b\u308b",
 
-    // Support
-    support: "\u30b5\u30dd\u30fc\u30c8",
-    supportDescription: "Ko-fi\u3067Data Cube\u3092\u5fdc\u63f4",
-
     // Share enhanced
     copyLink: "\u30ea\u30f3\u30af\u3092\u30b3\u30d4\u30fc",
     shareOnX: "X\u3067\u5171\u6709",
@@ -1271,10 +1243,6 @@ export const translations = {
     chooseNewsletterLang: "\uc5b8\uc5b4 \uc120\ud0dd:",
     confirm: "\ud655\uc778",
     back: "\ub4a4\ub85c",
-
-    // Support
-    support: "\ud6c4\uc6d0",
-    supportDescription: "Ko-fi\uc5d0\uc11c Data Cube \ud6c4\uc6d0\ud558\uae30",
 
     // Share enhanced
     copyLink: "\ub9c1\ud06c \ubcf5\uc0ac",

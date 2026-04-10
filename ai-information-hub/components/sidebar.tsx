@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Cpu, TrendingUp, Lightbulb, Sun, Moon, Languages, Heart, Check } from "lucide-react";
+import { Cpu, TrendingUp, Lightbulb, Sun, Moon, Languages, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSettings } from "@/lib/settings-context";
 import { LogoCube } from "@/components/logo-cube";
@@ -194,14 +194,6 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
 
           {/* Language Selector */}
           <LanguageDropdown language={language} setLanguage={setLanguage} />
-
-          {/* Support */}
-          <NavButton
-            icon={Heart}
-            label={t("support")}
-            onClick={() => window.open("https://ko-fi.com/datacubeai", "_blank", "noopener,noreferrer")}
-            iconClassName="text-pink-500"
-          />
         </div>
 
         {/* Legal Links */}

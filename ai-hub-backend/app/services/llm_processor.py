@@ -70,10 +70,10 @@ class LLMProcessor:
     CLASSIFIER_MODELS = [
         "z-ai/glm-4.5-air:free",
         "arcee-ai/trinity-large-preview:free",
-        "stepfun/step-3.5-flash:free",
         "nvidia/nemotron-3-nano-30b-a3b:free",
-        "upstage/solar-pro-3:free",
-        "arcee-ai/trinity-mini:free",
+        "nvidia/nemotron-3-super-120b-a12b:free",
+        "google/gemma-4-31b-it:free",
+        "qwen/qwen3-next-80b-a3b-instruct:free",
     ]
 
     def __init__(self):
