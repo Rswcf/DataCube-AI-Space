@@ -954,8 +954,11 @@ def send_newsletter(db: Session, period_id: str | None = None):
     # Fetch content
     data = _fetch_period_content(db, period_id)
 
-    # Check there's actual content
-    total_items = len(data["tech"]) + len(data["funding"]) + len(data["tips"])
+    # Check there's actual content (count ALL section types)
+    total_items = (
+        len(data["tech"]) + len(data["funding"]) + len(data["tips"])
+        + len(data.get("ma", [])) + len(data.get("videos", []))
+    )
     if total_items == 0:
         logger.warning(f"No content for {period_id}, skipping newsletter")
         return

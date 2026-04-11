@@ -70,14 +70,49 @@ jobs:
           echo "Polling collection status for $PERIOD (up to 35 min)..."
 
           # Poll /admin/collect/status every 60s, up to 35 minutes
+          # Capture HTTP code to detect 404/401/500 instead of hiding as "unknown"
+          STATUS_ERRORS=0
           for i in $(seq 1 35); do
-            STATUS_JSON=$(curl -sS \
+            HTTP_CODE=$(curl -sS -o status.json -w "%{http_code}" \
               "${{ secrets.API_BASE_URL }}/admin/collect/status?period_id=${PERIOD}" \
               -H "X-API-Key: ${{ secrets.ADMIN_API_KEY }}" \
               --http1.1 \
               --max-time 30)
 
-            STATUS=$(echo "$STATUS_JSON" | python3 -c "import sys,json; print(json.load(sys.stdin).get('status','unknown'))" 2>/dev/null || echo "unknown")
+            if [ "$HTTP_CODE" -ne 200 ]; then
+              STATUS_ERRORS=$((STATUS_ERRORS + 1))
+              echo "Attempt $i/35: HTTP $HTTP_CODE (status endpoint error)"
+              if [ -f status.json ]; then cat status.json; echo ""; fi
+              # After 3 consecutive non-200, fall back to content polling
+              if [ "$STATUS_ERRORS" -ge 3 ]; then
+                echo "Status endpoint unavailable, falling back to content polling..."
+                TECH_CODE=$(curl -sS -o tech.json -w "%{http_code}" \
+                  "${{ secrets.API_BASE_URL }}/tech/${PERIOD}" \
+                  --http1.1 --max-time 30)
+                if [ "$TECH_CODE" -eq 200 ] && [ -f tech.json ]; then
+                  TOTAL=$(python3 -c "
+          import json, sys
+          try:
+              data = json.load(open('tech.json'))
+              total = sum(len(v) for v in data.values() if isinstance(v, list))
+              print(total)
+          except Exception:
+              print(0)
+          ")
+                  echo "Fallback poll $i/35: $TOTAL articles"
+                  if [ "$TOTAL" -gt 0 ]; then
+                    echo "Content ready via fallback for $PERIOD"
+                    echo "RESULT=completed" >> "$GITHUB_OUTPUT"
+                    exit 0
+                  fi
+                fi
+              fi
+              sleep 60
+              continue
+            fi
+
+            STATUS_ERRORS=0
+            STATUS=$(python3 -c "import sys,json; print(json.load(open('status.json')).get('status','unknown'))" 2>/dev/null || echo "unknown")
 
             echo "Attempt $i/35: status=$STATUS"
 
@@ -119,13 +154,31 @@ jobs:
           fi
 
           echo "Retry triggered, polling again (up to 35 min)..."
+          RETRY_ERRORS=0
           for i in $(seq 1 35); do
-            STATUS=$(curl -sS \
+            HTTP_CODE=$(curl -sS -o retry-status.json -w "%{http_code}" \
               "${{ secrets.API_BASE_URL }}/admin/collect/status?period_id=${PERIOD}" \
               -H "X-API-Key: ${{ secrets.ADMIN_API_KEY }}" \
-              --http1.1 --max-time 30 \
-              | python3 -c "import sys,json; print(json.load(sys.stdin).get('status','unknown'))" 2>/dev/null || echo "unknown")
+              --http1.1 --max-time 30)
 
+            if [ "$HTTP_CODE" -ne 200 ]; then
+              RETRY_ERRORS=$((RETRY_ERRORS + 1))
+              echo "Retry attempt $i/35: HTTP $HTTP_CODE"
+              if [ "$RETRY_ERRORS" -ge 3 ]; then
+                TOTAL=$(curl -sS "${{ secrets.API_BASE_URL }}/tech/${PERIOD}" --http1.1 --max-time 30 \
+                  | python3 -c "import json,sys; d=json.load(sys.stdin); print(sum(len(v) for v in d.values() if isinstance(v,list)))" 2>/dev/null || echo "0")
+                echo "Fallback poll: $TOTAL articles"
+                if [ "$TOTAL" -gt 0 ]; then
+                  echo "RETRY_OK=true" >> "$GITHUB_OUTPUT"
+                  exit 0
+                fi
+              fi
+              sleep 60
+              continue
+            fi
+
+            RETRY_ERRORS=0
+            STATUS=$(python3 -c "import json; print(json.load(open('retry-status.json')).get('status','unknown'))" 2>/dev/null || echo "unknown")
             echo "Retry attempt $i/35: status=$STATUS"
 
             if [ "$STATUS" = "completed" ]; then
