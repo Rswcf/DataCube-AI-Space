@@ -33,7 +33,7 @@ def _generate_api_key() -> str:
 
 
 def _get_api_key_record(
-    db: Session, x_api_key: str = Header(..., alias="X-API-Key"),
+    db: Session = Depends(get_db), x_api_key: str = Header(..., alias="X-API-Key"),
 ) -> ApiKey:
     """Dependency to verify and return the developer API key record."""
     record = db.query(ApiKey).filter(ApiKey.api_key == x_api_key).first()
