@@ -1,0 +1,99 @@
+name: Daily Newsletter
+
+# Sends yesterday's collected content as a newsletter at 08:00 Berlin time.
+# Data is collected the previous day at 23:xx (see daily-collect.yml).
+# This workflow fires the morning after to deliver the digest.
+
+on:
+  schedule:
+    # Fire at both possible UTC slots covering Berlin 08:00:
+    # - Summer (CEST, UTC+2): 06:07 UTC = 08:07 Berlin
+    # - Winter (CET, UTC+1):  07:07 UTC = 08:07 Berlin
+    - cron: "7 6 * * *"
+    - cron: "7 7 * * *"
+  workflow_dispatch:
+    inputs:
+      period_id:
+        description: "Period ID to send newsletter for (e.g. 2026-04-10). Default: yesterday"
+        required: false
+
+jobs:
+  send:
+    name: Send daily newsletter
+    runs-on: ubuntu-latest
+    steps:
+      - name: Determine period
+        id: period
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            BERLIN_HOUR=$(TZ=Europe/Berlin date +%H)
+            if [ "$BERLIN_HOUR" != "08" ]; then
+              echo "Skip: now is not 08:xx in Europe/Berlin (hour=$BERLIN_HOUR)"
+              echo "SKIP=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          fi
+
+          PERIOD="${{ github.event.inputs.period_id }}"
+          if [ -z "$PERIOD" ]; then
+            # Default: yesterday in Berlin time (content collected last night at 23:xx)
+            PERIOD=$(TZ=Europe/Berlin date -d "yesterday" +%F)
+          fi
+          echo "PERIOD=$PERIOD" >> "$GITHUB_OUTPUT"
+          echo "SKIP=false" >> "$GITHUB_OUTPUT"
+          echo "Will send newsletter for $PERIOD"
+
+      - name: Verify content exists
+        id: verify
+        if: steps.period.outputs.SKIP != 'true'
+        run: |
+          PERIOD="${{ steps.period.outputs.PERIOD }}"
+          echo "Verifying content for $PERIOD..."
+
+          HTTP_CODE=$(curl -sS -o tech.json -w "%{http_code}" \
+            "${{ secrets.API_BASE_URL }}/tech/${PERIOD}" \
+            --http1.1 --max-time 30)
+
+          if [ "$HTTP_CODE" -ne 200 ]; then
+            echo "WARNING: content endpoint returned HTTP $HTTP_CODE — skipping newsletter"
+            echo "HAS_CONTENT=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          TOTAL=$(python3 -c "
+          import json, sys
+          try:
+              data = json.load(open('tech.json'))
+              total = sum(len(v) for v in data.values() if isinstance(v, list))
+              print(total)
+          except Exception:
+              print(0)
+          ")
+
+          echo "Tech articles found: $TOTAL"
+
+          if [ "$TOTAL" -gt 0 ]; then
+            echo "HAS_CONTENT=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "HAS_CONTENT=false" >> "$GITHUB_OUTPUT"
+            echo "WARNING: no content for $PERIOD — skipping newsletter"
+          fi
+
+      - name: Send newsletter
+        if: steps.verify.outputs.HAS_CONTENT == 'true'
+        run: |
+          set +e
+          PERIOD="${{ steps.period.outputs.PERIOD }}"
+          echo "Sending newsletter for period: $PERIOD"
+          HTTP_CODE=$(curl -sS -o nl-response.json -w "%{http_code}" \
+            -X POST "${{ secrets.API_BASE_URL }}/admin/newsletter?period_id=${PERIOD}&wait=true" \
+            -H "X-API-Key: ${{ secrets.ADMIN_API_KEY }}" \
+            --http1.1 \
+            --max-time 300)
+          if [ -f nl-response.json ]; then cat nl-response.json; echo ""; fi
+          if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
+            echo "Newsletter sent successfully (HTTP $HTTP_CODE)"
+          else
+            echo "ERROR: Newsletter API returned HTTP $HTTP_CODE"
+            exit 1
+          fi

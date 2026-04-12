@@ -198,20 +198,5 @@ jobs:
           echo "RETRY_OK=false" >> "$GITHUB_OUTPUT"
           exit 1
 
-      - name: Send newsletter
-        if: steps.poll.outputs.RESULT == 'completed' || steps.retry.outputs.RETRY_OK == 'true'
-        run: |
-          set +e
-          PERIOD="${{ steps.period.outputs.PERIOD }}"
-          echo "Sending newsletter for period: $PERIOD"
-          HTTP_CODE=$(curl -sS -o nl-response.json -w "%{http_code}" \
-            -X POST "${{ secrets.API_BASE_URL }}/admin/newsletter?period_id=${PERIOD}&wait=true" \
-            -H "X-API-Key: ${{ secrets.ADMIN_API_KEY }}" \
-            --http1.1 \
-            --max-time 300)
-          if [ -f nl-response.json ]; then cat nl-response.json; echo ""; fi
-          if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
-            echo "Newsletter sent successfully (HTTP $HTTP_CODE)"
-          else
-            echo "WARNING: Newsletter API returned HTTP $HTTP_CODE — non-fatal"
-          fi
+      # Newsletter is sent by a separate workflow (daily-newsletter.yml) at
+      # 08:xx Berlin the next morning, not right after collection at 23:xx.
