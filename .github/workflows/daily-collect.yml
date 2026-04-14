@@ -67,12 +67,15 @@ jobs:
         if: steps.trigger.outputs.TRIGGERED == 'true'
         run: |
           PERIOD="${{ steps.period.outputs.PERIOD }}"
-          echo "Polling collection status for $PERIOD (up to 35 min)..."
+          echo "Polling collection status for $PERIOD (up to 60 min)..."
 
-          # Poll /admin/collect/status every 60s, up to 35 minutes
-          # Capture HTTP code to detect 404/401/500 instead of hiding as "unknown"
+          # Poll /admin/collect/status every 60s, up to 60 minutes.
+          # Stage 3.5 (translations) has no hard cap and can run long; a wider
+          # budget avoids false timeouts that would otherwise race with the
+          # still-running backend (POST /admin/collect does not serialize
+          # concurrent runs per period_id).
           STATUS_ERRORS=0
-          for i in $(seq 1 35); do
+          for i in $(seq 1 60); do
             HTTP_CODE=$(curl -sS -o status.json -w "%{http_code}" \
               "${{ secrets.API_BASE_URL }}/admin/collect/status?period_id=${PERIOD}" \
               -H "X-API-Key: ${{ secrets.ADMIN_API_KEY }}" \
@@ -81,30 +84,21 @@ jobs:
 
             if [ "$HTTP_CODE" -ne 200 ]; then
               STATUS_ERRORS=$((STATUS_ERRORS + 1))
-              echo "Attempt $i/35: HTTP $HTTP_CODE (status endpoint error)"
+              echo "Attempt $i/60: HTTP $HTTP_CODE (status endpoint error)"
               if [ -f status.json ]; then cat status.json; echo ""; fi
-              # After 3 consecutive non-200, fall back to content polling
               if [ "$STATUS_ERRORS" -ge 3 ]; then
                 echo "Status endpoint unavailable, falling back to content polling..."
-                TECH_CODE=$(curl -sS -o tech.json -w "%{http_code}" \
-                  "${{ secrets.API_BASE_URL }}/tech/${PERIOD}" \
-                  --http1.1 --max-time 30)
-                if [ "$TECH_CODE" -eq 200 ] && [ -f tech.json ]; then
-                  TOTAL=$(python3 -c "
-          import json, sys
-          try:
-              data = json.load(open('tech.json'))
-              total = sum(len(v) for v in data.values() if isinstance(v, list))
-              print(total)
-          except Exception:
-              print(0)
-          ")
-                  echo "Fallback poll $i/35: $TOTAL articles"
-                  if [ "$TOTAL" -gt 0 ]; then
-                    echo "Content ready via fallback for $PERIOD"
-                    echo "RESULT=completed" >> "$GITHUB_OUTPUT"
-                    exit 0
-                  fi
+                # Recursive list-counter works for /tech (flat), /tips (flat), and /investment (nested).
+                COUNTER='import json,sys;cnt=lambda v:len(v) if isinstance(v,list) else (sum(cnt(x) for x in v.values()) if isinstance(v,dict) else 0);print(cnt(json.load(sys.stdin)))'
+                T1=$(curl -sS "${{ secrets.API_BASE_URL }}/tech/${PERIOD}"       --http1.1 --max-time 30 | python3 -c "$COUNTER" 2>/dev/null || echo 0)
+                T2=$(curl -sS "${{ secrets.API_BASE_URL }}/tips/${PERIOD}"       --http1.1 --max-time 30 | python3 -c "$COUNTER" 2>/dev/null || echo 0)
+                T3=$(curl -sS "${{ secrets.API_BASE_URL }}/investment/${PERIOD}" --http1.1 --max-time 30 | python3 -c "$COUNTER" 2>/dev/null || echo 0)
+                TOTAL=$((T1 + T2 + T3))
+                echo "Fallback poll $i/60: $TOTAL items total (tech=$T1 tips=$T2 inv=$T3)"
+                if [ "$TOTAL" -gt 0 ]; then
+                  echo "Content ready via fallback for $PERIOD"
+                  echo "RESULT=completed" >> "$GITHUB_OUTPUT"
+                  exit 0
                 fi
               fi
               sleep 60
@@ -113,8 +107,9 @@ jobs:
 
             STATUS_ERRORS=0
             STATUS=$(python3 -c "import sys,json; print(json.load(open('status.json')).get('status','unknown'))" 2>/dev/null || echo "unknown")
+            STAGE=$(python3 -c "import sys,json; print(json.load(open('status.json')).get('stage',''))" 2>/dev/null || echo "")
 
-            echo "Attempt $i/35: status=$STATUS"
+            echo "Attempt $i/60: status=$STATUS stage=$STAGE"
 
             if [ "$STATUS" = "completed" ]; then
               echo "Collection completed for $PERIOD"
@@ -129,11 +124,39 @@ jobs:
             sleep 60
           done
 
-          echo "WARNING: Collection still running after 35 minutes"
+          # Poll budget exhausted. Decide:
+          #   (a) if content was saved (sum across tech+tips+investment > 0),
+          #       this is stage3_5 running slow — DE/EN is already visible,
+          #       treat as soft success.
+          #   (b) if no content exists, the run is genuinely stuck. Fail RED.
+          # Do NOT auto-retry — backend has no "already running" guard, a retry
+          # here would race the still-running original run (see collector stages
+          # 1 and 4 which clear + reinsert rows per period).
+          echo "Poll timed out after 60 min. Checking whether content was saved..."
+          COUNTER='import json,sys;cnt=lambda v:len(v) if isinstance(v,list) else (sum(cnt(x) for x in v.values()) if isinstance(v,dict) else 0);print(cnt(json.load(sys.stdin)))'
+          T1=$(curl -sS "${{ secrets.API_BASE_URL }}/tech/${PERIOD}"       --http1.1 --max-time 30 | python3 -c "$COUNTER" 2>/dev/null || echo 0)
+          T2=$(curl -sS "${{ secrets.API_BASE_URL }}/tips/${PERIOD}"       --http1.1 --max-time 30 | python3 -c "$COUNTER" 2>/dev/null || echo 0)
+          T3=$(curl -sS "${{ secrets.API_BASE_URL }}/investment/${PERIOD}" --http1.1 --max-time 30 | python3 -c "$COUNTER" 2>/dev/null || echo 0)
+          TOTAL=$((T1 + T2 + T3))
+          echo "Content items found across tech+tips+investment: $TOTAL (tech=$T1 tips=$T2 inv=$T3)"
+
+          if [ "$TOTAL" -gt 0 ]; then
+            echo "Content present despite timeout — treating as completed (stage3_5 likely slow)."
+            echo "RESULT=completed" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "ERROR: 60-min timeout AND no content saved for $PERIOD"
           echo "RESULT=timeout" >> "$GITHUB_OUTPUT"
+          exit 1
 
       - name: Retry on failure
         id: retry
+        # Only retry terminal failures. Do NOT include 'timeout' here: without
+        # a backend per-period lock, retrying while the original run may still
+        # be in progress causes a race in stages 1 and 4 (raw clear + delete/
+        # reinsert). The poll step already handles timeout-with-content as a
+        # soft success and timeout-without-content as RED.
         if: steps.poll.outputs.RESULT == 'failed' || steps.poll.outputs.RESULT == 'empty'
         run: |
           PERIOD="${{ steps.period.outputs.PERIOD }}"
@@ -153,9 +176,9 @@ jobs:
             exit 1
           fi
 
-          echo "Retry triggered, polling again (up to 35 min)..."
+          echo "Retry triggered, polling again (up to 60 min)..."
           RETRY_ERRORS=0
-          for i in $(seq 1 35); do
+          for i in $(seq 1 60); do
             HTTP_CODE=$(curl -sS -o retry-status.json -w "%{http_code}" \
               "${{ secrets.API_BASE_URL }}/admin/collect/status?period_id=${PERIOD}" \
               -H "X-API-Key: ${{ secrets.ADMIN_API_KEY }}" \
@@ -163,7 +186,7 @@ jobs:
 
             if [ "$HTTP_CODE" -ne 200 ]; then
               RETRY_ERRORS=$((RETRY_ERRORS + 1))
-              echo "Retry attempt $i/35: HTTP $HTTP_CODE"
+              echo "Retry attempt $i/60: HTTP $HTTP_CODE"
               if [ "$RETRY_ERRORS" -ge 3 ]; then
                 TOTAL=$(curl -sS "${{ secrets.API_BASE_URL }}/tech/${PERIOD}" --http1.1 --max-time 30 \
                   | python3 -c "import json,sys; d=json.load(sys.stdin); print(sum(len(v) for v in d.values() if isinstance(v,list)))" 2>/dev/null || echo "0")
@@ -179,7 +202,7 @@ jobs:
 
             RETRY_ERRORS=0
             STATUS=$(python3 -c "import json; print(json.load(open('retry-status.json')).get('status','unknown'))" 2>/dev/null || echo "unknown")
-            echo "Retry attempt $i/35: status=$STATUS"
+            echo "Retry attempt $i/60: status=$STATUS"
 
             if [ "$STATUS" = "completed" ]; then
               echo "Retry succeeded for $PERIOD"

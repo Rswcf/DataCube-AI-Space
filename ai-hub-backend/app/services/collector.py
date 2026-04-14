@@ -67,6 +67,15 @@ def set_collection_status(
                 started_at=datetime.utcnow(),
             )
             db.add(run)
+        else:
+            # Fresh transition to running = fresh run: clear leftover error +
+            # completed_at from prior attempt, refresh started_at. Otherwise
+            # the status endpoint shows misleading stale failure details
+            # while a new run is in progress.
+            if status == "running" and run.status != "running":
+                run.error = None
+                run.completed_at = None
+                run.started_at = datetime.utcnow()
         run.status = status
         if stage:
             run.stage = stage
@@ -76,6 +85,9 @@ def set_collection_status(
             run.raw_counts = raw_counts
         if error is not None:
             run.error = error[:500] if error else None
+        elif status in ("completed", "empty"):
+            # Explicit success/empty: clear any leftover error text.
+            run.error = None
         if status in ("completed", "failed", "empty"):
             run.completed_at = datetime.utcnow()
         db.commit()
