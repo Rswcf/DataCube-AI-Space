@@ -51,7 +51,13 @@ export function ArticleSchema({ post, inLanguage = 'de', url }: { post: TechPost
   const firstLine = (post.content || '').split('\n')[0]?.trim()
   const headline = (firstLine && firstLine.length > 0 ? firstLine : post.content).slice(0, 110)
 
-  const schema = {
+  // Semantics: this is OUR summary page, not the original article.
+  //   url / mainEntityOfPage  -> the Data Cube week page (where the schema lives)
+  //   isBasedOn               -> the external source we summarised, if any
+  // Previously mainEntityOfPage pointed at the external source, which is
+  // schema.org-wrong (the "main entity" of this page IS this page).
+  const canonicalUrl = url || 'https://www.datacubeai.space'
+  const schema: Record<string, unknown> = {
     '@context': 'https://schema.org',
     '@type': 'NewsArticle',
     headline,
@@ -61,7 +67,8 @@ export function ArticleSchema({ post, inLanguage = 'de', url }: { post: TechPost
     image: 'https://www.datacubeai.space/og-image.jpg',
     inLanguage,
     isAccessibleForFree: true,
-    url: url || post.sourceUrl || 'https://www.datacubeai.space',
+    url: canonicalUrl,
+    mainEntityOfPage: canonicalUrl,
     author: {
       '@type': 'Organization',
       name: 'Data Cube AI',
@@ -75,7 +82,9 @@ export function ArticleSchema({ post, inLanguage = 'de', url }: { post: TechPost
         url: 'https://www.datacubeai.space/icon.svg',
       },
     },
-    mainEntityOfPage: post.sourceUrl || 'https://www.datacubeai.space',
+  }
+  if (post.sourceUrl) {
+    schema.isBasedOn = post.sourceUrl
   }
 
   return (
@@ -98,7 +107,7 @@ export function VideoSchema({ video }: { video: TechPost }) {
     uploadDate: video.timestamp,
     duration: video.videoDuration,
     contentUrl: `https://www.youtube.com/watch?v=${video.videoId}`,
-    embedUrl: `https://www.youtube.com/embed/${video.videoId}`,
+    embedUrl: `https://www.youtube-nocookie.com/embed/${video.videoId}`,
     publisher: {
       '@type': 'Organization',
       name: 'Data Cube AI',

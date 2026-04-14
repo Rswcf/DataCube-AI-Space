@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import HomePageClient from '@/components/home-page-client'
@@ -7,6 +8,31 @@ import { toTopicSlug } from '@/lib/topic-utils'
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api-production-3ee5.up.railway.app/api'
 
 export const revalidate = 3600
+
+// Root / and /de render the same German homepage. Consolidate indexing on /de
+// by declaring it canonical here, so search engines don't treat both as dupes.
+// Sitemap intentionally omits the root URL; /de is the one sitemap entry that
+// points at the German homepage.
+//
+// The full hreflang `languages` map is restated here because Next.js merges
+// metadata shallowly — setting `alternates` at page level would otherwise blow
+// away the layout-level `alternates.languages` map.
+export const metadata: Metadata = {
+  alternates: {
+    canonical: 'https://www.datacubeai.space/de',
+    languages: {
+      'de': 'https://www.datacubeai.space/de',
+      'en': 'https://www.datacubeai.space/en',
+      'zh-Hans': 'https://www.datacubeai.space/zh',
+      'fr': 'https://www.datacubeai.space/fr',
+      'es': 'https://www.datacubeai.space/es',
+      'pt': 'https://www.datacubeai.space/pt',
+      'ja': 'https://www.datacubeai.space/ja',
+      'ko': 'https://www.datacubeai.space/ko',
+      'x-default': 'https://www.datacubeai.space/',
+    },
+  },
+}
 
 interface DayEntry {
   id: string

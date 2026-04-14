@@ -18,6 +18,25 @@ export default function ImpressumPage() {
         </p>
       </header>
 
+      {/* Draft / placeholder banner — the operator details in [brackets] below
+          have not been filled in yet. Shown publicly so readers are not misled
+          into thinking this is a finalised legal document, and so AdSense
+          reviewers understand the page is clearly work-in-progress rather than
+          an attempt at shipping non-compliant boilerplate. */}
+      <aside
+        role="note"
+        className="mb-8 rounded-md border-2 border-amber-500/60 bg-amber-500/10 p-4 text-sm leading-relaxed text-amber-900 dark:text-amber-200"
+      >
+        <strong className="font-semibold">⚠ Draft notice — Entwurf:</strong>{' '}
+        This Impressum is currently a template. The fields in square brackets
+        ([Name], [Adresse], [E-Mail] …) have not yet been completed with the
+        operator&rsquo;s real details. The site is not yet monetised and does
+        not yet rely on this page for regulatory disclosure. Please contact
+        the operator through the channels listed on the homepage for binding
+        information. — Dieses Impressum ist eine Vorlage; die Platzhalter in
+        eckigen Klammern werden vor Launch ausgefüllt.
+      </aside>
+
       {/* German Section */}
       <section className="mb-10">
         <h2 className="text-2xl font-semibold mb-4">Impressum (Deutsch)</h2>

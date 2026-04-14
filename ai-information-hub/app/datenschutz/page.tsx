@@ -18,6 +18,23 @@ export default function DatenschutzPage() {
         </p>
       </header>
 
+      {/* Draft / placeholder banner — the controller/DPO/retention fields in
+          [brackets] below have not been filled in yet. This page will be
+          revised before we enable advertising cookies or any third-party ad
+          network. Shown publicly to avoid misleading readers. */}
+      <aside
+        role="note"
+        className="mb-8 rounded-md border-2 border-amber-500/60 bg-amber-500/10 p-4 text-sm leading-relaxed text-amber-900 dark:text-amber-200"
+      >
+        <strong className="font-semibold">⚠ Draft notice — Entwurf:</strong>{' '}
+        This privacy policy is in draft form. Controller contact, DPO, and
+        retention fields in square brackets will be completed before any
+        advertising cookies are enabled on this site. Today the site sets only
+        a functional &quot;visited&quot; cookie and uses Vercel Analytics
+        (privacy-friendly, no cookies). — Diese Datenschutzerklärung ist ein
+        Entwurf; Platzhalter werden vor Aktivierung von Werbecookies ergänzt.
+      </aside>
+
       {/* German Section */}
       <section className="mb-10">
         <h2 className="text-2xl font-semibold mb-4">Datenschutzerklärung (Deutsch)</h2>

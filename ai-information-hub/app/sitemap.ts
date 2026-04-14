@@ -167,13 +167,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }))
   )
 
+  // NOTE: root baseUrl is intentionally NOT in the sitemap. It renders the same
+  // content as /de, so listing both was duplicate-content noise. The /de entry
+  // in langHomeEntries is the canonical German homepage; the root URL sets
+  // <link rel="canonical" href=".../de"> via app/page.tsx metadata to signal
+  // consolidation while still serving content to users who arrive without a
+  // language segment.
   return [
-    {
-      url: baseUrl,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 1,
-    },
     {
       url: `${baseUrl}/impressum`,
       lastModified: new Date('2026-02-18T00:00:00Z'),

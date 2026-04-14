@@ -137,6 +137,7 @@ export default async function RootLayout({
   const headersList = await headers()
   const rawLang = headersList.get('x-lang') || 'de'
   const htmlLang = isSupportedLanguage(rawLang) ? toBcp47(rawLang as AppLanguage) : rawLang
+  const initialLanguage: AppLanguage = isSupportedLanguage(rawLang) ? rawLang : 'de'
 
   return (
     <html lang={htmlLang} suppressHydrationWarning>
@@ -158,7 +159,7 @@ export default async function RootLayout({
         >
           Skip to content
         </a>
-        <SettingsProvider>
+        <SettingsProvider initialLanguage={initialLanguage}>
           {children}
         </SettingsProvider>
         <Analytics />

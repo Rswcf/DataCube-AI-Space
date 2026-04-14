@@ -18,34 +18,46 @@ interface SettingsContextType {
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
 
 /**
- * Provides theme (dark/light) and language (de/en) settings to the app.
+ * Provides theme (dark/light) and language (de/en/...) settings to the app.
  *
  * Wraps the entire app in layout.tsx. Persists preferences to localStorage.
- * Default: dark theme, German language.
+ * Default: dark theme. Initial language comes from the URL-derived `initialLanguage`
+ * prop (passed by the server layout via the x-lang header), NOT from a hard-coded
+ * 'de' default. Previously the strict default caused /en to SSR German content
+ * until JS mounted, which search engines indexed as duplicate/wrong-language.
  *
  * @example
  * // In layout.tsx (already configured)
- * <SettingsProvider>
+ * <SettingsProvider initialLanguage={rawLang}>
  *   {children}
  * </SettingsProvider>
  */
-export function SettingsProvider({ children }: { children: ReactNode }) {
+export function SettingsProvider({
+  children,
+  initialLanguage = "de",
+}: {
+  children: ReactNode;
+  initialLanguage?: Language;
+}) {
   const router = useRouter();
   const pathname = usePathname();
   const [theme, setThemeState] = useState<Theme>("dark");
-  const [language, setLanguageState] = useState<Language>("de");
+  const [language, setLanguageState] = useState<Language>(initialLanguage);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    // Check for saved preferences
     const savedTheme = localStorage.getItem("theme") as Theme | null;
     const savedLanguage = localStorage.getItem("language") as Language | null;
 
     if (savedTheme) {
       setThemeState(savedTheme);
     }
-    if (savedLanguage) {
+    // Apply saved language ONLY when the URL does not already specify one.
+    // URL-based language always wins to prevent /en flickering back to a
+    // stored 'de' preference before the pathname effect corrects it.
+    const urlLang = getLanguageFromPathname(window.location.pathname);
+    if (savedLanguage && !urlLang) {
       setLanguageState(savedLanguage);
     }
   }, []);
