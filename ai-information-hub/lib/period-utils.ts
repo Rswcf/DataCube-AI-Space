@@ -61,6 +61,32 @@ export function getPeriodNum(id: string): string {
 }
 
 /**
+ * Derive a published-at Date for a period id — the day itself for daily IDs,
+ * Saturday of the ISO week for weekly IDs. Single source of truth used by
+ * sitemap.ts (lastModified) and week page (datePublished / OG publishedTime)
+ * — drift between these two would be a real freshness-signal SEO cost.
+ */
+export function periodPublishedDate(periodId: string): Date {
+  const dayMatch = periodId.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (dayMatch) {
+    return new Date(`${dayMatch[1]}-${dayMatch[2]}-${dayMatch[3]}T00:00:00Z`);
+  }
+  const weekMatch = periodId.match(/^(\d{4})-kw(\d{2})$/);
+  if (weekMatch) {
+    const year = parseInt(weekMatch[1], 10);
+    const week = parseInt(weekMatch[2], 10);
+    const jan4 = new Date(Date.UTC(year, 0, 4));
+    const dayOfWeek = jan4.getUTCDay() || 7; // Mon=1 .. Sun=7
+    const mondayWeek1 = new Date(jan4);
+    mondayWeek1.setUTCDate(jan4.getUTCDate() - dayOfWeek + 1);
+    const saturday = new Date(mondayWeek1);
+    saturday.setUTCDate(mondayWeek1.getUTCDate() + (week - 1) * 7 + 5);
+    return saturday;
+  }
+  return new Date();
+}
+
+/**
  * Get the parent weekly period ID (YYYY-kwWW) for a daily period ID (YYYY-MM-DD).
  * Uses ISO 8601 week numbering (Monday-based weeks).
  * Returns null if the input is not a daily ID.

@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import { toTopicSlug } from '@/lib/topic-utils'
 import { SUPPORTED_LANGUAGES } from '@/lib/i18n'
+import { periodPublishedDate } from '@/lib/period-utils'
 
 interface WeeksResponse {
   weeks: { id: string; days?: { id: string }[] }[]
@@ -15,28 +16,9 @@ interface TrendsResponse {
   }
 }
 
-function lastModFromId(id: string): Date {
-  // Day ID: YYYY-MM-DD
-  const dayMatch = id.match(/^(\d{4})-(\d{2})-(\d{2})$/)
-  if (dayMatch) {
-    return new Date(`${dayMatch[1]}-${dayMatch[2]}-${dayMatch[3]}T00:00:00Z`)
-  }
-  // Week ID: YYYY-kwWW — calculate Saturday of that ISO week
-  const weekMatch = id.match(/^(\d{4})-kw(\d{2})$/)
-  if (weekMatch) {
-    const year = parseInt(weekMatch[1], 10)
-    const week = parseInt(weekMatch[2], 10)
-    // Jan 4 is always in ISO week 1
-    const jan4 = new Date(Date.UTC(year, 0, 4))
-    const dayOfWeek = jan4.getUTCDay() || 7 // Mon=1 .. Sun=7
-    const mondayWeek1 = new Date(jan4)
-    mondayWeek1.setUTCDate(jan4.getUTCDate() - dayOfWeek + 1)
-    const saturday = new Date(mondayWeek1)
-    saturday.setUTCDate(mondayWeek1.getUTCDate() + (week - 1) * 7 + 5) // +5 = Saturday
-    return saturday
-  }
-  return new Date()
-}
+// `periodPublishedDate` from lib/period-utils is the shared source of truth
+// for period-id → Date conversion across sitemap.ts + week/page.tsx.
+const lastModFromId = periodPublishedDate
 
 async function getTopicTitlesByLanguage(periodId: string, apiUrl: string): Promise<{ de: string[]; en: string[] }> {
   let data: TrendsResponse | null = null

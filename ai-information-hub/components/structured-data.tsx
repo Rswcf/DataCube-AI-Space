@@ -82,6 +82,11 @@ export function ArticleSchema({ post, inLanguage = 'de', url }: { post: TechPost
         url: 'https://www.datacubeai.space/icon.svg',
       },
     },
+    // NOTE: `speakable` deliberately NOT set here. A per-item speakable on an
+    // aggregation page matches selectors across EVERY other item's headline
+    // and body, which contradicts Google's "concise, 20-30s" speakable
+    // guidance. Speakable lives on the page-level CollectionPageSchema
+    // instead, targeting the takeaways section only.
   }
   if (post.sourceUrl) {
     schema.isBasedOn = post.sourceUrl
@@ -288,6 +293,75 @@ export function ItemListSchema({ items, name, lang }: { items: Array<{ url: stri
       url: item.url,
       name: item.name,
     })),
+  }
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+    />
+  )
+}
+
+/**
+ * CollectionPage schema — tells Google this page is a curated list of
+ * articles, not a single primary article. Complements the per-item
+ * NewsArticle schemas, which continue to describe individual entries.
+ *
+ * Intentionally NOT using `hasPart`: our individual article items do not
+ * have unique on-site URLs (all live on this week page), so any hasPart
+ * list would collapse to N duplicate NewsArticle nodes at the same URL,
+ * which weakens entity resolution instead of helping it. Add hasPart
+ * back once we give each article a stable internal fragment or canonical.
+ *
+ * `speakable` points at the takeaways section (one concise, page-scoped
+ * block) rather than spraying across every article body. Google's
+ * Speakable guidance asks for 20-30s of focused text, not an entire
+ * roundup page.
+ */
+export function CollectionPageSchema({
+  url,
+  name,
+  description,
+  inLanguage,
+  datePublished,
+  dateModified,
+  speakableCssSelector,
+}: {
+  url: string
+  name: string
+  description: string
+  inLanguage: string
+  datePublished?: string
+  dateModified?: string
+  speakableCssSelector?: string[]
+}) {
+  const schema: Record<string, unknown> = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    url,
+    name,
+    description,
+    inLanguage,
+    isAccessibleForFree: true,
+    isPartOf: {
+      '@type': 'WebSite',
+      name: 'Data Cube AI',
+      url: 'https://www.datacubeai.space',
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'Data Cube AI',
+      url: 'https://www.datacubeai.space',
+    },
+  }
+  if (datePublished) schema.datePublished = datePublished
+  if (dateModified) schema.dateModified = dateModified
+  if (speakableCssSelector && speakableCssSelector.length > 0) {
+    schema.speakable = {
+      '@type': 'SpeakableSpecification',
+      cssSelector: speakableCssSelector,
+    }
   }
 
   return (

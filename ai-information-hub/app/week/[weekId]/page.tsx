@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
-import { ArticleSchema, VideoSchema, BreadcrumbListSchema } from '@/components/structured-data'
-import { formatPeriodTitle } from '@/lib/period-utils'
+import { ArticleSchema, VideoSchema, BreadcrumbListSchema, CollectionPageSchema } from '@/components/structured-data'
+import { formatPeriodTitle, periodPublishedDate } from '@/lib/period-utils'
 import type { TechPost, MultilingualData, InvestmentData, TipPost, ImpactLevel } from '@/lib/types'
 import { toTopicSlug } from '@/lib/topic-utils'
 import { isSupportedLanguage, SUPPORTED_LANGUAGES, toBcp47 } from '@/lib/i18n'
@@ -127,6 +127,20 @@ const h2Tips: L = {
   ja: '今週の実用的なAIヒントは？',
   ko: '이번 주 실용적인 AI 팁은?',
 }
+
+const h2Takeaways: L = {
+  de: 'Wichtigste Erkenntnisse',
+  en: 'Key Takeaways',
+  zh: '核心要点',
+  fr: 'Points clés',
+  es: 'Ideas clave',
+  pt: 'Pontos principais',
+  ja: '主なポイント',
+  ko: '핵심 요약',
+}
+
+// periodPublishedDate is imported from lib/period-utils — shared with
+// sitemap.ts so freshness signals can't drift.
 
 // ---------------------------------------------------------------------------
 // Lead paragraphs (functions — they use dynamic counts)
@@ -292,6 +306,13 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
       description: t(descriptions, lang),
       url: localizedUrl,
       type: 'article',
+      // article:published_time freshness signal derived deterministically
+      // from the period id (day or Saturday of ISO week). modifiedTime is
+      // intentionally omitted here — generateMetadata doesn't fetch item
+      // data, so we'd have to emit render time (noisy) or duplicate the
+      // fetch. The JSON-LD CollectionPage in the page body uses the max
+      // item timestamp, which is what Google will prefer.
+      publishedTime: periodPublishedDate(weekId).toISOString(),
       images: [
         {
           url: `/api/og?period=${weekId}&lang=${lang}`,
@@ -401,10 +422,71 @@ export default async function WeekPage({ params, searchParams }: Props) {
     }
   } catch {}
 
+  // Build an extractive Key Takeaways list from existing data. No LLM call.
+  // This gives AI answer engines (Perplexity, AI Overviews) a crisp bulleted
+  // summary they can quote verbatim, without any authenticity risk from
+  // machine-generated editorial. Sort by impact, then timestamp desc as
+  // tie-break (Codex recommendation).
+  const takeawayBullets: string[] = []
+  const prioritizedTech = [...nonVideoTechPosts].sort((a, b) => {
+    const rank: Record<string, number> = { critical: 0, high: 1, medium: 2, low: 3 }
+    const byImpact = (rank[a.impact || 'medium'] ?? 2) - (rank[b.impact || 'medium'] ?? 2)
+    if (byImpact !== 0) return byImpact
+    return (b.timestamp || '').localeCompare(a.timestamp || '')
+  })
+  for (const post of prioritizedTech.slice(0, 3)) {
+    const snippet = snippetFromContent(post.content, 180)
+    if (snippet) takeawayBullets.push(snippet)
+  }
+  if (primaryMarket[0]?.company && primaryMarket[0]?.amount) {
+    takeawayBullets.push(
+      `${primaryMarket[0].company}: ${primaryMarket[0].amount}${primaryMarket[0].round ? ` (${primaryMarket[0].round})` : ''}`,
+    )
+  }
+  if (maDeals[0]?.acquirer && maDeals[0]?.target) {
+    takeawayBullets.push(
+      `${maDeals[0].acquirer} → ${maDeals[0].target}${maDeals[0].dealValue ? ` (${maDeals[0].dealValue})` : ''}`,
+    )
+  }
+  if (tips[0]?.tip) {
+    takeawayBullets.push(snippetFromContent(tips[0].tip, 160))
+  }
+
+  const pageUrl = `https://www.datacubeai.space/${lang}/week/${weekId}`
+  const publishedIso = periodPublishedDate(weekId).toISOString()
+
+  // Derive modifiedTime from the max underlying item timestamp rather than
+  // new Date(). Avoids emitting a "fresh" timestamp every ISR render when
+  // nothing actually changed (Codex feedback). Falls back to publishedIso
+  // when no items have timestamps yet.
+  const allTimestamps: string[] = [
+    ...nonVideoTechPosts.map((p) => p.timestamp || ''),
+    ...videoTechPosts.map((p) => p.timestamp || ''),
+    ...primaryMarket.map((p: { timestamp?: string }) => p.timestamp || ''),
+    ...secondaryMarket.map((p: { timestamp?: string }) => p.timestamp || ''),
+    ...maDeals.map((p: { timestamp?: string }) => p.timestamp || ''),
+    ...tips.map((p: { timestamp?: string }) => p.timestamp || ''),
+  ].filter(Boolean)
+  const maxTimestamp = allTimestamps.length > 0 ? allTimestamps.sort().at(-1) : undefined
+  const modifiedIso = maxTimestamp
+    ? new Date(maxTimestamp).toISOString()
+    : publishedIso
+
   return (
     <article className="max-w-4xl mx-auto px-4 py-8">
       {/* Header */}
       <BreadcrumbListSchema weekId={weekId} weekLabel={periodLabel} lang={lang} />
+      <CollectionPageSchema
+        url={pageUrl}
+        name={t(metaTitles(periodLabel), lang)}
+        description={t(metaDescriptions(periodLabel), lang)}
+        inLanguage={lang}
+        datePublished={publishedIso}
+        dateModified={modifiedIso}
+        speakableCssSelector={
+          takeawayBullets.length > 0 ? ['#dcai-takeaways'] : undefined
+        }
+      />
       <header className="mb-8">
         <h1 className="text-3xl font-bold">{t(h1Headings(periodLabel), lang)}</h1>
         <p className="mt-2 text-sm text-gray-600">
@@ -419,6 +501,35 @@ export default async function WeekPage({ params, searchParams }: Props) {
           ))}
         </p>
       </header>
+
+      {/* Key Takeaways — extractive (no LLM), localized heading.
+          This is the primary extractable surface for AI answer engines.
+          Bullets are sourced from existing content: top-3 impact-ranked tech
+          items, then lead deal, lead M&A, lead tip.
+
+          The #dcai-takeaways id is referenced as the `speakable` cssSelector
+          on the page-level CollectionPage schema — keeps voice-read scope
+          tight (~20-30s) per Google's Speakable guidance, instead of
+          spraying across every article on the roundup. */}
+      {takeawayBullets.length > 0 && (
+        <section
+          id="dcai-takeaways"
+          aria-labelledby="takeaways-heading"
+          className="mb-10 rounded-lg border border-gray-200 bg-gray-50 p-5 dark:bg-gray-900/40"
+        >
+          <h2
+            id="takeaways-heading"
+            className="text-xl font-semibold mb-3"
+          >
+            {t(h2Takeaways, lang)}
+          </h2>
+          <ul className="list-disc pl-5 space-y-2 leading-relaxed">
+            {takeawayBullets.map((b, i) => (
+              <li key={i}>{b}</li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {/* Tech Section */}
       <section className="mb-10">
