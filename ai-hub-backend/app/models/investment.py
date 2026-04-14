@@ -23,8 +23,8 @@ class PrimaryMarketPost(Base):
 
     # Deal info
     company: Mapped[str] = mapped_column(String(200))
-    amount_de: Mapped[str] = mapped_column(String(50))  # "$2,75 Mrd."
-    amount_en: Mapped[str] = mapped_column(String(50))  # "$2.75B"
+    amount_de: Mapped[str | None] = mapped_column(String(50), nullable=True)  # "$2,75 Mrd." or NULL when undisclosed
+    amount_en: Mapped[str | None] = mapped_column(String(50), nullable=True)  # "$2.75B" or NULL when undisclosed
     round: Mapped[str] = mapped_column(String(50))  # "Series D"
     # Funding round category for filtering: Early, Series A, Series B, Series C+, Late/PE, Unknown
     round_category: Mapped[str | None] = mapped_column(String(20), nullable=True)

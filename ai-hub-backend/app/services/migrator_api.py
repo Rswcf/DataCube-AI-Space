@@ -75,12 +75,12 @@ def import_week_from_json(
         for de_p, en_p in zip(primary.get("de", []), primary.get("en", [])):
             post = PrimaryMarketPost(
                 week_id=week_id,
-                content_de=de_p.get("content", ""),
-                content_en=en_p.get("content", ""),
-                company=de_p.get("company", ""),
-                amount_de=de_p.get("amount", ""),
-                amount_en=en_p.get("amount", ""),
-                round=de_p.get("round", ""),
+                content_de=de_p.get("content") or "",
+                content_en=en_p.get("content") or "",
+                company=de_p.get("company") or "",
+                amount_de=de_p.get("amount"),  # nullable since migration 0011
+                amount_en=en_p.get("amount"),  # nullable since migration 0011
+                round=de_p.get("round") or "",
                 investors=de_p.get("investors", []),
                 valuation_de=de_p.get("valuation"),
                 valuation_en=en_p.get("valuation"),

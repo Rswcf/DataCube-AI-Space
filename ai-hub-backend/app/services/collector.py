@@ -26,6 +26,19 @@ from app.services.llm_processor import LLMProcessor
 
 logger = logging.getLogger(__name__)
 
+
+def _nn(value, default=""):
+    """Coalesce None/missing to default for NOT NULL DB columns.
+
+    `.get("x", default)` only returns `default` when the key is missing.
+    LLM JSON often contains `{"x": null}` (key present, value null), which
+    then maps to None and violates NOT NULL on commit, aborting the whole
+    stage4 transaction. Use this helper at every save site that writes a
+    NOT NULL column sourced from LLM JSON.
+    """
+    return value if value is not None else default
+
+
 # ---------------------------------------------------------------------------
 # Persistent collection status tracking (DB-backed, survives restarts)
 # ---------------------------------------------------------------------------
@@ -1026,19 +1039,19 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
         video = Video(
             week_id=week_id,
             video_id=vid,
-            title_de=de_v.get("title", ""),
-            title_en=en_v.get("title", ""),
-            summary_de=de_v.get("summary", ""),
-            summary_en=en_v.get("summary", ""),
-            original_title=meta.get("original_title", ""),
-            channel_name=meta.get("channel_name", ""),
+            title_de=_nn(de_v.get("title"), ""),
+            title_en=_nn(en_v.get("title"), ""),
+            summary_de=_nn(de_v.get("summary"), ""),
+            summary_en=_nn(en_v.get("summary"), ""),
+            original_title=_nn(meta.get("original_title"), ""),
+            channel_name=_nn(meta.get("channel_name"), ""),
             channel_id=meta.get("channel_id"),
-            thumbnail_url=meta.get("thumbnail_url", ""),
-            published_at=meta.get("published_at", ""),
-            duration_seconds=meta.get("duration_seconds", 0),
-            duration_formatted=meta.get("duration_formatted", "0:00"),
-            view_count=meta.get("view_count", 0),
-            like_count=meta.get("like_count", 0),
+            thumbnail_url=_nn(meta.get("thumbnail_url"), ""),
+            published_at=_nn(meta.get("published_at"), ""),
+            duration_seconds=_nn(meta.get("duration_seconds"), 0),
+            duration_formatted=_nn(meta.get("duration_formatted"), "0:00"),
+            view_count=_nn(meta.get("view_count"), 0),
+            like_count=_nn(meta.get("like_count"), 0),
             transcript=raw_video.transcript if raw_video else None,
             category=de_v.get("category") or en_v.get("category"),
             translations=en_v.get("_translations") or None,
@@ -1056,17 +1069,17 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
 
         video_post = TechPost(
             week_id=week_id,
-            content_de=de_v.get("summary", ""),
-            content_en=en_v.get("summary", ""),
-            category_de=de_v.get("category", "Video"),
-            category_en=en_v.get("category", "Video"),
-            author={"name": meta.get("channel_name", "YouTube"), "handle": "@youtube", "avatar": "YT", "verified": True},
+            content_de=_nn(de_v.get("summary"), ""),
+            content_en=_nn(en_v.get("summary"), ""),
+            category_de=_nn(de_v.get("category"), "Video"),
+            category_en=_nn(en_v.get("category"), "Video"),
+            author={"name": _nn(meta.get("channel_name"), "YouTube"), "handle": "@youtube", "avatar": "YT", "verified": True},
             tags_de=["Video", "YouTube"],
             tags_en=["Video", "YouTube"],
             icon_type="Zap",
             impact="medium",
-            timestamp=meta.get("published_at", "")[:10] if meta.get("published_at") else "",
-            source=meta.get("channel_name", "YouTube"),
+            timestamp=(meta.get("published_at") or "")[:10],
+            source=_nn(meta.get("channel_name"), "YouTube"),
             source_url=f"https://www.youtube.com/watch?v={vid}",
             metrics={"comments": 0, "retweets": 0, "likes": meta.get("like_count", 0), "views": meta.get("view_count_formatted", "0")},
             is_video=True,
@@ -1084,22 +1097,23 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
 
     # Save tech posts with interspersed videos
     regular_posts = []
+    _default_author = {"name": "Unknown", "handle": "@unknown", "avatar": "??", "verified": False}
     for i, (de_p, en_p) in enumerate(zip(tech_data.get("de", []), tech_data.get("en", []))):
         post = TechPost(
             week_id=week_id,
-            content_de=de_p.get("content", ""),
-            content_en=en_p.get("content", ""),
-            category_de=de_p.get("category", ""),
-            category_en=en_p.get("category", ""),
-            author=de_p.get("author", {"name": "Unknown", "handle": "@unknown", "avatar": "??", "verified": False}),
-            tags_de=de_p.get("tags", []),
-            tags_en=en_p.get("tags", []),
-            icon_type=de_p.get("iconType", "Brain"),
-            impact=de_p.get("impact", "medium"),
-            timestamp=de_p.get("timestamp", ""),
-            source=de_p.get("source", ""),
+            content_de=_nn(de_p.get("content"), ""),
+            content_en=_nn(en_p.get("content"), ""),
+            category_de=_nn(de_p.get("category"), ""),
+            category_en=_nn(en_p.get("category"), ""),
+            author=_nn(de_p.get("author"), _default_author),
+            tags_de=_nn(de_p.get("tags"), []),
+            tags_en=_nn(en_p.get("tags"), []),
+            icon_type=_nn(de_p.get("iconType"), "Brain"),
+            impact=_nn(de_p.get("impact"), "medium"),
+            timestamp=_nn(de_p.get("timestamp"), ""),
+            source=_nn(de_p.get("source"), ""),
             source_url=de_p.get("sourceUrl"),
-            metrics=de_p.get("metrics", {}),
+            metrics=_nn(de_p.get("metrics"), {}),
             is_video=False,
             translations=en_p.get("_translations") or None,
         )
@@ -1130,23 +1144,25 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
 
         for de_p, en_p in zip(de_posts, en_posts):
             if model_class == PrimaryMarketPost:
-                # Use default values instead of skipping entries without amount
+                # amount_de/en are nullable since migration 0011; API layer (investment.py)
+                # normalizes NULL back to "N/A" for UI. LLM returns `null` for
+                # undisclosed amounts (e.g. SEC EDGAR unregistered equity sales).
                 post = PrimaryMarketPost(
                     week_id=week_id,
-                    content_de=de_p.get("content", ""),
-                    content_en=en_p.get("content", ""),
-                    company=de_p.get("company", ""),
-                    amount_de=de_p.get("amount", "N/A"),
-                    amount_en=en_p.get("amount", "N/A"),
+                    content_de=_nn(de_p.get("content"), ""),
+                    content_en=_nn(en_p.get("content"), ""),
+                    company=_nn(de_p.get("company"), ""),
+                    amount_de=de_p.get("amount"),
+                    amount_en=en_p.get("amount"),
                     round=de_p.get("round") or en_p.get("round") or "Unknown",
                     round_category=de_p.get("roundCategory") or en_p.get("roundCategory"),
-                    investors=de_p.get("investors", []),
+                    investors=_nn(de_p.get("investors"), []),
                     valuation_de=de_p.get("valuation"),
                     valuation_en=en_p.get("valuation"),
-                    author=de_p.get("author", {}),
-                    timestamp=de_p.get("timestamp", ""),
+                    author=_nn(de_p.get("author"), {}),
+                    timestamp=_nn(de_p.get("timestamp"), ""),
                     source_url=de_p.get("sourceUrl"),
-                    metrics=de_p.get("metrics", {}),
+                    metrics=_nn(de_p.get("metrics"), {}),
                     translations=en_p.get("_translations") or None,
                 )
             elif model_class == SecondaryMarketPost:
@@ -1154,36 +1170,36 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
                 # We only store ticker and content from LLM processing
                 post = SecondaryMarketPost(
                     week_id=week_id,
-                    content_de=de_p.get("content", ""),
-                    content_en=en_p.get("content", ""),
-                    ticker=de_p.get("ticker", ""),
+                    content_de=_nn(de_p.get("content"), ""),
+                    content_en=_nn(en_p.get("content"), ""),
+                    ticker=_nn(de_p.get("ticker"), ""),
                     price="",  # Fetched from real-time API
                     change="",  # Fetched from real-time API
                     direction="up",  # Determined by real-time API
                     market_cap_de=None,  # Fetched from real-time API
                     market_cap_en=None,  # Fetched from real-time API
-                    author=de_p.get("author", {}),
-                    timestamp=de_p.get("timestamp", ""),
+                    author=_nn(de_p.get("author"), {}),
+                    timestamp=_nn(de_p.get("timestamp"), ""),
                     source_url=de_p.get("sourceUrl"),
-                    metrics=de_p.get("metrics", {}),
+                    metrics=_nn(de_p.get("metrics"), {}),
                     translations=en_p.get("_translations") or None,
                 )
             else:  # MAPost
                 post = MAPost(
                     week_id=week_id,
-                    content_de=de_p.get("content", ""),
-                    content_en=en_p.get("content", ""),
-                    acquirer=de_p.get("acquirer", ""),
-                    target=de_p.get("target", ""),
+                    content_de=_nn(de_p.get("content"), ""),
+                    content_en=_nn(en_p.get("content"), ""),
+                    acquirer=_nn(de_p.get("acquirer"), ""),
+                    target=_nn(de_p.get("target"), ""),
                     deal_value_de=de_p.get("dealValue"),
                     deal_value_en=en_p.get("dealValue"),
-                    deal_type_de=de_p.get("dealType", ""),
-                    deal_type_en=en_p.get("dealType", ""),
+                    deal_type_de=_nn(de_p.get("dealType"), ""),
+                    deal_type_en=_nn(en_p.get("dealType"), ""),
                     industry=de_p.get("industry") or en_p.get("industry"),
-                    author=de_p.get("author", {}),
-                    timestamp=de_p.get("timestamp", ""),
+                    author=_nn(de_p.get("author"), {}),
+                    timestamp=_nn(de_p.get("timestamp"), ""),
                     source_url=de_p.get("sourceUrl"),
-                    metrics=de_p.get("metrics", {}),
+                    metrics=_nn(de_p.get("metrics"), {}),
                     translations=en_p.get("_translations") or None,
                 )
             db.add(post)
@@ -1192,19 +1208,19 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
     for de_p, en_p in zip(tips_data.get("de", []), tips_data.get("en", [])):
         post = TipPost(
             week_id=week_id,
-            content_de=de_p.get("content", ""),
-            content_en=en_p.get("content", ""),
-            tip_de=de_p.get("tip", ""),
-            tip_en=en_p.get("tip", ""),
-            category_de=de_p.get("category", ""),
-            category_en=en_p.get("category", ""),
-            platform=de_p.get("platform", "X"),
-            difficulty_de=de_p.get("difficulty", "Mittel"),
-            difficulty_en=en_p.get("difficulty", "Intermediate"),
-            author=de_p.get("author", {}),
-            timestamp=de_p.get("timestamp", ""),
+            content_de=_nn(de_p.get("content"), ""),
+            content_en=_nn(en_p.get("content"), ""),
+            tip_de=_nn(de_p.get("tip"), ""),
+            tip_en=_nn(en_p.get("tip"), ""),
+            category_de=_nn(de_p.get("category"), ""),
+            category_en=_nn(en_p.get("category"), ""),
+            platform=_nn(de_p.get("platform"), "X"),
+            difficulty_de=_nn(de_p.get("difficulty"), "Mittel"),
+            difficulty_en=_nn(en_p.get("difficulty"), "Intermediate"),
+            author=_nn(de_p.get("author"), {}),
+            timestamp=_nn(de_p.get("timestamp"), ""),
             source_url=de_p.get("sourceUrl"),
-            metrics=de_p.get("metrics", {}),
+            metrics=_nn(de_p.get("metrics"), {}),
             translations=en_p.get("_translations") or None,
         )
         db.add(post)
@@ -1223,10 +1239,10 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
             continue
         trend = Trend(
             week_id=week_id,
-            category_de=de_t.get("category", ""),
-            category_en=en_t.get("category", ""),
-            title_de=de_t.get("title", ""),
-            title_en=en_t.get("title", ""),
+            category_de=_nn(de_t.get("category"), ""),
+            category_en=_nn(en_t.get("category"), ""),
+            title_de=_nn(de_t.get("title"), ""),
+            title_en=_nn(en_t.get("title"), ""),
             posts=de_t.get("posts"),
             translations=en_t.get("_translations") or None,
         )
@@ -1361,10 +1377,15 @@ def run_collection(db: Session, week_id: Optional[str] = None):
         # This makes content visible even if translations fail
         stage4_save_to_database(db, week_id, results, raw_videos)
 
+        _inv = results.get("investment", {}) or {}
         counts = {
             "tech": len(results.get("tech", {}).get("de", [])),
             "tips": len(results.get("tips", {}).get("de", [])),
-            "investment": len(results.get("investment", {}).get("primaryMarket", {}).get("de", [])),
+            "investment": (
+                len((_inv.get("primaryMarket") or {}).get("de", []))
+                + len((_inv.get("secondaryMarket") or {}).get("de", []))
+                + len((_inv.get("ma") or {}).get("de", []))
+            ),
             "videos": len(results.get("videos", {}).get("de", [])),
         }
 
