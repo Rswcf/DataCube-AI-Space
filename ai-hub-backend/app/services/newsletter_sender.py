@@ -16,10 +16,12 @@ Design based on best practices from TLDR, Morning Brew, Superhuman AI:
 
 import html
 import logging
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
+from zoneinfo import ZoneInfo
 
 import requests
 import resend
+from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
@@ -27,10 +29,18 @@ from app.models.tech import TechPost
 from app.models.investment import PrimaryMarketPost, MAPost
 from app.models.tip import TipPost
 from app.models.week import Week
+from app.models.newsletter_send import NewsletterSend
 from app.services.period_utils import current_day_id
 from app.services.i18n_utils import get_field, SUPPORTED_LANGUAGES
 
 logger = logging.getLogger(__name__)
+
+# In-progress rows older than this are considered orphaned (e.g. crashed run)
+# and releasable for retry. Must exceed the gap between the two dual-DST cron
+# slots (~1h apart) plus a healthy send cycle budget, so a legitimately
+# still-running send is NOT reclaimed mid-flight by the second cron slot.
+# 6h is deliberately conservative; tighten once we add a heartbeat.
+_STALE_IN_PROGRESS_SECONDS = 6 * 3600  # 6 hours
 
 SITE_URL = "https://www.datacubeai.space"
 
@@ -887,12 +897,18 @@ def _send_via_resend(
     subject: str,
     html_content: str,
     recipients: list[str],
-) -> int:
-    """Send newsletter to all recipients via Resend. Returns count sent."""
+) -> tuple[int, int]:
+    """Send newsletter to all recipients via Resend.
+
+    Returns (sent, failed) so the caller can distinguish partial failures
+    (some batches OK, some not) from total failure. Previously returned
+    only `sent`, which let partial failures masquerade as full success
+    and made the idempotency lock mark the cohort 'sent' even when
+    some recipients got nothing.
+    """
     sent = 0
     failed = 0
-    # Resend batch API supports up to 100 recipients per call
-    batch_size = 100
+    batch_size = 100  # Resend batch API supports up to 100
 
     for i in range(0, len(recipients), batch_size):
         batch = recipients[i : i + batch_size]
@@ -915,12 +931,122 @@ def _send_via_resend(
             failed += len(batch)
 
     if failed:
-        logger.warning(f"Failed to send {failed} emails across batches")
-    return sent
+        logger.warning(f"Resend partial failure: {failed}/{len(recipients)} emails failed")
+    return sent, failed
 
 
 # ---------------------------------------------------------------------------
-# 5. Main entry point
+# 5. Idempotency helpers (NewsletterSend lock)
+# ---------------------------------------------------------------------------
+
+
+def _acquire_send_lock(db: Session, period_id: str, language: str) -> bool:
+    """Try to claim the send slot for (period_id, language). Race-safe.
+
+    Returns True if the caller should proceed to send, False if another
+    run already owns this slot.
+
+    Implementation:
+      1. INSERT ... ON CONFLICT DO NOTHING RETURNING — atomic first-writer-wins.
+         If RETURNING yields a row, we created it and own the slot.
+      2. If no row was returned, a row already existed. Re-SELECT with
+         FOR UPDATE to serialize concurrent readers, then inspect state:
+         - 'sent': return False (duplicate protection).
+         - 'in_progress' fresh: return False (another worker holds it).
+         - 'in_progress' stale (> _STALE_IN_PROGRESS_SECONDS): reclaim.
+         - 'failed': reclaim for retry.
+    """
+    now = datetime.utcnow()
+
+    # Step 1: atomic insert-if-absent with RETURNING to detect insert winner.
+    insert_stmt = (
+        pg_insert(NewsletterSend)
+        .values(
+            period_id=period_id,
+            language=language,
+            status="in_progress",
+            started_at=now,
+        )
+        .on_conflict_do_nothing(index_elements=["period_id", "language"])
+        .returning(NewsletterSend.period_id)
+    )
+    result = db.execute(insert_stmt).first()
+    db.commit()
+    if result is not None:
+        # We inserted — we own the lock.
+        return True
+
+    # Step 2: row existed; lock it and inspect.
+    row = (
+        db.query(NewsletterSend)
+        .filter(
+            NewsletterSend.period_id == period_id,
+            NewsletterSend.language == language,
+        )
+        .with_for_update()
+        .one()
+    )
+
+    if row.status == "sent":
+        db.commit()  # release FOR UPDATE lock
+        return False
+
+    if row.status == "in_progress":
+        age = (now - (row.started_at or now)).total_seconds()
+        if age < _STALE_IN_PROGRESS_SECONDS:
+            db.commit()
+            return False
+        logger.warning(
+            f"Reclaiming stale in_progress lock for {period_id}/{language} "
+            f"(age={age:.0f}s)"
+        )
+
+    # status == 'failed' or stale 'in_progress' — reclaim.
+    row.status = "in_progress"
+    row.started_at = now
+    row.completed_at = None
+    row.error = None
+    db.commit()
+    return True
+
+
+def _mark_send_sent(db: Session, period_id: str, language: str, count: int) -> None:
+    row = (
+        db.query(NewsletterSend)
+        .filter(
+            NewsletterSend.period_id == period_id,
+            NewsletterSend.language == language,
+        )
+        .first()
+    )
+    if row is None:
+        return
+    row.status = "sent"
+    row.completed_at = datetime.utcnow()
+    row.sent_count = count
+    row.error = None
+    db.commit()
+
+
+def _mark_send_failed(db: Session, period_id: str, language: str, error: str) -> None:
+    row = (
+        db.query(NewsletterSend)
+        .filter(
+            NewsletterSend.period_id == period_id,
+            NewsletterSend.language == language,
+        )
+        .first()
+    )
+    if row is None:
+        return
+    row.status = "failed"
+    row.completed_at = datetime.utcnow()
+    row.error = (error or "")[:1000]
+    db.commit()
+
+
+# ---------------------------------------------------------------------------
+# 6. Main entry point
 # ---------------------------------------------------------------------------
 
 def send_newsletter(db: Session, period_id: str | None = None):
@@ -937,9 +1063,13 @@ def send_newsletter(db: Session, period_id: str | None = None):
     # Configure Resend
     resend.api_key = settings.resend_api_key
 
-    # Default to yesterday (newsletter goes out morning after collection)
+    # Default to yesterday in the configured app timezone (Berlin), not UTC.
+    # A UTC-based date.today() can land on the wrong day when the cron fires
+    # late evening UTC (= early morning Berlin) and "yesterday" then points
+    # to the day before the one we actually want.
     if not period_id:
-        yesterday = date.today() - timedelta(days=1)
+        tz = ZoneInfo(settings.app_timezone)
+        yesterday = (datetime.now(tz) - timedelta(days=1)).date()
         period_id = yesterday.strftime("%Y-%m-%d")
         week = db.query(Week).filter(Week.id == period_id).first()
         if not week:
@@ -982,42 +1112,84 @@ def send_newsletter(db: Session, period_id: str | None = None):
     lang_counts = {lang: len(addrs) for lang, addrs in by_lang.items() if addrs}
     logger.info(f"Language split: {lang_counts}")
 
-    # Build and send per language (only to subscribers who chose that language)
+    # Build and send per language (only to subscribers who chose that language).
+    # Each (period_id, lang) slot is guarded by the NewsletterSend lock to
+    # prevent duplicates on manual re-runs, dual cron fires, or workflow retries.
     total_sent = 0
+    skipped_already_sent = 0
     for lang, addrs in by_lang.items():
         if not addrs:
             continue
 
-        html_content = _build_email_html(data, lang)
+        if not _acquire_send_lock(db, period_id, lang):
+            logger.info(
+                f"Skip {lang.upper()} newsletter for {period_id}: already sent "
+                f"or another worker holds the lock"
+            )
+            skipped_already_sent += 1
+            continue
 
-        # Build subject line with lead story preview
-        lead_preview = ""
-        if data["tech"]:
-            first_content = get_field(data["tech"][0], "content", lang)
-            if first_content:
-                first_sentence = first_content.split(".")[0]
-                if len(first_sentence) > 30:
-                    first_sentence = first_sentence[:27] + "..."
-                lead_preview = f": {first_sentence}"
+        try:
+            html_content = _build_email_html(data, lang)
 
-        if "-kw" in period_id:
-            week_num = period_id.split("-kw")[1]
-            subject = _s(lang, "subject_week").format(num=week_num)
-        else:
-            date_label = _format_date_label(period_id, lang)
-            subject = _s(lang, "subject_daily").format(date=date_label)
+            # Build subject line with lead story preview
+            lead_preview = ""
+            if data["tech"]:
+                first_content = get_field(data["tech"][0], "content", lang)
+                if first_content:
+                    first_sentence = first_content.split(".")[0]
+                    if len(first_sentence) > 30:
+                        first_sentence = first_sentence[:27] + "..."
+                    lead_preview = f": {first_sentence}"
 
-        subject = f"\U0001f9ca {subject}{lead_preview}"
+            if "-kw" in period_id:
+                week_num = period_id.split("-kw")[1]
+                subject = _s(lang, "subject_week").format(num=week_num)
+            else:
+                date_label = _format_date_label(period_id, lang)
+                subject = _s(lang, "subject_daily").format(date=date_label)
 
-        sent = _send_via_resend(
-            settings.newsletter_from_email,
-            subject,
-            html_content,
-            addrs,
-        )
-        total_sent += sent
-        logger.info(f"Sent {lang.upper()} newsletter: {sent} emails")
+            subject = f"\U0001f9ca {subject}{lead_preview}"
+
+            sent, failed = _send_via_resend(
+                settings.newsletter_from_email,
+                subject,
+                html_content,
+                addrs,
+            )
+            if sent == 0 and failed > 0:
+                # Total failure: leave the lock in 'failed' so the next
+                # workflow run can retry this cohort.
+                _mark_send_failed(
+                    db, period_id, lang,
+                    f"All {failed} emails failed via Resend",
+                )
+                logger.error(
+                    f"{lang.upper()} newsletter total failure for {period_id}: "
+                    f"{failed}/{len(addrs)} emails failed"
+                )
+            else:
+                # All-success OR partial success: mark 'sent' to avoid the
+                # next retry re-sending to already-delivered recipients.
+                # Partial failures are logged loudly in _send_via_resend.
+                # (Proper fix requires per-recipient tracking; deferred.)
+                _mark_send_sent(db, period_id, lang, sent)
+                total_sent += sent
+                if failed > 0:
+                    logger.warning(
+                        f"{lang.upper()} newsletter partial success for {period_id}: "
+                        f"{sent} sent, {failed} failed — NOT retrying failed cohort "
+                        f"to avoid duplicate sends to the {sent} that succeeded"
+                    )
+                else:
+                    logger.info(f"Sent {lang.upper()} newsletter: {sent} emails")
+        except Exception as e:
+            _mark_send_failed(db, period_id, lang, str(e))
+            logger.exception(f"Failed to send {lang.upper()} newsletter for {period_id}: {e}")
+            # Continue with other languages rather than aborting the whole run.
+            continue
 
     logger.info(
-        f"Newsletter complete: {total_sent} total emails sent for {period_id}"
+        f"Newsletter complete: {total_sent} total emails sent for {period_id} "
+        f"(skipped {skipped_already_sent} already-sent language cohorts)"
     )

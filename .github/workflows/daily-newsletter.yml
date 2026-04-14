@@ -6,11 +6,15 @@ name: Daily Newsletter
 
 on:
   schedule:
-    # Fire at both possible UTC slots covering Berlin 08:00:
-    # - Summer (CEST, UTC+2): 06:07 UTC = 08:07 Berlin
-    # - Winter (CET, UTC+1):  07:07 UTC = 08:07 Berlin
-    - cron: "7 6 * * *"
-    - cron: "7 7 * * *"
+    # Two cron slots to cover DST transitions and absorb GitHub Actions cron
+    # delay (typically 5-60 min, occasionally 1-2h under load).
+    # Schedule ~2h earlier than target delivery so even a delayed run lands
+    # inside the acceptable Berlin 06-10 window.
+    # - Summer (CEST, UTC+2): 04:07 UTC = 06:07 Berlin (+ delay = 06-10 Berlin)
+    # - Winter (CET,  UTC+1): 05:07 UTC = 06:07 Berlin (+ delay = 06-10 Berlin)
+    # Minute :07 (not :00) avoids GitHub's documented on-the-hour load spike.
+    - cron: "7 4 * * *"
+    - cron: "7 5 * * *"
   workflow_dispatch:
     inputs:
       period_id:
@@ -27,11 +31,17 @@ jobs:
         run: |
           if [ "${{ github.event_name }}" = "schedule" ]; then
             BERLIN_HOUR=$(TZ=Europe/Berlin date +%H)
-            if [ "$BERLIN_HOUR" != "08" ]; then
-              echo "Skip: now is not 08:xx in Europe/Berlin (hour=$BERLIN_HOUR)"
-              echo "SKIP=true" >> "$GITHUB_OUTPUT"
-              exit 0
-            fi
+            # Accept 06-10 Berlin: covers both DST states and absorbs cron delay.
+            # Backend idempotency (newsletter_sends table) protects against the
+            # case where both cron slots succeed on the same day.
+            case "$BERLIN_HOUR" in
+              06|07|08|09|10) ;;
+              *)
+                echo "Skip: Berlin hour $BERLIN_HOUR outside 06-10 delivery window"
+                echo "SKIP=true" >> "$GITHUB_OUTPUT"
+                exit 0
+                ;;
+            esac
           fi
 
           PERIOD="${{ github.event.inputs.period_id }}"
