@@ -16,7 +16,7 @@ FastAPI backend for the AI Information Hub — multilingual (8 languages) daily 
 - Tips sources bypass classification (Reddit, Simon Willison)
 - **8-language support** (DE, EN, ZH, FR, ES, PT, JA, KO) with resilient free-model translation pipeline
 - Period ID support: daily `YYYY-MM-DD` or weekly `YYYY-kwWW`
-- **Automated newsletter** via Resend + Beehiiv with per-subscriber language preference
+- **Automated newsletter** via Resend + Beehiiv with per-subscriber language preference (idempotent send-lock per `(period_id, language)`; safe against dual-cron slots + manual re-triggers)
 - **Developer API** with tiered rate limiting (free/premium/business API keys)
 - **AI Job Board** for DACH region (job listings CRUD with admin controls)
 - **Stripe Premium Subscriptions** (checkout, webhooks, subscription management)
@@ -53,6 +53,12 @@ Stage 3.5: Translate EN → 6 languages (free model chain)
     • Smaller batch fallback (size=3) on parse failure
     ↓
 Stage 4: Save to PostgreSQL (translations in JSONB column)
+    • `_nn(value, default)` helper coalesces LLM `null` → default
+      at every NOT NULL save site (old `.get("x", default)` only
+      fired on missing keys, not explicit `null`)
+    • `set_collection_status()` clears stale `error`/`completed_at`
+      on transition to `running`, and clears `error` on
+      `completed`/`empty`
 ```
 
 ---
@@ -539,8 +545,10 @@ alembic downgrade -1
 | `0007_add_developer_api_keys` | `api_keys` table (email, api_key, tier, calls_today, calls_total, is_active) |
 | `0008_add_job_listings` | `job_listings` table (title, company, location, salary, tags, listing_type) |
 | `0009_add_subscriptions` | `subscriptions` table (email, stripe IDs, tier, status, period dates) |
+| `0011_primary_market_amount_nullable` | `primary_market_posts.amount_de/amount_en` made nullable — LLM returns `null` for undisclosed amounts (e.g. SEC EDGAR 8-K unregistered equity sales). Prevents a single null-amount row from aborting the entire stage 4 transaction and wiping the day's data. API layer (`routers/investment.py:44`) still coerces NULL → "N/A" for UI, so the frontend contract is unchanged. |
+| `0012_add_newsletter_sends` | `newsletter_sends` table with composite PK `(period_id, language)`, `status ∈ {in_progress, sent, failed}`, `started_at`, `completed_at`, `sent_count`, `error`. Provides idempotency for newsletter delivery (dual-cron slots, manual re-triggers, in-flight retries). |
 
-Chain: 0006 -> 0007 -> 0008 -> 0009
+Chain: 0006 -> 0007 -> 0008 -> 0009 -> 0011 -> 0012
 
 ## API Endpoints
 
@@ -774,7 +782,8 @@ ai-hub-backend/
 │   │   ├── raw.py           # Raw article/video storage
 │   │   ├── developer.py     # ApiKey model (email, api_key, tier, rate limits)
 │   │   ├── job.py           # JobListing model (title, company, location, salary, tags)
-│   │   └── subscription.py  # Subscription model (Stripe IDs, tier, status, period dates)
+│   │   ├── subscription.py  # Subscription model (Stripe IDs, tier, status, period dates)
+│   │   └── newsletter_send.py  # NewsletterSend model (period_id, language, status, sent_count) — idempotency lock
 │   ├── schemas/             # Pydantic schemas
 │   ├── routers/             # API routes
 │   │   ├── admin.py         # Collection endpoints
@@ -791,7 +800,7 @@ ai-hub-backend/
 │       ├── youtube_fetcher.py  # YouTube API
 │       ├── llm_processor.py # LLM processing + resilient translation (JSON validation + small-batch retry)
 │       ├── i18n_utils.py    # Language constants, get_field() helper
-│       ├── newsletter_sender.py # Resend + Beehiiv newsletter
+│       ├── newsletter_sender.py # Resend + Beehiiv newsletter — idempotent via newsletter_sends lock (ON CONFLICT DO NOTHING + SELECT FOR UPDATE, 6h stale reclaim); (sent, failed) tuple lets partial success avoid duplicate delivery; Berlin-tz default period (no late-UTC cron "yesterday" bug)
 │       └── migrator.py      # JSON migration
 ├── alembic/                 # DB migrations
 ├── scripts/                 # CLI scripts
