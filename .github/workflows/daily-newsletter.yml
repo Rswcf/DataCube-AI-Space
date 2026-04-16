@@ -60,27 +60,13 @@ jobs:
           PERIOD="${{ steps.period.outputs.PERIOD }}"
           echo "Verifying content for $PERIOD..."
 
-          HTTP_CODE=$(curl -sS -o tech.json -w "%{http_code}" \
-            "${{ secrets.API_BASE_URL }}/tech/${PERIOD}" \
-            --http1.1 --max-time 30)
+          COUNTER='import json,sys;cnt=lambda v:len(v) if isinstance(v,list) else (sum(cnt(x) for x in v.values()) if isinstance(v,dict) else 0);print(cnt(json.load(sys.stdin)))'
+          T1=$(curl -sS "${{ secrets.API_BASE_URL }}/tech/${PERIOD}"       --http1.1 --max-time 30 | python3 -c "$COUNTER" 2>/dev/null || echo 0)
+          T2=$(curl -sS "${{ secrets.API_BASE_URL }}/tips/${PERIOD}"       --http1.1 --max-time 30 | python3 -c "$COUNTER" 2>/dev/null || echo 0)
+          T3=$(curl -sS "${{ secrets.API_BASE_URL }}/investment/${PERIOD}" --http1.1 --max-time 30 | python3 -c "$COUNTER" 2>/dev/null || echo 0)
+          TOTAL=$((T1 + T2 + T3))
 
-          if [ "$HTTP_CODE" -ne 200 ]; then
-            echo "WARNING: content endpoint returned HTTP $HTTP_CODE — skipping newsletter"
-            echo "HAS_CONTENT=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          TOTAL=$(python3 -c "
-          import json, sys
-          try:
-              data = json.load(open('tech.json'))
-              total = sum(len(v) for v in data.values() if isinstance(v, list))
-              print(total)
-          except Exception:
-              print(0)
-          ")
-
-          echo "Tech articles found: $TOTAL"
+          echo "Content items found: total=$TOTAL (tech=$T1 tips=$T2 inv=$T3)"
 
           if [ "$TOTAL" -gt 0 ]; then
             echo "HAS_CONTENT=true" >> "$GITHUB_OUTPUT"
