@@ -392,18 +392,42 @@ async def trigger_newsletter(
     Send newsletter for a period.
 
     Defaults to yesterday's content. Set wait=true for synchronous mode.
+
+    In wait=true mode the response includes the real send result. If
+    Resend/Beehiiv produced ZERO successful sends but at least one was
+    attempted, the endpoint returns HTTP 502 so the GitHub Actions
+    workflow turns RED — previously this case returned 200 and the
+    workflow logged success even though no email arrived.
+
     Requires X-API-Key header.
     """
     if wait:
         from app.services.newsletter_sender import send_newsletter
 
         try:
-            send_newsletter(db, period_id)
+            result = send_newsletter(db, period_id)
         except ValueError as e:
             raise HTTPException(status_code=404, detail=str(e))
         except Exception as e:
+            logger.exception(f"Newsletter send raised: {e}")
             raise HTTPException(status_code=500, detail=str(e))
-        return {"status": "completed", "period_id": period_id or "yesterday"}
+
+        # send_newsletter returns a dict; tolerate older behaviour just in case.
+        if not isinstance(result, dict):
+            return {"status": "completed", "period_id": period_id or "yesterday"}
+
+        # Surface real failure to the workflow as 502.
+        total_sent = result.get("total_sent", 0)
+        total_failed = result.get("total_failed", 0)
+        if total_sent == 0 and total_failed > 0:
+            raise HTTPException(
+                status_code=502,
+                detail={
+                    "message": "Newsletter run produced zero successful sends",
+                    **result,
+                },
+            )
+        return result
 
     background_tasks.add_task(_send_newsletter_with_new_session, period_id)
     return {"status": "started", "period_id": period_id or "yesterday"}

@@ -39,6 +39,31 @@ def _nn(value, default=""):
     return value if value is not None else default
 
 
+def _pair_de_en(de_items: list, en_items: list, section: str) -> list:
+    """Pair DE+EN items, padding with {} on length mismatch.
+
+    The original `zip(de, en)` silently truncates to the shorter list,
+    which dropped real records when the LLM returned (say) 8 DE but 5 EN.
+    Now we pad with empty dicts so every record gets at least one
+    language saved (downstream `_nn()` coalesces empties), and we log a
+    loud warning so the mismatch surfaces in Railway logs.
+    """
+    de = de_items or []
+    en = en_items or []
+    if len(de) != len(en):
+        logger.warning(
+            "Stage4 %s: DE/EN length mismatch (de=%d, en=%d) — padding shorter side with {}",
+            section, len(de), len(en),
+        )
+    n = max(len(de), len(en))
+    paired = []
+    for i in range(n):
+        d = de[i] if i < len(de) else {}
+        e = en[i] if i < len(en) else {}
+        paired.append((d if isinstance(d, dict) else {}, e if isinstance(e, dict) else {}))
+    return paired
+
+
 # ---------------------------------------------------------------------------
 # Persistent collection status tracking (DB-backed, survives restarts)
 # ---------------------------------------------------------------------------
@@ -72,10 +97,24 @@ def set_collection_status(
             # completed_at from prior attempt, refresh started_at. Otherwise
             # the status endpoint shows misleading stale failure details
             # while a new run is in progress.
-            if status == "running" and run.status != "running":
-                run.error = None
-                run.completed_at = None
-                run.started_at = datetime.utcnow()
+            #
+            # We also reset started_at when the *current* row is `running`
+            # but stale (older than the fresh-run reentry window). That
+            # row belongs to a crashed previous worker (zombie); keeping
+            # its started_at would make our fresh-run reentry guard
+            # _is_collection_running() see the new run as a stale zombie
+            # and refuse the second trigger of the day.
+            now = datetime.utcnow()
+            if status == "running":
+                if run.status != "running":
+                    run.error = None
+                    run.completed_at = None
+                    run.started_at = now
+                elif run.started_at and (now - run.started_at).total_seconds() > _FRESH_RUNNING_SECONDS:
+                    # Reclaiming a stale 'running' row from a crashed worker.
+                    run.error = None
+                    run.completed_at = None
+                    run.started_at = now
         run.status = status
         if stage:
             run.stage = stage
@@ -98,8 +137,23 @@ def set_collection_status(
         db.close()
 
 
+# A run that has been "running" longer than this is treated as a zombie:
+# whichever process owned it has crashed without updating status, and the
+# next workflow trigger should be allowed to proceed instead of seeing
+# `running` and skipping the period.
+_ZOMBIE_RUNNING_SECONDS = 90 * 60  # 90 minutes
+
+
 def get_collection_status(period_id: str) -> dict | None:
-    """Return the current collection status for a period, or None if unknown."""
+    """Return the current collection status for a period, or None if unknown.
+
+    Zombie detection: if `status == 'running'` but `started_at` is older
+    than _ZOMBIE_RUNNING_SECONDS, the row is reported as `failed` with a
+    'zombie' marker. Without this, a backend crash mid-collection leaves
+    the period stuck in `running` forever, and the daily-collect workflow
+    sees the stale state and skips the trigger — meaning that day stays
+    blank until manually unblocked.
+    """
     from app.database import get_session_local
     from app.models.collection_run import CollectionRun
 
@@ -108,14 +162,27 @@ def get_collection_status(period_id: str) -> dict | None:
         run = db.query(CollectionRun).filter(CollectionRun.period_id == period_id).first()
         if not run:
             return None
-        result = {"status": run.status}
+        status = run.status
+        zombie = False
+        if status == "running" and run.started_at:
+            age = (datetime.utcnow() - run.started_at).total_seconds()
+            if age > _ZOMBIE_RUNNING_SECONDS:
+                status = "failed"
+                zombie = True
+        result: dict = {"status": status}
+        if zombie:
+            result["zombie"] = True
+            result["error"] = (
+                f"Stuck in 'running' for >{_ZOMBIE_RUNNING_SECONDS // 60} min — "
+                "treating as failed so workflow can retrigger."
+            )
         if run.stage:
             result["stage"] = run.stage
         if run.counts:
             result["counts"] = run.counts
         if run.raw_counts:
             result["raw_counts"] = run.raw_counts
-        if run.error:
+        if run.error and not zombie:
             result["error"] = run.error
         if run.started_at:
             result["started_at"] = run.started_at.isoformat()
@@ -1034,7 +1101,7 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
     video_posts = []
     skipped_videos = 0
     logger.info(f"Saving {len(video_data.get('de', []))} video posts to database")
-    for i, (de_v, en_v) in enumerate(zip(video_data.get("de", []), video_data.get("en", []))):
+    for i, (de_v, en_v) in enumerate(_pair_de_en(video_data.get("de", []), video_data.get("en", []), "videos")):
         vid = de_v.get("video_id") or en_v.get("video_id")
         if not vid:
             continue
@@ -1110,7 +1177,14 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
     # Save tech posts with interspersed videos
     regular_posts = []
     _default_author = {"name": "Unknown", "handle": "@unknown", "avatar": "??", "verified": False}
-    for i, (de_p, en_p) in enumerate(zip(tech_data.get("de", []), tech_data.get("en", []))):
+    skipped_tech = 0
+    for i, (de_p, en_p) in enumerate(_pair_de_en(tech_data.get("de", []), tech_data.get("en", []), "tech")):
+        # Drop records where BOTH languages have empty content — these
+        # are LLM hallucinations or pad-fill from _pair_de_en. Saving
+        # them pollutes the feed with blank cards.
+        if not (de_p.get("content") or en_p.get("content")):
+            skipped_tech += 1
+            continue
         post = TechPost(
             week_id=week_id,
             content_de=_nn(de_p.get("content"), ""),
@@ -1130,6 +1204,8 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
             translations=en_p.get("_translations") or None,
         )
         regular_posts.append(post)
+    if skipped_tech:
+        logger.warning(f"Stage4 tech: skipped {skipped_tech} record(s) with empty content")
 
     # Intersperse videos among regular posts
     all_tech_posts = intersperse_videos(regular_posts, video_posts)
@@ -1154,8 +1230,14 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
             de_posts = []
             en_posts = []
 
-        for de_p, en_p in zip(de_posts, en_posts):
+        skipped_inv = 0
+        for de_p, en_p in _pair_de_en(de_posts, en_posts, f"investment.{category}"):
             if model_class == PrimaryMarketPost:
+                # Drop records missing the only key identifier (company).
+                # An empty-company funding row is just noise in the feed.
+                if not (de_p.get("company") or en_p.get("company")):
+                    skipped_inv += 1
+                    continue
                 # amount_de/en are nullable since migration 0011; API layer (investment.py)
                 # normalizes NULL back to "N/A" for UI. LLM returns `null` for
                 # undisclosed amounts (e.g. SEC EDGAR unregistered equity sales).
@@ -1163,7 +1245,7 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
                     week_id=week_id,
                     content_de=_nn(de_p.get("content"), ""),
                     content_en=_nn(en_p.get("content"), ""),
-                    company=_nn(de_p.get("company"), ""),
+                    company=_nn(de_p.get("company") or en_p.get("company"), ""),
                     amount_de=de_p.get("amount"),
                     amount_en=en_p.get("amount"),
                     round=de_p.get("round") or en_p.get("round") or "Unknown",
@@ -1178,13 +1260,18 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
                     translations=en_p.get("_translations") or None,
                 )
             elif model_class == SecondaryMarketPost:
+                # Drop secondary-market entries with no ticker — without a
+                # ticker we can't fetch real-time data and the row is dead weight.
+                if not (de_p.get("ticker") or en_p.get("ticker")):
+                    skipped_inv += 1
+                    continue
                 # Note: price, change, marketCap are now fetched from real-time API
                 # We only store ticker and content from LLM processing
                 post = SecondaryMarketPost(
                     week_id=week_id,
                     content_de=_nn(de_p.get("content"), ""),
                     content_en=_nn(en_p.get("content"), ""),
-                    ticker=_nn(de_p.get("ticker"), ""),
+                    ticker=_nn(de_p.get("ticker") or en_p.get("ticker"), ""),
                     price="",  # Fetched from real-time API
                     change="",  # Fetched from real-time API
                     direction="up",  # Determined by real-time API
@@ -1197,12 +1284,20 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
                     translations=en_p.get("_translations") or None,
                 )
             else:  # MAPost
+                # M&A needs at least an acquirer OR target. Empty for both
+                # = LLM hallucination (often false-positives from off-topic feeds).
+                if not (
+                    de_p.get("acquirer") or en_p.get("acquirer")
+                    or de_p.get("target") or en_p.get("target")
+                ):
+                    skipped_inv += 1
+                    continue
                 post = MAPost(
                     week_id=week_id,
                     content_de=_nn(de_p.get("content"), ""),
                     content_en=_nn(en_p.get("content"), ""),
-                    acquirer=_nn(de_p.get("acquirer"), ""),
-                    target=_nn(de_p.get("target"), ""),
+                    acquirer=_nn(de_p.get("acquirer") or en_p.get("acquirer"), ""),
+                    target=_nn(de_p.get("target") or en_p.get("target"), ""),
                     deal_value_de=de_p.get("dealValue"),
                     deal_value_en=en_p.get("dealValue"),
                     deal_type_de=_nn(de_p.get("dealType"), ""),
@@ -1215,9 +1310,16 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
                     translations=en_p.get("_translations") or None,
                 )
             db.add(post)
+        if skipped_inv:
+            logger.warning(f"Stage4 investment.{category}: skipped {skipped_inv} record(s) missing key field")
 
     # Save tips
-    for de_p, en_p in zip(tips_data.get("de", []), tips_data.get("en", [])):
+    skipped_tips = 0
+    for de_p, en_p in _pair_de_en(tips_data.get("de", []), tips_data.get("en", []), "tips"):
+        # Drop tips with no content AND no tip text — guarantees nothing-to-show
+        if not (de_p.get("content") or en_p.get("content") or de_p.get("tip") or en_p.get("tip")):
+            skipped_tips += 1
+            continue
         post = TipPost(
             week_id=week_id,
             content_de=_nn(de_p.get("content"), ""),
@@ -1236,6 +1338,8 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
             translations=en_p.get("_translations") or None,
         )
         db.add(post)
+    if skipped_tips:
+        logger.warning(f"Stage4 tips: skipped {skipped_tips} empty record(s)")
 
     # Save trends
     trends_section = trends_data.get("trends", {})
@@ -1246,7 +1350,7 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
         de_trends = []
         en_trends = []
 
-    for de_t, en_t in zip(de_trends, en_trends):
+    for de_t, en_t in _pair_de_en(de_trends, en_trends, "trends"):
         if not isinstance(de_t, dict) or not isinstance(en_t, dict):
             continue
         trend = Trend(
@@ -1353,6 +1457,39 @@ def run_process_only(db: Session, week_id: Optional[str] = None) -> dict:
     }
 
 
+# Reject re-entry from a duplicate trigger that fires while a fresh run
+# is still in progress. Anything older than the zombie window is treated
+# as crashed and reclaimable (handled by get_collection_status).
+_FRESH_RUNNING_SECONDS = 5 * 60  # 5 minutes
+
+
+def _is_collection_running(period_id: str) -> bool:
+    """Return True iff there is a fresh `running` row for this period.
+
+    Used as a lightweight per-period reentry lock: prevents the dual-cron
+    slots (21:07 + 22:07 UTC) and a manual workflow_dispatch from firing
+    two pipelines for the same period concurrently. There is no strong
+    DB-level lock — this is best-effort and racy by design, but it
+    eliminates the common case of two parallel workers stomping on each
+    other's `clear_week_data()` + INSERT cycle.
+    """
+    from app.database import get_session_local
+    from app.models.collection_run import CollectionRun
+
+    db = get_session_local()()
+    try:
+        run = db.query(CollectionRun).filter(CollectionRun.period_id == period_id).first()
+        if not run or run.status != "running" or not run.started_at:
+            return False
+        age = (datetime.utcnow() - run.started_at).total_seconds()
+        return age < _FRESH_RUNNING_SECONDS
+    except Exception as e:
+        logger.warning(f"Failed to check running state for {period_id}: {e}")
+        return False
+    finally:
+        db.close()
+
+
 def run_collection(db: Session, week_id: Optional[str] = None):
     """
     Run the full data collection pipeline (all stages).
@@ -1363,8 +1500,17 @@ def run_collection(db: Session, week_id: Optional[str] = None):
     """
     week_id = week_id or current_day_id()
 
+    # Reject duplicate triggers within the fresh-run window.
+    if _is_collection_running(week_id):
+        logger.warning(
+            f"Skip: collection for {week_id} is already running (fresh < "
+            f"{_FRESH_RUNNING_SECONDS}s). Refusing to start a parallel pipeline."
+        )
+        return
+
     logger.info(f"Starting full collection for {week_id}")
     set_collection_status(week_id, "running", stage="stage1")
+    finalised = False
 
     try:
         # Stage 1: Fetch and store raw data
@@ -1403,6 +1549,7 @@ def run_collection(db: Session, week_id: Optional[str] = None):
 
         if sum(counts.values()) == 0:
             set_collection_status(week_id, "empty", stage="stage4_base", counts=counts)
+            finalised = True
             logger.warning(f"Collection produced 0 items for {week_id}")
             return
 
@@ -1419,11 +1566,30 @@ def run_collection(db: Session, week_id: Optional[str] = None):
             # but content is still accessible
 
         set_collection_status(week_id, "completed", stage="done", counts=counts)
+        finalised = True
         logger.info(f"Collection complete for {week_id}")
     except Exception as e:
-        set_collection_status(week_id, "failed", error=str(e))
+        try:
+            set_collection_status(week_id, "failed", error=str(e))
+            finalised = True
+        except Exception as inner:
+            logger.error(f"Could not mark {week_id} failed after error '{e}': {inner}")
         logger.error(f"Collection failed for {week_id}: {e}")
         raise
+    finally:
+        # Last-resort: never leave the row stuck in 'running'. If we
+        # somehow returned without writing a terminal status (early
+        # `return` paths above all set one explicitly, but defend
+        # against future edits), mark it failed so the next workflow
+        # trigger can retry instead of skipping.
+        if not finalised:
+            try:
+                set_collection_status(
+                    week_id, "failed",
+                    error="run_collection exited without setting terminal status",
+                )
+            except Exception as inner:
+                logger.error(f"Final-status fallback for {week_id} failed: {inner}")
 
 
 def stage4_save_ma_to_database(db: Session, week_id: str, investment_data: dict) -> None:

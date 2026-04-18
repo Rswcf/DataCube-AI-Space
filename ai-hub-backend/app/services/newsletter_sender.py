@@ -848,9 +848,26 @@ def _build_email_html(data: dict, lang: str) -> str:
 # ---------------------------------------------------------------------------
 
 def _fetch_beehiiv_subscribers(api_key: str, publication_id: str) -> list[dict]:
-    """Fetch all active subscribers with language preference from Beehiiv."""
+    """Fetch all active subscribers with language preference from Beehiiv.
+
+    Behaviour notes:
+      * 401/403 → raise. Silently swallowing auth failures used to surface
+        as "no subscribers found" and let the workflow report green
+        without ever sending anything.
+      * Other 4xx/5xx → raise. Same reason.
+      * Default language → ``en``. The previous default was ``de`` which
+        meant any sub whose custom field was missing/misnamed was
+        silently bucketed into DE; an empty DE-only mailing then made the
+        majority of (EN-speaking) subs receive nothing. EN matches the
+        site's primary audience and reduces silent misallocation.
+      * Unknown language values → bucketed to ``en`` and warned.
+      * If NO subscriber on the first page returns any custom_fields,
+        log loudly — almost certainly a Beehiiv API misconfig.
+    """
     subscribers: list[dict] = []
     page = 1
+    saw_any_custom_fields = False
+    total_seen = 0
 
     while True:
         resp = requests.get(
@@ -860,8 +877,14 @@ def _fetch_beehiiv_subscribers(api_key: str, publication_id: str) -> list[dict]:
             timeout=30,
         )
         if not resp.ok:
-            logger.error(f"Beehiiv API error {resp.status_code}: {resp.text}")
-            break
+            # Used to `break` here, returning [] silently. That made auth
+            # errors look like "no subscribers" to upstream — workflow
+            # would log success and never send. Now we raise so the
+            # admin endpoint surfaces 5xx and the workflow turns red.
+            raise RuntimeError(
+                f"Beehiiv API error {resp.status_code} on page {page}: "
+                f"{resp.text[:300]}"
+            )
 
         data = resp.json()
         subs = data.get("data", [])
@@ -870,20 +893,43 @@ def _fetch_beehiiv_subscribers(api_key: str, publication_id: str) -> list[dict]:
 
         for sub in subs:
             email = sub.get("email")
-            if email:
-                lang = "de"  # default
-                for field in sub.get("custom_fields", []):
-                    if field.get("name", "").lower() == "language":
-                        lang = field.get("value", "de")
-                subscribers.append({"email": email, "language": lang})
-            else:
+            if not email:
                 logger.warning(f"Subscriber without email: {sub.get('id', 'unknown')}")
+                continue
+            total_seen += 1
+            raw_lang: str | None = None
+            for field in sub.get("custom_fields", []):
+                saw_any_custom_fields = True
+                if field.get("name", "").lower() == "language":
+                    val = field.get("value")
+                    if isinstance(val, str) and val.strip():
+                        raw_lang = val.strip().lower()
+                    break
+            if raw_lang is None:
+                lang = "en"
+            elif raw_lang not in SUPPORTED_LANGUAGES:
+                logger.warning(
+                    f"Subscriber {email} has unrecognised language '{raw_lang}'; "
+                    f"defaulting to 'en'"
+                )
+                lang = "en"
+            else:
+                lang = raw_lang
+            subscribers.append({"email": email, "language": lang})
 
-        # Check pagination
         total_pages = data.get("total_pages", 1)
         if page >= total_pages:
             break
         page += 1
+
+    if total_seen > 0 and not saw_any_custom_fields:
+        logger.error(
+            "Beehiiv returned %d subscribers but ZERO custom_fields entries — "
+            "either the publication has no Language custom field or the "
+            "expand[]=custom_fields request was stripped. All subs will fall "
+            "back to default language. Check Beehiiv dashboard.",
+            total_seen,
+        )
 
     return subscribers
 
@@ -924,10 +970,47 @@ def _send_via_resend(
 
         try:
             result = resend.Batch.send(emails)
-            logger.info(f"Resend batch {i // batch_size + 1} result: {result}")
-            sent += len(batch)
+            # Resend Batch.send returns {"data": [{"id": "..."}, ...]} on success.
+            # Older code blindly bumped `sent += len(batch)` regardless of
+            # response shape — if Resend rejected the batch (unverified
+            # sender domain, invalid From, etc.) but the SDK chose not to
+            # raise, every "send" was counted as a success and nothing
+            # actually arrived. Validate the response: an "id" per email
+            # is the only proof of acceptance.
+            ids: list[str] = []
+            if isinstance(result, dict):
+                payload = result.get("data") or result.get("emails")
+                if isinstance(payload, list):
+                    ids = [item.get("id") for item in payload if isinstance(item, dict) and item.get("id")]
+                elif result.get("id"):  # single-email shape, just in case
+                    ids = [result["id"]]
+
+            if ids:
+                sent += len(ids)
+                # If the API accepted fewer than we sent, count the rest as failed.
+                if len(ids) < len(batch):
+                    short = len(batch) - len(ids)
+                    failed += short
+                    logger.error(
+                        f"Resend batch {i // batch_size + 1}: only {len(ids)}/{len(batch)} "
+                        f"emails accepted; {short} silently rejected. result={result}"
+                    )
+                else:
+                    logger.info(
+                        f"Resend batch {i // batch_size + 1}: {len(ids)}/{len(batch)} accepted"
+                    )
+            else:
+                # No ids in response = total batch rejection (most commonly
+                # 4xx that the SDK didn't raise on, e.g. unverified domain).
+                failed += len(batch)
+                logger.error(
+                    f"Resend batch {i // batch_size + 1}: ZERO ids in response — "
+                    f"treating all {len(batch)} as failed. result={result!r}"
+                )
         except Exception as e:
-            logger.error(f"Resend batch error for {[addr for addr in batch]}: {e}", exc_info=True)
+            logger.error(
+                f"Resend batch error for {batch}: {e}", exc_info=True
+            )
             failed += len(batch)
 
     if failed:
@@ -1049,8 +1132,24 @@ def _mark_send_failed(db: Session, period_id: str, language: str, error: str) ->
 # 6. Main entry point
 # ---------------------------------------------------------------------------
 
-def send_newsletter(db: Session, period_id: str | None = None):
-    """Send daily newsletter for a specific period."""
+def send_newsletter(db: Session, period_id: str | None = None) -> dict:
+    """Send daily newsletter for a specific period.
+
+    Returns a dict so the HTTP endpoint can surface real success/failure
+    to upstream callers (workflow, monitoring). Old signature returned
+    None, which made every call look like success regardless of how many
+    emails actually went out.
+
+    Returns:
+        {
+            "period_id": str,
+            "status": "sent" | "no_subscribers" | "no_content" | "skipped" | "no_period",
+            "total_sent": int,
+            "total_failed": int,
+            "lang_breakdown": {lang: {"sent": int, "failed": int, "attempted": int}},
+            "skipped_already_sent": int,
+        }
+    """
     settings = get_settings()
 
     if not settings.resend_api_key:
@@ -1067,6 +1166,16 @@ def send_newsletter(db: Session, period_id: str | None = None):
     # A UTC-based date.today() can land on the wrong day when the cron fires
     # late evening UTC (= early morning Berlin) and "yesterday" then points
     # to the day before the one we actually want.
+    def _empty_result(status: str) -> dict:
+        return {
+            "period_id": period_id,
+            "status": status,
+            "total_sent": 0,
+            "total_failed": 0,
+            "lang_breakdown": {},
+            "skipped_already_sent": 0,
+        }
+
     if not period_id:
         tz = ZoneInfo(settings.app_timezone)
         yesterday = (datetime.now(tz) - timedelta(days=1)).date()
@@ -1076,7 +1185,7 @@ def send_newsletter(db: Session, period_id: str | None = None):
             period_id = current_day_id()
             if not db.query(Week).filter(Week.id == period_id).first():
                 logger.warning("No recent period found, skipping newsletter")
-                return
+                return _empty_result("no_period")
             logger.info(f"Yesterday not found, using {period_id}")
 
     logger.info(f"Building newsletter for period {period_id}")
@@ -1091,22 +1200,24 @@ def send_newsletter(db: Session, period_id: str | None = None):
     )
     if total_items == 0:
         logger.warning(f"No content for {period_id}, skipping newsletter")
-        return
+        return _empty_result("no_content")
 
-    # Fetch subscribers
+    # Fetch subscribers — raises on Beehiiv API errors so caller surfaces 5xx
     subscribers = _fetch_beehiiv_subscribers(
         settings.beehiiv_api_key, settings.beehiiv_publication_id
     )
     if not subscribers:
         logger.warning("No active subscribers found, skipping")
-        return
+        return _empty_result("no_subscribers")
 
     logger.info(f"Sending to {len(subscribers)} subscriber(s)")
 
-    # Group subscribers by language preference (8 languages supported)
+    # Group subscribers by language preference (8 languages supported).
+    # Subs with unrecognised language already coerced to "en" in
+    # _fetch_beehiiv_subscribers; this assertion is just belt-and-braces.
     by_lang: dict[str, list[str]] = {lang: [] for lang in SUPPORTED_LANGUAGES}
     for sub in subscribers:
-        lang = sub["language"] if sub["language"] in SUPPORTED_LANGUAGES else "de"
+        lang = sub["language"] if sub["language"] in SUPPORTED_LANGUAGES else "en"
         by_lang[lang].append(sub["email"])
 
     lang_counts = {lang: len(addrs) for lang, addrs in by_lang.items() if addrs}
@@ -1116,7 +1227,9 @@ def send_newsletter(db: Session, period_id: str | None = None):
     # Each (period_id, lang) slot is guarded by the NewsletterSend lock to
     # prevent duplicates on manual re-runs, dual cron fires, or workflow retries.
     total_sent = 0
+    total_failed = 0
     skipped_already_sent = 0
+    lang_breakdown: dict[str, dict[str, int]] = {}
     for lang, addrs in by_lang.items():
         if not addrs:
             continue
@@ -1157,6 +1270,7 @@ def send_newsletter(db: Session, period_id: str | None = None):
                 html_content,
                 addrs,
             )
+            lang_breakdown[lang] = {"sent": sent, "failed": failed, "attempted": len(addrs)}
             if sent == 0 and failed > 0:
                 # Total failure: leave the lock in 'failed' so the next
                 # workflow run can retry this cohort.
@@ -1168,6 +1282,7 @@ def send_newsletter(db: Session, period_id: str | None = None):
                     f"{lang.upper()} newsletter total failure for {period_id}: "
                     f"{failed}/{len(addrs)} emails failed"
                 )
+                total_failed += failed
             else:
                 # All-success OR partial success: mark 'sent' to avoid the
                 # next retry re-sending to already-delivered recipients.
@@ -1175,6 +1290,7 @@ def send_newsletter(db: Session, period_id: str | None = None):
                 # (Proper fix requires per-recipient tracking; deferred.)
                 _mark_send_sent(db, period_id, lang, sent)
                 total_sent += sent
+                total_failed += failed
                 if failed > 0:
                     logger.warning(
                         f"{lang.upper()} newsletter partial success for {period_id}: "
@@ -1185,11 +1301,35 @@ def send_newsletter(db: Session, period_id: str | None = None):
                     logger.info(f"Sent {lang.upper()} newsletter: {sent} emails")
         except Exception as e:
             _mark_send_failed(db, period_id, lang, str(e))
+            lang_breakdown[lang] = {"sent": 0, "failed": len(addrs), "attempted": len(addrs)}
+            total_failed += len(addrs)
             logger.exception(f"Failed to send {lang.upper()} newsletter for {period_id}: {e}")
             # Continue with other languages rather than aborting the whole run.
             continue
 
     logger.info(
-        f"Newsletter complete: {total_sent} total emails sent for {period_id} "
+        f"Newsletter complete: {total_sent} sent, {total_failed} failed for {period_id} "
         f"(skipped {skipped_already_sent} already-sent language cohorts)"
     )
+
+    # Status reflects whether any email actually went out. Workflow keys on
+    # this via the HTTP layer to decide red/green.
+    if total_sent == 0 and total_failed > 0:
+        status = "all_failed"
+    elif total_sent == 0 and skipped_already_sent > 0:
+        status = "skipped"  # all cohorts were already sent
+    elif total_failed > 0:
+        status = "partial"
+    elif total_sent > 0:
+        status = "sent"
+    else:
+        status = "skipped"
+
+    return {
+        "period_id": period_id,
+        "status": status,
+        "total_sent": total_sent,
+        "total_failed": total_failed,
+        "lang_breakdown": lang_breakdown,
+        "skipped_already_sent": skipped_already_sent,
+    }
