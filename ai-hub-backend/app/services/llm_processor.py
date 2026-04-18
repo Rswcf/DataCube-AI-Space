@@ -78,11 +78,18 @@ class LLMProcessor:
 
     # Processor models in priority order (fallback chain).
     # Primary model is paid/high-quality; fallbacks are free but capable.
+    # NOTE: `deepseek/deepseek-chat-v3-0324:free` was removed from OpenRouter
+    # in early 2026 — calling it throws a 404-not-found that the old chain
+    # treated as "try next", but the lost slot left the chain effectively
+    # three-wide, and when the paid model is out of credits we'd fall back
+    # straight to two generic free models that struggle with complex JSON.
+    # Replaced with live free deepseek + stronger JSON-capable fallbacks.
     PROCESSOR_MODELS = [
         "deepseek/deepseek-v3.2",
-        "deepseek/deepseek-chat-v3-0324:free",
-        "google/gemma-4-31b-it:free",
+        "deepseek/deepseek-v3.2-exp",
+        "z-ai/glm-4.5-air:free",
         "qwen/qwen3-next-80b-a3b-instruct:free",
+        "google/gemma-4-31b-it:free",
     ]
 
     def __init__(self):
@@ -95,7 +102,8 @@ class LLMProcessor:
             api_key=settings.openrouter_api_key,
         )
 
-    def _call_llm(self, prompt: str, temperature: float = 0.3, use_classifier: bool = False, timeout: float = 120.0) -> str:
+    def _call_llm(self, prompt: str, temperature: float = 0.3, use_classifier: bool = False,
+                  timeout: float = 120.0, expect_json: bool = True) -> str:
         """Make an LLM API call with retry and fallback logic.
 
         Both classifier and processor use fallback chains.
@@ -105,6 +113,15 @@ class LLMProcessor:
             temperature: Sampling temperature
             use_classifier: If True, use CLASSIFIER_MODELS; otherwise PROCESSOR_MODELS
             timeout: Request timeout in seconds (default 120s)
+            expect_json: If True (default for processor), validate the response
+                parses as JSON. Invalid JSON on a model is treated as a
+                retriable failure before falling back to the next model.
+                Previously the processor path accepted ANY non-blank string —
+                when the paid model was rate-limited / out-of-credits and the
+                chain fell back to smaller free models (gemma, qwen) they
+                often returned explanation text instead of valid JSON,
+                upstream `parse_llm_json` coerced it to `{}`, and tech/invest
+                silently ended up with 0 items.
 
         Returns:
             LLM response content string
@@ -113,7 +130,7 @@ class LLMProcessor:
             Exception: Re-raises after all models/retries are exhausted
         """
         if use_classifier:
-            return self._call_with_fallback(prompt, temperature, timeout)
+            return self._call_with_fallback(prompt, temperature, timeout, expect_json=expect_json)
 
         # Processor model: fallback chain with retries
         models = self.PROCESSOR_MODELS
@@ -139,6 +156,25 @@ class LLMProcessor:
                         logger.warning(f"Blank content from processor model {model}")
                         last_error = RuntimeError(f"Blank content from {model}")
                         break  # try next model
+
+                    if expect_json:
+                        parsed = parse_llm_json(content, fallback=None)
+                        if parsed is None:
+                            logger.warning(
+                                f"Invalid JSON from processor {model}, attempt "
+                                f"{attempt + 1}/{retries_per_model}. Content head: "
+                                f"{content[:200]!r}"
+                            )
+                            last_error = ValueError(f"Invalid JSON from {model}")
+                            if attempt < retries_per_model - 1:
+                                time.sleep(base_delay * (2 ** attempt))
+                                continue  # retry same model
+                            else:
+                                logger.warning(
+                                    f"Processor {model} exhausted (bad JSON), trying next fallback..."
+                                )
+                                break  # next model
+
                     logger.info(f"Processor succeeded with model: {model}")
                     return content
                 except RateLimitError as e:
