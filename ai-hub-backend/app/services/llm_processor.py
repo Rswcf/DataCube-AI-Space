@@ -67,11 +67,21 @@ class LLMProcessor:
 
     # Free classifier models in priority order (fallback chain).
     # When one is rate-limited (429), the next one is tried automatically.
+    # Chain ordering rationale (verified against OpenRouter catalog 2026-04-23):
+    #   * Provider diversity — no two adjacent slots share an upstream host, so
+    #     a single provider 429 doesn't collapse the chain.
+    #   * Top-3 are the most-available models at peak traffic; 70B-class Llama
+    #     and 480B Qwen coder are explicit JSON-capable backups for when the
+    #     smaller free models return explanatory text (the 0324-delisting bug).
+    #   * `arcee-ai/trinity-large-preview:free` was removed after it 404'd in
+    #     the catalog (Arcee dropped the free tier for Trinity models).
     CLASSIFIER_MODELS = [
         "z-ai/glm-4.5-air:free",
-        "arcee-ai/trinity-large-preview:free",
-        "nvidia/nemotron-3-nano-30b-a3b:free",
         "nvidia/nemotron-3-super-120b-a12b:free",
+        "meta-llama/llama-3.3-70b-instruct:free",
+        "qwen/qwen3-coder:free",
+        "minimax/minimax-m2.5:free",
+        "nvidia/nemotron-3-nano-30b-a3b:free",
         "google/gemma-4-31b-it:free",
         "qwen/qwen3-next-80b-a3b-instruct:free",
     ]
@@ -83,11 +93,16 @@ class LLMProcessor:
     # treated as "try next", but the lost slot left the chain effectively
     # three-wide, and when the paid model is out of credits we'd fall back
     # straight to two generic free models that struggle with complex JSON.
-    # Replaced with live free deepseek + stronger JSON-capable fallbacks.
+    # 2026-04-23 refresh: added llama-3.3-70b + qwen3-coder + minimax-m2.5 so
+    # the post-deepseek fallback has three 70B+-class JSON-capable options
+    # from different providers before dropping to 31B gemma.
     PROCESSOR_MODELS = [
         "deepseek/deepseek-v3.2",
         "deepseek/deepseek-v3.2-exp",
+        "meta-llama/llama-3.3-70b-instruct:free",
+        "qwen/qwen3-coder:free",
         "z-ai/glm-4.5-air:free",
+        "minimax/minimax-m2.5:free",
         "qwen/qwen3-next-80b-a3b-instruct:free",
         "google/gemma-4-31b-it:free",
     ]
