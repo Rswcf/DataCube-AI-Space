@@ -3,8 +3,14 @@ import { TrustPage, type TrustPageConfig } from '../trust-page'
 
 export const metadata: Metadata = {
   title: 'Corrections Policy | Data Cube AI',
-  description: 'Corrections policy for Data Cube AI summaries, sources, translations, and period pages.',
+  description: 'Corrections policy for Data Cube AI summaries, sources, translations, period pages, feeds, and AI-readable discovery surfaces.',
   alternates: { canonical: 'https://www.datacubeai.space/corrections' },
+  openGraph: {
+    title: 'Corrections Policy | Data Cube AI',
+    description: 'How Data Cube AI reviews and updates corrections for summaries, source links, translations, feeds, and period pages.',
+    url: 'https://www.datacubeai.space/corrections',
+    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: 'Data Cube AI' }],
+  },
 }
 
 const config: TrustPageConfig = {

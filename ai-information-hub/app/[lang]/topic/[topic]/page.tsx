@@ -475,6 +475,7 @@ export default async function TopicPage({ params, searchParams }: Props) {
   const faqSchema = buildFAQSchema(lang, topicTitle, filteredBuckets)
 
   return (
+    <main id="main-content">
     <article className="mx-auto max-w-4xl px-4 py-8">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }} />
@@ -655,6 +656,16 @@ export default async function TopicPage({ params, searchParams }: Props) {
           )}
         </nav>
       ) : null}
+      <footer className="mt-8 border-t border-border pt-4 text-sm text-muted-foreground">
+        <a className="underline focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded" href="/contact">
+          {t({ de: 'Kontakt', en: 'Contact', zh: '联系', fr: 'Contact', es: 'Contacto', pt: 'Contato', ja: 'お問い合わせ', ko: '문의' })}
+        </a>
+        <span className="mx-2">|</span>
+        <a className="underline focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded" href="/datenschutz">
+          {t({ de: 'Datenschutz', en: 'Privacy Policy', zh: '隐私政策', fr: 'Confidentialité', es: 'Privacidad', pt: 'Privacidade', ja: 'プライバシー', ko: '개인정보' })}
+        </a>
+      </footer>
     </article>
+    </main>
   )
 }

@@ -3,8 +3,14 @@ import { TrustPage, type TrustPageConfig } from '../trust-page'
 
 export const metadata: Metadata = {
   title: 'About Data Cube AI',
-  description: 'About Data Cube AI, a multilingual AI intelligence memo covering technology, capital, and practical workflows.',
+  description: 'About Data Cube AI, a multilingual AI intelligence memo covering technology, capital, practical workflows, sources, and update rhythm.',
   alternates: { canonical: 'https://www.datacubeai.space/about' },
+  openGraph: {
+    title: 'About Data Cube AI',
+    description: 'Publisher information for Data Cube AI, a multilingual intelligence memo for AI technology and capital signals.',
+    url: 'https://www.datacubeai.space/about',
+    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: 'Data Cube AI' }],
+  },
 }
 
 const config: TrustPageConfig = {

@@ -70,6 +70,7 @@ const LOGIN_BYPASS_PATHS = new Set([
   '/for-teams',
   '/premium',
   '/about',
+  '/contact',
   '/editorial-policy',
   '/source-methodology',
   '/corrections',

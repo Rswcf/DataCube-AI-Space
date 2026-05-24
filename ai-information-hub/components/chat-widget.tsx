@@ -207,7 +207,8 @@ export function ChatWidget({ weekId }: ChatWidgetProps) {
                     : "max-w-[56px] w-14 justify-center",
                 ]
         )}
-        aria-label={isOpen ? t("reportClose") : t("chatTitle")}
+        aria-label={isOpen ? t("reportClose") : t("fabChat")}
+        aria-expanded={isOpen}
       >
         {isOpen ? (
           <X className="h-6 w-6 shrink-0" aria-hidden="true" />
@@ -243,12 +244,12 @@ export function ChatWidget({ weekId }: ChatWidgetProps) {
             <h3 className="text-lg font-semibold">{t("chatTitle")}</h3>
             <div className="flex items-center gap-1">
               {messages.length > 0 && (
-                <Button variant="ghost" size="icon" className="h-11 w-11" onClick={clearMessages} title={t("chatClear")}>
-                  <Trash2 className="h-4 w-4" />
+                <Button variant="ghost" size="icon" className="h-11 w-11" onClick={clearMessages} title={t("chatClear")} aria-label={t("chatClear")}>
+                  <Trash2 className="h-4 w-4" aria-hidden="true" />
                 </Button>
               )}
-              <Button variant="ghost" size="icon" className="h-11 w-11" onClick={() => setIsOpen(false)}>
-                <X className="h-4 w-4" />
+              <Button variant="ghost" size="icon" className="h-11 w-11" onClick={() => setIsOpen(false)} aria-label={t("reportClose")}>
+                <X className="h-4 w-4" aria-hidden="true" />
               </Button>
             </div>
           </div>
@@ -309,14 +310,20 @@ export function ChatWidget({ weekId }: ChatWidgetProps) {
           {/* Input */}
           <form onSubmit={handleSubmit} className="border-t border-border p-4">
             <div className="flex gap-2">
+              <label htmlFor="chat-message-input" className="sr-only">
+                {t("chatPlaceholder")}
+              </label>
               <input
+                id="chat-message-input"
                 ref={inputRef}
+                name="message"
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder={t("chatPlaceholder")}
                 aria-label={t("chatPlaceholder")}
                 className="flex-1 rounded-full border border-input bg-background px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                autoComplete="off"
                 disabled={isLoading}
               />
               <Button
@@ -324,8 +331,9 @@ export function ChatWidget({ weekId }: ChatWidgetProps) {
                 size="icon"
                 className="h-11 w-11 rounded-full"
                 disabled={isLoading || !input.trim()}
+                aria-label={language === "de" ? "Nachricht senden" : "Send message"}
               >
-                <Send className="h-4 w-4" />
+                <Send className="h-4 w-4" aria-hidden="true" />
               </Button>
             </div>
           </form>

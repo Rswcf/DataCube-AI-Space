@@ -20,23 +20,23 @@ const t = (map: L, lang: string) => map[lang] || map.en
 // ---------------------------------------------------------------------------
 
 const META_TITLES: L = {
-  de: 'Kostenloser KI-Bericht-Generator \u2014 KI-Wochen- und Tagesberichte per Knopfdruck | DataCube AI',
-  en: 'Free AI Report Generator \u2014 Weekly & Daily AI Reports in Seconds | DataCube AI',
+  de: 'KI-Bericht-Generator | DataCube AI',
+  en: 'AI Report Generator | DataCube AI',
   zh: '\u514d\u8d39AI\u62a5\u544a\u751f\u6210\u5668 \u2014 \u4e00\u952e\u751f\u6210AI\u5468\u62a5\u548c\u65e5\u62a5 | DataCube AI',
-  fr: 'G\u00e9n\u00e9rateur de Rapports IA Gratuit \u2014 Rapports IA en Quelques Secondes | DataCube AI',
-  es: 'Generador de Informes IA Gratuito \u2014 Informes de IA en Segundos | DataCube AI',
-  pt: 'Gerador de Relat\u00f3rios IA Gratuito \u2014 Relat\u00f3rios de IA em Segundos | DataCube AI',
+  fr: 'G\u00e9n\u00e9rateur de Rapports IA | DataCube AI',
+  es: 'Generador de Informes IA | DataCube AI',
+  pt: 'Gerador de Relat\u00f3rios IA | DataCube AI',
   ja: '\u7121\u6599AI\u30ec\u30dd\u30fc\u30c8\u30b8\u30a7\u30cd\u30ec\u30fc\u30bf\u30fc \u2014 AI\u30ec\u30dd\u30fc\u30c8\u3092\u6570\u79d2\u3067\u4f5c\u6210 | DataCube AI',
   ko: '\ubb34\ub8cc AI \ubcf4\uace0\uc11c \uc0dd\uc131\uae30 \u2014 AI \ubcf4\uace0\uc11c\ub97c \uba87 \ucd08 \ub9cc\uc5d0 \uc0dd\uc131 | DataCube AI',
 }
 
 const META_DESCRIPTIONS: L = {
-  de: 'Erstellen Sie kostenlose KI-Berichte mit DataCube AI. Streaming-Generierung, 5 Exportformate (DOCX, HTML, Markdown, TXT, JSON). W\u00f6chentliche und t\u00e4gliche Analysen.',
+  de: 'Erstellen Sie KI-Berichte mit DataCube AI: Streaming-Generierung, Exportformate und t\u00e4gliche oder w\u00f6chentliche Analysen.',
   en: 'Generate free AI reports with DataCube AI. Streaming generation, 5 export formats (DOCX, HTML, Markdown, TXT, JSON). Weekly and daily AI news analysis.',
   zh: '\u4f7f\u7528DataCube AI\u514d\u8d39\u751f\u6210AI\u62a5\u544a\u3002\u6d41\u5f0f\u751f\u6210\u30015\u79cd\u5bfc\u51fa\u683c\u5f0f\uff08DOCX\u3001HTML\u3001Markdown\u3001TXT\u3001JSON\uff09\u3002\u6bcf\u5468\u548c\u6bcf\u65e5AI\u65b0\u95fb\u5206\u6790\u3002',
-  fr: "G\u00e9n\u00e9rez des rapports IA gratuits avec DataCube AI. G\u00e9n\u00e9ration en streaming, 5 formats d'export (DOCX, HTML, Markdown, TXT, JSON). Analyses IA hebdomadaires.",
-  es: 'Genere informes de IA gratuitos con DataCube AI. Generaci\u00f3n en streaming, 5 formatos de exportaci\u00f3n (DOCX, HTML, Markdown, TXT, JSON). An\u00e1lisis IA semanales.',
-  pt: 'Gere relat\u00f3rios de IA gratuitos com DataCube AI. Gera\u00e7\u00e3o em streaming, 5 formatos de exporta\u00e7\u00e3o (DOCX, HTML, Markdown, TXT, JSON). An\u00e1lises IA semanais.',
+  fr: "G\u00e9n\u00e9rez des rapports IA avec DataCube AI: streaming, exports et analyses IA quotidiennes ou hebdomadaires.",
+  es: 'Genere informes de IA con DataCube AI: streaming, exportaciones y an\u00e1lisis diarios o semanales.',
+  pt: 'Gere relat\u00f3rios de IA com DataCube AI: streaming, exporta\u00e7\u00f5es e an\u00e1lises di\u00e1rias ou semanais.',
   ja: 'DataCube AI\u3067\u7121\u6599AI\u30ec\u30dd\u30fc\u30c8\u3092\u751f\u6210\u3002\u30b9\u30c8\u30ea\u30fc\u30df\u30f3\u30b0\u751f\u6210\u30015\u3064\u306e\u30a8\u30af\u30b9\u30dd\u30fc\u30c8\u5f62\u5f0f\uff08DOCX\u3001HTML\u3001Markdown\u3001TXT\u3001JSON\uff09\u3002\u9031\u520a\u30fb\u65e5\u520aAI\u5206\u6790\u3002',
   ko: 'DataCube AI\ub85c \ubb34\ub8cc AI \ubcf4\uace0\uc11c\ub97c \uc0dd\uc131\ud558\uc138\uc694. \uc2a4\ud2b8\ub9ac\ubc0d \uc0dd\uc131, 5\uac00\uc9c0 \ub0b4\ubcf4\ub0b4\uae30 \ud615\uc2dd (DOCX, HTML, Markdown, TXT, JSON). \uc8fc\uac04 \ubc0f \uc77c\uac04 AI \ubd84\uc11d.',
 }
@@ -673,6 +673,7 @@ export default async function AIReportGeneratorToolPage({ params }: Props) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
 
+      <main id="main-content">
       <article className="max-w-5xl mx-auto px-4 sm:px-6">
         {/* ================================================================= */}
         {/* Section A: Hero                                                   */}
@@ -934,6 +935,7 @@ The convergence of multimodal AI...`}
           <p className="mt-6 text-sm text-muted-foreground">{t(TRUST_LINE, lang)}</p>
         </section>
       </article>
+      </main>
     </>
   )
 }

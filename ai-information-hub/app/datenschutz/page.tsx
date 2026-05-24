@@ -2,12 +2,19 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Datenschutzerklärung / Privacy Policy',
-  description: 'Privacy policy / Datenschutzerklärung for Data Cube AI Space',
-  robots: { index: false, follow: true },
+  description: 'Privacy policy for Data Cube AI, covering hosting, functional cookies, analytics, embedded media, backend APIs, and data rights.',
+  alternates: { canonical: 'https://www.datacubeai.space/datenschutz' },
+  openGraph: {
+    title: 'Privacy Policy | Data Cube AI',
+    description: 'Privacy policy for Data Cube AI, covering hosting, cookies, analytics, embedded media, APIs, and data rights.',
+    url: 'https://www.datacubeai.space/datenschutz',
+    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: 'Data Cube AI' }],
+  },
 }
 
 export default function DatenschutzPage() {
   return (
+    <main id="main-content">
     <article className="max-w-4xl mx-auto px-4 py-8">
       <header className="mb-8">
         <h1 className="text-3xl font-bold">Datenschutzerklärung / Privacy Policy</h1>
@@ -326,5 +333,6 @@ export default function DatenschutzPage() {
         </div>
       </footer>
     </article>
+    </main>
   )
 }

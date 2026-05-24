@@ -135,11 +135,18 @@ export function RightSidebar({ weekId, onSearchChange }: RightSidebarProps) {
       <div ref={contentRef}>
         {/* Search */}
         <div className="relative">
+          <label htmlFor="desktop-search-input" className="sr-only">
+            {t("search")}
+          </label>
           <Search aria-hidden="true" className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
+            id="desktop-search-input"
+            name="search"
             placeholder={t("search")}
             className="rounded-none border-foreground bg-card pl-10 focus-visible:ring-1 focus-visible:ring-primary"
             value={searchValue}
+            autoComplete="off"
+            aria-label={t("search")}
             onChange={(e) => {
               setSearchValue(e.target.value);
               onSearchChange(e.target.value);
@@ -156,9 +163,9 @@ export function RightSidebar({ weekId, onSearchChange }: RightSidebarProps) {
             <div className="mb-3 font-display text-[11px] font-semibold uppercase tracking-[0.14em] text-[#1c1a17] dark:text-foreground">
               Data Cube AI
             </div>
-            <h3 className="mx-auto max-w-[15rem] break-words font-display text-2xl font-normal leading-[1.05] text-[#1c1a17] dark:text-foreground">
+            <h2 className="mx-auto max-w-[15rem] break-words font-display text-2xl font-normal leading-[1.05] text-[#1c1a17] dark:text-foreground">
               {t("newsletterHeading")}
-            </h3>
+            </h2>
             <p className="mx-auto mb-2 mt-3 max-w-[15rem] text-xs leading-relaxed text-[#1c1a17] dark:text-muted-foreground">
               {t("newsletterDescription")}
             </p>
@@ -234,13 +241,21 @@ export function RightSidebar({ weekId, onSearchChange }: RightSidebarProps) {
                 }}
                 className="flex flex-col gap-2"
               >
+                <label htmlFor="desktop-newsletter-email" className="sr-only">
+                  {t("emailPlaceholder")}
+                </label>
                 <Input
+                  id="desktop-newsletter-email"
+                  name="email"
                   type="email"
                   required
                   placeholder={t("emailPlaceholder")}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="rounded-none border-0 border-b border-[#1c1a17] bg-transparent px-0 text-center text-sm placeholder:text-[#1c1a17]/55 focus-visible:border-[#1c1a17] focus-visible:ring-0 dark:border-border dark:placeholder:text-muted-foreground"
+                  autoComplete="email"
+                  inputMode="email"
+                  spellCheck={false}
                 />
                 {subscribeState === "error" && (
                   <p className="text-xs text-red-500">{t("subscribeError")}</p>
@@ -264,7 +279,7 @@ export function RightSidebar({ weekId, onSearchChange }: RightSidebarProps) {
         {/* Trends */}
         <div className="mt-4 border-t-2 border-foreground bg-card p-4">
           <div className="flex items-center justify-between gap-2 border-b border-border pb-3">
-            <h3 className="font-sans text-[11px] font-extrabold uppercase tracking-[0.16em] text-primary">{t("whatsNew")}</h3>
+            <h2 className="font-sans text-[11px] font-extrabold uppercase tracking-[0.16em] text-primary">{t("whatsNew")}</h2>
             <TrendingUp aria-hidden="true" className="h-4 w-4 text-primary" />
           </div>
           <div className="mt-1">
@@ -290,8 +305,22 @@ export function RightSidebar({ weekId, onSearchChange }: RightSidebarProps) {
         </div>
 
         {/* Footer */}
-        <div className="mt-4 px-2">
-          <p className="text-xs text-muted-foreground">&copy; 2026 Data Cube, All Rights Reserved</p>
+        <div className="mt-4 px-2 text-xs text-muted-foreground">
+          <nav aria-label="Trust and legal links" className="mb-2 flex flex-wrap gap-x-3 gap-y-1">
+            <a href="/about" className="hover:text-foreground transition-colors focus-visible:ring-2 focus-visible:ring-ring rounded">
+              About
+            </a>
+            <a href="/contact" className="hover:text-foreground transition-colors focus-visible:ring-2 focus-visible:ring-ring rounded">
+              Contact
+            </a>
+            <a href="/datenschutz" className="hover:text-foreground transition-colors focus-visible:ring-2 focus-visible:ring-ring rounded">
+              Privacy Policy
+            </a>
+            <a href="/editorial-policy" className="hover:text-foreground transition-colors focus-visible:ring-2 focus-visible:ring-ring rounded">
+              Editorial Policy
+            </a>
+          </nav>
+          <p>&copy; 2026 Data Cube, All Rights Reserved</p>
         </div>
       </div>
     </aside>

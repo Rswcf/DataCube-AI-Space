@@ -21,23 +21,23 @@ const t = (map: L, lang: string) => map[lang] || map.en
 // ---------------------------------------------------------------------------
 
 const META_TITLES: L = {
-  de: 'Kostenloser KI-News-Aggregator \u2014 22+ Quellen, 8 Sprachen, T\u00e4glich | DataCube AI',
-  en: 'Free AI News Aggregator \u2014 22+ Sources, 8 Languages, Updated Daily | DataCube AI',
+  de: 'KI-News-Aggregator | DataCube AI',
+  en: 'AI News Aggregator | DataCube AI',
   zh: '\u514d\u8d39AI\u65b0\u95fb\u805a\u5408\u5668 \u2014 22+\u4fe1\u606f\u6e90, 8\u79cd\u8bed\u8a00, \u6bcf\u65e5\u66f4\u65b0 | DataCube AI',
-  fr: 'Agr\u00e9gateur Actualit\u00e9s IA Gratuit \u2014 22+ Sources, 8 Langues | DataCube AI',
-  es: 'Agregador Noticias IA Gratuito \u2014 22+ Fuentes, 8 Idiomas | DataCube AI',
-  pt: 'Agregador Not\u00edcias IA Gratuito \u2014 22+ Fontes, 8 Idiomas | DataCube AI',
+  fr: 'Agr\u00e9gateur Actualit\u00e9s IA | DataCube AI',
+  es: 'Agregador de Noticias IA | DataCube AI',
+  pt: 'Agregador de Not\u00edcias IA | DataCube AI',
   ja: '\u7121\u6599AI\u30cb\u30e5\u30fc\u30b9\u30a2\u30b0\u30ea\u30b2\u30fc\u30bf\u30fc \u2014 22\u4ee5\u4e0a\u306e\u30bd\u30fc\u30b9\u30018\u8a00\u8a9e\u3001\u6bce\u65e5\u66f4\u65b0 | DataCube AI',
   ko: '\ubb34\ub8cc AI \ub274\uc2a4 \uc9d1\ud569\uae30 \u2014 22\uac1c+ \uc18c\uc2a4, 8\uac1c \uc5b8\uc5b4, \ub9e4\uc77c \uc5c5\ub370\uc774\ud2b8 | DataCube AI',
 }
 
 const META_DESCRIPTIONS: L = {
-  de: 'Der kostenlose KI-News-Aggregator von DataCube AI kuratiert t\u00e4glich Nachrichten aus 22+ Quellen. Technologie, Investments, Tipps & Videos in 8 Sprachen.',
+  de: 'DataCube AI kuratiert t\u00e4glich KI-News aus 22+ Quellen: Technologie, Investments, Tipps und Videos in 8 Sprachen.',
   en: "DataCube AI's free AI news aggregator curates daily news from 22+ sources. Technology breakthroughs, investments, tips & videos in 8 languages.",
   zh: 'DataCube AI\u514d\u8d39AI\u65b0\u95fb\u805a\u5408\u5668\uff0c\u6bcf\u65e5\u4ece22+\u4fe1\u606f\u6e90\u7cbe\u9009\u65b0\u95fb\u3002\u6db5\u76d6\u6280\u672f\u7a81\u7834\u3001\u6295\u8d44\u52a8\u6001\u3001\u5b9e\u7528\u6280\u5de7\u548c\u89c6\u9891\uff0c\u652f\u6301\u0038\u79cd\u8bed\u8a00\u3002',
-  fr: "L'agr\u00e9gateur d'actualit\u00e9s IA gratuit de DataCube AI propose chaque jour des nouvelles de 22+ sources. Technologies, investissements, conseils en 8 langues.",
+  fr: "DataCube AI s\u00e9lectionne chaque jour des actualit\u00e9s IA de 22+ sources: technologie, investissements et conseils.",
   es: 'El agregador de noticias IA gratuito de DataCube AI selecciona noticias diarias de 22+ fuentes. Tecnolog\u00eda, inversiones, consejos y videos en 8 idiomas.',
-  pt: 'O agregador de not\u00edcias IA gratuito do DataCube AI seleciona not\u00edcias di\u00e1rias de 22+ fontes. Tecnologia, investimentos, dicas e v\u00eddeos em 8 idiomas.',
+  pt: 'DataCube AI seleciona not\u00edcias IA di\u00e1rias de 22+ fontes: tecnologia, investimentos, dicas e v\u00eddeos.',
   ja: 'DataCube AI\u306e\u7121\u6599AI\u30cb\u30e5\u30fc\u30b9\u30a2\u30b0\u30ea\u30b2\u30fc\u30bf\u30fc\u306f22\u4ee5\u4e0a\u306e\u30bd\u30fc\u30b9\u304b\u3089\u6bce\u65e5\u30cb\u30e5\u30fc\u30b9\u3092\u53b3\u9078\u3002\u30c6\u30af\u30ce\u30ed\u30b8\u30fc\u3001\u6295\u8cc7\u3001\u30d2\u30f3\u30c8\u3001\u52d5\u753b\u30928\u8a00\u8a9e\u3067\u63d0\u4f9b\u3002',
   ko: 'DataCube AI\uc758 \ubb34\ub8cc AI \ub274\uc2a4 \uc9d1\ud569\uae30\ub294 22\uac1c \uc774\uc0c1 \uc18c\uc2a4\uc5d0\uc11c \ub9e4\uc77c \ub274\uc2a4\ub97c \uc120\ubcc4\ud569\ub2c8\ub2e4. \uae30\uc220, \ud22c\uc790, \ud301, \ub3d9\uc601\uc0c1\uc744 8\uac1c \uc5b8\uc5b4\ub85c \uc81c\uacf5\ud569\ub2c8\ub2e4.',
 }
@@ -685,6 +685,7 @@ export default async function AINewsAggregatorToolPage({ params }: Props) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
 
+      <main id="main-content">
       <article className="max-w-5xl mx-auto px-4 sm:px-6">
         {/* ================================================================= */}
         {/* Section A: Hero                                                   */}
@@ -968,6 +969,7 @@ export default async function AINewsAggregatorToolPage({ params }: Props) {
           <p className="mt-6 text-sm text-muted-foreground">{t(TRUST_LINE, lang)}</p>
         </section>
       </article>
+      </main>
     </>
   )
 }

@@ -1,13 +1,20 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Impressum',
-  description: 'Legal notice / Impressum for Data Cube AI Space',
-  robots: { index: false, follow: true },
+  title: 'Impressum / Legal Notice',
+  description: 'Legal notice for Data Cube AI, including operator disclosure, contact information, hosting, liability, and copyright details.',
+  alternates: { canonical: 'https://www.datacubeai.space/impressum' },
+  openGraph: {
+    title: 'Impressum / Legal Notice | Data Cube AI',
+    description: 'Legal notice for Data Cube AI, including operator disclosure, contact, hosting, liability, and copyright details.',
+    url: 'https://www.datacubeai.space/impressum',
+    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: 'Data Cube AI' }],
+  },
 }
 
 export default function ImpressumPage() {
   return (
+    <main id="main-content">
     <article className="max-w-4xl mx-auto px-4 py-8">
       <header className="mb-8">
         <h1 className="text-3xl font-bold">Impressum / Legal Notice</h1>
@@ -196,5 +203,6 @@ export default function ImpressumPage() {
         </div>
       </footer>
     </article>
+    </main>
   )
 }

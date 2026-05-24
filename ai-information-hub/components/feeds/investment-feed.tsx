@@ -266,7 +266,7 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
       <div className="section-header-invest border-b border-foreground px-4 py-4 sm:px-6">
         <div className="flex items-center gap-3">
           <TrendingUp className="h-4 w-4 text-primary" aria-hidden="true" />
-          <h3 className="font-sans text-[11px] font-extrabold uppercase tracking-[0.18em] text-primary">{t("aiInvestments")}</h3>
+          <h2 className="font-sans text-[11px] font-extrabold uppercase tracking-[0.18em] text-primary">{t("aiInvestments")}</h2>
           <Badge variant="secondary" className="ml-auto rounded-none border border-border bg-card font-sans text-[10px] uppercase tracking-[0.12em]">
             {periodLabel}
           </Badge>

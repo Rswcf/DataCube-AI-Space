@@ -124,6 +124,7 @@ function CellValue({ value }: { value: string }) {
 
 export default function PremiumPage() {
   return (
+    <main id="main-content">
     <article className="max-w-4xl mx-auto px-4 py-8">
       {/* Back link */}
       <p className="text-sm text-gray-600 mb-8">
@@ -278,5 +279,6 @@ export default function PremiumPage() {
         </div>
       </footer>
     </article>
+    </main>
   )
 }

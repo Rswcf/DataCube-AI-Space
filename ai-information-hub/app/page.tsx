@@ -11,13 +11,15 @@ export const revalidate = 3600
 
 // Root / and /de render the same German homepage. Consolidate indexing on /de
 // by declaring it canonical here, so search engines don't treat both as dupes.
-// Sitemap intentionally omits the root URL; /de is the one sitemap entry that
+// The sitemap includes root as a discoverable entry, while the canonical tag
 // points at the German homepage.
 //
 // The full hreflang `languages` map is restated here because Next.js merges
 // metadata shallowly — setting `alternates` at page level would otherwise blow
 // away the layout-level `alternates.languages` map.
 export const metadata: Metadata = {
+  title: { absolute: 'Data Cube AI | Tägliche KI-News' },
+  description: 'Kuratierte KI-News, Investment-Signale, Quellenlinks und praktische Workflows, täglich aus 40+ Quellen aktualisiert.',
   alternates: {
     canonical: 'https://www.datacubeai.space/de',
     languages: {
@@ -31,6 +33,30 @@ export const metadata: Metadata = {
       'ko': 'https://www.datacubeai.space/ko',
       'x-default': 'https://www.datacubeai.space/',
     },
+  },
+  openGraph: {
+    url: 'https://www.datacubeai.space/de',
+    title: 'Data Cube AI | Tägliche KI-News',
+    description: 'Kuratierte KI-News, Investments und Workflows, täglich aktualisiert.',
+    images: [
+      {
+        url: '/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Data Cube AI – Wo KI auf menschliche Einsicht trifft',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Data Cube AI | Tägliche KI-News',
+    description: 'Kuratierte KI-News, Investments und Workflows, täglich aktualisiert.',
+    images: [
+      {
+        url: '/og-image.jpg',
+        alt: 'Data Cube AI – Wo KI auf menschliche Einsicht trifft',
+      },
+    ],
   },
 }
 
@@ -243,14 +269,14 @@ export async function HomePageContent({ language = 'de' }: HomePageContentProps 
   const t = SR_ONLY_TEXT[language] || SR_ONLY_TEXT.de
 
   return (
-    <main className="min-h-screen w-full">
-      <section className="sr-only">
-        <h1>{t.h1}</h1>
+    <div className="min-h-screen w-full">
+      <section className="sr-only" aria-label={t.h1}>
+        <p>{t.h1}</p>
         <p>{t.description}</p>
 
         {headlines.length > 0 && (
           <section>
-            <h2>{t.latestNews}</h2>
+            <p>{t.latestNews}</p>
             <ul>
               {headlines.map((h) => (
                 <li key={h.title}>
@@ -263,7 +289,7 @@ export async function HomePageContent({ language = 'de' }: HomePageContentProps 
 
         {recentPeriodIds.length > 0 && (
           <nav aria-label={t.recentUpdates}>
-            <h2>{t.recentUpdates}</h2>
+            <p>{t.recentUpdates}</p>
             {recentPeriodIds.map((id) => (
               <a
                 key={id}
@@ -278,7 +304,7 @@ export async function HomePageContent({ language = 'de' }: HomePageContentProps 
 
         {trendingTopics.length > 0 && (
           <nav aria-label={t.trendingTopics}>
-            <h2>{t.trendingTopics}</h2>
+            <p>{t.trendingTopics}</p>
             {trendingTopics.map((topic) => (
               <a
                 key={topic}
@@ -293,7 +319,7 @@ export async function HomePageContent({ language = 'de' }: HomePageContentProps 
       </section>
 
       <HomePageClient initialWeekId={initialWeekId} />
-    </main>
+    </div>
   )
 }
 

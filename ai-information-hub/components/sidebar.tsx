@@ -212,6 +212,9 @@ export function Sidebar({ activeTab, onTabChange, selectedWeekId, onWeekChange }
           <a href="/about" className="text-xs text-muted-foreground hover:text-foreground transition-colors focus-visible:ring-2 focus-visible:ring-ring rounded">
             {language === "de" ? "Über uns" : "About"}
           </a>
+          <a href="/contact" className="text-xs text-muted-foreground hover:text-foreground transition-colors focus-visible:ring-2 focus-visible:ring-ring rounded">
+            {language === "de" ? "Kontakt" : "Contact"}
+          </a>
           <a href="/editorial-policy" className="text-xs text-muted-foreground hover:text-foreground transition-colors focus-visible:ring-2 focus-visible:ring-ring rounded">
             {language === "de" ? "Redaktion" : "Editorial"}
           </a>
@@ -219,7 +222,7 @@ export function Sidebar({ activeTab, onTabChange, selectedWeekId, onWeekChange }
             {language === "de" ? "Impressum" : "Legal Notice"}
           </a>
           <a href="/datenschutz" className="text-xs text-muted-foreground hover:text-foreground transition-colors focus-visible:ring-2 focus-visible:ring-ring rounded">
-            {language === "de" ? "Datenschutz" : "Privacy"}
+            {language === "de" ? "Datenschutz" : "Privacy Policy"}
           </a>
         </div>
       </aside>

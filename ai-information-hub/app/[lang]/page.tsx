@@ -12,7 +12,7 @@ type Props = {
 const META: Record<string, { title: string; description: string; ogDescription: string; ogAlt: string }> = {
   de: {
     title: 'Data Cube AI | Tägliche KI-News & Einblicke',
-    description: 'Täglicher KI-News-Aggregator: Künstliche Intelligenz Durchbrüche, KI-Investment-Signale, praktische KI-Tipps und kuratierte Videos – kostenlos in 8 Sprachen. Ihr wöchentlicher KI-Überblick.',
+    description: 'Tägliche KI-News, Investment-Signale, Quellenlinks und praktische Workflows, kuratiert aus 40+ Quellen in 8 Sprachen.',
     ogDescription: 'Kuratierte KI-News, Investments und Tipps – täglich aktualisiert in 8 Sprachen.',
     ogAlt: 'Data Cube AI – Wo KI auf menschliche Einsicht trifft',
   },
@@ -30,19 +30,19 @@ const META: Record<string, { title: string; description: string; ogDescription: 
   },
   fr: {
     title: 'Data Cube AI | Actualités IA quotidiennes',
-    description: "Agrégateur gratuit d'actualités IA : percées en intelligence artificielle, actualités LLM, signaux d'investissement IA et conseils pratiques – 8 langues, mis à jour quotidiennement.",
+    description: "Actualités IA, signaux d'investissement et workflows pratiques, sélectionnés chaque jour dans 8 langues.",
     ogDescription: 'Actualités IA, investissements et astuces — mis à jour quotidiennement en 8 langues.',
     ogAlt: "Data Cube AI – Où l'IA rencontre l'intelligence humaine",
   },
   es: {
     title: 'Data Cube AI | Noticias diarias de IA',
-    description: 'Agregador gratuito de noticias de IA: avances en inteligencia artificial, noticias de LLM, señales de inversión en IA y consejos prácticos – 8 idiomas, actualizado diariamente.',
+    description: 'Noticias de IA, señales de inversión y workflows prácticos, seleccionados a diario en 8 idiomas.',
     ogDescription: 'Noticias de IA, inversiones y consejos — actualizados diariamente en 8 idiomas.',
     ogAlt: 'Data Cube AI – Donde la IA se encuentra con la inteligencia humana',
   },
   pt: {
     title: 'Data Cube AI | Notícias diárias de IA',
-    description: 'Agregador gratuito de notícias de IA: avanços em inteligência artificial, atualizações de LLM, sinais de investimento em IA e dicas práticas – 8 idiomas, atualizado diariamente.',
+    description: 'Notícias de IA, sinais de investimento e workflows práticos, selecionados diariamente em 8 idiomas.',
     ogDescription: 'Notícias de IA, investimentos e dicas — atualizados diariamente em 8 idiomas.',
     ogAlt: 'Data Cube AI – Onde a IA encontra a inteligência humana',
   },

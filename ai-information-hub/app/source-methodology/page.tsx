@@ -3,8 +3,14 @@ import { TrustPage, type TrustPageConfig } from '../trust-page'
 
 export const metadata: Metadata = {
   title: 'Source Methodology | Data Cube AI',
-  description: 'How Data Cube AI sources, filters, summarizes, and links AI news and intelligence items.',
+  description: 'How Data Cube AI sources, filters, summarizes, verifies, and links AI news items across technology, capital, and workflow coverage.',
   alternates: { canonical: 'https://www.datacubeai.space/source-methodology' },
+  openGraph: {
+    title: 'Source Methodology | Data Cube AI',
+    description: 'How Data Cube AI turns source material into multilingual period pages, feeds, summaries, and AI-readable surfaces.',
+    url: 'https://www.datacubeai.space/source-methodology',
+    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: 'Data Cube AI' }],
+  },
 }
 
 const config: TrustPageConfig = {

@@ -6,7 +6,15 @@ export const revalidate = 86400
 export const metadata: Metadata = {
   title: 'For Teams & Enterprise',
   description:
-    'Enterprise AI intelligence for corporate innovation teams, investment firms, and consulting companies. Custom dashboards, white-label feeds, data APIs, and trend reports from 40+ curated sources in 8 languages.',
+    'Enterprise AI intelligence for teams: custom feeds, dashboards, APIs, and reports from 40+ sources in 8 languages.',
+  alternates: { canonical: 'https://www.datacubeai.space/for-teams' },
+  openGraph: {
+    title: 'For Teams & Enterprise',
+    description:
+      'Enterprise AI intelligence for teams: custom feeds, dashboards, APIs, and reports from 40+ sources.',
+    url: 'https://www.datacubeai.space/for-teams',
+    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: 'Data Cube AI' }],
+  },
 }
 
 const useCases = [
@@ -76,6 +84,7 @@ const benefits = [
 
 export default function ForTeamsPage() {
   return (
+    <main id="main-content">
     <article className="max-w-4xl mx-auto px-4 py-8">
       <header className="mb-8">
         <p className="text-sm text-gray-600">
@@ -210,5 +219,6 @@ export default function ForTeamsPage() {
         </div>
       </footer>
     </article>
+    </main>
   )
 }

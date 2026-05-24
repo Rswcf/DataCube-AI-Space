@@ -19,10 +19,13 @@ const trustLinks = [
   { href: '/source-methodology', label: 'Source Methodology' },
   { href: '/corrections', label: 'Corrections' },
   { href: '/ai-disclosure', label: 'AI Disclosure' },
+  { href: '/contact', label: 'Contact' },
+  { href: '/datenschutz', label: 'Privacy Policy' },
 ]
 
 export function TrustPage({ config }: { config: TrustPageConfig }) {
   return (
+    <main id="main-content">
     <article className="mx-auto max-w-3xl px-4 py-10">
       <header className="border-b-2 border-foreground pb-8">
         <p className="font-sans text-[11px] font-extrabold uppercase tracking-[0.18em] text-primary">
@@ -73,11 +76,9 @@ export function TrustPage({ config }: { config: TrustPageConfig }) {
               {link.label}
             </Link>
           ))}
-          <Link href="/for-teams" className="underline hover:no-underline">
-            Contact
-          </Link>
         </nav>
       </footer>
     </article>
+    </main>
   )
 }

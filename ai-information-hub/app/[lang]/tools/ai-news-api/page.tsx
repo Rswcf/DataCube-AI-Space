@@ -21,23 +21,23 @@ const t = (map: L, lang: string) => map[lang] || map.en
 // ---------------------------------------------------------------------------
 
 const META_TITLES: L = {
-  de: 'Kostenlose KI-News-API \u2014 KI-Nachrichten-Daten in 8 Sprachen | DataCube AI',
-  en: 'Free AI News API \u2014 Curated AI News Data in 8 Languages | DataCube AI',
+  de: 'KI-News-API in 8 Sprachen | DataCube AI',
+  en: 'Free AI News API | DataCube AI',
   zh: '\u514d\u8d39AI\u65b0\u95fbAPI \u2014 8\u79cd\u8bed\u8a00\u7684\u7cbe\u9009AI\u65b0\u95fb\u6570\u636e | DataCube AI',
-  fr: 'API Actualit\u00e9s IA Gratuite \u2014 Donn\u00e9es IA en 8 Langues | DataCube AI',
-  es: 'API Noticias IA Gratis \u2014 Datos IA Curados en 8 Idiomas | DataCube AI',
-  pt: 'API Not\u00edcias IA Gr\u00e1tis \u2014 Dados IA Curados em 8 Idiomas | DataCube AI',
+  fr: 'API Actualit\u00e9s IA | DataCube AI',
+  es: 'API de Noticias IA | DataCube AI',
+  pt: 'API de Not\u00edcias IA | DataCube AI',
   ja: '\u7121\u6599AI\u30cb\u30e5\u30fc\u30b9API \u2014 8\u8a00\u8a9e\u306e\u30ad\u30e5\u30ec\u30fc\u30b7\u30e7\u30f3AI\u30cb\u30e5\u30fc\u30b9\u30c7\u30fc\u30bf | DataCube AI',
   ko: '\ubb34\ub8cc AI \ub274\uc2a4 API \u2014 8\uac1c \uc5b8\uc5b4 \ud050\ub808\uc774\uc158 AI \ub274\uc2a4 \ub370\uc774\ud130 | DataCube AI',
 }
 
 const META_DESCRIPTIONS: L = {
-  de: 'Kostenlose REST API f\u00fcr kuratierte KI-Nachrichten aus 22+ Quellen. Technologie, Investments, Tipps, Videos in 8 Sprachen. JSON-Antworten, keine Authentifizierung n\u00f6tig.',
+  de: 'Kostenlose REST API f\u00fcr kuratierte KI-News aus 22+ Quellen: Technologie, Investments, Tipps und Videos in 8 Sprachen.',
   en: 'Free REST API for curated AI news from 22+ sources. Technology, investments, tips, videos in 8 languages. JSON responses, no authentication required.',
   zh: '\u514d\u8d39REST API\uff0c\u6765\u81ea22+\u6765\u6e90\u7684\u7cbe\u9009AI\u65b0\u95fb\u3002\u6280\u672f\u3001\u6295\u8d44\u3001\u6280\u5de7\u3001\u89c6\u9891\uff0c\u652f\u63018\u79cd\u8bed\u8a00\u3002JSON\u54cd\u5e94\uff0c\u65e0\u9700\u8ba4\u8bc1\u3002',
-  fr: 'API REST gratuite pour actualit\u00e9s IA de 22+ sources. Technologies, investissements, conseils, vid\u00e9os en 8 langues. R\u00e9ponses JSON, sans authentification.',
+  fr: 'API REST gratuite pour actualit\u00e9s IA de 22+ sources: technologie, investissements, conseils et vid\u00e9os en 8 langues.',
   es: 'API REST gratuita para noticias IA de 22+ fuentes. Tecnolog\u00eda, inversiones, consejos, videos en 8 idiomas. Respuestas JSON, sin autenticaci\u00f3n.',
-  pt: 'API REST gratuita para not\u00edcias IA de 22+ fontes. Tecnologia, investimentos, dicas, v\u00eddeos em 8 idiomas. Respostas JSON, sem autentica\u00e7\u00e3o.',
+  pt: 'API REST gratuita para not\u00edcias IA de 22+ fontes: tecnologia, investimentos, dicas e v\u00eddeos em 8 idiomas.',
   ja: '22\u4ee5\u4e0a\u306e\u30bd\u30fc\u30b9\u304b\u3089\u306eAI\u30cb\u30e5\u30fc\u30b9\u7528\u7121\u6599REST API\u3002\u30c6\u30af\u30ce\u30ed\u30b8\u30fc\u3001\u6295\u8cc7\u3001\u30d2\u30f3\u30c8\u3001\u52d5\u753b\u30928\u8a00\u8a9e\u3067\u3002JSON\u5fdc\u7b54\u3001\u8a8d\u8a3c\u4e0d\u8981\u3002',
   ko: '22\uac1c+ \uc18c\uc2a4\uc758 \ud050\ub808\uc774\uc158 AI \ub274\uc2a4\ub97c \uc704\ud55c \ubb34\ub8cc REST API. \uae30\uc220, \ud22c\uc790, \ud301, \ub3d9\uc601\uc0c1\uc744 8\uac1c \uc5b8\uc5b4\ub85c. JSON \uc751\ub2f5, \uc778\uc99d \ubd88\ud544\uc694.',
 }
@@ -592,6 +592,7 @@ export default async function AINewsAPIToolPage({ params }: Props) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
 
+      <main id="main-content">
       <article className="max-w-5xl mx-auto px-4 sm:px-6">
         {/* ================================================================= */}
         {/* Section A: Hero                                                   */}
@@ -903,6 +904,7 @@ for article in data['en']:
           <p className="mt-6 text-sm text-muted-foreground">{t(TRUST_LINE, lang)}</p>
         </section>
       </article>
+      </main>
     </>
   )
 }

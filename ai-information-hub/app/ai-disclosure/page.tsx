@@ -3,8 +3,14 @@ import { TrustPage, type TrustPageConfig } from '../trust-page'
 
 export const metadata: Metadata = {
   title: 'AI Disclosure | Data Cube AI',
-  description: 'AI usage disclosure for Data Cube AI content collection, summarization, categorization, and translation.',
+  description: 'AI usage disclosure for Data Cube AI content collection, summarization, categorization, translation, curation, and human review.',
   alternates: { canonical: 'https://www.datacubeai.space/ai-disclosure' },
+  openGraph: {
+    title: 'AI Disclosure | Data Cube AI',
+    description: 'How Data Cube AI uses AI-assisted workflows for collection, summarization, categorization, translation, and review.',
+    url: 'https://www.datacubeai.space/ai-disclosure',
+    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: 'Data Cube AI' }],
+  },
 }
 
 const config: TrustPageConfig = {

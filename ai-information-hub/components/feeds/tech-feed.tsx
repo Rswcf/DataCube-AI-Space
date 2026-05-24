@@ -145,7 +145,7 @@ export function TechFeed({ weekId, searchQuery }: TechFeedProps) {
       <div className="section-header-tech border-b border-foreground px-4 py-4 sm:px-6">
         <div className="flex items-center gap-3">
           <Cpu className="h-4 w-4 text-primary" aria-hidden="true" />
-          <h3 className="font-sans text-[11px] font-extrabold uppercase tracking-[0.18em] text-primary">{t("aiTechProgress")}</h3>
+          <h2 className="font-sans text-[11px] font-extrabold uppercase tracking-[0.18em] text-primary">{t("aiTechProgress")}</h2>
           {!loading && filteredPosts.length > 0 && (
             <Badge variant="outline" className="rounded-none border-primary/40 text-xs text-primary">
               {filteredPosts.length}

@@ -5,6 +5,12 @@ export const metadata: Metadata = {
   title: 'Editorial Policy | Data Cube AI',
   description: 'Editorial policy for Data Cube AI, including source attribution, curation rules, corrections, and AI-assisted processing.',
   alternates: { canonical: 'https://www.datacubeai.space/editorial-policy' },
+  openGraph: {
+    title: 'Editorial Policy | Data Cube AI',
+    description: 'How Data Cube AI selects sources, summarizes AI news, labels AI-assisted processing, and handles corrections.',
+    url: 'https://www.datacubeai.space/editorial-policy',
+    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: 'Data Cube AI' }],
+  },
 }
 
 const config: TrustPageConfig = {

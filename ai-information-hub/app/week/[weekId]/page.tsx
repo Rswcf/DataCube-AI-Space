@@ -28,12 +28,12 @@ export type Props = {
 // ---------------------------------------------------------------------------
 function metaTitles(periodLabel: string): L {
   return {
-    de: `KI-News ${periodLabel} — Technologie, Investitionen & Tipps`,
-    en: `AI News ${periodLabel} — Tech, Investments & Tips`,
+    de: `KI-News ${periodLabel} | Data Cube AI`,
+    en: `AI News ${periodLabel} | Data Cube AI`,
     zh: `AI新闻 ${periodLabel} — 科技、投资与实用技巧`,
-    fr: `Actualités IA ${periodLabel} — Tech, Investissements & Conseils`,
-    es: `Noticias IA ${periodLabel} — Tecnología, Inversiones y Consejos`,
-    pt: `Notícias IA ${periodLabel} — Tecnologia, Investimentos e Dicas`,
+    fr: `Actualités IA ${periodLabel} | Data Cube AI`,
+    es: `Noticias IA ${periodLabel} | Data Cube AI`,
+    pt: `Notícias IA ${periodLabel} | Data Cube AI`,
     ja: `AIニュース ${periodLabel} — テクノロジー、投資＆実用ヒント`,
     ko: `AI 뉴스 ${periodLabel} — 기술, 투자 및 실용 팁`,
   }
@@ -41,12 +41,12 @@ function metaTitles(periodLabel: string): L {
 
 function metaDescriptions(periodLabel: string): L {
   return {
-    de: `Kuratierte KI-News der ${periodLabel}: Technologie-Durchbrüche, Investment-Signale und praktische Tipps – täglich aktualisiert auf Data Cube AI.`,
-    en: `Curated AI news for ${periodLabel}: technology breakthroughs, investment signals, and practical tips – updated daily on Data Cube AI.`,
+    de: `Kuratierte KI-News der ${periodLabel}: Technologie, Investment-Signale, praktische Tipps und Quellenlinks auf Data Cube AI.`,
+    en: `Curated AI news for ${periodLabel}: technology, investment signals, practical tips, and source links on Data Cube AI.`,
     zh: `${periodLabel} AI新闻精选：技术突破、投资信号和实用技巧 – 每日更新于 Data Cube AI。`,
-    fr: `Actualités IA sélectionnées pour ${periodLabel} : percées technologiques, signaux d'investissement et conseils pratiques – mis à jour quotidiennement.`,
-    es: `Noticias de IA seleccionadas para ${periodLabel}: avances tecnológicos, señales de inversión y consejos prácticos – actualizado diariamente.`,
-    pt: `Notícias de IA selecionadas para ${periodLabel}: avanços tecnológicos, sinais de investimento e dicas práticas – atualizado diariamente.`,
+    fr: `Actualités IA pour ${periodLabel}: technologie, signaux d'investissement, conseils pratiques et sources sur Data Cube AI.`,
+    es: `Noticias de IA para ${periodLabel}: tecnología, señales de inversión, consejos prácticos y fuentes en Data Cube AI.`,
+    pt: `Notícias de IA para ${periodLabel}: tecnologia, sinais de investimento, dicas práticas e fontes no Data Cube AI.`,
     ja: `${periodLabel}のAIニュース厳選：技術的ブレークスルー、投資シグナル、実践ヒント – 毎日更新。`,
     ko: `${periodLabel} AI 뉴스 큐레이션: 기술 돌파구, 투자 신호, 실용 팁 – 매일 업데이트.`,
   }
@@ -252,6 +252,10 @@ const thDealType: L = { de: 'Dealtyp', en: 'Deal Type', zh: '交易类型', fr: 
 // Misc UI labels
 // ---------------------------------------------------------------------------
 const labelLanguage: L = { de: 'Sprache:', en: 'Language:', zh: '语言：', fr: 'Langue :', es: 'Idioma:', pt: 'Idioma:', ja: '言語：', ko: '언어:' }
+const labelByline: L = { de: 'Von', en: 'By', zh: '作者：', fr: 'Par', es: 'Por', pt: 'Por', ja: '著者：', ko: '작성:' }
+const labelPublished: L = { de: 'Veröffentlicht', en: 'Published', zh: '发布于', fr: 'Publié', es: 'Publicado', pt: 'Publicado', ja: '公開日', ko: '게시일' }
+const labelContact: L = { de: 'Kontakt', en: 'Contact', zh: '联系', fr: 'Contact', es: 'Contacto', pt: 'Contato', ja: 'お問い合わせ', ko: '문의' }
+const labelPrivacy: L = { de: 'Datenschutz', en: 'Privacy Policy', zh: '隐私政策', fr: 'Confidentialité', es: 'Privacidad', pt: 'Privacidade', ja: 'プライバシー', ko: '개인정보' }
 const labelCategory: L = { de: 'Kategorie:', en: 'Category:', zh: '类别：', fr: 'Catégorie :', es: 'Categoría:', pt: 'Categoria:', ja: 'カテゴリ：', ko: '카테고리:' }
 const labelImpact: L = { de: 'Auswirkung:', en: 'Impact:', zh: '影响：', fr: 'Impact :', es: 'Impacto:', pt: 'Impacto:', ja: '影響度：', ko: '영향:' }
 const labelSource: L = { de: 'Quelle:', en: 'Source:', zh: '来源：', fr: 'Source :', es: 'Fuente:', pt: 'Fonte:', ja: '出典：', ko: '출처:' }
@@ -482,8 +486,10 @@ export default async function WeekPage({ params, searchParams }: Props) {
   const modifiedIso = maxTimestamp
     ? new Date(maxTimestamp).toISOString()
     : publishedIso
+  const publishedDateLabel = new Intl.DateTimeFormat(lang, { dateStyle: 'medium' }).format(new Date(publishedIso))
 
   return (
+    <main id="main-content">
     <article className="max-w-4xl mx-auto px-4 py-8">
       {/* Header */}
       <BreadcrumbListSchema weekId={weekId} weekLabel={periodLabel} lang={lang} />
@@ -510,6 +516,11 @@ export default async function WeekPage({ params, searchParams }: Props) {
               <a href={`/${code}/week/${weekId}`} className={`rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${lang === code ? 'font-semibold underline' : 'hover:underline'}`}>{code.toUpperCase()}</a>
             </span>
           ))}
+        </p>
+        <p className="mt-2 text-sm text-gray-600">
+          <span>{t(labelByline, lang)} <span className="font-medium">Data Cube AI Editorial</span></span>
+          <span> • </span>
+          <time dateTime={publishedIso}>{t(labelPublished, lang)} {publishedDateLabel}</time>
         </p>
       </header>
 
@@ -766,7 +777,16 @@ export default async function WeekPage({ params, searchParams }: Props) {
         <a href={`/${lang}`} className="underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">
           {t(footerInteractive, lang)}
         </a>
+        <span className="mx-2 text-gray-400">|</span>
+        <a href="/contact" className="underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">
+          {t(labelContact, lang)}
+        </a>
+        <span className="mx-2 text-gray-400">|</span>
+        <a href="/datenschutz" className="underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">
+          {t(labelPrivacy, lang)}
+        </a>
       </footer>
     </article>
+    </main>
   )
 }

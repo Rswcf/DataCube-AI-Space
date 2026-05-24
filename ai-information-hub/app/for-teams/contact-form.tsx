@@ -35,12 +35,14 @@ export function ContactForm() {
         </label>
         <input
           id="contact-name"
+          name="name"
           type="text"
           required
           value={name}
           onChange={(e) => setName(e.target.value)}
           className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus:outline-none"
           placeholder="Your full name"
+          autoComplete="name"
         />
       </div>
 
@@ -50,12 +52,16 @@ export function ContactForm() {
         </label>
         <input
           id="contact-email"
+          name="email"
           type="email"
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus:outline-none"
           placeholder="you@company.com"
+          autoComplete="email"
+          inputMode="email"
+          spellCheck={false}
         />
       </div>
 
@@ -65,12 +71,14 @@ export function ContactForm() {
         </label>
         <input
           id="contact-company"
+          name="organization"
           type="text"
           required
           value={company}
           onChange={(e) => setCompany(e.target.value)}
           className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus:outline-none"
           placeholder="Company name"
+          autoComplete="organization"
         />
       </div>
 
@@ -80,6 +88,7 @@ export function ContactForm() {
         </label>
         <textarea
           id="contact-message"
+          name="message"
           rows={4}
           value={message}
           onChange={(e) => setMessage(e.target.value)}

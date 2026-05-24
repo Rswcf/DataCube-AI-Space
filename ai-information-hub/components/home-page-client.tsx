@@ -76,7 +76,7 @@ export default function HomePageClient({ initialWeekId = "" }: HomePageClientPro
         className="pointer-events-none fixed top-0 left-0 right-0 z-0 h-32 bg-gradient-to-b from-card/80 to-transparent"
         aria-hidden="true"
       />
-      <div id="main-content" className="relative z-[1] mx-auto flex w-full max-w-[1360px]">
+      <div className="relative z-[1] mx-auto flex w-full max-w-[1360px]">
         {/* Left Sidebar - Fixed width */}
         <div className="hidden md:flex md:w-20 xl:w-[275px] shrink-0 justify-end">
           <div className="w-full xl:w-[275px]">
@@ -298,14 +298,20 @@ function MobileSearchDrawer({
         {/* Search Input */}
         <div className="px-4 pb-4">
           <div className="relative">
+            <label htmlFor="mobile-search-input" className="sr-only">
+              {t("search")}
+            </label>
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
             <input
+              id="mobile-search-input"
+              name="search"
               type="text"
               placeholder={t("search")}
               value={searchValue}
               onChange={(e) => handleSearch(e.target.value)}
               className="w-full border border-foreground bg-card py-3 pl-10 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
               autoFocus
+              autoComplete="off"
               aria-label={t("search")}
             />
             {searchValue && (
@@ -468,9 +474,9 @@ function MobileSettingsDrawer({
               <div className="mb-3 font-display text-[11px] font-semibold uppercase tracking-[0.14em] text-[#1c1a17] dark:text-foreground">
                 Data Cube AI
               </div>
-              <h3 className="mx-auto max-w-[16rem] break-words font-display text-2xl font-normal leading-[1.05] text-[#1c1a17] dark:text-foreground">
+              <h2 className="mx-auto max-w-[16rem] break-words font-display text-2xl font-normal leading-[1.05] text-[#1c1a17] dark:text-foreground">
                 {t("newsletterHeading")}
-              </h3>
+              </h2>
               <p className="mx-auto mb-4 mt-3 max-w-[16rem] text-xs leading-relaxed text-[#1c1a17] dark:text-muted-foreground">
                 {t("newsletterDescription")}
               </p>
@@ -543,13 +549,21 @@ function MobileSettingsDrawer({
                   }}
                   className="flex flex-col gap-2"
                 >
+                  <label htmlFor="mobile-newsletter-email" className="sr-only">
+                    {t("emailPlaceholder")}
+                  </label>
                   <input
+                    id="mobile-newsletter-email"
+                    name="email"
                     type="email"
                     required
                     placeholder={t("emailPlaceholder")}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full rounded-none border-0 border-b border-[#1c1a17] bg-transparent px-0 py-2 text-center text-sm placeholder:text-[#1c1a17]/55 focus:border-[#1c1a17] focus:outline-none focus:ring-0 dark:border-border dark:placeholder:text-muted-foreground"
+                    autoComplete="email"
+                    inputMode="email"
+                    spellCheck={false}
                   />
                   {subscribeState === "error" && (
                     <p className="text-xs text-red-500">{t("subscribeError")}</p>

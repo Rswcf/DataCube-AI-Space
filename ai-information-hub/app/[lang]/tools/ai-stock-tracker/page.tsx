@@ -20,23 +20,23 @@ const t = (map: L, lang: string) => map[lang] || map.en
 // ---------------------------------------------------------------------------
 
 const META_TITLES: L = {
-  de: 'KI-Aktien-Tracker \u2014 Echtzeit-Kurse f\u00fcr KI-Unternehmen | DataCube AI',
-  en: 'AI Stock Tracker \u2014 Real-Time AI Company Stock Data | DataCube AI',
+  de: 'KI-Aktien-Tracker | DataCube AI',
+  en: 'AI Stock Tracker & Market Data | DataCube AI',
   zh: 'AI\u80a1\u7968\u8ffd\u8e2a\u5668 \u2014 AI\u516c\u53f8\u5b9e\u65f6\u80a1\u4ef7\u6570\u636e | DataCube AI',
-  fr: 'Tracker Actions IA \u2014 Donn\u00e9es Boursi\u00e8res IA en Temps R\u00e9el | DataCube AI',
-  es: 'Rastreador Acciones IA \u2014 Datos Burs\u00e1tiles IA en Tiempo Real | DataCube AI',
-  pt: 'Rastreador A\u00e7\u00f5es IA \u2014 Dados de A\u00e7\u00f5es IA em Tempo Real | DataCube AI',
+  fr: 'Tracker Actions IA | DataCube AI',
+  es: 'Rastreador Acciones IA | DataCube AI',
+  pt: 'Rastreador A\u00e7\u00f5es IA | DataCube AI',
   ja: 'AI\u682a\u5f0f\u30c8\u30e9\u30c3\u30ab\u30fc \u2014 AI\u4f01\u696d\u306e\u30ea\u30a2\u30eb\u30bf\u30a4\u30e0\u682a\u4fa1\u30c7\u30fc\u30bf | DataCube AI',
   ko: 'AI \uc8fc\uc2dd \ucd94\uc801\uae30 \u2014 AI \uae30\uc5c5 \uc2e4\uc2dc\uac04 \uc8fc\uac00 \ub370\uc774\ud130 | DataCube AI',
 }
 
 const META_DESCRIPTIONS: L = {
-  de: 'Verfolgen Sie KI-Aktienkurse in Echtzeit mit DataCube AI. Finanzierungsrunden, M&A-Deals, Aktienbewegungen der f\u00fchrenden KI-Unternehmen. Kostenlos.',
-  en: 'Track AI company stocks in real-time with DataCube AI. Funding rounds, M&A deals, stock movements of leading AI companies. Powered by Polygon.io. Free.',
+  de: 'Verfolgen Sie KI-Aktien mit DataCube AI: Kurse, Finanzierungsrunden, M&A-Deals und Marktsignale an einem Ort.',
+  en: 'Track AI company stocks with DataCube AI: prices, funding rounds, M&A deals, market moves, and company intelligence.',
   zh: '\u4f7f\u7528DataCube AI\u5b9e\u65f6\u8ffd\u8e2aAI\u516c\u53f8\u80a1\u7968\u3002\u878d\u8d44\u8f6e\u6b21\u3001\u5e76\u8d2d\u4ea4\u6613\u3001\u9886\u5148AI\u4f01\u4e1a\u7684\u80a1\u4ef7\u53d8\u52a8\u3002\u7531Polygon.io\u63d0\u4f9b\u6570\u636e\u3002\u514d\u8d39\u3002',
-  fr: 'Suivez les actions des entreprises IA en temps r\u00e9el avec DataCube AI. Lev\u00e9es de fonds, M&A, mouvements boursiers des leaders de l\u2019IA. Gratuit.',
-  es: 'Rastree acciones de empresas IA en tiempo real con DataCube AI. Rondas de financiaci\u00f3n, M&A, movimientos burs\u00e1tiles de l\u00edderes en IA. Gratuito.',
-  pt: 'Acompanhe a\u00e7\u00f5es de empresas IA em tempo real com DataCube AI. Rodadas de financiamento, M&A, movimentos de a\u00e7\u00f5es dos l\u00edderes em IA. Gratuito.',
+  fr: 'Suivez les actions IA avec DataCube AI: cours, lev\u00e9es de fonds, M&A, mouvements de march\u00e9 et donn\u00e9es soci\u00e9t\u00e9.',
+  es: 'Rastree acciones IA con DataCube AI: precios, rondas de financiaci\u00f3n, M&A, movimientos de mercado y datos empresariales.',
+  pt: 'Acompanhe a\u00e7\u00f5es IA com DataCube AI: pre\u00e7os, rodadas de financiamento, M&A, mercado e dados de empresas.',
   ja: 'DataCube AI\u3067AI\u4f01\u696d\u306e\u682a\u4fa1\u3092\u30ea\u30a2\u30eb\u30bf\u30a4\u30e0\u3067\u8ffd\u8de1\u3002\u8cc7\u91d1\u8abf\u9054\u3001M&A\u3001\u4e3b\u8981AI\u4f01\u696d\u306e\u682a\u4fa1\u5909\u52d5\u3002Polygon.io\u642d\u8f09\u3002\u7121\u6599\u3002',
   ko: 'DataCube AI\ub85c AI \uae30\uc5c5 \uc8fc\uc2dd\uc744 \uc2e4\uc2dc\uac04 \ucd94\uc801\ud558\uc138\uc694. \uc790\uae08 \uc870\ub2ec, M&A, \uc8fc\uc694 AI \uae30\uc5c5\uc758 \uc8fc\uac00 \ubcc0\ub3d9. Polygon.io \uc9c0\uc6d0. \ubb34\ub8cc.',
 }
@@ -651,6 +651,7 @@ export default async function AIStockTrackerToolPage({ params }: Props) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
 
+      <main id="main-content">
       <article className="max-w-5xl mx-auto px-4 sm:px-6">
         {/* ================================================================= */}
         {/* Section A: Hero                                                   */}
@@ -920,6 +921,7 @@ export default async function AIStockTrackerToolPage({ params }: Props) {
           <p className="mt-6 text-sm text-muted-foreground">{t(TRUST_LINE, lang)}</p>
         </section>
       </article>
+      </main>
     </>
   )
 }
