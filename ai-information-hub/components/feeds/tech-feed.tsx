@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { ExternalLink, Cpu } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ShareButton } from "@/components/share-button";
@@ -9,6 +10,7 @@ import { FeedSkeleton } from "@/components/feeds/feed-skeleton";
 import { useSettings } from "@/lib/settings-context";
 import { getPeriodLabel } from "@/lib/period-utils";
 import { API_BASE, USE_API } from "@/lib/api-base";
+import { ARTICLE_CTA_LABELS, articleHref, techStoryId } from "@/lib/article-routes";
 import type { TechPost } from "@/lib/types";
 
 interface TechFeedProps {
@@ -181,6 +183,8 @@ export function TechFeed({ weekId, searchQuery }: TechFeedProps) {
         const isVideoPost = post.isVideo && post.videoId;
         const [headline, deck] = splitHeadlineDeck(post.content);
         const impactLabel = impacts[post.impact as keyof typeof impacts] || post.impact;
+        const storyHref = articleHref(language, weekId, techStoryId(post));
+        const articleLabel = ARTICLE_CTA_LABELS[language] || ARTICLE_CTA_LABELS.en;
 
         return (
           <article
@@ -197,7 +201,9 @@ export function TechFeed({ weekId, searchQuery }: TechFeedProps) {
                   {isVideoPost ? "Video" : post.category} · {impactLabel} · {post.timestamp}
                 </div>
                 <h2 className="mt-2 border-b border-border pb-3 font-display text-2xl font-normal leading-[1.1] text-foreground sm:text-[1.75rem]">
-                  {headline}
+                  <Link href={storyHref} className="transition-colors hover:text-primary">
+                    {headline}
+                  </Link>
                 </h2>
                 {deck && (
                   <p className="mt-3 text-[15px] leading-relaxed text-foreground sm:text-base">
@@ -253,6 +259,12 @@ export function TechFeed({ weekId, searchQuery }: TechFeedProps) {
                     text={post.content}
                     url={post.sourceUrl}
                   />
+                  <Link
+                    href={storyHref}
+                    className="ml-auto border-b border-foreground/30 font-sans text-[11px] font-extrabold uppercase tracking-[0.12em] text-foreground transition-colors hover:border-primary hover:text-primary"
+                  >
+                    {articleLabel}
+                  </Link>
                 </div>
               </div>
             </div>

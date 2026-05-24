@@ -56,8 +56,10 @@ function isLocalizablePath(pathname: string): boolean {
     new RegExp(`^\\/${LANG_RE}$`).test(pathname) ||
     /^\/week\/[^/]+$/.test(pathname) ||
     /^\/topic\/[^/]+$/.test(pathname) ||
+    /^\/news\/[^/]+\/[^/]+$/.test(pathname) ||
     new RegExp(`^\\/${LANG_RE}\\/week\\/[^/]+$`).test(pathname) ||
     new RegExp(`^\\/${LANG_RE}\\/topic\\/[^/]+$`).test(pathname) ||
+    new RegExp(`^\\/${LANG_RE}\\/news\\/[^/]+\\/[^/]+$`).test(pathname) ||
     new RegExp(`^\\/${LANG_RE}\\/tools(\\/[^/]+)?$`).test(pathname)
   )
 }
@@ -84,8 +86,10 @@ function isSeoAlwaysAllowedPath(pathname: string): boolean {
     LOGIN_BYPASS_PATHS.has(pathname) ||
     /^\/week\/[^/]+$/.test(pathname) ||
     /^\/topic\/[^/]+$/.test(pathname) ||
+    /^\/news\/[^/]+\/[^/]+$/.test(pathname) ||
     new RegExp(`^\\/${LANG_RE}\\/week\\/[^/]+$`).test(pathname) ||
     new RegExp(`^\\/${LANG_RE}\\/topic\\/[^/]+$`).test(pathname) ||
+    new RegExp(`^\\/${LANG_RE}\\/news\\/[^/]+\\/[^/]+$`).test(pathname) ||
     new RegExp(`^\\/${LANG_RE}\\/tools(\\/[^/]+)?$`).test(pathname)
   )
 }
@@ -161,6 +165,12 @@ export function middleware(request: NextRequest) {
   const legacyTopic = pathname.match(/^\/topic\/([^/]+)$/)
   if (legacyTopic) {
     const target = buildTarget(`/de/topic/${legacyTopic[1]}`, searchParams)
+    return NextResponse.redirect(new URL(target, request.url), 308)
+  }
+
+  const legacyNews = pathname.match(/^\/news\/([^/]+)\/([^/]+)$/)
+  if (legacyNews) {
+    const target = buildTarget(`/de/news/${legacyNews[1]}/${legacyNews[2]}`, searchParams)
     return NextResponse.redirect(new URL(target, request.url), 308)
   }
 

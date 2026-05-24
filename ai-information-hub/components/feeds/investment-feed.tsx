@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { ExternalLink, TrendingUp, TrendingDown, Building2, Briefcase, GitMerge } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ShareButton } from "@/components/share-button";
@@ -10,6 +11,13 @@ import { FeedSkeleton } from "@/components/feeds/feed-skeleton";
 import { useSettings } from "@/lib/settings-context";
 import { getPeriodLabel } from "@/lib/period-utils";
 import { API_BASE, USE_API } from "@/lib/api-base";
+import {
+  ARTICLE_CTA_LABELS,
+  articleHref,
+  maStoryId,
+  primaryStoryId,
+  secondaryStoryId,
+} from "@/lib/article-routes";
 
 interface InvestmentFeedProps {
   weekId: string;
@@ -242,22 +250,32 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
     { id: "secondary" as const, label: t("secondaryMarket"), icon: TrendingUp },
     { id: "ma" as const, label: "M&A", icon: GitMerge },
   ];
+  const articleLabel = ARTICLE_CTA_LABELS[language] || ARTICLE_CTA_LABELS.en;
 
-  const SourceLink = ({ sourceUrl }: { sourceUrl?: string }) =>
-    sourceUrl ? (
-      <div className="mt-3 flex items-center gap-1 border-t border-border pt-3 text-xs text-muted-foreground">
-        <ExternalLink className="h-3 w-3" aria-hidden="true" />
-        <a
-          href={sourceUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="border-b border-primary/40 text-primary transition-colors hover:border-primary"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {t("source")}
-        </a>
-      </div>
-    ) : null;
+  const SourceLink = ({ sourceUrl, storyHref }: { sourceUrl?: string; storyHref: string }) => (
+    <div className="mt-3 flex flex-wrap items-center gap-3 border-t border-border pt-3 text-xs text-muted-foreground">
+      {sourceUrl ? (
+        <div className="flex items-center gap-1">
+          <ExternalLink className="h-3 w-3" aria-hidden="true" />
+          <a
+            href={sourceUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="border-b border-primary/40 text-primary transition-colors hover:border-primary"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {t("source")}
+          </a>
+        </div>
+      ) : null}
+      <Link
+        href={storyHref}
+        className="ml-auto border-b border-foreground/30 font-sans text-[11px] font-extrabold uppercase tracking-[0.12em] text-foreground transition-colors hover:border-primary hover:text-primary"
+      >
+        {articleLabel}
+      </Link>
+    </div>
+  );
 
 
   return (
@@ -334,7 +352,9 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
               </p>
             </div>
           )}
-          {filteredPrimary.map((post, index) => (
+          {filteredPrimary.map((post, index) => {
+            const storyHref = articleHref(language, weekId, primaryStoryId(post));
+            return (
             <article key={post.id} className="animate-fade-up border-b border-border px-4 py-5 transition-colors hover:bg-secondary/50 sm:px-6" style={{ animationDelay: `${Math.min(index, 10) * 50}ms` }}>
               <div className="flex gap-2 sm:gap-3">
                 <div className="w-14 shrink-0 font-display text-3xl font-normal leading-none text-primary tabular-nums sm:text-4xl">
@@ -354,7 +374,9 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <Building2 className="h-4 w-4 text-accent" aria-hidden="true" />
-                        <span className="font-display text-2xl font-normal leading-tight text-foreground">{post.company}</span>
+                        <Link href={storyHref} className="font-display text-2xl font-normal leading-tight text-foreground transition-colors hover:text-primary">
+                          {post.company}
+                        </Link>
                       </div>
                       <Badge className="rounded-none border border-primary/30 bg-primary/10 text-primary">{post.round}</Badge>
                     </div>
@@ -376,14 +398,15 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
                   </div>
 
                   <p className="mt-3 border-t border-border pt-3 text-[15px] leading-relaxed text-foreground sm:text-base">{post.content}</p>
-                  <SourceLink sourceUrl={post.sourceUrl} />
+                  <SourceLink sourceUrl={post.sourceUrl} storyHref={storyHref} />
                   <div className="mt-3">
                     <ShareButton title={post.company} text={post.content} url={post.sourceUrl} />
                   </div>
                 </div>
               </div>
             </article>
-          ))}
+            );
+          })}
         </div>
       )}
 
@@ -408,7 +431,9 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
               </p>
             </div>
           )}
-          {filteredSecondary.map((post, index) => (
+          {filteredSecondary.map((post, index) => {
+            const storyHref = articleHref(language, weekId, secondaryStoryId(post));
+            return (
             <article key={post.id} className="animate-fade-up border-b border-border px-4 py-5 transition-colors hover:bg-secondary/50 sm:px-6" style={{ animationDelay: `${Math.min(index, 10) * 50}ms` }}>
               <div className="flex gap-2 sm:gap-3">
                 <div className="w-14 shrink-0 font-display text-3xl font-normal leading-none text-primary tabular-nums sm:text-4xl">
@@ -427,7 +452,9 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
                   <div className="mt-3 border-t border-foreground bg-card py-3">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <div className="flex items-center gap-3 min-w-0 flex-wrap">
-                        <span className="font-display text-2xl font-normal text-foreground">{post.ticker}</span>
+                        <Link href={storyHref} className="font-display text-2xl font-normal text-foreground transition-colors hover:text-primary">
+                          {post.ticker}
+                        </Link>
                         {post.price && post.price !== "N/A" && (
                           <span className="font-display text-2xl font-normal tabular-nums text-primary">{post.price}</span>
                         )}
@@ -466,14 +493,15 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
                   </div>
 
                   <p className="mt-3 border-t border-border pt-3 text-[15px] leading-relaxed text-foreground sm:text-base">{post.content}</p>
-                  <SourceLink sourceUrl={post.sourceUrl} />
+                  <SourceLink sourceUrl={post.sourceUrl} storyHref={storyHref} />
                   <div className="mt-3">
                     <ShareButton title={post.ticker} text={post.content} url={post.sourceUrl} />
                   </div>
                 </div>
               </div>
             </article>
-          ))}
+            );
+          })}
         </div>
       )}
 
@@ -491,7 +519,9 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
               </p>
             </div>
           )}
-          {filteredMa.map((post, index) => (
+          {filteredMa.map((post, index) => {
+            const storyHref = articleHref(language, weekId, maStoryId(post));
+            return (
             <article key={post.id} className="animate-fade-up border-b border-border px-4 py-5 transition-colors hover:bg-secondary/50 sm:px-6" style={{ animationDelay: `${Math.min(index, 10) * 50}ms` }}>
               <div className="flex gap-2 sm:gap-3">
                 <div className="w-14 shrink-0 font-display text-3xl font-normal leading-none text-primary tabular-nums sm:text-4xl">
@@ -511,7 +541,9 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
                     <div className="flex items-center justify-center gap-3 min-w-0">
                       <div className="text-center min-w-0">
                         <p className="text-xs text-muted-foreground">{t("acquirer")}</p>
-                        <p className="truncate font-display text-xl font-normal text-foreground">{post.acquirer}</p>
+                        <Link href={storyHref} className="block truncate font-display text-xl font-normal text-foreground transition-colors hover:text-primary">
+                          {post.acquirer}
+                        </Link>
                       </div>
                       <GitMerge className="h-6 w-6 text-chart-5 shrink-0" aria-hidden="true" />
                       <div className="text-center min-w-0">
@@ -533,14 +565,15 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
                   </div>
 
                   <p className="mt-3 border-t border-border pt-3 text-[15px] leading-relaxed text-foreground sm:text-base">{post.content}</p>
-                  <SourceLink sourceUrl={post.sourceUrl} />
+                  <SourceLink sourceUrl={post.sourceUrl} storyHref={storyHref} />
                   <div className="mt-3">
                     <ShareButton title={`${post.acquirer} → ${post.target}`} text={post.content} url={post.sourceUrl} />
                   </div>
                 </div>
               </div>
             </article>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

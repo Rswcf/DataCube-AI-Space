@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { formatPeriodTitle, periodPublishedDate } from '@/lib/period-utils';
+import { absoluteArticleUrl, techStoryId } from '@/lib/article-routes';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api-production-3ee5.up.railway.app/api';
 const SITE_URL = 'https://www.datacubeai.space';
@@ -95,6 +96,13 @@ function newsTitle(periodId: string, lang: string): string {
   return labels[lang] || labels.en;
 }
 
+function articleTitle(content: string): string {
+  const clean = content.replace(/\s+/g, ' ').trim();
+  if (clean.length <= 110) return clean;
+  const cut = clean.lastIndexOf(' ', 110);
+  return `${clean.slice(0, cut > 70 ? cut : 110).replace(/[ .,-;:]+$/, '')}...`;
+}
+
 export async function GET() {
   // Fetch weeks
   let weeks: Week[] = [];
@@ -122,23 +130,20 @@ export async function GET() {
         const posts = getLocalizedPosts(data, lang).filter((post) => !post.isVideo);
         if (posts.length === 0 || entries.length >= 1000) continue;
 
-        const latestTimestamp = [...posts]
-          .map((post) => post.timestamp)
-          .filter(Boolean)
-          .sort()
-          .at(-1);
-
-        entries.push(`  <url>
-    <loc>${SITE_URL}/${lang}/week/${periodId}</loc>
+        for (const post of posts) {
+          if (entries.length >= 1000) break;
+          entries.push(`  <url>
+    <loc>${absoluteArticleUrl(SITE_URL, lang, periodId, techStoryId(post))}</loc>
     <news:news>
       <news:publication>
         <news:name>Data Cube AI</news:name>
         <news:language>${LANG_NAMES[lang]}</news:language>
       </news:publication>
-      <news:publication_date>${toNewsDate(latestTimestamp, fallbackDate)}</news:publication_date>
-      <news:title>${escapeXml(newsTitle(periodId, lang))}</news:title>
+      <news:publication_date>${toNewsDate(post.timestamp, fallbackDate)}</news:publication_date>
+      <news:title>${escapeXml(articleTitle(post.content) || newsTitle(periodId, lang))}</news:title>
     </news:news>
   </url>`);
+        }
       }
     } catch {}
   }

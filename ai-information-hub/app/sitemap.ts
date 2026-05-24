@@ -1,6 +1,14 @@
 import { MetadataRoute } from 'next'
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
+import {
+  articleHref,
+  maStoryId,
+  primaryStoryId,
+  secondaryStoryId,
+  techStoryId,
+  tipStoryId,
+} from '@/lib/article-routes'
 import { toTopicSlug } from '@/lib/topic-utils'
 import { SUPPORTED_LANGUAGES } from '@/lib/i18n'
 import { periodPublishedDate } from '@/lib/period-utils'
@@ -14,6 +22,23 @@ interface TrendsResponse {
     de?: { title?: string }[]
     en?: { title?: string }[]
   }
+}
+
+interface SitemapStoryPost {
+  id: number
+  timestamp?: string
+  isVideo?: boolean
+}
+
+interface SitemapInvestmentResponse {
+  primaryMarket?: Record<string, SitemapStoryPost[]>
+  secondaryMarket?: Record<string, SitemapStoryPost[]>
+  ma?: Record<string, SitemapStoryPost[]>
+}
+
+interface ArticleCandidate {
+  storyId: string
+  timestamp?: string
 }
 
 // `periodPublishedDate` from lib/period-utils is the shared source of truth
@@ -39,6 +64,67 @@ async function getTopicTitlesByLanguage(periodId: string, apiUrl: string): Promi
     de: (data?.trends?.de || []).map((i) => (i.title || '').trim()).filter(Boolean),
     en: (data?.trends?.en || []).map((i) => (i.title || '').trim()).filter(Boolean),
   }
+}
+
+async function getFeedFromApiOrFile<T>(periodId: string, apiUrl: string, endpoint: string, filename: string): Promise<T | null> {
+  try {
+    const res = await fetch(`${apiUrl}/${endpoint}/${periodId}`, { next: { revalidate: 3600 } })
+    if (res.ok) return (await res.json()) as T
+  } catch {
+    // Static fallback below.
+  }
+
+  try {
+    const filePath = path.join(process.cwd(), 'public', 'data', periodId, filename)
+    const raw = await readFile(filePath, 'utf-8')
+    return JSON.parse(raw) as T
+  } catch {
+    return null
+  }
+}
+
+function firstLocalizedList<T>(data: Record<string, T[]> | null | undefined): T[] {
+  if (!data) return []
+  for (const lang of SUPPORTED_LANGUAGES) {
+    const items = data[lang]
+    if (Array.isArray(items) && items.length > 0) return items
+  }
+  return []
+}
+
+async function getArticleCandidates(periodId: string, apiUrl: string): Promise<ArticleCandidate[]> {
+  const [techData, tipsData, investmentData] = await Promise.all([
+    getFeedFromApiOrFile<Record<string, SitemapStoryPost[]>>(periodId, apiUrl, 'tech', 'tech.json'),
+    getFeedFromApiOrFile<Record<string, SitemapStoryPost[]>>(periodId, apiUrl, 'tips', 'tips.json'),
+    getFeedFromApiOrFile<SitemapInvestmentResponse>(periodId, apiUrl, 'investment', 'investment.json'),
+  ])
+
+  const candidates: ArticleCandidate[] = []
+  const seen = new Set<string>()
+  const add = (storyId: string, timestamp?: string) => {
+    if (seen.has(storyId)) return
+    seen.add(storyId)
+    candidates.push({ storyId, timestamp })
+  }
+
+  const techPosts = firstLocalizedList(techData)
+  for (const post of techPosts.filter((item) => !item.isVideo).slice(0, 8)) add(techStoryId(post), post.timestamp)
+  for (const post of techPosts.filter((item) => item.isVideo).slice(0, 3)) add(techStoryId(post), post.timestamp)
+
+  for (const post of firstLocalizedList(tipsData).slice(0, 5)) add(tipStoryId(post), post.timestamp)
+  for (const post of firstLocalizedList(investmentData?.primaryMarket).slice(0, 5)) add(primaryStoryId(post), post.timestamp)
+  for (const post of firstLocalizedList(investmentData?.secondaryMarket).slice(0, 3)) add(secondaryStoryId(post), post.timestamp)
+  for (const post of firstLocalizedList(investmentData?.ma).slice(0, 3)) add(maStoryId(post), post.timestamp)
+
+  return candidates
+}
+
+function candidateLastModified(candidate: ArticleCandidate, periodId: string): Date {
+  if (candidate.timestamp) {
+    const date = new Date(candidate.timestamp)
+    if (!Number.isNaN(date.getTime())) return date
+  }
+  return lastModFromId(periodId)
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -128,6 +214,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }))
   })
 
+  const articlePeriods = await Promise.all(
+    periodIds.slice(0, 8).map(async (periodId) => ({
+      periodId,
+      candidates: await getArticleCandidates(periodId, apiUrl),
+    })),
+  )
+
+  const articleEntries = articlePeriods.flatMap(({ periodId, candidates }) =>
+    candidates.flatMap((candidate) => {
+      const lastModified = candidateLastModified(candidate, periodId)
+      const changeFrequency: 'daily' | 'weekly' = lastModified < sevenDaysAgo ? 'weekly' : 'daily'
+      return SUPPORTED_LANGUAGES.map((lang) => ({
+        url: `${baseUrl}${articleHref(lang, periodId, candidate.storyId)}`,
+        lastModified,
+        changeFrequency,
+        priority: 0.55,
+      }))
+    }),
+  )
+
   const homePriority: Record<string, number> = { de: 0.9, en: 0.9 }
   const homeDefault = 0.7
 
@@ -192,6 +298,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...langHomeEntries,
     ...toolEntries,
     ...topicEntries,
+    ...articleEntries,
     ...periodEntries,
   ]
 }

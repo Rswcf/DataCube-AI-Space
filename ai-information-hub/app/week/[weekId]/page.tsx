@@ -4,6 +4,15 @@ import { formatPeriodTitle, periodPublishedDate } from '@/lib/period-utils'
 import type { TechPost, MultilingualData, InvestmentData, TipPost, ImpactLevel } from '@/lib/types'
 import { toTopicSlug } from '@/lib/topic-utils'
 import { isSupportedLanguage, SUPPORTED_LANGUAGES, toBcp47 } from '@/lib/i18n'
+import {
+  ARTICLE_CTA_LABELS,
+  articleHref,
+  maStoryId,
+  primaryStoryId,
+  secondaryStoryId,
+  techStoryId,
+  tipStoryId,
+} from '@/lib/article-routes'
 
 // API base URL with production fallback
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api-production-3ee5.up.railway.app/api'
@@ -468,6 +477,7 @@ export default async function WeekPage({ params, searchParams }: Props) {
   }
 
   const pageUrl = `https://www.datacubeai.space/${lang}/week/${weekId}`
+  const articleLabel = ARTICLE_CTA_LABELS[lang] || ARTICLE_CTA_LABELS.en
   const publishedIso = periodPublishedDate(weekId).toISOString()
 
   // Derive modifiedTime from the max underlying item timestamp rather than
@@ -567,7 +577,9 @@ export default async function WeekPage({ params, searchParams }: Props) {
             {nonVideoTechPosts.map((post) => (
               <article id={`story-tech-${post.id}`} key={post.id} className="scroll-mt-6 border-b border-gray-200 pb-6">
                 <h3 className="text-xl font-semibold">
-                  {snippetFromContent(post.content, 100)}
+                  <a href={articleHref(lang, weekId, techStoryId(post))} className="hover:underline">
+                    {snippetFromContent(post.content, 100)}
+                  </a>
                 </h3>
                 <p className="mt-2 whitespace-pre-wrap leading-relaxed">{post.content}</p>
                 <div className="mt-3 text-sm text-gray-700 flex flex-wrap items-center gap-2">
@@ -594,6 +606,10 @@ export default async function WeekPage({ params, searchParams }: Props) {
                       </span>
                     </>
                   ) : null}
+                  <span className="text-gray-400">|</span>
+                  <a href={articleHref(lang, weekId, techStoryId(post))} className="underline hover:no-underline">
+                    {articleLabel}
+                  </a>
                 </div>
                 {Array.from(new Set([post.category, ...(post.tags || []).slice(0, 3)])).filter(Boolean).length > 0 ? (
                   <div className="mt-2 flex flex-wrap gap-2">
@@ -608,7 +624,7 @@ export default async function WeekPage({ params, searchParams }: Props) {
                     ))}
                   </div>
                 ) : null}
-                <ArticleSchema post={post} inLanguage={lang} url={`${pageUrl}#story-tech-${post.id}`} />
+                <ArticleSchema post={post} inLanguage={lang} url={`https://www.datacubeai.space${articleHref(lang, weekId, techStoryId(post))}`} />
               </article>
             ))}
           </div>
@@ -628,7 +644,9 @@ export default async function WeekPage({ params, searchParams }: Props) {
             {videoTechPosts.map((post, index) => (
               <article key={post.id} className="border-b border-gray-200 pb-6">
                 <h3 className="text-xl font-semibold">
-                  {snippetFromContent(post.content, 100)}
+                  <a href={articleHref(lang, weekId, techStoryId(post))} className="hover:underline">
+                    {snippetFromContent(post.content, 100)}
+                  </a>
                 </h3>
                 {post.videoId ? (
                   <a
@@ -648,6 +666,11 @@ export default async function WeekPage({ params, searchParams }: Props) {
                   </a>
                 ) : null}
                 <p className="mt-2 whitespace-pre-wrap leading-relaxed">{post.content}</p>
+                <p className="mt-3 text-sm">
+                  <a href={articleHref(lang, weekId, techStoryId(post))} className="underline hover:no-underline">
+                    {articleLabel}
+                  </a>
+                </p>
                 <VideoSchema video={post} />
               </article>
             ))}
@@ -679,7 +702,9 @@ export default async function WeekPage({ params, searchParams }: Props) {
               <tbody>
                 {primaryMarket.map((p: any) => (
                   <tr key={p.id}>
-                    <td className="border border-gray-200 px-2 py-1">{p.company}</td>
+                    <td className="border border-gray-200 px-2 py-1">
+                      <a href={articleHref(lang, weekId, primaryStoryId(p))} className="underline hover:no-underline">{p.company}</a>
+                    </td>
                     <td className="border border-gray-200 px-2 py-1">{p.amount}</td>
                     <td className="border border-gray-200 px-2 py-1">{p.round}</td>
                     <td className="border border-gray-200 px-2 py-1">{Array.isArray(p.investors) ? p.investors.join(', ') : p.investors}</td>
@@ -706,7 +731,9 @@ export default async function WeekPage({ params, searchParams }: Props) {
               <tbody>
                 {secondaryMarket.map((p: any) => (
                   <tr key={p.id}>
-                    <td className="border border-gray-200 px-2 py-1">{p.ticker}</td>
+                    <td className="border border-gray-200 px-2 py-1">
+                      <a href={articleHref(lang, weekId, secondaryStoryId(p))} className="underline hover:no-underline">{p.ticker}</a>
+                    </td>
                     <td className="border border-gray-200 px-2 py-1">{p.price}</td>
                     <td className={`border border-gray-200 px-2 py-1 ${String(p.change).startsWith('-') ? 'text-red-600' : 'text-green-700'}`}>{p.change}</td>
                   </tr>
@@ -733,7 +760,9 @@ export default async function WeekPage({ params, searchParams }: Props) {
               <tbody>
                 {maDeals.map((p: any) => (
                   <tr key={p.id}>
-                    <td className="border border-gray-200 px-2 py-1">{p.acquirer}</td>
+                    <td className="border border-gray-200 px-2 py-1">
+                      <a href={articleHref(lang, weekId, maStoryId(p))} className="underline hover:no-underline">{p.acquirer}</a>
+                    </td>
                     <td className="border border-gray-200 px-2 py-1">{p.target}</td>
                     <td className="border border-gray-200 px-2 py-1">{p.dealValue}</td>
                     <td className="border border-gray-200 px-2 py-1">{p.dealType}</td>
@@ -758,9 +787,16 @@ export default async function WeekPage({ params, searchParams }: Props) {
           <div className="space-y-6">
             {tips.map((tip: TipPost) => (
               <article key={tip.id} className="border-b border-gray-200 pb-6">
-                <h3 className="text-xl font-semibold">{tip.category}</h3>
+                <h3 className="text-xl font-semibold">
+                  <a href={articleHref(lang, weekId, tipStoryId(tip))} className="hover:underline">{tip.category}</a>
+                </h3>
                 <p className="mt-2 leading-relaxed">{tip.content}</p>
                 <pre className="mt-3 whitespace-pre-wrap rounded bg-gray-50 p-3 text-sm overflow-x-auto">{tip.tip}</pre>
+                <p className="mt-3 text-sm">
+                  <a href={articleHref(lang, weekId, tipStoryId(tip))} className="underline hover:no-underline">
+                    {articleLabel}
+                  </a>
+                </p>
               </article>
             ))}
           </div>

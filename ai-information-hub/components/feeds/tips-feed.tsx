@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { ExternalLink, Lightbulb, Copy, Check } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -9,6 +10,7 @@ import { FeedSkeleton } from "@/components/feeds/feed-skeleton";
 import { useSettings } from "@/lib/settings-context";
 import { getPeriodLabel } from "@/lib/period-utils";
 import { API_BASE, USE_API } from "@/lib/api-base";
+import { ARTICLE_CTA_LABELS, articleHref, tipStoryId } from "@/lib/article-routes";
 
 interface TipsFeedProps {
   weekId: string;
@@ -165,6 +167,8 @@ export function TipsFeed({ weekId, searchQuery }: TipsFeedProps) {
       {filteredPosts.map((post, index) => {
         const tipIsCodeLike = isCodeLikeTip(post.tip);
         const [headline, deck] = splitHeadlineDeck(post.content);
+        const storyHref = articleHref(language, weekId, tipStoryId(post));
+        const articleLabel = ARTICLE_CTA_LABELS[language] || ARTICLE_CTA_LABELS.en;
 
         return (
           <article
@@ -181,7 +185,9 @@ export function TipsFeed({ weekId, searchQuery }: TipsFeedProps) {
                   {post.category} · {post.difficulty} · {post.platform} · {post.timestamp}
                 </div>
                 <h2 className="mt-2 border-b border-border pb-3 font-display text-2xl font-normal leading-[1.1] text-foreground sm:text-[1.75rem]">
-                  {headline}
+                  <Link href={storyHref} className="transition-colors hover:text-primary">
+                    {headline}
+                  </Link>
                 </h2>
                 {deck && (
                   <p className="mt-3 text-[15px] leading-relaxed text-foreground sm:text-base">
@@ -240,6 +246,12 @@ export function TipsFeed({ weekId, searchQuery }: TipsFeedProps) {
                     text={`${post.content}\n\n${post.tip}`}
                     url={post.sourceUrl}
                   />
+                  <Link
+                    href={storyHref}
+                    className="ml-auto border-b border-foreground/30 font-sans text-[11px] font-extrabold uppercase tracking-[0.12em] text-foreground transition-colors hover:border-primary hover:text-primary"
+                  >
+                    {articleLabel}
+                  </Link>
                 </div>
               </div>
             </div>

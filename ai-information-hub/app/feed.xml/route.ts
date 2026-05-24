@@ -1,4 +1,5 @@
 import { NextRequest } from 'next/server';
+import { absoluteArticleUrl, techStoryId } from '@/lib/article-routes';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api-production-3ee5.up.railway.app/api';
 const SITE_URL = 'https://www.datacubeai.space';
@@ -115,13 +116,14 @@ export async function GET(request: NextRequest) {
       const title = post.content.length > 120
         ? post.content.slice(0, 117) + '...'
         : post.content;
-      const postUrl = `${SITE_URL}/${lang}/week/${post.periodId}#story-tech-${post.id}`;
+      const storyId = techStoryId(post);
+      const postUrl = absoluteArticleUrl(SITE_URL, lang, post.periodId, storyId);
       const updated = toAtomDate(post.timestamp, now);
 
       return `  <entry>
     <title>${escapeXml(title)}</title>
     <link href="${escapeXml(postUrl)}" rel="alternate" />
-    <id>tag:datacubeai.space,2026:${lang}:tech-${post.periodId}-${post.id}</id>
+    <id>tag:datacubeai.space,2026:${lang}:${post.periodId}-${storyId}</id>
     <updated>${updated}</updated>
     <summary type="text">${escapeXml(post.content)}</summary>
     <category term="${escapeXml(post.category)}" />
