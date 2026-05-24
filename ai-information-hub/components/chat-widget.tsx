@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { useSettings } from "@/lib/settings-context";
-import { isDailyId, getParentWeekId } from "@/lib/period-utils";
 import ReactMarkdown from "react-markdown";
 
 interface Message {
@@ -19,79 +18,8 @@ interface ChatWidgetProps {
   weekId: string;
 }
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
-/** Condense raw week JSON into a compact text summary for the given language. */
-function condenseWeekData(
-  tech: any,
-  investment: any,
-  tips: any,
-  trends: any,
-  lang: string
-): string {
-  const lines: string[] = [];
-
-  // Tech items
-  const techItems = tech?.[lang] ?? tech?.de ?? [];
-  if (techItems.length) {
-    lines.push("## Tech News");
-    for (const item of techItems) {
-      lines.push(`- [${item.category || "General"}] (${item.impact || "medium"}) ${item.content ?? ""}${item.source ? ` (Source: ${item.source})` : ""}`);
-    }
-  }
-
-  // Investment — primary market
-  const primary = investment?.primaryMarket?.[lang] ?? investment?.primaryMarket?.de ?? [];
-  if (primary.length) {
-    lines.push("## Primary Market");
-    for (const item of primary) {
-      lines.push(`- ${item.company}: ${item.amount || "undisclosed"} (${item.round || "N/A"})`);
-    }
-  }
-
-  // Investment — secondary market
-  const secondary = investment?.secondaryMarket?.[lang] ?? investment?.secondaryMarket?.de ?? [];
-  if (secondary.length) {
-    lines.push("## Secondary Market");
-    for (const item of secondary) {
-      lines.push(`- ${item.ticker}: ${item.price} (${item.direction === "up" ? "+" : ""}${item.change})`);
-    }
-  }
-
-  // Investment — M&A
-  const ma = investment?.ma?.[lang] ?? investment?.ma?.de ?? [];
-  if (ma.length) {
-    lines.push("## M&A");
-    for (const item of ma) {
-      lines.push(`- ${item.acquirer} → ${item.target}: ${item.dealValue || "undisclosed"}`);
-    }
-  }
-
-  // Tips
-  const tipItems = tips?.[lang] ?? tips?.de ?? [];
-  if (tipItems.length) {
-    lines.push("## Tips");
-    for (const item of tipItems) {
-      lines.push(`- [${item.difficulty || "General"}] ${item.tip ?? item.content ?? ""} (${item.platform || ""})`);
-    }
-  }
-
-  // Trends
-  const trendItems = trends?.trends?.[lang] ?? trends?.trends?.de ?? [];
-  if (trendItems.length) {
-    lines.push("## Trends");
-    for (const item of trendItems) {
-      lines.push(`- ${item.title} (${item.category || ""})`);
-    }
-  }
-
-  return lines.join("\n");
-}
-/* eslint-enable @typescript-eslint/no-explicit-any */
-
 export function ChatWidget({ weekId }: ChatWidgetProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [weekContext, setWeekContext] = useState<string>("");
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -103,59 +31,9 @@ export function ChatWidget({ weekId }: ChatWidgetProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  // Fetch week data for context — regenerate when weekId or language changes
+  // Reset conversation when the selected period or language changes.
   useEffect(() => {
-    if (!weekId) return;
-
-    const fetchForPeriod = async (periodId: string) => {
-      const apiBase = process.env.NEXT_PUBLIC_API_URL;
-      const fetchOne = async (apiPath: string, staticPath: string) => {
-        if (apiBase) {
-          try {
-            const res = await fetch(`${apiBase}${apiPath}`);
-            if (res.ok) return res.json();
-          } catch { /* fall through to static */ }
-        }
-        const res = await fetch(staticPath);
-        return res.ok ? res.json() : null;
-      };
-      return Promise.all([
-        fetchOne(`/tech/${periodId}`, `/data/${periodId}/tech.json`),
-        fetchOne(`/investment/${periodId}`, `/data/${periodId}/investment.json`),
-        fetchOne(`/tips/${periodId}`, `/data/${periodId}/tips.json`),
-        fetchOne(`/trends/${periodId}`, `/data/${periodId}/trends.json`),
-      ]);
-    };
-
-    const hasContent = (data: any[]) =>
-      data.some(
-        (obj) =>
-          obj &&
-          typeof obj === "object" &&
-          Object.values(obj).some((v) => Array.isArray(v) && (v as any[]).length > 0)
-      );
-
-    const fetchData = async () => {
-      try {
-        let [tech, investment, tips, trends] = await fetchForPeriod(weekId);
-
-        // Fallback: if daily period has no data, try parent week
-        if (!hasContent([tech, investment, tips, trends]) && isDailyId(weekId)) {
-          const parentWeek = getParentWeekId(weekId);
-          if (parentWeek) {
-            [tech, investment, tips, trends] = await fetchForPeriod(parentWeek);
-          }
-        }
-
-        const condensed = condenseWeekData(tech, investment, tips, trends, language);
-        setWeekContext(condensed);
-      } catch {
-        setWeekContext("");
-      }
-    };
-
-    fetchData();
-    setMessages([]); // Clear messages when week changes
+    setMessages([]);
   }, [weekId, language]);
 
   // Cleanup abort controller on unmount
@@ -234,7 +112,7 @@ export function ChatWidget({ weekId }: ChatWidgetProps) {
           messages: newMessages
             .slice(-10)
             .map((m) => ({ role: m.role, content: m.content })),
-          weekContext,
+          weekId,
           language,
         }),
         signal: controller.signal,
@@ -290,7 +168,7 @@ export function ChatWidget({ weekId }: ChatWidgetProps) {
       setIsLoading(false);
       abortControllerRef.current = null;
     }
-  }, [messages, weekContext, language, t]);
+  }, [messages, weekId, language, t]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

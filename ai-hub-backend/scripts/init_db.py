@@ -17,7 +17,7 @@ from pathlib import Path
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from app.database import engine, SessionLocal, Base
+from app.database import Base, get_engine, get_session_local
 from app.models import TeamMember
 from app.services.migrator import migrate_weeks_json, migrate_week_data
 
@@ -60,7 +60,7 @@ DEFAULT_TEAM_MEMBERS = [
 def create_tables():
     """Create all database tables."""
     logger.info("Creating database tables...")
-    Base.metadata.create_all(bind=engine)
+    Base.metadata.create_all(bind=get_engine())
     logger.info("Tables created successfully")
 
 
@@ -130,6 +130,7 @@ def main():
     create_tables()
 
     # Insert team members
+    SessionLocal = get_session_local()
     db = SessionLocal()
     try:
         insert_team_members(db)

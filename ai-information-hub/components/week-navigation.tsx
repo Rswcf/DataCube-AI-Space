@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import { useSettings } from "@/lib/settings-context";
 import { isDailyId, getPeriodLabel } from "@/lib/period-utils";
+import { API_BASE, USE_API } from "@/lib/api-base";
 
 interface WeekNavigationProps {
   selectedWeekId: string;
@@ -39,8 +40,7 @@ export function WeekNavigation({ selectedWeekId, onWeekChange }: WeekNavigationP
   useEffect(() => {
     const processData = (data: any) => setWeeks(data.weeks || []);
 
-    const apiBase = process.env.NEXT_PUBLIC_API_URL;
-    const fetchUrl = apiBase ? `${apiBase}/weeks` : "/data/weeks.json";
+    const fetchUrl = USE_API ? `${API_BASE}/weeks` : "/data/weeks.json";
 
     fetch(fetchUrl)
       .then((res) => {
@@ -49,7 +49,7 @@ export function WeekNavigation({ selectedWeekId, onWeekChange }: WeekNavigationP
       })
       .then(processData)
       .catch(() => {
-        if (apiBase) {
+        if (USE_API) {
           fetch("/data/weeks.json")
             .then((res) => {
               if (!res.ok) throw new Error(`HTTP ${res.status}`);

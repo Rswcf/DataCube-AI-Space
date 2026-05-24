@@ -1,6 +1,16 @@
 import { createOpenAI } from "@ai-sdk/openai";
 import { streamText } from "ai";
 import { isDailyId, getParentWeekId } from "@/lib/period-utils";
+import {
+  ApiRouteError,
+  apiErrorResponse,
+  enforceProtectedApiRequest,
+  readJsonBody,
+} from "@/lib/server/api-guard";
+import {
+  countNestedArrays,
+  isValidPeriodId,
+} from "@/lib/server/period-context";
 
 const openrouter = createOpenAI({
   baseURL: "https://openrouter.ai/api/v1",
@@ -93,16 +103,18 @@ function condenseWeekData(
 }
 
 async function fetchPeriodData(weekId: string) {
-  const apiBase = process.env.NEXT_PUBLIC_API_URL;
+  const apiBase =
+    process.env.NEXT_PUBLIC_API_URL ||
+    "https://api-production-3ee5.up.railway.app/api";
 
   const fetchOne = async (apiPath: string) => {
-    if (apiBase) {
-      try {
-        const res = await fetch(`${apiBase}${apiPath}`);
-        if (res.ok) return res.json();
-      } catch {
-        /* fall through */
-      }
+    try {
+      const res = await fetch(`${apiBase}${apiPath}`, {
+        next: { revalidate: 300 },
+      });
+      if (res.ok) return res.json();
+    } catch {
+      /* fall through */
     }
     return null;
   };
@@ -119,13 +131,7 @@ async function fetchPeriodData(weekId: string) {
 
 /** Check if fetched data has any content (non-empty arrays in at least one section). */
 function hasData(tech: any, investment: any, tips: any, trends: any): boolean {
-  const check = (obj: any) => {
-    if (!obj || typeof obj !== "object") return false;
-    return Object.values(obj).some(
-      (v) => Array.isArray(v) && v.length > 0
-    );
-  };
-  return check(tech) || check(investment) || check(tips) || check(trends);
+  return [tech, investment, tips, trends].some((obj) => countNestedArrays(obj) > 0);
 }
 
 /** Fetch data with fallback: daily → parent week → recent days in the same week. */
@@ -172,10 +178,19 @@ async function fetchPeriodDataWithFallback(weekId: string): Promise<{
 
 export async function POST(req: Request) {
   try {
-    const { weekId, language } = await req.json();
+    enforceProtectedApiRequest(req);
 
-    if (!weekId || typeof weekId !== "string") {
-      return new Response("Missing or invalid weekId", { status: 400 });
+    const { weekId, language } = await readJsonBody<{
+      weekId?: string;
+      language?: string;
+    }>(req, 16_000);
+
+    if (!isValidPeriodId(weekId)) {
+      throw new ApiRouteError(400, "Missing or invalid weekId");
+    }
+
+    if (!process.env.OPENROUTER_API_KEY) {
+      throw new ApiRouteError(503, "LLM service not configured");
     }
 
     const lang: string =
@@ -245,6 +260,6 @@ ${context}`;
     return result.toTextStreamResponse();
   } catch (error) {
     console.error("Report API error:", error);
-    return new Response("Error generating report", { status: 500 });
+    return apiErrorResponse(error);
   }
 }

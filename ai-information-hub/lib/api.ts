@@ -13,12 +13,7 @@ import type {
   TrendsData,
   MultilingualData,
 } from "@/lib/types";
-
-// API base URL - configurable via environment variable
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
-
-// Whether to use the API (true) or static JSON files (false)
-const USE_API = !!API_BASE;
+import { API_BASE, USE_API } from "@/lib/api-base";
 
 /**
  * Fetch with fallback to static JSON.

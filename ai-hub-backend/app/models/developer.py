@@ -2,10 +2,10 @@
 Developer API key model for rate-limited API access.
 """
 
-from datetime import datetime
+from datetime import date, datetime
 from typing import Optional
 
-from sqlalchemy import String, Boolean, Integer, DateTime
+from sqlalchemy import String, Boolean, Integer, Date, DateTime
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import Base
@@ -22,6 +22,7 @@ class ApiKey(Base):
     api_key: Mapped[str] = mapped_column(String(40), unique=True, index=True, nullable=False)
     tier: Mapped[str] = mapped_column(String(20), default="free")  # free/developer/business/enterprise
     calls_today: Mapped[int] = mapped_column(Integer, default=0)
+    calls_today_date: Mapped[Optional[date]] = mapped_column(Date, nullable=True)
     calls_total: Mapped[int] = mapped_column(Integer, default=0)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     last_used_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)

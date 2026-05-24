@@ -10,6 +10,7 @@ import { Cpu, TrendingUp, Lightbulb, Search, X, Settings, Sun, Moon, Languages, 
 import { LANGUAGE_OPTIONS } from "@/lib/translations";
 import { cn } from "@/lib/utils";
 import { useSettings } from "@/lib/settings-context";
+import { API_BASE, USE_API } from "@/lib/api-base";
 
 interface HomePageClientProps {
   initialWeekId?: string;
@@ -46,8 +47,7 @@ export default function HomePageClient({ initialWeekId = "" }: HomePageClientPro
     };
 
     // Try API first if configured, fall back to static JSON
-    const apiBase = process.env.NEXT_PUBLIC_API_URL;
-    const fetchUrl = apiBase ? `${apiBase}/weeks` : "/data/weeks.json";
+    const fetchUrl = USE_API ? `${API_BASE}/weeks` : "/data/weeks.json";
 
     fetch(fetchUrl)
       .then((res) => {
@@ -57,7 +57,7 @@ export default function HomePageClient({ initialWeekId = "" }: HomePageClientPro
       .then(processData)
       .catch(() => {
         // If API fails, try static JSON as fallback
-        if (apiBase) {
+        if (USE_API) {
           fetch("/data/weeks.json")
             .then((res) => {
               if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -243,8 +243,7 @@ function MobileSearchDrawer({
       }
     };
 
-    const apiBase = process.env.NEXT_PUBLIC_API_URL;
-    const fetchUrl = apiBase ? `${apiBase}/trends/${weekId}` : `/data/${weekId}/trends.json`;
+    const fetchUrl = USE_API ? `${API_BASE}/trends/${weekId}` : `/data/${weekId}/trends.json`;
 
     fetch(fetchUrl)
       .then((res) => {

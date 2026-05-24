@@ -9,6 +9,7 @@ import { VerifiedBadge } from "@/components/verified-badge";
 import { FeedSkeleton } from "@/components/feeds/feed-skeleton";
 import { useSettings } from "@/lib/settings-context";
 import { getPeriodLabel } from "@/lib/period-utils";
+import { API_BASE, USE_API } from "@/lib/api-base";
 
 interface InvestmentFeedProps {
   weekId: string;
@@ -140,9 +141,8 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
     };
 
     // Try API first if configured, fall back to static JSON
-    const apiBase = process.env.NEXT_PUBLIC_API_URL;
-    const fetchUrl = apiBase
-      ? `${apiBase}/investment/${weekId}`
+    const fetchUrl = USE_API
+      ? `${API_BASE}/investment/${weekId}`
       : `/data/${weekId}/investment.json`;
 
     fetch(fetchUrl)
@@ -153,7 +153,7 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
       .then(processData)
       .catch(() => {
         // If API fails, try static JSON as fallback
-        if (apiBase) {
+        if (USE_API) {
           fetch(`/data/${weekId}/investment.json`)
             .then((res) => {
               if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -170,8 +170,7 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
   // Fetch real-time stock data for secondary market posts
   useEffect(() => {
     const fetchRealTimeStockData = async () => {
-      const apiBase = process.env.NEXT_PUBLIC_API_URL;
-      if (!apiBase || secondaryPosts.length === 0) return;
+      if (!USE_API || secondaryPosts.length === 0) return;
 
       // Get unique tickers from secondary posts
       const tickers = [...new Set(secondaryPosts.map((p) => p.ticker).filter(Boolean))];
@@ -181,7 +180,7 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
 
       try {
         const response = await fetch(
-          `${apiBase}/stock/formatted/batch/?tickers=${tickers.join(",")}&language=${language}`
+          `${API_BASE}/stock/formatted/batch/?tickers=${tickers.join(",")}&language=${language}`
         );
         if (!response.ok) throw new Error("Failed to fetch stock data");
 

@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { useSettings } from "@/lib/settings-context";
 import { LANGUAGE_OPTIONS } from "@/lib/translations";
 import { cn } from "@/lib/utils";
+import { API_BASE, USE_API } from "@/lib/api-base";
 
 
 interface TrendItem {
@@ -72,9 +73,8 @@ export function RightSidebar({ weekId, onSearchChange }: RightSidebarProps) {
     };
 
     // Try API first if configured, fall back to static JSON
-    const apiBase = process.env.NEXT_PUBLIC_API_URL;
-    const fetchUrl = apiBase
-      ? `${apiBase}/trends/${weekId}`
+    const fetchUrl = USE_API
+      ? `${API_BASE}/trends/${weekId}`
       : `/data/${weekId}/trends.json`;
 
     fetch(fetchUrl)
@@ -82,7 +82,7 @@ export function RightSidebar({ weekId, onSearchChange }: RightSidebarProps) {
       .then(processData)
       .catch(() => {
         // If API fails, try static JSON as fallback
-        if (apiBase) {
+        if (USE_API) {
           fetch(`/data/${weekId}/trends.json`)
             .then((res) => res.json())
             .then(processData)

@@ -9,6 +9,7 @@ import { VerifiedBadge } from "@/components/verified-badge";
 import { FeedSkeleton } from "@/components/feeds/feed-skeleton";
 import { useSettings } from "@/lib/settings-context";
 import { getPeriodLabel } from "@/lib/period-utils";
+import { API_BASE, USE_API } from "@/lib/api-base";
 import type { TechPost } from "@/lib/types";
 
 interface TechFeedProps {
@@ -82,9 +83,8 @@ export function TechFeed({ weekId, searchQuery }: TechFeedProps) {
     setLoading(true);
 
     // Try API first if configured, fall back to static JSON
-    const apiBase = process.env.NEXT_PUBLIC_API_URL;
-    const fetchUrl = apiBase
-      ? `${apiBase}/tech/${weekId}`
+    const fetchUrl = USE_API
+      ? `${API_BASE}/tech/${weekId}`
       : `/data/${weekId}/tech.json`;
 
     fetch(fetchUrl)
@@ -98,7 +98,7 @@ export function TechFeed({ weekId, searchQuery }: TechFeedProps) {
       })
       .catch(() => {
         // If API fails, try static JSON as fallback
-        if (apiBase) {
+        if (USE_API) {
           fetch(`/data/${weekId}/tech.json`)
             .then((res) => {
               if (!res.ok) throw new Error(`HTTP ${res.status}`);

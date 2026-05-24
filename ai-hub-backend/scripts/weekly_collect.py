@@ -18,7 +18,7 @@ from pathlib import Path
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from app.database import SessionLocal
+from app.database import get_session_local
 from app.services.collector import run_collection
 
 logging.basicConfig(
@@ -41,6 +41,7 @@ def main():
 
     logger.info("Starting collection (weekly mode)...")
 
+    SessionLocal = get_session_local()
     db = SessionLocal()
     try:
         run_collection(db, args.week)

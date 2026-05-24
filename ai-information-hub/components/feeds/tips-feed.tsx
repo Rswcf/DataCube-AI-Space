@@ -9,6 +9,7 @@ import { VerifiedBadge } from "@/components/verified-badge";
 import { FeedSkeleton } from "@/components/feeds/feed-skeleton";
 import { useSettings } from "@/lib/settings-context";
 import { getPeriodLabel } from "@/lib/period-utils";
+import { API_BASE, USE_API } from "@/lib/api-base";
 
 interface TipsFeedProps {
   weekId: string;
@@ -64,9 +65,8 @@ export function TipsFeed({ weekId, searchQuery }: TipsFeedProps) {
     setLoading(true);
 
     // Try API first if configured, fall back to static JSON
-    const apiBase = process.env.NEXT_PUBLIC_API_URL;
-    const fetchUrl = apiBase
-      ? `${apiBase}/tips/${weekId}`
+    const fetchUrl = USE_API
+      ? `${API_BASE}/tips/${weekId}`
       : `/data/${weekId}/tips.json`;
 
     fetch(fetchUrl)
@@ -80,7 +80,7 @@ export function TipsFeed({ weekId, searchQuery }: TipsFeedProps) {
       })
       .catch(() => {
         // If API fails, try static JSON as fallback
-        if (apiBase) {
+        if (USE_API) {
           fetch(`/data/${weekId}/tips.json`)
             .then((res) => {
               if (!res.ok) throw new Error(`HTTP ${res.status}`);

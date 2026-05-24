@@ -1,5 +1,18 @@
 import { createOpenAI } from "@ai-sdk/openai";
 import { streamText } from "ai";
+import {
+  ApiRouteError,
+  apiErrorResponse,
+  enforceProtectedApiRequest,
+  readJsonBody,
+} from "@/lib/server/api-guard";
+import {
+  condensePeriodData,
+  fetchPeriodDataWithFallback,
+  isValidPeriodId,
+  LANGUAGE_NAMES,
+  normalizeLanguage,
+} from "@/lib/server/period-context";
 
 const openrouter = createOpenAI({
   baseURL: "https://openrouter.ai/api/v1",
@@ -13,20 +26,28 @@ const openrouter = createOpenAI({
 // SEC-H3: Allowed message roles - filter out any other roles (e.g., "system")
 const ALLOWED_ROLES = new Set(["user", "assistant"]);
 
-const LANGUAGE_NAMES: Record<string, string> = {
-  de: "German",
-  en: "English",
-  zh: "Chinese",
-  fr: "French",
-  es: "Spanish",
-  pt: "Portuguese",
-  ja: "Japanese",
-  ko: "Korean",
-};
-
 export async function POST(req: Request) {
   try {
-    const { messages, weekContext, language } = await req.json();
+    enforceProtectedApiRequest(req);
+
+    const { messages, weekId, language } = await readJsonBody<{
+      messages?: { role: string; content: string }[];
+      weekId?: string;
+      language?: string;
+    }>(req, 160_000);
+
+    if (!isValidPeriodId(weekId)) {
+      throw new ApiRouteError(400, "Missing or invalid weekId");
+    }
+
+    if (!process.env.OPENROUTER_API_KEY) {
+      throw new ApiRouteError(503, "LLM service not configured");
+    }
+
+    const lang = normalizeLanguage(language);
+    const { tech, investment, tips, trends } =
+      await fetchPeriodDataWithFallback(weekId);
+    const weekContext = condensePeriodData(tech, investment, tips, trends, lang);
 
     const systemPrompt = `You are the Data Cube AI Hub Assistant — a concise helper for the Data Cube AI Information Hub platform.
 
@@ -41,14 +62,15 @@ OFF-TOPIC:
 STYLE:
 - Be concise: 2-3 short paragraphs max, never exceed 300 words.
 - Cite specific news items from the context when relevant.
-- Respond in ${LANGUAGE_NAMES[language] || "English"}.
+- Respond in ${LANGUAGE_NAMES[lang] || "English"}.
 
 CONTEXT — This week's AI data:
 ${weekContext || "No data available for this week."}`;
 
     // Cap message history to last 10 messages for token budget
     // SEC-H3: Filter message roles to only allow "user" and "assistant"
-    const coreMessages = (messages || [])
+    const messageList = Array.isArray(messages) ? messages : [];
+    const coreMessages = messageList
       .filter((msg: { role: string }) => ALLOWED_ROLES.has(msg.role))
       .slice(-10)
       .map((msg: { role: string; content: string }) => ({
@@ -67,6 +89,6 @@ ${weekContext || "No data available for this week."}`;
     return result.toTextStreamResponse();
   } catch (error) {
     console.error("Chat API error:", error);
-    return new Response("Error processing request", { status: 500 });
+    return apiErrorResponse(error);
   }
 }

@@ -65,6 +65,7 @@ class UsageResponse(BaseModel):
     name: str
     tier: str
     calls_today: int
+    calls_today_date: Optional[str]
     calls_total: int
     daily_limit: Optional[int]
     created_at: str
@@ -137,6 +138,7 @@ def get_usage(
         name=record.name,
         tier=record.tier,
         calls_today=record.calls_today,
+        calls_today_date=record.calls_today_date.isoformat() if record.calls_today_date else None,
         calls_total=record.calls_total,
         daily_limit=limit,
         created_at=record.created_at.isoformat(),
@@ -207,6 +209,11 @@ def check_developer_rate_limit(request: Request, db: Session) -> Optional[ApiKey
         raise HTTPException(status_code=401, detail="Invalid API key")
     if not record.is_active:
         raise HTTPException(status_code=403, detail="API key is deactivated")
+
+    today = datetime.utcnow().date()
+    if record.calls_today_date != today:
+        record.calls_today = 0
+        record.calls_today_date = today
 
     # Check tier limit
     limit = TIER_LIMITS.get(record.tier)
