@@ -322,6 +322,17 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
         },
       ],
     },
+    twitter: {
+      card: 'summary_large_image',
+      title: t(titles, lang),
+      description: t(descriptions, lang),
+      images: [
+        {
+          url: `/api/og?period=${weekId}&lang=${lang}`,
+          alt: t(altTexts, lang),
+        },
+      ],
+    },
   }
 }
 
@@ -543,7 +554,7 @@ export default async function WeekPage({ params, searchParams }: Props) {
         ) : (
           <div className="space-y-6">
             {nonVideoTechPosts.map((post) => (
-              <article key={post.id} className="border-b border-gray-200 pb-6">
+              <article id={`story-tech-${post.id}`} key={post.id} className="scroll-mt-6 border-b border-gray-200 pb-6">
                 <h3 className="text-xl font-semibold">
                   {snippetFromContent(post.content, 100)}
                 </h3>
@@ -586,7 +597,7 @@ export default async function WeekPage({ params, searchParams }: Props) {
                     ))}
                   </div>
                 ) : null}
-                <ArticleSchema post={post} inLanguage={lang} url={`https://www.datacubeai.space/${lang}/week/${weekId}`} />
+                <ArticleSchema post={post} inLanguage={lang} url={`${pageUrl}#story-tech-${post.id}`} />
               </article>
             ))}
           </div>

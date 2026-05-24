@@ -28,6 +28,13 @@ Allow: /api/content-summary
 Disallow: /login
 Crawl-delay: 2
 
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /api/
+Allow: /api/content-summary
+Disallow: /login
+Crawl-delay: 2
+
 User-agent: PerplexityBot
 Allow: /
 Disallow: /api/
@@ -35,7 +42,28 @@ Allow: /api/content-summary
 Disallow: /login
 Crawl-delay: 2
 
+User-agent: Perplexity-User
+Allow: /
+Disallow: /api/
+Allow: /api/content-summary
+Disallow: /login
+Crawl-delay: 2
+
 User-agent: ClaudeBot
+Allow: /
+Disallow: /api/
+Allow: /api/content-summary
+Disallow: /login
+Crawl-delay: 2
+
+User-agent: Claude-SearchBot
+Allow: /
+Disallow: /api/
+Allow: /api/content-summary
+Disallow: /login
+Crawl-delay: 2
+
+User-agent: Claude-User
 Allow: /
 Disallow: /api/
 Allow: /api/content-summary

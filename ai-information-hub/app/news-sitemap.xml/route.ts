@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { formatPeriodTitle, periodPublishedDate } from '@/lib/period-utils';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api-production-3ee5.up.railway.app/api';
 const SITE_URL = 'https://www.datacubeai.space';
@@ -30,6 +31,10 @@ function escapeXml(str: string): string {
     .replace(/'/g, '&apos;');
 }
 
+function getLocalizedPosts(data: any, lang: string): TechPost[] {
+  return data?.[lang] || data?.tech?.[lang] || data?.de || data?.tech?.de || [];
+}
+
 function isWithin72Hours(dateStr: string): boolean {
   const date = new Date(dateStr);
   const now = new Date();
@@ -38,22 +43,56 @@ function isWithin72Hours(dateStr: string): boolean {
 }
 
 function periodIdToDate(id: string): string {
-  // Daily: YYYY-MM-DD → use directly
-  if (/^\d{4}-\d{2}-\d{2}$/.test(id)) return `${id}T00:00:00Z`;
-  // Weekly: YYYY-kwWW → calculate Saturday
-  const match = id.match(/^(\d{4})-kw(\d{2})$/);
-  if (match) {
-    const year = parseInt(match[1], 10);
-    const week = parseInt(match[2], 10);
-    const jan4 = new Date(Date.UTC(year, 0, 4));
-    const dayOfWeek = jan4.getUTCDay() || 7;
-    const mondayWeek1 = new Date(jan4);
-    mondayWeek1.setUTCDate(jan4.getUTCDate() - dayOfWeek + 1);
-    const saturday = new Date(mondayWeek1);
-    saturday.setUTCDate(mondayWeek1.getUTCDate() + (week - 1) * 7 + 5);
-    return saturday.toISOString();
+  return periodPublishedDate(id).toISOString();
+}
+
+function toNewsDate(value: string | undefined, fallback: string): string {
+  const date = new Date(value || fallback);
+  return Number.isNaN(date.getTime()) ? fallback : date.toISOString();
+}
+
+function getRecentPeriodIds(weeks: Week[]): string[] {
+  const recentPeriodIds: string[] = [];
+  for (const week of weeks.slice(0, 4)) {
+    if (week.days) {
+      for (const day of [...week.days].reverse()) {
+        const dateStr = periodIdToDate(day.id);
+        if (isWithin72Hours(dateStr)) {
+          recentPeriodIds.push(day.id);
+        }
+      }
+    }
+    const weekDateStr = periodIdToDate(week.id);
+    if (isWithin72Hours(weekDateStr)) {
+      recentPeriodIds.push(week.id);
+    }
   }
-  return new Date().toISOString();
+
+  if (recentPeriodIds.length === 0 && weeks.length > 0) {
+    const latest = weeks[0];
+    if (latest.days && latest.days.length > 0) {
+      recentPeriodIds.push(latest.days[latest.days.length - 1].id);
+    } else {
+      recentPeriodIds.push(latest.id);
+    }
+  }
+
+  return Array.from(new Set(recentPeriodIds));
+}
+
+function newsTitle(periodId: string, lang: string): string {
+  const periodLabel = formatPeriodTitle(periodId, lang);
+  const labels: Record<string, string> = {
+    de: `Data Cube AI KI-News ${periodLabel}`,
+    en: `Data Cube AI AI News ${periodLabel}`,
+    zh: `Data Cube AI AI新闻 ${periodLabel}`,
+    fr: `Data Cube AI Actualités IA ${periodLabel}`,
+    es: `Data Cube AI Noticias IA ${periodLabel}`,
+    pt: `Data Cube AI Notícias IA ${periodLabel}`,
+    ja: `Data Cube AI AIニュース ${periodLabel}`,
+    ko: `Data Cube AI AI 뉴스 ${periodLabel}`,
+  };
+  return labels[lang] || labels.en;
 }
 
 export async function GET() {
@@ -67,34 +106,8 @@ export async function GET() {
     }
   } catch {}
 
-  // Get all recent period IDs (last 72 hours)
-  const recentPeriodIds: string[] = [];
-  for (const week of weeks.slice(0, 4)) {
-    if (week.days) {
-      for (const day of week.days) {
-        const dateStr = periodIdToDate(day.id);
-        if (isWithin72Hours(dateStr)) {
-          recentPeriodIds.push(day.id);
-        }
-      }
-    }
-    const weekDateStr = periodIdToDate(week.id);
-    if (isWithin72Hours(weekDateStr)) {
-      recentPeriodIds.push(week.id);
-    }
-  }
+  const recentPeriodIds = getRecentPeriodIds(weeks);
 
-  // If no recent periods, use the most recent one
-  if (recentPeriodIds.length === 0 && weeks.length > 0) {
-    const latest = weeks[0];
-    if (latest.days && latest.days.length > 0) {
-      recentPeriodIds.push(latest.days[latest.days.length - 1].id);
-    } else {
-      recentPeriodIds.push(latest.id);
-    }
-  }
-
-  // Fetch tech posts for recent periods
   const entries: string[] = [];
   for (const periodId of recentPeriodIds) {
     if (entries.length >= 1000) break;
@@ -103,28 +116,29 @@ export async function GET() {
       const res = await fetch(`${API_BASE}/tech/${periodId}`, { next: { revalidate: 3600 } });
       if (!res.ok) continue;
       const data = await res.json();
-      const pubDate = periodIdToDate(periodId);
+      const fallbackDate = periodIdToDate(periodId);
 
       for (const lang of SUPPORTED_LANGS) {
-        const posts: TechPost[] = data[lang] || [];
-        for (const post of posts) {
-          if (post.isVideo || entries.length >= 1000) continue;
-          const title = post.content.length > 120
-            ? post.content.slice(0, 117) + '...'
-            : post.content;
+        const posts = getLocalizedPosts(data, lang).filter((post) => !post.isVideo);
+        if (posts.length === 0 || entries.length >= 1000) continue;
 
-          entries.push(`  <url>
+        const latestTimestamp = [...posts]
+          .map((post) => post.timestamp)
+          .filter(Boolean)
+          .sort()
+          .at(-1);
+
+        entries.push(`  <url>
     <loc>${SITE_URL}/${lang}/week/${periodId}</loc>
     <news:news>
       <news:publication>
         <news:name>Data Cube AI</news:name>
         <news:language>${LANG_NAMES[lang]}</news:language>
       </news:publication>
-      <news:publication_date>${post.timestamp || pubDate}</news:publication_date>
-      <news:title>${escapeXml(title)}</news:title>
+      <news:publication_date>${toNewsDate(latestTimestamp, fallbackDate)}</news:publication_date>
+      <news:title>${escapeXml(newsTitle(periodId, lang))}</news:title>
     </news:news>
   </url>`);
-        }
       }
     } catch {}
   }

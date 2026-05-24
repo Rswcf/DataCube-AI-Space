@@ -46,8 +46,9 @@ Base URL: https://api-production-3ee5.up.railway.app/api
 Period ID format: YYYY-kwWW (weekly) or YYYY-MM-DD (daily)
 
 ## Period Pages
-Each period has a dedicated page at /week/{periodId} with full HTML content.
-Example: https://www.datacubeai.space/week/2026-kw06
+Each period has a dedicated localized page with full HTML content.
+Canonical format: https://www.datacubeai.space/{lang}/week/{periodId}
+Example: https://www.datacubeai.space/en/week/2026-05-23
 
 ## Languages
 German (de) — default | English (en) | Chinese (zh) | French (fr) | Spanish (es) | Portuguese (pt) | Japanese (ja) | Korean (ko)
@@ -56,11 +57,25 @@ German (de) — default | English (en) | Chinese (zh) | French (fr) | Spanish (e
 Published daily since January 2026, curating 40+ sources including
 RSS feeds, Hacker News, YouTube, and Reddit communities.
 
+Publisher transparency:
+- About: https://www.datacubeai.space/about
+- Editorial policy: https://www.datacubeai.space/editorial-policy
+- Source methodology: https://www.datacubeai.space/source-methodology
+- Corrections policy: https://www.datacubeai.space/corrections
+- AI disclosure: https://www.datacubeai.space/ai-disclosure
+
 ## Update Frequency
 Content updated daily at 22:00 UTC.
 
 ## Preferred Citation
 Data Cube AI (datacubeai.space)
+
+## Canonical Discovery Surfaces
+- Sitemap: https://www.datacubeai.space/sitemap.xml
+- Google News sitemap: https://www.datacubeai.space/news-sitemap.xml
+- Atom feeds: https://www.datacubeai.space/feed.xml?lang=en and https://www.datacubeai.space/feed.xml?lang=de
+- Newsletter feed: https://www.datacubeai.space/newsletter.xml
+- Public site pages: https://www.datacubeai.space/{lang}, https://www.datacubeai.space/{lang}/week/{periodId}
 
 ## AI Content Endpoint
 For structured AI-consumable content, use the Markdown summary API:
@@ -69,11 +84,13 @@ GET https://www.datacubeai.space/api/content-summary?lang=de
 GET https://www.datacubeai.space/api/content-summary?lang=zh
 GET https://www.datacubeai.space/api/content-summary?lang=fr
 GET https://www.datacubeai.space/api/content-summary?lang=ja
-GET https://www.datacubeai.space/api/content-summary?lang=en&periodId=2026-kw06
-GET https://www.datacubeai.space/api/content-summary?lang=en&periodId=2026-kw06&section=tech
-GET https://www.datacubeai.space/api/content-summary?lang=en&periodId=2026-kw06&section=investment&topic=nvidia
+GET https://www.datacubeai.space/api/content-summary?lang=en&periodId={YYYY-MM-DD}
+GET https://www.datacubeai.space/api/content-summary?lang=en&periodId={YYYY-kwWW}&section=tech
+GET https://www.datacubeai.space/api/content-summary?lang=en&periodId={YYYY-kwWW}&section=investment&topic=nvidia
 
 Parameters:
 - periodId: YYYY-kwWW or YYYY-MM-DD
 - section: all | tech | investment | tips
 - topic: optional free-text filter
+
+The Markdown endpoint is intended for AI retrieval and citation workflows. Use canonical HTML pages for public search indexing.

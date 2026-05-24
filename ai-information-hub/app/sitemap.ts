@@ -155,6 +155,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // <link rel="canonical" href=".../de"> via app/page.tsx metadata to signal
   // consolidation while still serving content to users who arrive without a
   // language segment.
+  const trustEntries = [
+    'about',
+    'editorial-policy',
+    'source-methodology',
+    'corrections',
+    'ai-disclosure',
+    'for-teams',
+  ].map((slug) => ({
+    url: `${baseUrl}/${slug}`,
+    lastModified: new Date('2026-05-24T00:00:00Z'),
+    changeFrequency: 'monthly' as const,
+    priority: 0.4,
+  }))
+
   return [
     {
       url: `${baseUrl}/impressum`,
@@ -168,6 +182,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'monthly',
       priority: 0.3,
     },
+    ...trustEntries,
     ...langHomeEntries,
     ...toolEntries,
     ...topicEntries,

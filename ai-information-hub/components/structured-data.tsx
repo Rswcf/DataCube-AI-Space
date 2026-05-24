@@ -9,8 +9,19 @@ export function OrganizationSchema() {
     logo: 'https://www.datacubeai.space/icon.svg',
     description: 'Multilingual AI news aggregator providing daily tech, investment, and tips content in 8 languages.',
     foundingDate: '2026-01',
-    publishingPrinciples: 'https://www.datacubeai.space',
-    ethicsPolicy: 'https://www.datacubeai.space',
+    publishingPrinciples: 'https://www.datacubeai.space/editorial-policy',
+    ethicsPolicy: 'https://www.datacubeai.space/editorial-policy',
+    correctionsPolicy: 'https://www.datacubeai.space/corrections',
+    ownershipFundingInfo: 'https://www.datacubeai.space/about',
+    diversityPolicy: 'https://www.datacubeai.space/source-methodology',
+    knowsAbout: [
+      'artificial intelligence',
+      'generative AI',
+      'large language models',
+      'AI investment',
+      'AI workflows',
+      'AI policy',
+    ],
     sameAs: [],
   }
 
@@ -52,7 +63,7 @@ export function ArticleSchema({ post, inLanguage = 'de', url }: { post: TechPost
   const headline = (firstLine && firstLine.length > 0 ? firstLine : post.content).slice(0, 110)
 
   // Semantics: this is OUR summary page, not the original article.
-  //   url / mainEntityOfPage  -> the Data Cube week page (where the schema lives)
+  //   url / mainEntityOfPage  -> the Data Cube story fragment where the schema lives
   //   isBasedOn               -> the external source we summarised, if any
   // Previously mainEntityOfPage pointed at the external source, which is
   // schema.org-wrong (the "main entity" of this page IS this page).

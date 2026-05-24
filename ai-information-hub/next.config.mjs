@@ -27,6 +27,18 @@ const nextConfig = {
       },
     ]
   },
+  async rewrites() {
+    return {
+      beforeFiles: [
+        {
+          source: '/:path*',
+          has: [{ type: 'header', key: 'next-router-prefetch' }],
+          missing: [{ type: 'header', key: 'rsc' }],
+          destination: '/api/prefetch-noop',
+        },
+      ],
+    }
+  },
 }
 
 export default nextConfig

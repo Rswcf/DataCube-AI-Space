@@ -79,6 +79,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         },
       ],
     },
+    twitter: {
+      card: 'summary_large_image',
+      title: t(META_TITLES, lang),
+      description: t(META_DESCRIPTIONS, lang),
+      images: [
+        {
+          url: '/og-image.jpg',
+          alt: 'DataCube AI News Aggregator',
+        },
+      ],
+    },
   }
 }
 

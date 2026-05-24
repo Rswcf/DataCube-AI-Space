@@ -17,6 +17,11 @@ interface TechPost {
 
 interface Week {
   id: string;
+  days?: { id: string }[];
+}
+
+interface FeedPost extends TechPost {
+  periodId: string;
 }
 
 function escapeXml(str: string): string {
@@ -28,19 +33,36 @@ function escapeXml(str: string): string {
     .replace(/'/g, '&apos;');
 }
 
+function toAtomDate(value: string | undefined, fallback: string): string {
+  const date = new Date(value || fallback);
+  return Number.isNaN(date.getTime()) ? fallback : date.toISOString();
+}
+
+function getRecentPeriodIds(weeks: Week[], limit = 14): string[] {
+  const ids: string[] = [];
+  for (const week of weeks) {
+    const days = [...(week.days || [])].reverse().map((day) => day.id);
+    ids.push(...days, week.id);
+  }
+  return Array.from(new Set(ids)).slice(0, limit);
+}
+
+function getLocalizedPosts(data: any, lang: string): TechPost[] {
+  return data?.[lang] || data?.tech?.[lang] || data?.de || data?.tech?.de || [];
+}
+
 export async function GET(request: NextRequest) {
   const SUPPORTED_LANGS = ['de', 'en', 'zh', 'fr', 'es', 'pt', 'ja', 'ko'] as const;
   type Lang = typeof SUPPORTED_LANGS[number];
   const rawLang = request.nextUrl.searchParams.get('lang') || 'de';
   const lang: Lang = SUPPORTED_LANGS.includes(rawLang as Lang) ? (rawLang as Lang) : 'de';
 
-  // Fetch weeks to get the latest 7 periods
   let weekIds: string[] = [];
   try {
     const weeksRes = await fetch(`${API_BASE}/weeks`, { next: { revalidate: 3600 } });
     if (weeksRes.ok) {
       const data = await weeksRes.json();
-      weekIds = (data.weeks || []).slice(0, 7).map((w: Week) => w.id);
+      weekIds = getRecentPeriodIds(data.weeks || []);
     }
   } catch {}
 
@@ -50,15 +72,14 @@ export async function GET(request: NextRequest) {
     });
   }
 
-  // Fetch tech posts for the latest weeks
-  const allPosts: TechPost[] = [];
-  for (const weekId of weekIds) {
+  const allPosts: FeedPost[] = [];
+  for (const periodId of weekIds) {
     try {
-      const res = await fetch(`${API_BASE}/tech/${weekId}`, { next: { revalidate: 3600 } });
+      const res = await fetch(`${API_BASE}/tech/${periodId}`, { next: { revalidate: 3600 } });
       if (res.ok) {
         const data = await res.json();
-        const posts: TechPost[] = data[lang] || [];
-        allPosts.push(...posts);
+        const posts = getLocalizedPosts(data, lang);
+        allPosts.push(...posts.map((post) => ({ ...post, periodId })));
       }
     } catch {}
   }
@@ -88,25 +109,33 @@ export async function GET(request: NextRequest) {
 
   const entries = allPosts
     .filter(post => !post.isVideo)
+    .sort((a, b) => (b.timestamp || '').localeCompare(a.timestamp || ''))
+    .slice(0, 50)
     .map(post => {
       const title = post.content.length > 120
         ? post.content.slice(0, 117) + '...'
         : post.content;
-      const postUrl = post.sourceUrl || `${SITE_URL}/week/${weekIds[0]}`;
+      const postUrl = `${SITE_URL}/${lang}/week/${post.periodId}#story-tech-${post.id}`;
+      const updated = toAtomDate(post.timestamp, now);
 
       return `  <entry>
     <title>${escapeXml(title)}</title>
     <link href="${escapeXml(postUrl)}" rel="alternate" />
-    <id>tag:datacubeai.space,2026:tech-${post.id}</id>
-    <updated>${post.timestamp || now}</updated>
+    <id>tag:datacubeai.space,2026:${lang}:tech-${post.periodId}-${post.id}</id>
+    <updated>${updated}</updated>
     <summary type="text">${escapeXml(post.content)}</summary>
     <category term="${escapeXml(post.category)}" />
     <source>
       <title>${escapeXml(post.source)}</title>
+      ${post.sourceUrl ? `<link href="${escapeXml(post.sourceUrl)}" />` : ''}
     </source>
   </entry>`;
     })
     .join('\n');
+
+  const feedUpdated = allPosts.length > 0
+    ? toAtomDate([...allPosts].sort((a, b) => (b.timestamp || '').localeCompare(a.timestamp || ''))[0]?.timestamp, now)
+    : now;
 
   const atom = `<?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="${lang}">
@@ -115,7 +144,7 @@ export async function GET(request: NextRequest) {
   <link href="${SITE_URL}/feed.xml?lang=${lang}" rel="self" type="application/atom+xml" />
   <link href="${SITE_URL}" rel="alternate" type="text/html" />
   <id>tag:datacubeai.space,2026:feed:${lang}</id>
-  <updated>${now}</updated>
+  <updated>${feedUpdated}</updated>
   <author>
     <name>Data Cube AI</name>
     <uri>${SITE_URL}</uri>

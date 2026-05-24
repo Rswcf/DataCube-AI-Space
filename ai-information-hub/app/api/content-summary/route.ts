@@ -98,6 +98,7 @@ export async function GET(request: NextRequest) {
       headers: {
         'Content-Type': 'text/markdown; charset=utf-8',
         'Cache-Control': 'public, s-maxage=3600',
+        'X-Robots-Tag': 'noindex, follow',
       },
     });
   }
@@ -275,6 +276,7 @@ export async function GET(request: NextRequest) {
     headers: {
       'Content-Type': 'text/markdown; charset=utf-8',
       'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=600',
+      'X-Robots-Tag': 'noindex, follow',
     },
   });
 }

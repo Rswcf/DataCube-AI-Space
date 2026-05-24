@@ -11,8 +11,12 @@ const CRAWLER_PATTERNS = [
   'slurp',
   'gptbot',
   'chatgpt-user',
+  'oai-searchbot',
   'perplexitybot',
+  'perplexity-user',
   'claudebot',
+  'claude-searchbot',
+  'claude-user',
   'anthropic-ai',
   'google-extended',
   'cohere-ai',
@@ -44,19 +48,6 @@ function isCrawler(request: NextRequest): boolean {
   return CRAWLER_PATTERNS.some((pattern) => ua.includes(pattern))
 }
 
-function isLikelyHumanBrowser(request: NextRequest): boolean {
-  const ua = request.headers.get('user-agent')?.toLowerCase() || ''
-  if (!ua) return false
-
-  const browserSignatures = ['chrome/', 'safari/', 'firefox/', 'edg/', 'opr/', 'mobile/']
-  const automationHints = ['bot', 'spider', 'crawler', 'curl/', 'wget/', 'python-requests', 'headless', 'lighthouse']
-
-  const hasBrowserSignature = browserSignatures.some((signature) => ua.includes(signature))
-  const hasAutomationHint = automationHints.some((hint) => ua.includes(hint))
-
-  return hasBrowserSignature && !hasAutomationHint
-}
-
 const LANG_RE = '(?:de|en|zh|fr|es|pt|ja|ko)'
 
 function isLocalizablePath(pathname: string): boolean {
@@ -78,6 +69,11 @@ const LOGIN_BYPASS_PATHS = new Set([
   '/datenschutz',
   '/for-teams',
   '/premium',
+  '/about',
+  '/editorial-policy',
+  '/source-methodology',
+  '/corrections',
+  '/ai-disclosure',
 ])
 
 function isSeoAlwaysAllowedPath(pathname: string): boolean {
@@ -100,6 +96,10 @@ function nextWithLang(request: NextRequest): NextResponse {
   const lang = isSupportedLanguage(langSegment) ? langSegment : 'de'
 
   const requestHeaders = new Headers(request.headers)
+  if (requestHeaders.get('next-router-prefetch') && !requestHeaders.get('rsc')) {
+    requestHeaders.delete('next-router-prefetch')
+    requestHeaders.delete('next-router-segment-prefetch')
+  }
   requestHeaders.set('x-lang', lang)
   return NextResponse.next({ request: { headers: requestHeaders } })
 }
@@ -117,11 +117,19 @@ export function middleware(request: NextRequest) {
     return nextWithLang(request)
   }
 
-  // Informational/marketing pages bypass login gate for ALL visitors (human or bot).
-  // SEO content paths bypass for crawlers and non-human browsers only.
-  const isPublicInfoPage = LOGIN_BYPASS_PATHS.has(pathname)
-  const isSeoAutomationPass = isSeoAlwaysAllowedPath(pathname) && !isLikelyHumanBrowser(request)
-  const shouldBypassLoginGate = isPublicInfoPage || isCrawler(request) || isSeoAutomationPass
+  if (request.headers.get('next-router-prefetch') && !request.headers.get('rsc')) {
+    return new NextResponse(null, {
+      status: 204,
+      headers: {
+        'Cache-Control': 'private, no-store',
+        'X-Robots-Tag': 'noindex, follow',
+      },
+    })
+  }
+
+  // Public SEO and marketing pages must serve the same primary content to
+  // humans, search crawlers, AI retrieval bots, and framework prefetches.
+  const shouldBypassLoginGate = isSeoAlwaysAllowedPath(pathname) || isCrawler(request)
   if (!shouldBypassLoginGate) {
     const hasVisited = request.cookies.get('visited')
     if (!hasVisited) {

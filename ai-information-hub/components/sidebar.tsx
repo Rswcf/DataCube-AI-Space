@@ -208,7 +208,13 @@ export function Sidebar({ activeTab, onTabChange, selectedWeekId, onWeekChange }
         </div>
 
         {/* Legal Links */}
-        <div className="mt-2 hidden gap-3 border-t border-sidebar-border px-4 pt-3 xl:flex">
+        <div className="mt-2 hidden flex-wrap gap-x-3 gap-y-1 border-t border-sidebar-border px-4 pt-3 xl:flex">
+          <a href="/about" className="text-xs text-muted-foreground hover:text-foreground transition-colors focus-visible:ring-2 focus-visible:ring-ring rounded">
+            {language === "de" ? "Über uns" : "About"}
+          </a>
+          <a href="/editorial-policy" className="text-xs text-muted-foreground hover:text-foreground transition-colors focus-visible:ring-2 focus-visible:ring-ring rounded">
+            {language === "de" ? "Redaktion" : "Editorial"}
+          </a>
           <a href="/impressum" className="text-xs text-muted-foreground hover:text-foreground transition-colors focus-visible:ring-2 focus-visible:ring-ring rounded">
             {language === "de" ? "Impressum" : "Legal Notice"}
           </a>

@@ -92,6 +92,12 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Data Cube AI | Daily AI News',
     description: 'Daily AI news digest: tech breakthroughs, investment signals, and practical tips – free in 8 languages.',
+    images: [
+      {
+        url: '/og-image.jpg',
+        alt: 'Data Cube AI – Where AI meets human insight',
+      },
+    ],
   },
 
   // Robots
