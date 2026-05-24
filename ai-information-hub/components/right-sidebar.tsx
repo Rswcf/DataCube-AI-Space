@@ -1,49 +1,14 @@
 "use client";
 
-import React from "react"
-
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { Search, Check, TrendingUp, Loader2, ArrowLeft } from "lucide-react";
+import { Search, Check, Loader2, ArrowLeft } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { TrendIndex } from "@/components/trend-index";
+import { usePeriodTrends } from "@/hooks/use-period-trends";
 import { useSettings } from "@/lib/settings-context";
 import { LANGUAGE_OPTIONS } from "@/lib/translations";
 import { cn } from "@/lib/utils";
-import { API_BASE, USE_API } from "@/lib/api-base";
-
-
-interface TrendItem {
-  category: string;
-  title: string;
-}
-
-// Fallback data in case JSON fetch fails
-const fallbackTrends: Record<string, TrendItem[]> = {
-  de: [
-    { category: "KI · Trend", title: "GPT-5" },
-    { category: "Technologie · Trend", title: "NVIDIA Blackwell" },
-    { category: "Finanzen · Trend", title: "KI-Aktien" },
-    { category: "Wissenschaft · Trend", title: "AlphaFold 3" },
-    { category: "Startups · Trend", title: "Anthropic" },
-    { category: "KI · Trend", title: "Open-Source LLMs" },
-    { category: "Technologie · Trend", title: "KI-Agenten" },
-    { category: "Finanzen · Trend", title: "KI-Infrastruktur" },
-    { category: "Wissenschaft · Trend", title: "Multimodale KI" },
-    { category: "Startups · Trend", title: "KI-Regulierung" },
-  ],
-  en: [
-    { category: "AI · Trending", title: "GPT-5" },
-    { category: "Technology · Trending", title: "NVIDIA Blackwell" },
-    { category: "Finance · Trending", title: "AI Stocks" },
-    { category: "Science · Trending", title: "AlphaFold 3" },
-    { category: "Startups · Trending", title: "Anthropic" },
-    { category: "AI · Trending", title: "Open-Source LLMs" },
-    { category: "Technology · Trending", title: "AI Agents" },
-    { category: "Finance · Trending", title: "AI Infrastructure" },
-    { category: "Science · Trending", title: "Multimodal AI" },
-    { category: "Startups · Trending", title: "AI Regulation" },
-  ],
-};
 
 
 interface RightSidebarProps {
@@ -60,38 +25,15 @@ export function RightSidebar({ weekId, onSearchChange }: RightSidebarProps) {
   const { language, t } = useSettings();
 
   const [searchValue, setSearchValue] = useState("");
-  const [trends, setTrends] = useState<TrendItem[]>(fallbackTrends[language] || fallbackTrends.en);
+  const { trends, loading: trendsLoading } = usePeriodTrends(weekId, language);
   const [email, setEmail] = useState("");
   const [subscribeState, setSubscribeState] = useState<"idle" | "selectLang" | "loading" | "success" | "error">("idle");
   const [newsletterLang, setNewsletterLang] = useState(language);
 
-  useEffect(() => {
-    const processData = (data: any) => {
-      if (data.trends) {
-        setTrends(data.trends[language] || data.trends["de"] || fallbackTrends[language] || fallbackTrends.en);
-      }
-    };
-
-    // Try API first if configured, fall back to static JSON
-    const fetchUrl = USE_API
-      ? `${API_BASE}/trends/${weekId}`
-      : `/data/${weekId}/trends.json`;
-
-    fetch(fetchUrl)
-      .then((res) => res.json())
-      .then(processData)
-      .catch(() => {
-        // If API fails, try static JSON as fallback
-        if (USE_API) {
-          fetch(`/data/${weekId}/trends.json`)
-            .then((res) => res.json())
-            .then(processData)
-            .catch(() => setTrends(fallbackTrends[language] || fallbackTrends.en));
-        } else {
-          setTrends(fallbackTrends[language] || fallbackTrends.en);
-        }
-      });
-  }, [weekId, language]);
+  const handleTrendFilter = (query: string) => {
+    setSearchValue(query);
+    onSearchChange(query);
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -276,33 +218,14 @@ export function RightSidebar({ weekId, onSearchChange }: RightSidebarProps) {
           </div>
         </div>
 
-        {/* Trends */}
-        <div className="mt-4 border-t-2 border-foreground bg-card p-4">
-          <div className="flex items-center justify-between gap-2 border-b border-border pb-3">
-            <h2 className="font-sans text-[11px] font-extrabold uppercase tracking-[0.16em] text-primary">{t("whatsNew")}</h2>
-            <TrendingUp aria-hidden="true" className="h-4 w-4 text-primary" />
-          </div>
-          <div className="mt-1">
-            {trends.slice(0, 10).map((trend, index) => (
-              <button
-                key={index}
-                type="button"
-                onClick={() => onSearchChange(trend.title)}
-                className="flex w-full cursor-pointer items-start gap-3 border-b border-border py-3 text-left transition-colors hover:bg-secondary/70"
-              >
-                <span className="w-8 shrink-0 select-none font-display text-2xl font-normal leading-none tabular-nums text-primary">
-                  {String(index + 1).padStart(2, "0")}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="font-sans text-[10px] font-bold uppercase tracking-[0.12em] text-muted-foreground">{trend.category}</p>
-                  <p className="font-display text-lg font-normal leading-tight text-foreground">
-                    {trend.title}
-                  </p>
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
+        <TrendIndex
+          trends={trends}
+          heading={t("whatsNew")}
+          language={language}
+          periodId={weekId}
+          loading={trendsLoading}
+          onFilter={handleTrendFilter}
+        />
 
         {/* Footer */}
         <div className="mt-4 px-2 text-xs text-muted-foreground">

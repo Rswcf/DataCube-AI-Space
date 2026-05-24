@@ -16,11 +16,12 @@ type TopicSection = (typeof TOPIC_SECTIONS)[number]
 
 type Props = {
   params: Promise<{ lang: string; topic: string }>
-  searchParams: Promise<{ page?: string; period?: string; section?: string }>
+  searchParams: Promise<{ page?: string; period?: string; q?: string; section?: string }>
 }
 
 interface WeekEntry {
   id: string
+  days?: { id: string }[]
 }
 
 interface WeeksResponse {
@@ -73,8 +74,23 @@ type TopicBucket = {
   tips: TipPost[]
 }
 
-function toSearchTerms(topicSlug: string): string[] {
-  return topicSlugToQuery(topicSlug)
+function normalizeTopicQuery(value: string | undefined): string {
+  const trimmed = (value || '').trim()
+  return trimmed.length > 0 && trimmed.length <= 180 ? trimmed : ''
+}
+
+function topicQueryToSearchText(topicSlug: string, queryText: string): string {
+  if (!queryText) return topicSlugToQuery(topicSlug)
+  const querySlug = toTopicSlug(queryText)
+  return topicSlugToQuery(querySlug) || topicSlugToQuery(topicSlug)
+}
+
+function topicDisplayTitle(topicSlug: string, queryText: string): string {
+  return queryText || topicSlugToTitle(topicSlug)
+}
+
+function toSearchTerms(topicSlug: string, queryText = ''): string[] {
+  return topicQueryToSearchText(topicSlug, queryText)
     .split(' ')
     .map((term) => term.trim())
     .filter(Boolean)
@@ -121,10 +137,11 @@ function bucketResultCount(bucket: TopicBucket): number {
 function buildTopicHref(
   lang: AppLanguage,
   topic: string,
-  opts: { page?: number; period?: string; section?: TopicSection; hash?: string }
+  opts: { page?: number; period?: string; q?: string; section?: TopicSection; hash?: string }
 ): string {
   const params = new URLSearchParams()
   if (opts.period) params.set('period', opts.period)
+  if (opts.q) params.set('q', opts.q)
   if (opts.section && opts.section !== 'all') params.set('section', opts.section)
   if (opts.page && opts.page > 1) params.set('page', String(opts.page))
 
@@ -156,9 +173,14 @@ async function getWeeks(): Promise<WeekEntry[]> {
   }
 }
 
-async function getTopicBuckets(terms: string[], language: AppLanguage): Promise<TopicBucket[]> {
+function getCandidatePeriodIds(weeks: WeekEntry[], preferredPeriodId?: string): string[] {
+  if (preferredPeriodId) return [preferredPeriodId]
+  return weeks.slice(0, 6).map((w) => w.id)
+}
+
+async function getTopicBuckets(terms: string[], language: AppLanguage, preferredPeriodId?: string): Promise<TopicBucket[]> {
   const weeks = await getWeeks()
-  const periodIds = weeks.slice(0, 6).map((w) => w.id)
+  const periodIds = getCandidatePeriodIds(weeks, preferredPeriodId)
 
   const bucketCandidates = await Promise.all(
     periodIds.map(async (periodId) => {
@@ -337,7 +359,8 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   if (!isSupportedLanguage(lang)) return {}
   const query = await searchParams
 
-  const topicTitle = topicSlugToTitle(topic)
+  const topicQuery = normalizeTopicQuery(query.q)
+  const topicTitle = topicDisplayTitle(topic, topicQuery)
   const localizedUrl = `https://www.datacubeai.space/${lang}/topic/${topic}`
   const section = parseSection(query.section)
   const period = isValidPeriodId(query.period) ? query.period : ''
@@ -436,21 +459,24 @@ export default async function TopicPage({ params, searchParams }: Props) {
   if (!isSupportedLanguage(lang)) notFound()
 
   const query = await searchParams
-  const terms = toSearchTerms(topic)
+  const topicQuery = normalizeTopicQuery(query.q)
+  const terms = toSearchTerms(topic, topicQuery)
   if (terms.length === 0) notFound()
 
-  const buckets = await getTopicBuckets(terms, lang)
-  const topicTitle = topicSlugToTitle(topic)
+  const periodFilter = isValidPeriodId(query.period) ? query.period : ''
+  const buckets = await getTopicBuckets(terms, lang, periodFilter || undefined)
+  const topicTitle = topicDisplayTitle(topic, topicQuery)
+  const topicQueryParam = topicQuery || undefined
   const sectionFilter = parseSection(query.section)
   const sectionBuckets = buckets
     .map((bucket) => projectBucketBySection(bucket, sectionFilter))
     .filter((bucket) => bucketResultCount(bucket) > 0)
 
   const availablePeriods = sectionBuckets.map((bucket) => bucket.periodId)
-  const periodFilter = query.period && availablePeriods.includes(query.period) ? query.period : ''
+  const activePeriodFilter = periodFilter && availablePeriods.includes(periodFilter) ? periodFilter : ''
 
-  const filteredBuckets = periodFilter
-    ? sectionBuckets.filter((bucket) => bucket.periodId === periodFilter)
+  const filteredBuckets = activePeriodFilter
+    ? sectionBuckets.filter((bucket) => bucket.periodId === activePeriodFilter)
     : sectionBuckets
 
   const requestedPage = parsePositiveInt(query.page)
@@ -501,7 +527,7 @@ export default async function TopicPage({ params, searchParams }: Props) {
           {TOPIC_SECTIONS.map((section) => (
             <a
               key={section}
-              href={buildTopicHref(lang, topic, { section, period: periodFilter || undefined })}
+              href={buildTopicHref(lang, topic, { section, period: periodFilter || undefined, q: topicQueryParam })}
               className={`rounded-full border px-3 py-1 text-xs focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${sectionFilter === section ? 'border-primary text-primary' : 'border-border text-muted-foreground'}`}
             >
               {sectionTitle[section]}
@@ -512,7 +538,7 @@ export default async function TopicPage({ params, searchParams }: Props) {
         {availablePeriods.length > 0 ? (
           <nav className="mt-3 flex flex-wrap items-center gap-2" aria-label="Period filter">
             <a
-              href={buildTopicHref(lang, topic, { section: sectionFilter })}
+              href={buildTopicHref(lang, topic, { section: sectionFilter, q: topicQueryParam })}
               className={`rounded-full border px-3 py-1 text-xs focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${periodFilter ? 'border-border text-muted-foreground' : 'border-primary text-primary'}`}
             >
               {t({ de: 'Alle Zeiträume', en: 'All periods', zh: '所有时段', fr: 'Toutes les périodes', es: 'Todos los periodos', pt: 'Todos os períodos', ja: '全期間', ko: '전체 기간' })}
@@ -520,7 +546,7 @@ export default async function TopicPage({ params, searchParams }: Props) {
             {availablePeriods.slice(0, 12).map((periodId) => (
               <a
                 key={periodId}
-                href={buildTopicHref(lang, topic, { period: periodId, section: sectionFilter })}
+                href={buildTopicHref(lang, topic, { period: periodId, section: sectionFilter, q: topicQueryParam })}
                 className={`rounded-full border px-3 py-1 text-xs focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${periodFilter === periodId ? 'border-primary text-primary' : 'border-border text-muted-foreground'}`}
               >
                 {periodId}
@@ -554,7 +580,7 @@ export default async function TopicPage({ params, searchParams }: Props) {
                           <p className="text-sm text-muted-foreground">{post.category} • {post.source}</p>
                           <a
                             className="text-xs text-muted-foreground underline"
-                            href={buildTopicHref(lang, topic, { period: bucket.periodId, section: sectionFilter, hash: anchorId })}
+                            href={buildTopicHref(lang, topic, { period: bucket.periodId, q: topicQueryParam, section: sectionFilter, hash: anchorId })}
                           >
                             {t({ de: 'Direktlink', en: 'Permalink', zh: '永久链接', fr: 'Lien permanent', es: 'Enlace permanente', pt: 'Link permanente', ja: 'パーマリンク', ko: '퍼머링크' })}
                           </a>
@@ -575,7 +601,7 @@ export default async function TopicPage({ params, searchParams }: Props) {
                         <li id={anchorId} key={`pm-${bucket.periodId}-${post.id}`} className="scroll-mt-20 border-l-2 border-border pl-3">
                           <p className="font-medium">{post.company} • {post.round}</p>
                           <p className="text-sm text-muted-foreground">{post.content}</p>
-                          <a className="text-xs text-muted-foreground underline" href={buildTopicHref(lang, topic, { period: bucket.periodId, section: sectionFilter, hash: anchorId })}>
+                          <a className="text-xs text-muted-foreground underline" href={buildTopicHref(lang, topic, { period: bucket.periodId, q: topicQueryParam, section: sectionFilter, hash: anchorId })}>
                             {t({ de: 'Direktlink', en: 'Permalink', zh: '永久链接', fr: 'Lien permanent', es: 'Enlace permanente', pt: 'Link permanente', ja: 'パーマリンク', ko: '퍼머링크' })}
                           </a>
                         </li>
@@ -587,7 +613,7 @@ export default async function TopicPage({ params, searchParams }: Props) {
                         <li id={anchorId} key={`sm-${bucket.periodId}-${post.id}`} className="scroll-mt-20 border-l-2 border-border pl-3">
                           <p className="font-medium">{post.ticker}</p>
                           <p className="text-sm text-muted-foreground">{post.content}</p>
-                          <a className="text-xs text-muted-foreground underline" href={buildTopicHref(lang, topic, { period: bucket.periodId, section: sectionFilter, hash: anchorId })}>
+                          <a className="text-xs text-muted-foreground underline" href={buildTopicHref(lang, topic, { period: bucket.periodId, q: topicQueryParam, section: sectionFilter, hash: anchorId })}>
                             {t({ de: 'Direktlink', en: 'Permalink', zh: '永久链接', fr: 'Lien permanent', es: 'Enlace permanente', pt: 'Link permanente', ja: 'パーマリンク', ko: '퍼머링크' })}
                           </a>
                         </li>
@@ -599,7 +625,7 @@ export default async function TopicPage({ params, searchParams }: Props) {
                         <li id={anchorId} key={`ma-${bucket.periodId}-${post.id}`} className="scroll-mt-20 border-l-2 border-border pl-3">
                           <p className="font-medium">{post.acquirer} → {post.target}</p>
                           <p className="text-sm text-muted-foreground">{post.content}</p>
-                          <a className="text-xs text-muted-foreground underline" href={buildTopicHref(lang, topic, { period: bucket.periodId, section: sectionFilter, hash: anchorId })}>
+                          <a className="text-xs text-muted-foreground underline" href={buildTopicHref(lang, topic, { period: bucket.periodId, q: topicQueryParam, section: sectionFilter, hash: anchorId })}>
                             {t({ de: 'Direktlink', en: 'Permalink', zh: '永久链接', fr: 'Lien permanent', es: 'Enlace permanente', pt: 'Link permanente', ja: 'パーマリンク', ko: '퍼머링크' })}
                           </a>
                         </li>
@@ -619,7 +645,7 @@ export default async function TopicPage({ params, searchParams }: Props) {
                         <li id={anchorId} key={`tip-${bucket.periodId}-${tip.id}`} className="scroll-mt-20 border-l-2 border-border pl-3">
                           <p className="font-medium">{tip.category}</p>
                           <p className="text-sm text-muted-foreground">{tip.content}</p>
-                          <a className="text-xs text-muted-foreground underline" href={buildTopicHref(lang, topic, { period: bucket.periodId, section: sectionFilter, hash: anchorId })}>
+                          <a className="text-xs text-muted-foreground underline" href={buildTopicHref(lang, topic, { period: bucket.periodId, q: topicQueryParam, section: sectionFilter, hash: anchorId })}>
                             {t({ de: 'Direktlink', en: 'Permalink', zh: '永久链接', fr: 'Lien permanent', es: 'Enlace permanente', pt: 'Link permanente', ja: 'パーマリンク', ko: '퍼머링크' })}
                           </a>
                         </li>
@@ -636,7 +662,7 @@ export default async function TopicPage({ params, searchParams }: Props) {
       {filteredBuckets.length > PAGE_SIZE ? (
         <nav className="mt-10 flex items-center justify-between border-t border-border pt-4" aria-label="Topic pagination">
           {currentPage > 1 ? (
-            <a className="underline focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded" href={buildTopicHref(lang, topic, { period: periodFilter || undefined, section: sectionFilter, page: currentPage - 1 })}>
+            <a className="underline focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded" href={buildTopicHref(lang, topic, { period: periodFilter || undefined, q: topicQueryParam, section: sectionFilter, page: currentPage - 1 })}>
               {t({ de: '← Vorherige', en: '← Previous', zh: '← 上一页', fr: '← Précédent', es: '← Anterior', pt: '← Anterior', ja: '← 前へ', ko: '← 이전' })}
             </a>
           ) : (
@@ -648,7 +674,7 @@ export default async function TopicPage({ params, searchParams }: Props) {
           </span>
 
           {currentPage < totalPages ? (
-            <a className="underline focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded" href={buildTopicHref(lang, topic, { period: periodFilter || undefined, section: sectionFilter, page: currentPage + 1 })}>
+            <a className="underline focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded" href={buildTopicHref(lang, topic, { period: periodFilter || undefined, q: topicQueryParam, section: sectionFilter, page: currentPage + 1 })}>
               {t({ de: 'Nächste →', en: 'Next →', zh: '下一页 →', fr: 'Suivant →', es: 'Siguiente →', pt: 'Próximo →', ja: '次へ →', ko: '다음 →' })}
             </a>
           ) : (

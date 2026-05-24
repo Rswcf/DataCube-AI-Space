@@ -6,7 +6,9 @@ import { Feed } from "@/components/feed";
 import { RightSidebar } from "@/components/right-sidebar";
 import { ChatWidget } from "@/components/chat-widget";
 import { ReportGenerator } from "@/components/report-generator";
+import { TrendIndex } from "@/components/trend-index";
 import { Cpu, TrendingUp, Lightbulb, Search, X, Settings, Sun, Moon, Languages, Check, Loader2, ArrowLeft } from "lucide-react";
+import { usePeriodTrends } from "@/hooks/use-period-trends";
 import { LANGUAGE_OPTIONS } from "@/lib/translations";
 import { cn } from "@/lib/utils";
 import { useSettings } from "@/lib/settings-context";
@@ -111,7 +113,7 @@ export default function HomePageClient({ initialWeekId = "" }: HomePageClientPro
       {/* Mobile Search Drawer */}
       <MobileSearchDrawer
         isOpen={showMobileSearch}
-        onClose={() => { setShowMobileSearch(false); setSearchQuery(""); }}
+        onClose={() => setShowMobileSearch(false)}
         weekId={selectedWeekId}
         onSearchChange={setSearchQuery}
       />
@@ -185,29 +187,6 @@ function MobileNav({
   );
 }
 
-// Fallback trends data (used when API is unavailable)
-const fallbackTrendsEN = [
-  { category: "AI · Trending", title: "GPT-5" },
-  { category: "Technology · Trending", title: "NVIDIA Blackwell" },
-  { category: "Finance · Trending", title: "AI Stocks" },
-  { category: "Science · Trending", title: "AlphaFold 3" },
-  { category: "Startups · Trending", title: "Anthropic" },
-];
-const fallbackTrends: Record<string, { category: string; title: string }[]> = {
-  de: [
-    { category: "KI · Trend", title: "GPT-5" },
-    { category: "Technologie · Trend", title: "NVIDIA Blackwell" },
-    { category: "Finanzen · Trend", title: "KI-Aktien" },
-    { category: "Wissenschaft · Trend", title: "AlphaFold 3" },
-    { category: "Startups · Trend", title: "Anthropic" },
-  ],
-  en: fallbackTrendsEN,
-};
-
-function getFallbackTrends(lang: string) {
-  return fallbackTrends[lang] || fallbackTrendsEN;
-}
-
 function MobileSearchDrawer({
   isOpen,
   onClose,
@@ -221,7 +200,7 @@ function MobileSearchDrawer({
 }) {
   const { language, t } = useSettings();
   const [searchValue, setSearchValue] = useState("");
-  const [trends, setTrends] = useState<{ category: string; title: string }[]>(getFallbackTrends(language));
+  const { trends, loading: trendsLoading } = usePeriodTrends(weekId, language, isOpen);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -239,32 +218,12 @@ function MobileSearchDrawer({
     }
   }, [isOpen]);
 
-  useEffect(() => {
-    if (!weekId) return;
-
-    const processData = (data: { trends?: Record<string, { category: string; title: string }[]> }) => {
-      if (data.trends) {
-        setTrends(data.trends[language] || data.trends["de"] || getFallbackTrends(language));
-      }
-    };
-
-    const fetchUrl = USE_API ? `${API_BASE}/trends/${weekId}` : `/data/${weekId}/trends.json`;
-
-    fetch(fetchUrl)
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.json();
-      })
-      .then(processData)
-      .catch(() => setTrends(getFallbackTrends(language)));
-  }, [weekId, language]);
-
   const handleSearch = (value: string) => {
     setSearchValue(value);
     onSearchChange(value);
   };
 
-  const handleTrendClick = (title: string) => {
+  const handleTrendFilter = (title: string) => {
     handleSearch(title);
     onClose();
   };
@@ -343,22 +302,16 @@ function MobileSearchDrawer({
             </div>
           ) : (
             <>
-              <h3 className="text-sm font-semibold text-muted-foreground mb-3">{t("whatsNew")}</h3>
-              <div className="space-y-1">
-                {trends.map((trend, index) => (
-                  <button
-                    key={index}
-                    onClick={() => handleTrendClick(trend.title)}
-                    className="flex w-full items-start gap-3 border-b border-border p-3 text-left transition-colors hover:bg-secondary focus-visible:ring-2 focus-visible:ring-ring"
-                  >
-                    <span className="text-sm font-bold text-muted-foreground/50 mt-0.5 w-5 shrink-0 tabular-nums" aria-hidden="true">{index + 1}</span>
-                    <div className="min-w-0">
-                      <p className="text-xs text-muted-foreground">{trend.category}</p>
-                      <p className="font-semibold">{trend.title}</p>
-                    </div>
-                  </button>
-                ))}
-              </div>
+              <TrendIndex
+                trends={trends}
+                heading={t("whatsNew")}
+                language={language}
+                periodId={weekId}
+                limit={8}
+                loading={trendsLoading}
+                compact
+                onFilter={handleTrendFilter}
+              />
             </>
           )}
         </div>
