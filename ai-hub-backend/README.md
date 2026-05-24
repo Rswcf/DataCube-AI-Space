@@ -26,8 +26,8 @@ FastAPI backend for the AI Information Hub — multilingual (8 languages) daily 
 | Purpose | Model | Notes |
 |---------|-------|-------|
 | **Classification** | `z-ai/glm-4.5-air:free` | Free tier, classifies tech/investment |
-| **Content Processing** | `deepseek/deepseek-v3.2` | Generates bilingual content (DE/EN), translated to 6 more via free chain |
-| **Translation** | Free model chain (6 models) | Translates EN → ZH, FR, ES, PT, JA, KO at zero cost |
+| **Content Processing** | `deepseek/deepseek-v4-flash` | Generates bilingual content (DE/EN), translated to 6 more via free chain. `deepseek/deepseek-v3.2` as paid fallback |
+| **Translation** | 8 free models + paid tail (`deepseek-v4-flash` → `v3.2`) | EN → ZH, FR, ES, PT, JA, KO. Paid tier only fires when full free chain 429s — historical cost ~$0/day |
 
 ## Data Collection Pipeline (Overview)
 
@@ -200,7 +200,7 @@ This section provides a comprehensive overview of the entire data flow from sour
 │    _articles()  │   │   _articles()   │   │   _articles()   │   │       ()        │   │       ()        │
 ├─────────────────┤   ├─────────────────┤   ├─────────────────┤   ├─────────────────┤   ├─────────────────┤
 │ Model:          │   │ Model:          │   │ Model:          │   │ Model:          │   │ Model:          │
-│ deepseek-v3.2   │   │ deepseek-v3.2   │   │ deepseek-v3.2   │   │ deepseek-v3.2   │   │ deepseek-v3.2   │
+│ deepseek-v4     │   │ deepseek-v4     │   │ deepseek-v4     │   │ deepseek-v4     │   │ deepseek-v4     │
 │ Temp: 0.3       │   │ Temp: 0.3       │   │ Temp: 0.2       │   │ Temp: 0.3       │   │ Temp: 0.3       │
 ├─────────────────┤   ├─────────────────┤   ├─────────────────┤   ├─────────────────┤   ├─────────────────┤
 │ Input: top 40   │   │ Input: all      │   │ Input: top 15   │   │ Input: top 20   │   │ Input: tech +   │

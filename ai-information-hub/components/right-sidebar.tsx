@@ -3,7 +3,7 @@
 import React from "react"
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { Search, Mail, Check, TrendingUp, Loader2, ArrowLeft } from "lucide-react";
+import { Search, Check, TrendingUp, Loader2, ArrowLeft } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useSettings } from "@/lib/settings-context";
@@ -131,14 +131,14 @@ export function RightSidebar({ weekId, onSearchChange }: RightSidebarProps) {
   }, []);
 
   return (
-    <aside ref={sidebarRef} style={sidebarStyle} className="py-3 pl-6 pr-4 bg-sidebar">
+    <aside ref={sidebarRef} style={sidebarStyle} className="bg-sidebar py-4 pl-6 pr-4">
       <div ref={contentRef}>
         {/* Search */}
         <div className="relative">
           <Search aria-hidden="true" className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder={t("search")}
-            className="pl-10 bg-secondary border-0 focus-visible:ring-1 focus-visible:ring-primary rounded-full"
+            className="rounded-none border-foreground bg-card pl-10 focus-visible:ring-1 focus-visible:ring-primary"
             value={searchValue}
             onChange={(e) => {
               setSearchValue(e.target.value);
@@ -148,128 +148,139 @@ export function RightSidebar({ weekId, onSearchChange }: RightSidebarProps) {
         </div>
 
         {/* Newsletter Signup */}
-        <div className="mt-4 rounded-xl border border-primary/40 bg-gradient-to-br from-primary/10 to-accent/10 p-4">
-          <div className="flex items-center gap-2 mb-1">
-            <Mail aria-hidden="true" className="h-4 w-4 text-primary" />
-            <h3 className="text-lg font-semibold text-foreground">{t("newsletterHeading")}</h3>
-          </div>
-          <p className="text-xs text-muted-foreground mb-1">{t("newsletterDescription")}</p>
-          <p className="text-xs text-muted-foreground/80 italic mt-1 mb-3">{t("newsletterSocialProof")}</p>
-          {subscribeState === "success" ? (
-            <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
-              <Check aria-hidden="true" className="h-4 w-4" />
-              <span>{t("subscribed")}</span>
+        <div
+          id="newsletter"
+          className="mt-4 border border-[#1c1a17] bg-[#ffef7a] p-4 text-center dark:border-border dark:bg-card"
+        >
+          <div>
+            <div className="mb-3 font-display text-[11px] font-semibold uppercase tracking-[0.14em] text-[#1c1a17] dark:text-foreground">
+              Data Cube AI
             </div>
-          ) : subscribeState === "selectLang" ? (
-            <div className="flex flex-col gap-2">
-              <p className="text-xs font-medium text-foreground">{t("chooseNewsletterLang")}</p>
-              <div className="grid grid-cols-4 gap-1.5">
-                {LANGUAGE_OPTIONS.map((opt) => (
+            <h3 className="mx-auto max-w-[15rem] break-words font-display text-2xl font-normal leading-[1.05] text-[#1c1a17] dark:text-foreground">
+              {t("newsletterHeading")}
+            </h3>
+            <p className="mx-auto mb-2 mt-3 max-w-[15rem] text-xs leading-relaxed text-[#1c1a17] dark:text-muted-foreground">
+              {t("newsletterDescription")}
+            </p>
+            <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#1c1a17]/70 dark:text-muted-foreground/80">
+              {t("newsletterSocialProof")}
+            </p>
+            {subscribeState === "success" ? (
+              <div className="flex items-center justify-center gap-2 text-sm font-semibold text-[#1c1a17] dark:text-tips-accent">
+                <Check aria-hidden="true" className="h-4 w-4" />
+                <span>{t("subscribed")}</span>
+              </div>
+            ) : subscribeState === "selectLang" ? (
+              <div className="flex flex-col gap-2">
+                <p className="text-xs font-medium text-foreground">{t("chooseNewsletterLang")}</p>
+                <div className="grid grid-cols-4 gap-1.5">
+                  {LANGUAGE_OPTIONS.map((opt) => (
+                    <button
+                      key={opt.code}
+                      type="button"
+                      onClick={() => setNewsletterLang(opt.code)}
+                      className={cn(
+                        "rounded-md border px-2 py-1.5 text-xs transition-colors focus-visible:ring-2 focus-visible:ring-ring",
+                        opt.code === newsletterLang
+                          ? "border-[#1c1a17] bg-[#1c1a17] font-semibold text-[#fffdf9] dark:border-video-accent dark:bg-video-accent dark:text-primary-foreground"
+                          : "border-[#1c1a17]/20 bg-[#fffdf9]/70 text-[#1c1a17] hover:border-[#1c1a17] dark:border-border dark:bg-background dark:text-muted-foreground"
+                      )}
+                    >
+                      {opt.nativeName}
+                    </button>
+                  ))}
+                </div>
+                <div className="flex items-center justify-between mt-1">
                   <button
-                    key={opt.code}
                     type="button"
-                    onClick={() => setNewsletterLang(opt.code)}
-                    className={cn(
-                      "rounded-md px-2 py-1.5 text-xs transition-colors",
-                      opt.code === newsletterLang
-                        ? "bg-primary/10 text-primary font-semibold border border-primary/30"
-                        : "bg-secondary hover:bg-secondary/80 text-muted-foreground border border-transparent"
-                    )}
+                    onClick={() => setSubscribeState("idle")}
+                    className="flex items-center gap-1 text-xs font-medium text-[#1c1a17]/75 transition-colors hover:text-[#1c1a17] dark:text-muted-foreground dark:hover:text-foreground"
                   >
-                    {opt.nativeName}
+                    <ArrowLeft className="h-3 w-3" aria-hidden="true" />
+                    {t("back")}
                   </button>
-                ))}
+                  <Button
+                    type="button"
+                    onClick={async () => {
+                      setSubscribeState("loading");
+                      try {
+                        const res = await fetch("/api/subscribe", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ email: email.trim(), language: newsletterLang }),
+                        });
+                        if (!res.ok) throw new Error();
+                        setEmail("");
+                        setSubscribeState("success");
+                        setTimeout(() => setSubscribeState("idle"), 4000);
+                      } catch {
+                        setSubscribeState("error");
+                        setTimeout(() => setSubscribeState("idle"), 3000);
+                      }
+                    }}
+                    className="h-8 rounded bg-[#1c1a17] px-4 text-xs text-[#fffdf9] transition-colors hover:bg-[#2c2924] dark:bg-video-accent dark:text-primary-foreground"
+                  >
+                    {t("confirm")}
+                  </Button>
+                </div>
               </div>
-              <div className="flex items-center justify-between mt-1">
-                <button
-                  type="button"
-                  onClick={() => setSubscribeState("idle")}
-                  className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <ArrowLeft className="h-3 w-3" aria-hidden="true" />
-                  {t("back")}
-                </button>
+            ) : (
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (!email.trim() || subscribeState === "loading") return;
+                  setNewsletterLang(language);
+                  setSubscribeState("selectLang");
+                }}
+                className="flex flex-col gap-2"
+              >
+                <Input
+                  type="email"
+                  required
+                  placeholder={t("emailPlaceholder")}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="rounded-none border-0 border-b border-[#1c1a17] bg-transparent px-0 text-center text-sm placeholder:text-[#1c1a17]/55 focus-visible:border-[#1c1a17] focus-visible:ring-0 dark:border-border dark:placeholder:text-muted-foreground"
+                />
+                {subscribeState === "error" && (
+                  <p className="text-xs text-red-500">{t("subscribeError")}</p>
+                )}
                 <Button
-                  type="button"
-                  onClick={async () => {
-                    setSubscribeState("loading");
-                    try {
-                      const res = await fetch("/api/subscribe", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ email: email.trim(), language: newsletterLang }),
-                      });
-                      if (!res.ok) throw new Error();
-                      setEmail("");
-                      setSubscribeState("success");
-                      setTimeout(() => setSubscribeState("idle"), 4000);
-                    } catch {
-                      setSubscribeState("error");
-                      setTimeout(() => setSubscribeState("idle"), 3000);
-                    }
-                  }}
-                  className="h-8 rounded-full bg-gradient-to-r from-primary to-accent text-primary-foreground hover:opacity-90 transition-opacity text-xs px-4"
-                >
-                  {t("confirm")}
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                if (!email.trim() || subscribeState === "loading") return;
-                setNewsletterLang(language);
-                setSubscribeState("selectLang");
-              }}
-              className="flex flex-col gap-2"
-            >
-              <Input
-                type="email"
-                required
-                placeholder={t("emailPlaceholder")}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="bg-background border border-input focus-visible:ring-1 focus-visible:ring-primary text-sm"
-              />
-              {subscribeState === "error" && (
-                <p className="text-xs text-red-500">{t("subscribeError")}</p>
-              )}
-              <Button
                 type="submit"
                 disabled={subscribeState === "loading"}
-                className="w-full h-10 rounded-full bg-gradient-to-r from-primary to-accent text-primary-foreground hover:opacity-90 transition-opacity"
+                className="h-10 w-full rounded bg-[#1c1a17] text-sm font-semibold text-[#fffdf9] transition-colors hover:bg-[#2c2924] dark:bg-video-accent dark:text-primary-foreground"
               >
-                {subscribeState === "loading" ? (
-                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-                ) : (
-                  t("subscribe")
-                )}
-              </Button>
-            </form>
-          )}
+                  {subscribeState === "loading" ? (
+                    <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                  ) : (
+                    t("subscribe")
+                  )}
+                </Button>
+              </form>
+            )}
+          </div>
         </div>
 
         {/* Trends */}
-        <div className="mt-4 rounded-xl bg-secondary/50 p-4">
-          <div className="flex items-center gap-2">
-            <TrendingUp aria-hidden="true" className="h-5 w-5 text-primary" />
-            <h3 className="text-xl font-bold text-foreground">{t("whatsNew")}</h3>
+        <div className="mt-4 border-t-2 border-foreground bg-card p-4">
+          <div className="flex items-center justify-between gap-2 border-b border-border pb-3">
+            <h3 className="font-sans text-[11px] font-extrabold uppercase tracking-[0.16em] text-primary">{t("whatsNew")}</h3>
+            <TrendingUp aria-hidden="true" className="h-4 w-4 text-primary" />
           </div>
-          <div className="mt-3 space-y-1">
+          <div className="mt-1">
             {trends.slice(0, 10).map((trend, index) => (
               <button
                 key={index}
                 type="button"
                 onClick={() => onSearchChange(trend.title)}
-                className="flex items-start gap-3 cursor-pointer hover:bg-secondary transition-colors rounded-lg w-full text-left p-2"
+                className="flex w-full cursor-pointer items-start gap-3 border-b border-border py-3 text-left transition-colors hover:bg-secondary/70"
               >
-                <span className="text-2xl font-bold text-muted-foreground/30 tabular-nums w-8 shrink-0 select-none">
-                  {index + 1}
+                <span className="w-8 shrink-0 select-none font-display text-2xl font-normal leading-none tabular-nums text-primary">
+                  {String(index + 1).padStart(2, "0")}
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="text-xs text-muted-foreground">{trend.category}</p>
-                  <p className="font-semibold text-foreground leading-tight">
+                  <p className="font-sans text-[10px] font-bold uppercase tracking-[0.12em] text-muted-foreground">{trend.category}</p>
+                  <p className="font-display text-lg font-normal leading-tight text-foreground">
                     {trend.title}
                   </p>
                 </div>

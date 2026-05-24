@@ -112,7 +112,7 @@ python -m scripts.weekly_collect --week 2026-kw06
 | **前端** | Next.js 16, React 19, Tailwind CSS 4, Shadcn/ui, TypeScript |
 | **后端** | FastAPI, SQLAlchemy, Alembic, PostgreSQL |
 | **LLM 分类** | GLM-4.5-Air (OpenRouter, 免费层) |
-| **LLM 处理** | DeepSeek V3.2 (OpenRouter) |
+| **LLM 处理** | DeepSeek V4 Flash (OpenRouter,首选;V3.2 作为备选) |
 | **对话与报告** | Aurora Alpha (OpenRouter) |
 | **股票数据** | Polygon.io API |
 | **托管** | Vercel（前端）、Railway（后端 + 数据库 + 定时任务） |

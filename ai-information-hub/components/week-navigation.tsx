@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ChevronLeft, ChevronRight, ChevronDown, Calendar } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -109,11 +109,13 @@ export function WeekNavigation({ selectedWeekId, onWeekChange }: WeekNavigationP
   }, [activeWeekIndex]);
 
   return (
-    <div className="sticky top-0 z-10 border-b border-border bg-background/80 backdrop-blur-md">
-      <div className="flex items-center justify-between px-4 py-3">
-        <div className="flex items-center gap-2">
-          <Calendar className="h-5 w-5 text-primary" aria-hidden="true" />
-          <h2 className="text-lg font-bold text-foreground">{t("weekOverview")}</h2>
+    <div className="sticky top-0 z-10 border-b-2 border-foreground bg-card/95 backdrop-blur-sm">
+      <div className="flex items-center justify-between border-b border-border px-4 py-3">
+        <div>
+          <p className="font-sans text-[10px] font-extrabold uppercase tracking-[0.18em] text-primary">
+            Issue Archive
+          </p>
+          <h2 className="font-display text-xl font-normal leading-tight text-foreground">{t("weekOverview")}</h2>
         </div>
         <div className="flex items-center gap-2">
           <Button
@@ -121,7 +123,7 @@ export function WeekNavigation({ selectedWeekId, onWeekChange }: WeekNavigationP
             size="icon"
             onClick={handlePrev}
             disabled={activeWeekIndex < 0 || activeWeekIndex >= weeks.length - 1}
-            className="h-11 w-11"
+            className="h-10 w-10 rounded-none border border-border bg-card hover:bg-secondary"
           >
             <ChevronLeft className="h-4 w-4" aria-hidden="true" />
           </Button>
@@ -130,7 +132,7 @@ export function WeekNavigation({ selectedWeekId, onWeekChange }: WeekNavigationP
             size="icon"
             onClick={handleNext}
             disabled={activeWeekIndex <= 0}
-            className="h-11 w-11"
+            className="h-10 w-10 rounded-none border border-border bg-card hover:bg-secondary"
           >
             <ChevronRight className="h-4 w-4" aria-hidden="true" />
           </Button>
@@ -138,7 +140,7 @@ export function WeekNavigation({ selectedWeekId, onWeekChange }: WeekNavigationP
       </div>
 
       <div className="relative">
-        <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-background to-transparent pointer-events-none z-10" aria-hidden="true" />
+        <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-card to-transparent pointer-events-none z-10" aria-hidden="true" />
 
         <div ref={scrollRef} className="flex gap-1 overflow-x-auto px-4 pb-2 scrollbar-hide scroll-smooth" style={{ touchAction: 'pan-x' }}>
           {weeks.length === 0 && (
@@ -157,15 +159,15 @@ export function WeekNavigation({ selectedWeekId, onWeekChange }: WeekNavigationP
                 key={week.id}
                 onClick={() => selectWeek(week)}
                 className={cn(
-                  "flex shrink-0 items-center gap-1.5 rounded-lg px-4 py-2 transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-ring",
+                  "flex shrink-0 items-center gap-1.5 border px-4 py-2 transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-ring",
                   isActive
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+                    ? "border-foreground bg-foreground text-background"
+                    : "border-border bg-card text-foreground hover:border-foreground hover:bg-secondary",
                   week.current && !isActive && "ring-1 ring-primary/30"
                 )}
               >
                 <div className="flex flex-col items-center">
-                  <span className="text-sm font-semibold">{getPeriodLabel(week.id, language)}</span>
+                  <span className="font-display text-base font-normal leading-tight">{getPeriodLabel(week.id, language)}</span>
                   <span className="text-xs opacity-80">{week.dateRange}</span>
                 </div>
                 {weekHasDays && (
@@ -187,7 +189,7 @@ export function WeekNavigation({ selectedWeekId, onWeekChange }: WeekNavigationP
           })}
         </div>
 
-        <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background to-transparent pointer-events-none z-10" aria-hidden="true" />
+        <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-card to-transparent pointer-events-none z-10" aria-hidden="true" />
       </div>
 
       <Collapsible open={hasDays}>
@@ -199,10 +201,10 @@ export function WeekNavigation({ selectedWeekId, onWeekChange }: WeekNavigationP
                   key={day.id}
                   onClick={() => onWeekChange(day.id)}
                   className={cn(
-                    "shrink-0 flex flex-col items-center rounded-lg px-3 py-2.5 transition-colors duration-200",
+                    "shrink-0 flex flex-col items-center border px-3 py-2.5 transition-colors duration-200",
                     selectedDay === day.id
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-secondary/60 text-secondary-foreground hover:bg-secondary/80",
+                      ? "border-foreground bg-primary text-primary-foreground"
+                      : "border-border bg-card text-secondary-foreground hover:border-foreground hover:bg-secondary",
                     day.current &&
                       selectedDay !== day.id &&
                       "ring-2 ring-accent ring-offset-1 ring-offset-background"

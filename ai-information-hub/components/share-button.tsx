@@ -97,10 +97,10 @@ export function ShareButton({ title, text, url }: ShareButtonProps) {
       <button
         onClick={handleShare}
         className={cn(
-          "flex items-center gap-1.5 rounded-full px-2 py-1.5 active:scale-95 transition-transform duration-150",
+          "flex items-center gap-1.5 border border-transparent px-2 py-1.5 transition-colors duration-150",
           copied
-            ? "text-accent bg-accent/10"
-            : "text-muted-foreground hover:text-primary hover:bg-primary/10"
+            ? "border-accent/30 bg-accent/10 text-accent"
+            : "text-muted-foreground hover:border-primary/30 hover:bg-primary/10 hover:text-primary"
         )}
         title={t("share")}
       >
@@ -115,24 +115,24 @@ export function ShareButton({ title, text, url }: ShareButtonProps) {
       </button>
 
       {showMenu && (
-        <div className="absolute bottom-full right-0 mb-1 z-50 min-w-[180px] rounded-lg border bg-popover p-1 shadow-md animate-in fade-in-0 zoom-in-95">
+        <div className="absolute bottom-full right-0 z-50 mb-1 min-w-[180px] border border-foreground bg-popover p-1 shadow-md animate-in fade-in-0 zoom-in-95">
           <button
             onClick={handleCopy}
-            className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-accent transition-colors focus-visible:ring-2 focus-visible:ring-ring"
+            className="flex w-full items-center gap-2 px-3 py-2 text-sm transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring"
           >
             <Link className="h-4 w-4" aria-hidden="true" />
             {t("copyLink")}
           </button>
           <button
             onClick={handleShareX}
-            className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-accent transition-colors focus-visible:ring-2 focus-visible:ring-ring"
+            className="flex w-full items-center gap-2 px-3 py-2 text-sm transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring"
           >
             <XIcon className="h-4 w-4" aria-hidden="true" />
             {t("shareOnX")}
           </button>
           <button
             onClick={handleShareLinkedIn}
-            className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-accent transition-colors focus-visible:ring-2 focus-visible:ring-ring"
+            className="flex w-full items-center gap-2 px-3 py-2 text-sm transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring"
           >
             <LinkedInIcon className="h-4 w-4" aria-hidden="true" />
             {t("shareOnLinkedIn")}

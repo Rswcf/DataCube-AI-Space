@@ -5,7 +5,6 @@ import { ExternalLink, Lightbulb, Copy, Check } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ShareButton } from "@/components/share-button";
-import { VerifiedBadge } from "@/components/verified-badge";
 import { FeedSkeleton } from "@/components/feeds/feed-skeleton";
 import { useSettings } from "@/lib/settings-context";
 import { getPeriodLabel } from "@/lib/period-utils";
@@ -29,23 +28,34 @@ interface TipPost {
   sourceUrl?: string;
 }
 
-const difficultyColors: Record<string, string> = {
-  "Anfänger": "bg-accent/20 text-accent border-accent/30",
-  "Mittel": "bg-chart-3/20 text-chart-3 border-chart-3/30",
-  "Fortgeschritten": "bg-chart-4/20 text-chart-4 border-chart-4/30",
-  "Beginner": "bg-accent/20 text-accent border-accent/30",
-  "Intermediate": "bg-chart-3/20 text-chart-3 border-chart-3/30",
-  "Advanced": "bg-chart-4/20 text-chart-4 border-chart-4/30",
-};
-
-const platformColors: Record<string, string> = {
-  X: "bg-foreground text-background",
-  Reddit: "bg-chart-4 text-chart-4-foreground",
-};
-
 function isCodeLikeTip(value: string): boolean {
   const text = value.trim();
   return /```|^\s*(curl|npm|pnpm|yarn|pip|python|git|docker|kubectl|const|let|var|function|import|from|def|class|select|with)\b|[{};]/im.test(text);
+}
+
+function sentenceCaseFragment(text: string) {
+  if (!text) return "";
+  return /^[a-z]/.test(text) ? `${text[0].toUpperCase()}${text.slice(1)}` : text;
+}
+
+function splitHeadlineDeck(content: string): [string, string] {
+  const clean = content.replace(/\s+/g, " ").trim();
+  if (!clean) return ["", ""];
+  for (const separator of [": ", " — ", " – ", " - "]) {
+    const position = clean.indexOf(separator);
+    if (position >= 20 && position <= 80) {
+      return [clean.slice(0, position).replace(/[ .,-;:]+$/, ""), clean.slice(position + separator.length).trim()];
+    }
+  }
+  for (const separator of [". ", "? ", "! "]) {
+    const position = clean.indexOf(separator);
+    if (position >= 28 && position <= 86 && position + separator.length < clean.length) {
+      return [clean.slice(0, position + 1), clean.slice(position + separator.length).trim()];
+    }
+  }
+  if (clean.length <= 86) return [clean, ""];
+  const cut = clean.lastIndexOf(" ", 86);
+  return [clean.slice(0, cut).replace(/[ .,-;:]+$/, ""), sentenceCaseFragment(clean.slice(cut).trim())];
 }
 
 export function TipsFeed({ weekId, searchQuery }: TipsFeedProps) {
@@ -115,22 +125,22 @@ export function TipsFeed({ weekId, searchQuery }: TipsFeedProps) {
   const periodLabel = getPeriodLabel(weekId, language);
 
   return (
-    <div className="divide-y divide-border">
+    <div>
       {/* Section Header */}
-      <div className="section-header-tips border-l-4 border-tips-accent px-3 py-2 sm:px-4 sm:py-3">
-        <div className="flex items-center gap-2">
-          <Lightbulb className="h-5 w-5 text-tips-accent" aria-hidden="true" />
-          <h3 className="text-base sm:text-lg font-semibold text-foreground">{t("practicalTipsTitle")}</h3>
+      <div className="section-header-tips border-b border-foreground px-4 py-4 sm:px-6">
+        <div className="flex items-center gap-3">
+          <Lightbulb className="h-4 w-4 text-primary" aria-hidden="true" />
+          <h3 className="font-sans text-[11px] font-extrabold uppercase tracking-[0.18em] text-primary">{t("practicalTipsTitle")}</h3>
           {!loading && filteredPosts.length > 0 && (
-            <Badge variant="outline" className="text-xs text-tips-accent border-tips-accent/30">
+            <Badge variant="outline" className="rounded-none border-primary/40 text-xs text-primary">
               {filteredPosts.length}
             </Badge>
           )}
-          <Badge variant="secondary" className="ml-auto">
+          <Badge variant="secondary" className="ml-auto rounded-none border border-border bg-card font-sans text-[10px] uppercase tracking-[0.12em]">
             {periodLabel}
           </Badge>
         </div>
-        <p className="mt-0.5 sm:mt-1 text-xs sm:text-sm text-muted-foreground">
+        <p className="mt-2 font-display text-2xl font-normal leading-tight text-foreground">
           {t("handsOnTipsFrom")}
         </p>
       </div>
@@ -154,55 +164,40 @@ export function TipsFeed({ weekId, searchQuery }: TipsFeedProps) {
       {/* Tips Posts */}
       {filteredPosts.map((post, index) => {
         const tipIsCodeLike = isCodeLikeTip(post.tip);
+        const [headline, deck] = splitHeadlineDeck(post.content);
 
         return (
           <article
             key={post.id}
-            className="border-l-2 border-l-tips-accent/30 px-3 py-3 sm:px-4 sm:py-4 transition-colors hover:bg-tips-accent/5 cursor-pointer animate-fade-up"
+            className="animate-fade-up border-b border-border px-4 py-5 transition-colors hover:bg-secondary/50 sm:px-6"
             style={{ animationDelay: `${Math.min(index, 10) * 50}ms` }}
           >
-            <div className="flex gap-2 sm:gap-3">
-              {/* Avatar */}
-              <div className="flex h-10 w-10 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-full bg-chart-3/20 text-chart-3 font-bold text-sm sm:text-base">
-                {post.author.avatar}
+            <div className="grid grid-cols-[3.25rem_minmax(0,1fr)] gap-4">
+              <div className="font-display text-3xl font-normal leading-none text-primary tabular-nums sm:text-4xl">
+                {String(index + 1).padStart(2, "0")}
               </div>
-
-              {/* Content */}
               <div className="flex-1 min-w-0">
-                {/* Author Info */}
-                <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
-                  <span className="font-bold text-sm sm:text-base text-foreground">{post.author.name}</span>
-                  {post.author.verified && <VerifiedBadge />}
-                  <span className="text-xs sm:text-sm text-muted-foreground">{post.author.handle}</span>
-                  <span className="text-xs sm:text-sm text-muted-foreground">·</span>
-                  <span className="text-xs sm:text-sm text-muted-foreground">{post.timestamp}</span>
-                  <Badge className={`text-xs ${platformColors[post.platform] || ""}`}>
-                    {post.platform}
-                  </Badge>
+                <div className="font-sans text-[11px] font-extrabold uppercase tracking-[0.14em] text-primary">
+                  {post.category} · {post.difficulty} · {post.platform} · {post.timestamp}
                 </div>
-
-                {/* Category & Difficulty */}
-                <div className="mt-1 flex items-center gap-2 flex-wrap">
-                  <Badge variant="outline" className="text-xs">
-                    {post.category}
-                  </Badge>
-                  <Badge className={`text-xs border ${difficultyColors[post.difficulty] || ""}`}>
-                    {post.difficulty}
-                  </Badge>
-                </div>
-
-                {/* Post Content */}
-                <p className="mt-2 text-[15px] sm:text-base text-foreground leading-relaxed">{post.content}</p>
+                <h2 className="mt-2 border-b border-border pb-3 font-display text-2xl font-normal leading-[1.1] text-foreground sm:text-[1.75rem]">
+                  {headline}
+                </h2>
+                {deck && (
+                  <p className="mt-3 text-[15px] leading-relaxed text-foreground sm:text-base">
+                    {deck}
+                  </p>
+                )}
 
                 {/* Tip Code Block */}
-                <div className="mt-3 rounded-lg border border-tips-accent/20 bg-tips-accent/5 p-3">
+                <div className="mt-4 border border-foreground bg-secondary/45 p-3">
                   <div className="flex items-start justify-between gap-2">
                     {tipIsCodeLike ? (
-                      <pre className="flex-1 overflow-x-auto whitespace-pre-wrap break-all text-sm font-mono text-foreground leading-relaxed">
+                      <pre className="flex-1 overflow-x-auto whitespace-pre-wrap break-all font-mono text-sm leading-relaxed text-foreground">
                         {post.tip}
                       </pre>
                     ) : (
-                      <p className="flex-1 whitespace-pre-wrap break-words text-sm text-foreground leading-relaxed">
+                      <p className="flex-1 whitespace-pre-wrap break-words text-sm leading-relaxed text-foreground">
                         {post.tip}
                       </p>
                     )}
@@ -225,22 +220,21 @@ export function TipsFeed({ weekId, searchQuery }: TipsFeedProps) {
                 </div>
 
                 {/* Source */}
-                {post.sourceUrl && (
-                  <div className="mt-2 flex items-center gap-1 text-xs sm:text-sm text-muted-foreground">
+                <div className="mt-3 flex flex-wrap items-center gap-3 border-t border-border pt-3 text-xs text-muted-foreground">
+                  {post.sourceUrl && (
+                  <div className="flex items-center gap-1">
                     <ExternalLink className="h-3 w-3" aria-hidden="true" />
                     <a
                       href={post.sourceUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="hover:text-primary hover:underline transition-colors"
+                      className="border-b border-primary/40 text-primary transition-colors hover:border-primary"
                       onClick={(e) => e.stopPropagation()}
                     >
                       {t("source")}
                     </a>
                   </div>
-                )}
-
-                <div className="mt-3">
+                  )}
                   <ShareButton
                     title={post.category}
                     text={`${post.content}\n\n${post.tip}`}

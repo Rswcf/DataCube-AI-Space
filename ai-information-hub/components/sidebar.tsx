@@ -5,12 +5,15 @@ import { Cpu, TrendingUp, Lightbulb, Sun, Moon, Languages, Check } from "lucide-
 import { cn } from "@/lib/utils";
 import { useSettings } from "@/lib/settings-context";
 import { LogoCube } from "@/components/logo-cube";
+import { IssueTimeline } from "@/components/issue-timeline";
 import { LANGUAGE_OPTIONS, type TranslationKey, type Language } from "@/lib/translations";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 
 interface SidebarProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
+  selectedWeekId: string;
+  onWeekChange: (weekId: string) => void;
 }
 
 const getTabsData = (t: (key: TranslationKey) => string) => [
@@ -58,10 +61,10 @@ function NavButton({
         <button
           onClick={onClick}
           className={cn(
-            "flex w-full items-center gap-4 rounded-lg px-4 py-3 border-l-[3px] transition-[color,background-color,border-color,transform] duration-200 hover:translate-x-0.5 focus-visible:ring-2 focus-visible:ring-ring",
+            "flex w-full items-center gap-4 border-l-[3px] px-4 py-3 transition-[color,background-color,border-color] duration-200 focus-visible:ring-2 focus-visible:ring-ring",
             isActive
-              ? "bg-primary/10 text-primary font-bold shadow-sm shadow-primary/10 border-l-primary"
-              : "text-foreground hover:bg-secondary border-l-transparent",
+              ? "border-l-primary bg-card text-primary"
+              : "border-l-transparent text-foreground hover:border-l-foreground hover:bg-card",
             className
           )}
         >
@@ -74,8 +77,8 @@ function NavButton({
             )}
           />
           <div className="text-left hidden xl:block">
-            <span className="text-lg">{label}</span>
-            {description && <p className="text-xs text-muted-foreground">{description}</p>}
+            <span className="font-sans text-[13px] font-extrabold uppercase tracking-[0.12em]">{label}</span>
+            {description && <p className="mt-1 text-xs leading-snug text-muted-foreground">{description}</p>}
           </div>
         </button>
       </TooltipTrigger>
@@ -115,10 +118,10 @@ function LanguageDropdown({ language, setLanguage }: { language: Language; setLa
         <TooltipTrigger asChild>
           <button
             onClick={() => setOpen((o) => !o)}
-            className="flex w-full items-center gap-4 rounded-lg px-4 py-3 border-l-[3px] border-l-transparent transition-[color,background-color,border-color,transform] duration-200 hover:translate-x-0.5 hover:bg-secondary text-foreground focus-visible:ring-2 focus-visible:ring-ring"
+            className="flex w-full items-center gap-4 border-l-[3px] border-l-transparent px-4 py-3 text-foreground transition-[color,background-color,border-color] duration-200 hover:border-l-foreground hover:bg-card focus-visible:ring-2 focus-visible:ring-ring"
           >
             <Languages aria-hidden="true" className="h-6 w-6 shrink-0 text-accent" />
-            <span className="text-lg hidden xl:block">{current.nativeName}</span>
+            <span className="hidden font-sans text-[13px] font-extrabold uppercase tracking-[0.12em] xl:block">{current.nativeName}</span>
           </button>
         </TooltipTrigger>
         <TooltipContent side="right" className="xl:hidden">
@@ -127,7 +130,7 @@ function LanguageDropdown({ language, setLanguage }: { language: Language; setLa
       </Tooltip>
 
       {open && (
-        <div className="absolute bottom-full left-0 mb-1 w-48 rounded-lg border border-border bg-popover shadow-lg z-50 py-1">
+        <div className="absolute bottom-full left-0 z-50 mb-1 w-48 border border-foreground bg-popover py-1 shadow-lg">
           {LANGUAGE_OPTIONS.map((opt) => (
             <button
               key={opt.code}
@@ -147,26 +150,26 @@ function LanguageDropdown({ language, setLanguage }: { language: Language; setLa
   );
 }
 
-export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
+export function Sidebar({ activeTab, onTabChange, selectedWeekId, onWeekChange }: SidebarProps) {
   const { theme, setTheme, language, setLanguage, t } = useSettings();
   const tabs = getTabsData(t);
 
   return (
     <TooltipProvider delayDuration={300}>
-      <aside className="sticky top-0 h-screen flex flex-col bg-sidebar px-3 py-4 w-full">
+      <aside className="sticky top-0 flex h-screen w-full flex-col border-r border-sidebar-border bg-sidebar px-3 py-4">
         {/* Logo */}
         <div className="mb-6 px-3">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 border-b-2 border-foreground pb-4">
             <LogoCube size={40} className="shrink-0" />
-            <span className="text-xl font-bold text-foreground hidden xl:block">Data Cube</span>
+            <span className="hidden font-display text-2xl font-normal leading-none text-foreground xl:block">Data Cube</span>
           </div>
         </div>
 
         {/* Main Navigation */}
-        <nav className="flex-1 space-y-1">
+        <nav className="flex-1 space-y-6 overflow-y-auto pb-4">
           {/* Category Tabs */}
           <div>
-            <p className="mb-2 px-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground hidden xl:block">
+            <p className="mb-2 px-4 font-sans text-[10px] font-extrabold uppercase tracking-[0.18em] text-muted-foreground hidden xl:block">
               {t("categories")}
             </p>
             {tabs.map((tab) => (
@@ -180,10 +183,18 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
               />
             ))}
           </div>
+
+          {selectedWeekId && (
+            <IssueTimeline
+              selectedWeekId={selectedWeekId}
+              onWeekChange={onWeekChange}
+              variant="sidebar"
+            />
+          )}
         </nav>
 
         {/* Settings Controls */}
-        <div className="border-t border-border pt-4 space-y-2">
+        <div className="space-y-2 border-t border-sidebar-border pt-4">
           {/* Theme Toggle */}
           <NavButton
             icon={theme === "dark" ? Sun : Moon}
@@ -197,7 +208,7 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
         </div>
 
         {/* Legal Links */}
-        <div className="border-t border-border pt-3 mt-2 px-4 hidden xl:flex gap-3">
+        <div className="mt-2 hidden gap-3 border-t border-sidebar-border px-4 pt-3 xl:flex">
           <a href="/impressum" className="text-xs text-muted-foreground hover:text-foreground transition-colors focus-visible:ring-2 focus-visible:ring-ring rounded">
             {language === "de" ? "Impressum" : "Legal Notice"}
           </a>

@@ -245,13 +245,13 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
 
   const SourceLink = ({ sourceUrl }: { sourceUrl?: string }) =>
     sourceUrl ? (
-      <div className="mt-2 flex items-center gap-1 text-xs sm:text-sm text-muted-foreground">
+      <div className="mt-3 flex items-center gap-1 border-t border-border pt-3 text-xs text-muted-foreground">
         <ExternalLink className="h-3 w-3" aria-hidden="true" />
         <a
           href={sourceUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="hover:text-primary hover:underline transition-colors"
+          className="border-b border-primary/40 text-primary transition-colors hover:border-primary"
           onClick={(e) => e.stopPropagation()}
         >
           {t("source")}
@@ -261,32 +261,32 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
 
 
   return (
-    <div className="divide-y divide-border">
+    <div>
       {/* Section Header */}
-      <div className="section-header-invest border-l-4 border-invest-accent px-3 py-2 sm:px-4 sm:py-3">
-        <div className="flex items-center gap-2">
-          <TrendingUp className="h-5 w-5 text-invest-accent" aria-hidden="true" />
-          <h3 className="text-base sm:text-lg font-semibold text-foreground">{t("aiInvestments")}</h3>
-          <Badge variant="secondary" className="ml-auto">
+      <div className="section-header-invest border-b border-foreground px-4 py-4 sm:px-6">
+        <div className="flex items-center gap-3">
+          <TrendingUp className="h-4 w-4 text-primary" aria-hidden="true" />
+          <h3 className="font-sans text-[11px] font-extrabold uppercase tracking-[0.18em] text-primary">{t("aiInvestments")}</h3>
+          <Badge variant="secondary" className="ml-auto rounded-none border border-border bg-card font-sans text-[10px] uppercase tracking-[0.12em]">
             {periodLabel}
           </Badge>
         </div>
-        <p className="mt-0.5 sm:mt-1 text-xs sm:text-sm text-muted-foreground">
+        <p className="mt-2 font-display text-2xl font-normal leading-tight text-foreground">
           {t("fundingNewsMA")}
         </p>
       </div>
 
       {/* Market Tabs */}
-      <div className="flex border-b border-border">
+      <div className="flex border-b border-foreground">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={cn(
-              "flex flex-1 items-center justify-center gap-2 py-3 text-sm font-medium transition-colors",
+              "flex flex-1 items-center justify-center gap-2 border-r border-border py-3 font-sans text-[11px] font-extrabold uppercase tracking-[0.12em] transition-colors last:border-r-0",
               activeTab === tab.id
-                ? "border-b-2 border-primary text-primary"
-                : "text-muted-foreground hover:text-foreground hover:bg-secondary/30"
+                ? "bg-foreground text-background"
+                : "text-muted-foreground hover:bg-secondary/60 hover:text-foreground"
             )}
           >
             <tab.icon className="h-4 w-4" aria-hidden="true" />
@@ -297,17 +297,17 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
 
       {/* Filter Chips - Primary Market (Round Filter) */}
       {activeTab === "primary" && (
-        <div className="px-3 py-2 sm:px-4 sm:py-3 bg-secondary/10 border-b border-border">
+        <div className="border-b border-border bg-card px-3 py-2 sm:px-4 sm:py-3">
           <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
             {roundFilters.map((round) => (
               <button
                 key={round}
                 onClick={() => setSelectedRound(round)}
                 className={cn(
-                  "px-3 py-1.5 text-xs font-medium rounded-full whitespace-nowrap transition-colors",
+                  "whitespace-nowrap border px-3 py-1.5 font-sans text-[10px] font-bold uppercase tracking-[0.12em] transition-colors",
                   selectedRound === round
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                    ? "border-foreground bg-foreground text-background"
+                    : "border-border bg-card text-secondary-foreground hover:border-foreground hover:bg-secondary"
                 )}
               >
                 {getRoundLabel(round)}
@@ -335,33 +335,33 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
             </div>
           )}
           {filteredPrimary.map((post, index) => (
-            <article key={post.id} className="border-l-2 border-l-invest-accent/30 px-3 py-3 sm:px-4 sm:py-4 transition-colors hover:bg-invest-accent/5 cursor-pointer animate-fade-up" style={{ animationDelay: `${Math.min(index, 10) * 50}ms` }}>
+            <article key={post.id} className="animate-fade-up border-b border-border px-4 py-5 transition-colors hover:bg-secondary/50 sm:px-6" style={{ animationDelay: `${Math.min(index, 10) * 50}ms` }}>
               <div className="flex gap-2 sm:gap-3">
-                <div className="flex h-10 w-10 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-full bg-accent/20 text-accent font-bold text-sm sm:text-base">
-                  {post.author.avatar}
+                <div className="w-14 shrink-0 font-display text-3xl font-normal leading-none text-primary tabular-nums sm:text-4xl">
+                  {String(index + 1).padStart(2, "0")}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
-                    <span className="font-bold text-sm sm:text-base text-foreground">{post.author.name}</span>
+                  <div className="flex flex-wrap items-center gap-1.5 font-sans text-[11px] font-extrabold uppercase tracking-[0.12em] text-primary sm:gap-2">
+                    <span>{post.author.name}</span>
                     {post.author.verified && <VerifiedBadge />}
-                    <span className="text-xs sm:text-sm text-muted-foreground">{post.author.handle}</span>
-                    <span className="text-xs sm:text-sm text-muted-foreground">·</span>
-                    <span className="text-xs sm:text-sm text-muted-foreground">{post.timestamp}</span>
+                    <span className="text-muted-foreground">{post.author.handle}</span>
+                    <span className="text-muted-foreground">·</span>
+                    <span className="text-muted-foreground">{post.timestamp}</span>
                   </div>
 
                   {/* Deal Info Card */}
-                  <div className="mt-2 rounded-lg border border-border bg-card p-3">
+                  <div className="mt-3 border-t border-foreground bg-card py-3">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <Building2 className="h-4 w-4 text-accent" aria-hidden="true" />
-                        <span className="font-semibold text-foreground">{post.company}</span>
+                        <span className="font-display text-2xl font-normal leading-tight text-foreground">{post.company}</span>
                       </div>
-                      <Badge className="bg-accent/20 text-accent border-accent/30">{post.round}</Badge>
+                      <Badge className="rounded-none border border-primary/30 bg-primary/10 text-primary">{post.round}</Badge>
                     </div>
                     <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
                       <div>
                         <span className="text-muted-foreground">{t("volume")}:</span>
-                        <span className="ml-2 font-semibold text-accent">{post.amount}</span>
+                        <span className="ml-2 font-display text-xl font-normal text-primary">{post.amount}</span>
                       </div>
                       <div>
                         <span className="text-muted-foreground">{t("valuation")}:</span>
@@ -370,12 +370,12 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
                     </div>
                     <div className="mt-2 flex flex-wrap gap-1">
                       {post.investors.map((investor) => (
-                        <Badge key={investor} variant="secondary" className="text-xs">{investor}</Badge>
+                        <Badge key={investor} variant="secondary" className="rounded-none text-xs">{investor}</Badge>
                       ))}
                     </div>
                   </div>
 
-                  <p className="mt-2 text-[15px] sm:text-base text-foreground leading-relaxed">{post.content}</p>
+                  <p className="mt-3 border-t border-border pt-3 text-[15px] leading-relaxed text-foreground sm:text-base">{post.content}</p>
                   <SourceLink sourceUrl={post.sourceUrl} />
                   <div className="mt-3">
                     <ShareButton title={post.company} text={post.content} url={post.sourceUrl} />
@@ -409,31 +409,31 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
             </div>
           )}
           {filteredSecondary.map((post, index) => (
-            <article key={post.id} className="border-l-2 border-l-invest-accent/30 px-3 py-3 sm:px-4 sm:py-4 transition-colors hover:bg-invest-accent/5 cursor-pointer animate-fade-up" style={{ animationDelay: `${Math.min(index, 10) * 50}ms` }}>
+            <article key={post.id} className="animate-fade-up border-b border-border px-4 py-5 transition-colors hover:bg-secondary/50 sm:px-6" style={{ animationDelay: `${Math.min(index, 10) * 50}ms` }}>
               <div className="flex gap-2 sm:gap-3">
-                <div className="flex h-10 w-10 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-full bg-chart-3/20 text-chart-3 font-bold text-sm sm:text-base">
-                  {post.author.avatar}
+                <div className="w-14 shrink-0 font-display text-3xl font-normal leading-none text-primary tabular-nums sm:text-4xl">
+                  {String(index + 1).padStart(2, "0")}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
-                    <span className="font-bold text-sm sm:text-base text-foreground">{post.author.name}</span>
+                  <div className="flex flex-wrap items-center gap-1.5 font-sans text-[11px] font-extrabold uppercase tracking-[0.12em] text-primary sm:gap-2">
+                    <span>{post.author.name}</span>
                     {post.author.verified && <VerifiedBadge />}
-                    <span className="text-xs sm:text-sm text-muted-foreground">{post.author.handle}</span>
-                    <span className="text-xs sm:text-sm text-muted-foreground">·</span>
-                    <span className="text-xs sm:text-sm text-muted-foreground">{post.timestamp}</span>
+                    <span className="text-muted-foreground">{post.author.handle}</span>
+                    <span className="text-muted-foreground">·</span>
+                    <span className="text-muted-foreground">{post.timestamp}</span>
                   </div>
 
                   {/* Stock Info Card */}
-                  <div className="mt-2 rounded-lg border border-border bg-card p-3">
+                  <div className="mt-3 border-t border-foreground bg-card py-3">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <div className="flex items-center gap-3 min-w-0 flex-wrap">
-                        <span className="text-lg font-bold text-foreground">{post.ticker}</span>
+                        <span className="font-display text-2xl font-normal text-foreground">{post.ticker}</span>
                         {post.price && post.price !== "N/A" && (
-                          <span className="text-xl font-semibold text-foreground tabular-nums">{post.price}</span>
+                          <span className="font-display text-2xl font-normal tabular-nums text-primary">{post.price}</span>
                         )}
                         {/* Live indicator for real-time data */}
                         {post.price && post.price !== "N/A" && !stockDataLoading && (
-                          <Badge variant="outline" className="text-xs text-chart-3 border-chart-3/50 bg-chart-3/10">
+                          <Badge variant="outline" className="rounded-none border-chart-3/50 bg-chart-3/10 text-xs text-chart-3">
                             {language === "de" ? "Live" : "Live"}
                           </Badge>
                         )}
@@ -441,7 +441,7 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
                       {post.change && post.change !== "N/A" && (
                         <div
                           className={cn(
-                            "flex items-center gap-1 rounded-full px-3 py-1 text-sm font-semibold tabular-nums",
+                            "flex items-center gap-1 border px-3 py-1 text-sm font-semibold tabular-nums",
                             post.direction === "up"
                               ? "bg-accent/20 text-accent"
                               : "bg-destructive/20 text-destructive"
@@ -465,7 +465,7 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
                     )}
                   </div>
 
-                  <p className="mt-2 text-[15px] sm:text-base text-foreground leading-relaxed">{post.content}</p>
+                  <p className="mt-3 border-t border-border pt-3 text-[15px] leading-relaxed text-foreground sm:text-base">{post.content}</p>
                   <SourceLink sourceUrl={post.sourceUrl} />
                   <div className="mt-3">
                     <ShareButton title={post.ticker} text={post.content} url={post.sourceUrl} />
@@ -492,47 +492,47 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
             </div>
           )}
           {filteredMa.map((post, index) => (
-            <article key={post.id} className="border-l-2 border-l-invest-accent/30 px-3 py-3 sm:px-4 sm:py-4 transition-colors hover:bg-invest-accent/5 cursor-pointer animate-fade-up" style={{ animationDelay: `${Math.min(index, 10) * 50}ms` }}>
+            <article key={post.id} className="animate-fade-up border-b border-border px-4 py-5 transition-colors hover:bg-secondary/50 sm:px-6" style={{ animationDelay: `${Math.min(index, 10) * 50}ms` }}>
               <div className="flex gap-2 sm:gap-3">
-                <div className="flex h-10 w-10 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-full bg-chart-5/20 text-chart-5 font-bold text-sm sm:text-base">
-                  {post.author.avatar}
+                <div className="w-14 shrink-0 font-display text-3xl font-normal leading-none text-primary tabular-nums sm:text-4xl">
+                  {String(index + 1).padStart(2, "0")}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
-                    <span className="font-bold text-sm sm:text-base text-foreground">{post.author.name}</span>
+                  <div className="flex flex-wrap items-center gap-1.5 font-sans text-[11px] font-extrabold uppercase tracking-[0.12em] text-primary sm:gap-2">
+                    <span>{post.author.name}</span>
                     {post.author.verified && <VerifiedBadge />}
-                    <span className="text-xs sm:text-sm text-muted-foreground">{post.author.handle}</span>
-                    <span className="text-xs sm:text-sm text-muted-foreground">·</span>
-                    <span className="text-xs sm:text-sm text-muted-foreground">{post.timestamp}</span>
+                    <span className="text-muted-foreground">{post.author.handle}</span>
+                    <span className="text-muted-foreground">·</span>
+                    <span className="text-muted-foreground">{post.timestamp}</span>
                   </div>
 
                   {/* M&A Info Card */}
-                  <div className="mt-2 rounded-lg border border-border bg-card p-3">
+                  <div className="mt-3 border-t border-foreground bg-card py-3">
                     <div className="flex items-center justify-center gap-3 min-w-0">
                       <div className="text-center min-w-0">
                         <p className="text-xs text-muted-foreground">{t("acquirer")}</p>
-                        <p className="font-semibold text-foreground truncate">{post.acquirer}</p>
+                        <p className="truncate font-display text-xl font-normal text-foreground">{post.acquirer}</p>
                       </div>
                       <GitMerge className="h-6 w-6 text-chart-5 shrink-0" aria-hidden="true" />
                       <div className="text-center min-w-0">
                         <p className="text-xs text-muted-foreground">{t("target")}</p>
-                        <p className="font-semibold text-foreground truncate">{post.target}</p>
+                        <p className="truncate font-display text-xl font-normal text-foreground">{post.target}</p>
                       </div>
                     </div>
                     <div className="mt-3 flex items-center justify-center gap-2 flex-wrap">
-                      <Badge className="bg-chart-5/20 text-chart-5 border-chart-5/30">
+                        <Badge className="rounded-none border-chart-5/30 bg-chart-5/20 text-chart-5">
                         {post.dealType}
                       </Badge>
                       {post.industry && (
-                        <Badge className="bg-primary/20 text-primary border-primary/30">
+                        <Badge className="rounded-none border-primary/30 bg-primary/20 text-primary">
                           {getIndustryDisplayName(post.industry)}
                         </Badge>
                       )}
-                      <span className="text-lg font-bold text-chart-5">{post.dealValue}</span>
+                      <span className="font-display text-xl font-normal text-primary">{post.dealValue}</span>
                     </div>
                   </div>
 
-                  <p className="mt-2 text-[15px] sm:text-base text-foreground leading-relaxed">{post.content}</p>
+                  <p className="mt-3 border-t border-border pt-3 text-[15px] leading-relaxed text-foreground sm:text-base">{post.content}</p>
                   <SourceLink sourceUrl={post.sourceUrl} />
                   <div className="mt-3">
                     <ShareButton title={`${post.acquirer} → ${post.target}`} text={post.content} url={post.sourceUrl} />

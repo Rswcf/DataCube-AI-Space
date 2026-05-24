@@ -1,11 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ExternalLink, Cpu, Brain, Zap, Server } from "lucide-react";
+import { ExternalLink, Cpu } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ShareButton } from "@/components/share-button";
-import { VideoEmbed, VideoBadge } from "@/components/video-embed";
-import { VerifiedBadge } from "@/components/verified-badge";
+import { VideoEmbed } from "@/components/video-embed";
 import { FeedSkeleton } from "@/components/feeds/feed-skeleton";
 import { useSettings } from "@/lib/settings-context";
 import { getPeriodLabel } from "@/lib/period-utils";
@@ -17,31 +16,50 @@ interface TechFeedProps {
   searchQuery?: string;
 }
 
-const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
-  Brain,
-  Server,
-  Zap,
-  Cpu,
-};
-
-const impactColors: Record<string, string> = {
-  critical: "bg-destructive/20 text-destructive border-destructive/30",
-  high: "bg-chart-4/20 text-chart-4 border-chart-4/30",
-  medium: "bg-chart-3/20 text-chart-3 border-chart-3/30",
-  low: "bg-muted text-muted-foreground border-border",
-};
-
-const impactBorderColors: Record<string, string> = {
-  critical: "border-l-destructive",
-  high: "border-l-chart-4",
-  medium: "border-l-primary",
-  low: "border-l-transparent",
-};
-
 const impactLabels: Record<string, Record<string, string>> = {
   de: { critical: "Kritisch", high: "Hoch", medium: "Mittel", low: "Niedrig" },
   en: { critical: "Critical", high: "High", medium: "Medium", low: "Low" },
 };
+
+function sentenceCaseFragment(text: string) {
+  if (!text) return "";
+  return /^[a-z]/.test(text) ? `${text[0].toUpperCase()}${text.slice(1)}` : text;
+}
+
+function splitHeadlineDeck(content: string): [string, string] {
+  const clean = content.replace(/\s+/g, " ").trim();
+  if (!clean) return ["", ""];
+
+  for (const separator of [": ", " — ", " – ", " - "]) {
+    const position = clean.indexOf(separator);
+    if (position >= 24 && position <= 82) {
+      return [clean.slice(0, position).replace(/[ .,-;:]+$/, ""), clean.slice(position + separator.length).trim()];
+    }
+  }
+
+  for (const separator of [" that ", " to "]) {
+    const position = clean.indexOf(separator, 30);
+    if (position > 0 && position <= 86) {
+      const headline = clean.slice(0, position).replace(/[ .,-;:]+$/, "");
+      let deck = separator === " to " ? clean.slice(position + 1).trim() : clean.slice(position + separator.length).trim();
+      if (separator === " to " && clean.slice(0, position).toLowerCase().includes(" from ")) {
+        deck = `toward ${clean.slice(position + separator.length).trim()}`;
+      }
+      return [headline, sentenceCaseFragment(deck)];
+    }
+  }
+
+  for (const separator of [". ", "? ", "! "]) {
+    const position = clean.indexOf(separator);
+    if (position >= 32 && position <= 90 && position + separator.length < clean.length) {
+      return [clean.slice(0, position + 1), clean.slice(position + separator.length).trim()];
+    }
+  }
+
+  if (clean.length <= 92) return [clean, ""];
+  const cut = clean.lastIndexOf(" ", 92);
+  return [clean.slice(0, cut).replace(/[ .,-;:]+$/, ""), clean.slice(cut).trim()];
+}
 
 /**
  * Displays AI technology news posts for a given week.
@@ -122,22 +140,22 @@ export function TechFeed({ weekId, searchQuery }: TechFeedProps) {
   const periodLabel = getPeriodLabel(weekId, language);
 
   return (
-    <div className="divide-y divide-border">
+    <div>
       {/* Section Header */}
-      <div className="section-header-tech border-l-4 border-tech-accent px-3 py-2 sm:px-4 sm:py-3">
-        <div className="flex items-center gap-2">
-          <Cpu className="h-5 w-5 text-tech-accent" aria-hidden="true" />
-          <h3 className="text-base sm:text-lg font-semibold text-foreground">{t("aiTechProgress")}</h3>
+      <div className="section-header-tech border-b border-foreground px-4 py-4 sm:px-6">
+        <div className="flex items-center gap-3">
+          <Cpu className="h-4 w-4 text-primary" aria-hidden="true" />
+          <h3 className="font-sans text-[11px] font-extrabold uppercase tracking-[0.18em] text-primary">{t("aiTechProgress")}</h3>
           {!loading && filteredPosts.length > 0 && (
-            <Badge variant="outline" className="text-xs text-tech-accent border-tech-accent/30">
+            <Badge variant="outline" className="rounded-none border-primary/40 text-xs text-primary">
               {filteredPosts.length}
             </Badge>
           )}
-          <Badge variant="secondary" className="ml-auto">
+          <Badge variant="secondary" className="ml-auto rounded-none border border-border bg-card font-sans text-[10px] uppercase tracking-[0.12em]">
             {periodLabel}
           </Badge>
         </div>
-        <p className="mt-0.5 sm:mt-1 text-xs sm:text-sm text-muted-foreground">
+        <p className="mt-2 font-display text-2xl font-normal leading-tight text-foreground">
           {t("importantDevThisWeek")}
         </p>
       </div>
@@ -160,59 +178,32 @@ export function TechFeed({ weekId, searchQuery }: TechFeedProps) {
 
       {/* Posts */}
       {filteredPosts.map((post, index) => {
-        const IconComponent = iconMap[post.iconType] || Brain;
         const isVideoPost = post.isVideo && post.videoId;
-        const borderColor = isVideoPost ? "border-l-video-accent" : (impactBorderColors[post.impact] || "border-l-transparent");
+        const [headline, deck] = splitHeadlineDeck(post.content);
+        const impactLabel = impacts[post.impact as keyof typeof impacts] || post.impact;
 
         return (
           <article
             key={post.id}
-            className={`border-l-2 ${borderColor} px-3 py-3 sm:px-4 sm:py-4 cursor-pointer transition-colors hover:bg-tech-accent/5 animate-fade-up`}
+            className="animate-fade-up border-b border-border px-4 py-5 transition-colors hover:bg-secondary/50 sm:px-6"
             style={{ animationDelay: `${Math.min(index, 10) * 50}ms` }}
           >
-            <div className="flex gap-2 sm:gap-3">
-              {/* Avatar */}
-              <div className={`flex h-10 w-10 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-full font-bold text-sm sm:text-base ${
-                isVideoPost
-                  ? "bg-red-600/20 text-red-600"
-                  : "bg-primary/20 text-primary"
-              }`}>
-                {post.author.avatar}
+            <div className="grid grid-cols-[3.25rem_minmax(0,1fr)] gap-4">
+              <div className="font-display text-3xl font-normal leading-none text-primary tabular-nums sm:text-4xl">
+                {String(index + 1).padStart(2, "0")}
               </div>
-
-              {/* Content */}
               <div className="flex-1 min-w-0">
-                {/* Author Info */}
-                <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
-                  <span className="font-bold text-sm sm:text-base text-foreground">{post.author.name}</span>
-                  {post.author.verified && <VerifiedBadge />}
-                  <span className="text-xs sm:text-sm text-muted-foreground">{post.author.handle}</span>
-                  <span className="text-xs sm:text-sm text-muted-foreground">·</span>
-                  <span className="text-xs sm:text-sm text-muted-foreground">{post.timestamp}</span>
+                <div className="font-sans text-[11px] font-extrabold uppercase tracking-[0.14em] text-primary">
+                  {isVideoPost ? "Video" : post.category} · {impactLabel} · {post.timestamp}
                 </div>
-
-                {/* Category & Impact (or Video Badge) */}
-                <div className="mt-1 flex items-center gap-2 flex-wrap">
-                  {isVideoPost ? (
-                    <VideoBadge
-                      duration={post.videoDuration}
-                      viewCount={post.videoViewCount}
-                    />
-                  ) : (
-                    <>
-                      <Badge variant="outline" className="text-xs">
-                        <IconComponent className="mr-1 h-3 w-3" />
-                        {post.category}
-                      </Badge>
-                      <Badge className={`text-xs border ${impactColors[post.impact]}`}>
-                        {t("impact")}: {impacts[post.impact as keyof typeof impacts]}
-                      </Badge>
-                    </>
-                  )}
-                </div>
-
-                {/* Post Content */}
-                <p className="mt-2 text-[15px] sm:text-base text-foreground leading-relaxed">{post.content}</p>
+                <h2 className="mt-2 border-b border-border pb-3 font-display text-2xl font-normal leading-[1.1] text-foreground sm:text-[1.75rem]">
+                  {headline}
+                </h2>
+                {deck && (
+                  <p className="mt-3 text-[15px] leading-relaxed text-foreground sm:text-base">
+                    {deck}
+                  </p>
+                )}
 
                 {/* Video Embed */}
                 {isVideoPost && post.videoId && (
@@ -232,32 +223,31 @@ export function TechFeed({ weekId, searchQuery }: TechFeedProps) {
                   {post.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="text-xs sm:text-sm text-primary hover:underline cursor-pointer"
+                      className="cursor-pointer font-sans text-[11px] font-bold uppercase tracking-[0.1em] text-muted-foreground hover:text-primary"
                     >
-                      #{tag}
+                      {tag}
                     </span>
                   ))}
                 </div>
 
                 {/* Source */}
-                <div className="mt-2 flex items-center gap-1 text-xs sm:text-sm text-muted-foreground">
-                  <ExternalLink className="h-3 w-3" aria-hidden="true" />
-                  {post.sourceUrl ? (
-                    <a
-                      href={post.sourceUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="hover:text-primary hover:underline transition-colors"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      {t("source")}: {post.source}
-                    </a>
-                  ) : (
-                    <span>{t("source")}: {post.source}</span>
-                  )}
-                </div>
-
-                <div className="mt-3">
+                <div className="mt-3 flex flex-wrap items-center gap-3 border-t border-border pt-3 text-xs text-muted-foreground">
+                  <div className="flex items-center gap-1">
+                    <ExternalLink className="h-3 w-3" aria-hidden="true" />
+                    {post.sourceUrl ? (
+                      <a
+                        href={post.sourceUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="border-b border-primary/40 text-primary transition-colors hover:border-primary"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {t("source")}: {post.source}
+                      </a>
+                    ) : (
+                      <span>{t("source")}: {post.source}</span>
+                    )}
+                  </div>
                   <ShareButton
                     title={post.category}
                     text={post.content}

@@ -1,23 +1,18 @@
 <svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="180" height="180" rx="37" fill="#111827"/>
-  <defs>
-    <linearGradient id="ico-r" x1="90" y1="28" x2="140" y2="115" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#60A5FA"/>
-      <stop offset="100%" stop-color="#2563EB"/>
-    </linearGradient>
-    <linearGradient id="ico-l" x1="90" y1="28" x2="40" y2="115" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#2DD4BF"/>
-      <stop offset="100%" stop-color="#0D9488"/>
-    </linearGradient>
-    <linearGradient id="ico-b" x1="90" y1="86" x2="90" y2="144" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#FBBF24"/>
-      <stop offset="100%" stop-color="#D97706"/>
-    </linearGradient>
-  </defs>
-  <!-- Right face — Tech (Blue) -->
-  <polygon points="90,86 90,28 140,57 140,115" fill="url(#ico-r)"/>
-  <!-- Left face — Tips (Teal) -->
-  <polygon points="90,86 90,28 40,57 40,115" fill="url(#ico-l)"/>
-  <!-- Bottom face — Investment (Amber) -->
-  <polygon points="90,86 140,115 90,144 40,115" fill="url(#ico-b)"/>
+  <rect width="180" height="180" rx="38" fill="#06111F"/>
+  <g stroke="#F8FAFC" stroke-width="4.4" stroke-linejoin="round" stroke-linecap="round">
+    <polygon points="90,23 151,55 90,87 29,55" fill="#101C2D"/>
+    <polygon points="29,55 90,87 90,158 29,124" fill="#101C2D"/>
+    <polygon points="90,87 151,55 151,124 90,158" fill="#0B76D1"/>
+    <path d="M59 39 120 71M29 89l61 35M59 141V71M121 141V71M29 124l61-37 61 37M29 55l61 32 61-32" fill="none" opacity="0.9"/>
+    <path d="M42 104 56 84 77 101 64 123 42 104Z" fill="none" stroke-width="3.8"/>
+    <g fill="#F8FAFC" stroke="none">
+      <circle cx="42" cy="104" r="5"/>
+      <circle cx="56" cy="84" r="5"/>
+      <circle cx="77" cy="101" r="5"/>
+      <circle cx="64" cy="123" r="5"/>
+    </g>
+    <polygon points="90,124 106,133 106,150 90,158" fill="#10B981" stroke-width="3.8"/>
+    <path d="M110 114h11l6-18 9 36 7-19h8" fill="none" stroke="#F2A51A" stroke-width="4.5"/>
+  </g>
 </svg>

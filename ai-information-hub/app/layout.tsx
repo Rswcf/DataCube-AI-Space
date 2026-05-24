@@ -1,7 +1,7 @@
 import React from "react"
 import type { Metadata } from 'next'
 import { headers } from 'next/headers'
-import { Geist, Geist_Mono } from 'next/font/google'
+import { Geist, Geist_Mono, Newsreader } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { SettingsProvider } from '@/lib/settings-context'
 import { isSupportedLanguage, toBcp47 } from '@/lib/i18n'
@@ -11,6 +11,11 @@ import './globals.css'
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-geist-sans" });
 const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono" });
+const newsreader = Newsreader({
+  subsets: ["latin"],
+  variable: "--font-newsreader",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.datacubeai.space'),
@@ -125,6 +130,8 @@ export const metadata: Metadata = {
 }
 
 export const viewport = {
+  width: 'device-width' as const,
+  initialScale: 1,
   viewportFit: 'cover' as const,
 };
 
@@ -151,7 +158,7 @@ export default async function RootLayout({
           <link key={l} rel="alternate" type="application/atom+xml" title={`Data Cube AI (${l.toUpperCase()})`} href={`/feed.xml?lang=${l}`} />
         ))}
       </head>
-      <body className={`${geist.variable} ${geistMono.variable} font-sans antialiased`}>
+      <body className={`${geist.variable} ${geistMono.variable} ${newsreader.variable} font-sans antialiased`}>
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:rounded-lg focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground focus:shadow-lg"

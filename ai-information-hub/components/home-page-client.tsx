@@ -6,7 +6,7 @@ import { Feed } from "@/components/feed";
 import { RightSidebar } from "@/components/right-sidebar";
 import { ChatWidget } from "@/components/chat-widget";
 import { ReportGenerator } from "@/components/report-generator";
-import { Cpu, TrendingUp, Lightbulb, Search, X, Settings, Sun, Moon, Languages, Mail, Check, Loader2, ArrowLeft } from "lucide-react";
+import { Cpu, TrendingUp, Lightbulb, Search, X, Settings, Sun, Moon, Languages, Check, Loader2, ArrowLeft } from "lucide-react";
 import { LANGUAGE_OPTIONS } from "@/lib/translations";
 import { cn } from "@/lib/utils";
 import { useSettings } from "@/lib/settings-context";
@@ -70,27 +70,32 @@ export default function HomePageClient({ initialWeekId = "" }: HomePageClientPro
   }, []);
 
   return (
-    <div className="min-h-dvh w-full overflow-x-hidden pb-16 md:pb-0">
-      {/* Ambient gradient - visual continuity from login */}
+    <div className="min-h-dvh w-full overflow-x-hidden bg-background pb-16 text-foreground md:pb-0">
+      {/* Paper wash for visual continuity */}
       <div
-        className="pointer-events-none fixed top-0 left-0 right-0 h-32 bg-gradient-to-b from-primary/[0.02] to-transparent z-0"
+        className="pointer-events-none fixed top-0 left-0 right-0 z-0 h-32 bg-gradient-to-b from-card/80 to-transparent"
         aria-hidden="true"
       />
-      <div id="main-content" className="mx-auto flex max-w-[1280px]">
+      <div id="main-content" className="relative z-[1] mx-auto flex w-full max-w-[1360px]">
         {/* Left Sidebar - Fixed width */}
         <div className="hidden md:flex md:w-20 xl:w-[275px] shrink-0 justify-end">
           <div className="w-full xl:w-[275px]">
-            <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
+            <Sidebar
+              activeTab={activeTab}
+              onTabChange={setActiveTab}
+              selectedWeekId={selectedWeekId}
+              onWeekChange={setSelectedWeekId}
+            />
           </div>
         </div>
 
         {/* Main Feed - Flexible center column */}
-        <div className="flex-1 min-w-0 max-w-[600px] border-x border-border dark:bg-content-surface">
+        <div className="w-full min-w-0 max-w-[680px] flex-1 border-x-2 border-foreground bg-card dark:bg-content-surface">
           <Feed activeTab={activeTab} selectedWeekId={selectedWeekId} onWeekChange={setSelectedWeekId} searchQuery={searchQuery} />
         </div>
 
         {/* Right Sidebar - Fixed width, hidden on smaller screens */}
-        <div className="hidden lg:block w-[350px] shrink-0">
+        <div className="hidden w-[350px] shrink-0 lg:block">
           <RightSidebar weekId={selectedWeekId} onSearchChange={setSearchQuery} />
         </div>
       </div>
@@ -145,19 +150,19 @@ function MobileNav({
   ];
 
   return (
-    <nav aria-label="Main navigation" className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around border-t border-border bg-background/95 backdrop-blur-md py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] md:hidden">
+    <nav aria-label="Main navigation" className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around border-t-2 border-foreground bg-card/95 py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] backdrop-blur-sm md:hidden">
       {tabs.map((tab) => (
         <button
           key={tab.id}
           onClick={() => onTabChange(tab.id)}
           className={cn(
             "flex flex-col items-center gap-1 px-3 py-2 active:scale-95 transition-transform duration-200",
-            activeTab === tab.id ? "text-primary scale-105" : "text-muted-foreground"
+            activeTab === tab.id ? "scale-105 text-primary" : "text-muted-foreground"
           )}
         >
           <tab.icon className="h-5 w-5" aria-hidden="true" />
           {activeTab === tab.id && (
-            <span className="h-1 w-1 rounded-full bg-primary" aria-hidden="true" />
+            <span className="h-0.5 w-6 bg-primary" aria-hidden="true" />
           )}
           <span className="text-[10px] font-medium">{tab.label}</span>
         </button>
@@ -272,11 +277,10 @@ function MobileSearchDrawer({
       <div className="absolute inset-0 bg-black/50" onClick={onClose} aria-hidden="true" />
 
       {/* Drawer */}
-      <div className="absolute bottom-0 left-0 right-0 max-h-[85vh] rounded-t-2xl bg-background animate-in slide-in-from-bottom duration-300">
+      <div className="absolute bottom-0 left-0 right-0 max-h-[85vh] border-t-2 border-foreground bg-card animate-in slide-in-from-bottom duration-300">
         {/* Handle with subtle gradient */}
         <div className="relative flex justify-center py-3" aria-hidden="true">
-          <div className="absolute inset-x-0 top-0 h-full rounded-t-2xl bg-gradient-to-b from-primary/[0.03] to-transparent" />
-          <div className="relative h-1 w-12 rounded-full bg-muted-foreground/30" />
+          <div className="relative h-0.5 w-12 bg-muted-foreground/40" />
         </div>
 
         {/* Header */}
@@ -284,7 +288,7 @@ function MobileSearchDrawer({
           <h2 id="mobile-search-title" className="text-lg font-bold">{t("search")}</h2>
           <button
             onClick={onClose}
-            className="rounded-full p-2.5 hover:bg-secondary transition-colors focus-visible:ring-2 focus-visible:ring-ring"
+            className="p-2.5 transition-colors hover:bg-secondary focus-visible:ring-2 focus-visible:ring-ring"
             aria-label={language === "de" ? "Schließen" : "Close"}
           >
             <X className="h-5 w-5" aria-hidden="true" />
@@ -300,14 +304,14 @@ function MobileSearchDrawer({
               placeholder={t("search")}
               value={searchValue}
               onChange={(e) => handleSearch(e.target.value)}
-              className="w-full rounded-full border border-input bg-secondary pl-10 pr-10 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full border border-foreground bg-card py-3 pl-10 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
               autoFocus
               aria-label={t("search")}
             />
             {searchValue && (
               <button
                 onClick={() => handleSearch("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 hover:bg-muted-foreground/20 transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 transition-colors hover:bg-muted-foreground/20"
                 aria-label="Clear search"
               >
                 <X className="h-4 w-4 text-muted-foreground" />
@@ -326,7 +330,7 @@ function MobileSearchDrawer({
               </p>
               <button
                 onClick={onClose}
-                className="mt-4 inline-flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground hover:opacity-90 transition-opacity focus-visible:ring-2 focus-visible:ring-ring"
+                className="mt-4 inline-flex items-center gap-2 bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-ring"
               >
                 {language === "de" ? "Ergebnisse anzeigen" : "Show results"}
               </button>
@@ -339,7 +343,7 @@ function MobileSearchDrawer({
                   <button
                     key={index}
                     onClick={() => handleTrendClick(trend.title)}
-                    className="w-full text-left p-3 rounded-lg hover:bg-secondary transition-colors focus-visible:ring-2 focus-visible:ring-ring flex items-start gap-3"
+                    className="flex w-full items-start gap-3 border-b border-border p-3 text-left transition-colors hover:bg-secondary focus-visible:ring-2 focus-visible:ring-ring"
                   >
                     <span className="text-sm font-bold text-muted-foreground/50 mt-0.5 w-5 shrink-0 tabular-nums" aria-hidden="true">{index + 1}</span>
                     <div className="min-w-0">
@@ -393,10 +397,10 @@ function MobileSettingsDrawer({
       <div className="absolute inset-0 bg-black/50" onClick={onClose} aria-hidden="true" />
 
       {/* Drawer */}
-      <div className="absolute bottom-0 left-0 right-0 max-h-[85vh] rounded-t-2xl bg-background animate-in slide-in-from-bottom duration-300 overflow-y-auto">
+      <div className="absolute bottom-0 left-0 right-0 max-h-[85vh] overflow-y-auto border-t-2 border-foreground bg-card animate-in slide-in-from-bottom duration-300">
         {/* Handle */}
         <div className="flex justify-center py-3" aria-hidden="true">
-          <div className="h-1 w-12 rounded-full bg-muted-foreground/30" />
+          <div className="h-0.5 w-12 bg-muted-foreground/40" />
         </div>
 
         {/* Header */}
@@ -404,7 +408,7 @@ function MobileSettingsDrawer({
           <h2 id="mobile-settings-title" className="text-lg font-bold">{t("settings")}</h2>
           <button
             onClick={onClose}
-            className="rounded-full p-2.5 hover:bg-secondary transition-colors focus-visible:ring-2 focus-visible:ring-ring"
+            className="p-2.5 transition-colors hover:bg-secondary focus-visible:ring-2 focus-visible:ring-ring"
             aria-label={language === "de" ? "Schließen" : "Close"}
           >
             <X className="h-5 w-5" aria-hidden="true" />
@@ -418,7 +422,7 @@ function MobileSettingsDrawer({
             onClick={() => {
               setTheme(theme === "dark" ? "light" : "dark");
             }}
-            className="flex w-full items-center gap-4 rounded-xl p-4 hover:bg-secondary transition-colors focus-visible:ring-2 focus-visible:ring-ring"
+            className="flex w-full items-center gap-4 border-b border-border p-4 transition-colors hover:bg-secondary focus-visible:ring-2 focus-visible:ring-ring"
           >
             {theme === "dark" ? (
               <Sun className="h-6 w-6 text-primary" aria-hidden="true" />
@@ -434,7 +438,7 @@ function MobileSettingsDrawer({
           </button>
 
           {/* Language Selector */}
-          <div className="rounded-xl p-4">
+          <div className="p-4">
             <div className="flex items-center gap-2 mb-3">
               <Languages className="h-5 w-5 text-primary" aria-hidden="true" />
               <p className="font-semibold">{t("language")}</p>
@@ -445,7 +449,7 @@ function MobileSettingsDrawer({
                   key={opt.code}
                   onClick={() => setLanguage(opt.code)}
                   className={cn(
-                    "flex items-center justify-between rounded-lg px-3 py-2.5 text-sm transition-colors focus-visible:ring-2 focus-visible:ring-ring",
+                    "flex items-center justify-between border px-3 py-2.5 text-sm transition-colors focus-visible:ring-2 focus-visible:ring-ring",
                     opt.code === language
                       ? "bg-primary/10 text-primary font-semibold border border-primary/30"
                       : "hover:bg-secondary border border-transparent"
@@ -459,105 +463,111 @@ function MobileSettingsDrawer({
           </div>
 
           {/* Newsletter */}
-          <div className="rounded-xl border border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5 p-4">
-            <div className="flex items-center gap-2 mb-1">
-              <Mail className="h-4 w-4 text-primary" aria-hidden="true" />
-              <h3 className="font-bold text-foreground">{t("newsletter")}</h3>
-            </div>
-            <p className="text-xs text-muted-foreground mb-3">{t("newsletterDescription")}</p>
-            {subscribeState === "success" ? (
-              <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
-                <Check className="h-4 w-4" aria-hidden="true" />
-                <span>{t("subscribed")}</span>
+          <div className="border border-[#1c1a17] bg-[#ffef7a] p-4 text-center dark:border-border dark:bg-card">
+            <div>
+              <div className="mb-3 font-display text-[11px] font-semibold uppercase tracking-[0.14em] text-[#1c1a17] dark:text-foreground">
+                Data Cube AI
               </div>
-            ) : subscribeState === "selectLang" ? (
-              <div className="flex flex-col gap-2">
-                <p className="text-xs font-medium text-foreground">{t("chooseNewsletterLang")}</p>
-                <div className="grid grid-cols-4 gap-1.5">
-                  {LANGUAGE_OPTIONS.map((opt) => (
+              <h3 className="mx-auto max-w-[16rem] break-words font-display text-2xl font-normal leading-[1.05] text-[#1c1a17] dark:text-foreground">
+                {t("newsletterHeading")}
+              </h3>
+              <p className="mx-auto mb-4 mt-3 max-w-[16rem] text-xs leading-relaxed text-[#1c1a17] dark:text-muted-foreground">
+                {t("newsletterDescription")}
+              </p>
+              {subscribeState === "success" ? (
+                <div className="flex items-center justify-center gap-2 text-sm font-semibold text-[#1c1a17] dark:text-tips-accent">
+                  <Check className="h-4 w-4" aria-hidden="true" />
+                  <span>{t("subscribed")}</span>
+                </div>
+              ) : subscribeState === "selectLang" ? (
+                <div className="flex flex-col gap-2">
+                  <p className="text-xs font-medium text-foreground">{t("chooseNewsletterLang")}</p>
+                  <div className="grid grid-cols-4 gap-1.5">
+                    {LANGUAGE_OPTIONS.map((opt) => (
+                      <button
+                        key={opt.code}
+                        type="button"
+                        onClick={() => setNewsletterLang(opt.code)}
+                        className={cn(
+                          "rounded-md border px-2 py-1.5 text-xs transition-colors focus-visible:ring-2 focus-visible:ring-ring",
+                          opt.code === newsletterLang
+                            ? "border-[#1c1a17] bg-[#1c1a17] font-semibold text-[#fffdf9] dark:border-video-accent dark:bg-video-accent dark:text-primary-foreground"
+                            : "border-[#1c1a17]/20 bg-[#fffdf9]/70 text-[#1c1a17] hover:border-[#1c1a17] dark:border-border dark:bg-background dark:text-muted-foreground"
+                        )}
+                      >
+                        {opt.nativeName}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="flex items-center justify-between mt-1">
                     <button
-                      key={opt.code}
                       type="button"
-                      onClick={() => setNewsletterLang(opt.code)}
-                      className={cn(
-                        "rounded-md px-2 py-1.5 text-xs transition-colors",
-                        opt.code === newsletterLang
-                          ? "bg-primary/10 text-primary font-semibold border border-primary/30"
-                          : "bg-secondary hover:bg-secondary/80 text-muted-foreground border border-transparent"
-                      )}
+                      onClick={() => setSubscribeState("idle")}
+                      className="flex items-center gap-1 text-xs font-medium text-[#1c1a17]/75 transition-colors hover:text-[#1c1a17] dark:text-muted-foreground dark:hover:text-foreground"
                     >
-                      {opt.nativeName}
+                      <ArrowLeft className="h-3 w-3" aria-hidden="true" />
+                      {t("back")}
                     </button>
-                  ))}
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        setSubscribeState("loading");
+                        try {
+                          const res = await fetch("/api/subscribe", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ email: email.trim(), language: newsletterLang }),
+                          });
+                          if (!res.ok) throw new Error();
+                          setEmail("");
+                          setSubscribeState("success");
+                          setTimeout(() => setSubscribeState("idle"), 4000);
+                        } catch {
+                          setSubscribeState("error");
+                          setTimeout(() => setSubscribeState("idle"), 3000);
+                        }
+                      }}
+                      className="rounded bg-[#1c1a17] px-4 py-1.5 text-xs font-semibold text-[#fffdf9] transition-colors hover:bg-[#2c2924] focus-visible:ring-2 focus-visible:ring-ring dark:bg-video-accent dark:text-primary-foreground"
+                    >
+                      {t("confirm")}
+                    </button>
+                  </div>
                 </div>
-                <div className="flex items-center justify-between mt-1">
+              ) : (
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (!email.trim() || subscribeState === "loading") return;
+                    setNewsletterLang(language);
+                    setSubscribeState("selectLang");
+                  }}
+                  className="flex flex-col gap-2"
+                >
+                  <input
+                    type="email"
+                    required
+                    placeholder={t("emailPlaceholder")}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full rounded-none border-0 border-b border-[#1c1a17] bg-transparent px-0 py-2 text-center text-sm placeholder:text-[#1c1a17]/55 focus:border-[#1c1a17] focus:outline-none focus:ring-0 dark:border-border dark:placeholder:text-muted-foreground"
+                  />
+                  {subscribeState === "error" && (
+                    <p className="text-xs text-red-500">{t("subscribeError")}</p>
+                  )}
                   <button
-                    type="button"
-                    onClick={() => setSubscribeState("idle")}
-                    className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    <ArrowLeft className="h-3 w-3" aria-hidden="true" />
-                    {t("back")}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      setSubscribeState("loading");
-                      try {
-                        const res = await fetch("/api/subscribe", {
-                          method: "POST",
-                          headers: { "Content-Type": "application/json" },
-                          body: JSON.stringify({ email: email.trim(), language: newsletterLang }),
-                        });
-                        if (!res.ok) throw new Error();
-                        setEmail("");
-                        setSubscribeState("success");
-                        setTimeout(() => setSubscribeState("idle"), 4000);
-                      } catch {
-                        setSubscribeState("error");
-                        setTimeout(() => setSubscribeState("idle"), 3000);
-                      }
-                    }}
-                    className="rounded-full bg-gradient-to-r from-primary to-accent px-4 py-1.5 text-xs font-medium text-primary-foreground hover:opacity-90 transition-opacity focus-visible:ring-2 focus-visible:ring-ring"
-                  >
-                    {t("confirm")}
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  if (!email.trim() || subscribeState === "loading") return;
-                  setNewsletterLang(language);
-                  setSubscribeState("selectLang");
-                }}
-                className="flex flex-col gap-2"
-              >
-                <input
-                  type="email"
-                  required
-                  placeholder={t("emailPlaceholder")}
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                />
-                {subscribeState === "error" && (
-                  <p className="text-xs text-red-500">{t("subscribeError")}</p>
-                )}
-                <button
                   type="submit"
                   disabled={subscribeState === "loading"}
-                  className="w-full rounded-full bg-gradient-to-r from-primary to-accent px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 transition-opacity focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
+                  className="w-full rounded bg-[#1c1a17] px-4 py-2 text-sm font-semibold text-[#fffdf9] transition-colors hover:bg-[#2c2924] focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50 dark:bg-video-accent dark:text-primary-foreground"
                 >
-                  {subscribeState === "loading" ? (
-                    <Loader2 className="h-4 w-4 animate-spin mx-auto" aria-hidden="true" />
-                  ) : (
-                    t("subscribe")
-                  )}
-                </button>
-              </form>
-            )}
+                    {subscribeState === "loading" ? (
+                      <Loader2 className="h-4 w-4 animate-spin mx-auto" aria-hidden="true" />
+                    ) : (
+                      t("subscribe")
+                    )}
+                  </button>
+                </form>
+              )}
+            </div>
           </div>
         </div>
       </div>

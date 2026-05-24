@@ -112,7 +112,7 @@ python -m scripts.weekly_collect --week 2026-kw06
 | **프론트엔드** | Next.js 16, React 19, Tailwind CSS 4, Shadcn/ui, TypeScript |
 | **백엔드** | FastAPI, SQLAlchemy, Alembic, PostgreSQL |
 | **LLM 분류** | GLM-4.5-Air (OpenRouter, 무료 티어) |
-| **LLM 처리** | DeepSeek V3.2 (OpenRouter) |
+| **LLM 처리** | DeepSeek V4 Flash (OpenRouter, 주 모델; V3.2는 폴백) |
 | **채팅 및 보고서** | Aurora Alpha (OpenRouter) |
 | **주가 데이터** | Polygon.io API |
 | **호스팅** | Vercel (프론트엔드), Railway (백엔드 + DB + 크론) |

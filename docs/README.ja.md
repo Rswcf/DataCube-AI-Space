@@ -112,7 +112,7 @@ python -m scripts.weekly_collect --week 2026-kw06
 | **フロントエンド** | Next.js 16, React 19, Tailwind CSS 4, Shadcn/ui, TypeScript |
 | **バックエンド** | FastAPI, SQLAlchemy, Alembic, PostgreSQL |
 | **LLM 分類** | GLM-4.5-Air (OpenRouter, 無料枠) |
-| **LLM 処理** | DeepSeek V3.2 (OpenRouter) |
+| **LLM 処理** | DeepSeek V4 Flash (OpenRouter、プライマリ; V3.2 はフォールバック) |
 | **チャット & レポート** | Aurora Alpha (OpenRouter) |
 | **株価データ** | Polygon.io API |
 | **ホスティング** | Vercel（フロントエンド）、Railway（バックエンド + DB + cron） |

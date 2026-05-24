@@ -86,6 +86,28 @@ class LLMProcessor:
         "qwen/qwen3-next-80b-a3b-instruct:free",
     ]
 
+    # Translator models in priority order (fallback chain).
+    # Stage 3.5 fans out 24 (4 sections × 6 langs) JSON-translation tasks via
+    # 3 ThreadPool workers. With only the 8 free models below, a peak-time
+    # OpenRouter rate-limit cascade collapses translation entirely (observed
+    # 2026-04-15 and 2026-04-24: full Stage 3.5 wipeout, users get DE fallback
+    # in the UI). The paid tier at the tail kicks in only when all 8 free
+    # models 429/error out — translation prompts are short (~1-2k tokens), so
+    # worst-case daily cost on a fully-failed run is ~$0.10-0.30. Cheap
+    # insurance against silent 0% translation coverage.
+    TRANSLATOR_MODELS = [
+        "z-ai/glm-4.5-air:free",
+        "nvidia/nemotron-3-super-120b-a12b:free",
+        "meta-llama/llama-3.3-70b-instruct:free",
+        "qwen/qwen3-coder:free",
+        "minimax/minimax-m2.5:free",
+        "nvidia/nemotron-3-nano-30b-a3b:free",
+        "google/gemma-4-31b-it:free",
+        "qwen/qwen3-next-80b-a3b-instruct:free",
+        "deepseek/deepseek-v4-flash",
+        "deepseek/deepseek-v3.2",
+    ]
+
     # Processor models in priority order (fallback chain).
     # Primary model is paid/high-quality; fallbacks are free but capable.
     # NOTE: `deepseek/deepseek-chat-v3-0324:free` was removed from OpenRouter
@@ -96,9 +118,15 @@ class LLMProcessor:
     # 2026-04-23 refresh: added llama-3.3-70b + qwen3-coder + minimax-m2.5 so
     # the post-deepseek fallback has three 70B+-class JSON-capable options
     # from different providers before dropping to 31B gemma.
+    # 2026-04-24 refresh: promoted `deepseek/deepseek-v4-flash` (released
+    # 2026-04-24; 1M context; $0.14/$0.28 per M tokens — ~44% cheaper input
+    # and ~26% cheaper output than v3.2) to primary; kept `deepseek/deepseek-v3.2`
+    # as paid fallback (proven JSON reliability); removed the experimental
+    # `deepseek/deepseek-v3.2-exp` (most expensive at $0.27/$0.41 and largely
+    # redundant with v3.2 in the same family).
     PROCESSOR_MODELS = [
+        "deepseek/deepseek-v4-flash",
         "deepseek/deepseek-v3.2",
-        "deepseek/deepseek-v3.2-exp",
         "meta-llama/llama-3.3-70b-instruct:free",
         "qwen/qwen3-coder:free",
         "z-ai/glm-4.5-air:free",
@@ -210,8 +238,10 @@ class LLMProcessor:
         raise last_error or RuntimeError("All processor models failed")
 
     def _call_with_fallback(self, prompt: str, temperature: float, timeout: float,
-                            expect_json: bool = False) -> str:
-        """Try classifier models in order, falling back on rate limits or bad JSON.
+                            expect_json: bool = False,
+                            models: "list[str] | None" = None,
+                            chain_name: str = "classifier") -> str:
+        """Try a model chain in order, falling back on rate limits or bad JSON.
 
         Each model gets 2 retry attempts with exponential backoff before
         moving to the next model in the chain.
@@ -222,12 +252,16 @@ class LLMProcessor:
             timeout: Request timeout in seconds.
             expect_json: If True, validate that the response parses as JSON.
                          Invalid JSON is treated as a retriable failure.
+            models: Optional explicit chain. Defaults to CLASSIFIER_MODELS.
+                    Translator path passes TRANSLATOR_MODELS (free chain + paid tail).
+            chain_name: Label used in log lines for diagnostics ("classifier" / "translator").
         """
+        chain = models if models is not None else self.CLASSIFIER_MODELS
         retries_per_model = 2
         base_delay = 2
         last_error = None
 
-        for model in self.CLASSIFIER_MODELS:
+        for model in chain:
             for attempt in range(retries_per_model):
                 try:
                     response = self.client.chat.completions.create(
@@ -237,7 +271,7 @@ class LLMProcessor:
                         timeout=timeout,
                     )
                     if not response.choices or not response.choices[0].message:
-                        logger.warning(f"Empty response from classifier model {model}")
+                        logger.warning(f"Empty response from {chain_name} model {model}")
                         return ""
                     content = response.choices[0].message.content or ""
 
@@ -256,7 +290,7 @@ class LLMProcessor:
                                 logger.warning(f"Model {model} exhausted (bad JSON), trying next fallback...")
                                 break  # try next model
 
-                    logger.info(f"Classifier succeeded with model: {model}")
+                    logger.info(f"{chain_name.capitalize()} succeeded with model: {model}")
                     return content
                 except RateLimitError as e:
                     last_error = e
@@ -268,13 +302,13 @@ class LLMProcessor:
                     else:
                         logger.warning(f"Model {model} exhausted, trying next fallback...")
                 except Exception as e:
-                    logger.error(f"Classifier call failed on {model}: {e}")
+                    logger.error(f"{chain_name.capitalize()} call failed on {model}: {e}")
                     last_error = e
                     # Non-rate-limit error: skip to next model immediately
                     break
 
-        logger.error(f"All {len(self.CLASSIFIER_MODELS)} classifier models exhausted")
-        raise last_error or RuntimeError("All classifier models failed")
+        logger.error(f"All {len(chain)} {chain_name} models exhausted")
+        raise last_error or RuntimeError(f"All {chain_name} models failed")
 
     def _try_translate_batch(
         self,
@@ -310,6 +344,7 @@ Output the translated JSON array with the same structure. Output ONLY the JSON a
         try:
             response = self._call_with_fallback(
                 prompt, temperature=0.2, timeout=120.0, expect_json=True,
+                models=self.TRANSLATOR_MODELS, chain_name="translator",
             )
             translated = parse_llm_json(response, fallback=None)
 

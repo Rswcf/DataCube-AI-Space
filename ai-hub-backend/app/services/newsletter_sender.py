@@ -4,13 +4,13 @@ Newsletter sender service.
 Fetches daily content from PostgreSQL, builds HTML email,
 retrieves subscribers from Beehiiv, and sends via Resend.
 
-Design based on best practices from TLDR, Morning Brew, Superhuman AI:
+Design based on OpenDesign warm editorial/newsletter craft:
 - Table-based layout for email client compatibility
-- Single-column 600px max-width
+- Single-column 680px max-width
 - WCAG AA compliant colors
-- Dark header/footer bookends for brand identity
-- Section-colored left-border accents
-- Vertical video cards with large thumbnails
+- Warm paper surfaces with restrained terracotta accents
+- Serif-led masthead and numbered editorial rows
+- Media-list videos with compact thumbnails
 - No content limits — shows all items from each collection
 """
 
@@ -48,37 +48,36 @@ SITE_URL = "https://www.datacubeai.space"
 # Design tokens (WCAG AA compliant)
 # ---------------------------------------------------------------------------
 
-# Brand accents (decorative borders only)
-ACCENT_TECH = "#2563eb"
-ACCENT_INVEST = "#d97706"
-ACCENT_TIPS = "#059669"
-ACCENT_VIDEO = "#e8533f"
+# Warm editorial palette adapted from OpenDesign's paper/editorial craft.
+ACCENT_BRAND = "#c0512f"
+ACCENT_TECH = "#0b5f9f"
+ACCENT_INVEST = "#9a5c02"
+ACCENT_TIPS = "#2f5b4f"
+ACCENT_VIDEO = "#a13d2b"
 
-# Darkened variants for text (pass WCAG AA 4.5:1 on white)
-TEXT_TECH = "#1d4ed8"
-TEXT_INVEST = "#b45309"
-TEXT_TIPS = "#047857"
-TEXT_VIDEO = "#c7382a"
+TEXT_TECH = ACCENT_TECH
+TEXT_INVEST = ACCENT_INVEST
+TEXT_TIPS = ACCENT_TIPS
+TEXT_VIDEO = ACCENT_VIDEO
 
-# Section background tints
-BG_TECH = "#eff6ff"
-BG_INVEST = "#fffbeb"
-BG_TIPS = "#ecfdf5"
-BG_VIDEO = "#fef2f2"
+BG_CANVAS = "#faf7f2"
+BG_SURFACE = "#fffdf9"
+BG_PANEL = "#f4efe6"
+BG_CARD = "#fbf8f1"
+BG_PROMO = "#ffef7a"
+TEXT_HEADLINE = "#1c1a17"
+TEXT_BODY = "#2c2924"
+TEXT_META = "#7a726b"
+BORDER_DIVIDER = "#e3ded4"
+LINK_COLOR = ACCENT_BRAND
+EMAIL_CONTAINER_WIDTH = 680
 
-# Neutral palette
-BG_DARK = "#1a1a2e"
-TEXT_HEADLINE = "#111827"
-TEXT_BODY = "#1f2937"
-TEXT_META = "#6b7280"
-BORDER_DIVIDER = "#e5e7eb"
-LINK_COLOR = "#1d4ed8"
-
-# Typography
-FONT_SERIF = "Georgia, 'Times New Roman', Times, serif"
+# Typography. Display gets editorial contrast; body remains multilingual-safe.
+FONT_DISPLAY = "Georgia, 'Times New Roman', 'Songti SC', 'Hiragino Mincho ProN', serif"
 FONT_SANS = (
     "-apple-system, BlinkMacSystemFont, 'Segoe UI', "
-    "Roboto, 'Helvetica Neue', Arial, sans-serif"
+    "Roboto, 'Helvetica Neue', Arial, 'PingFang SC', 'Hiragino Sans', "
+    "'Microsoft YaHei', 'Noto Sans', sans-serif"
 )
 
 # ---------------------------------------------------------------------------
@@ -100,6 +99,7 @@ EMAIL_STRINGS: dict[str, dict[str, str]] = {
         "header_round": "Runde",
         "watch_label": "Auf YouTube ansehen",
         "cta": "Alle News vom {date} lesen \u2192",
+        "promo_headline": "Die Signale, die z\u00e4hlen. Die Workflows, die helfen.",
         "footer_msg": "Du erh\u00e4ltst diese E-Mail, weil du den Data Cube AI Newsletter abonniert hast.",
         "unsubscribe": "Abmelden",
         "subject_week": "KI-News KW {num}",
@@ -120,6 +120,7 @@ EMAIL_STRINGS: dict[str, dict[str, str]] = {
         "header_round": "Round",
         "watch_label": "Watch on YouTube",
         "cta": "Read all news from {date} \u2192",
+        "promo_headline": "The signals that matter. The workflows you need.",
         "footer_msg": "You received this email because you subscribed to the Data Cube AI newsletter.",
         "unsubscribe": "Unsubscribe",
         "subject_week": "AI News Week {num}",
@@ -140,6 +141,7 @@ EMAIL_STRINGS: dict[str, dict[str, str]] = {
         "header_round": "\u8f6e\u6b21",
         "watch_label": "\u5728YouTube\u89c2\u770b",
         "cta": "\u9605\u8bfb{date}\u7684\u6240\u6709\u65b0\u95fb \u2192",
+        "promo_headline": "\u91cd\u8981\u7684 AI \u4fe1\u53f7\u3002\u53ef\u7528\u7684\u5de5\u4f5c\u6d41\u3002",
         "footer_msg": "\u60a8\u6536\u5230\u6b64\u90ae\u4ef6\u662f\u56e0\u4e3a\u60a8\u8ba2\u9605\u4e86Data Cube AI\u901a\u8baf\u3002",
         "unsubscribe": "\u53d6\u6d88\u8ba2\u9605",
         "subject_week": "AI\u65b0\u95fb \u7b2c{num}\u5468",
@@ -160,6 +162,7 @@ EMAIL_STRINGS: dict[str, dict[str, str]] = {
         "header_round": "Tour",
         "watch_label": "Voir sur YouTube",
         "cta": "Lire toutes les actualit\u00e9s du {date} \u2192",
+        "promo_headline": "Les signaux qui comptent. Les workflows utiles.",
         "footer_msg": "Vous recevez cet e-mail car vous \u00eates abonn\u00e9(e) \u00e0 la newsletter Data Cube AI.",
         "unsubscribe": "Se d\u00e9sabonner",
         "subject_week": "Actu IA Semaine {num}",
@@ -180,6 +183,7 @@ EMAIL_STRINGS: dict[str, dict[str, str]] = {
         "header_round": "Ronda",
         "watch_label": "Ver en YouTube",
         "cta": "Leer todas las noticias del {date} \u2192",
+        "promo_headline": "Las se\u00f1ales que importan. Los flujos que necesitas.",
         "footer_msg": "Recibes este correo porque te suscribiste al bolet\u00edn de Data Cube AI.",
         "unsubscribe": "Cancelar suscripci\u00f3n",
         "subject_week": "Noticias IA Semana {num}",
@@ -200,6 +204,7 @@ EMAIL_STRINGS: dict[str, dict[str, str]] = {
         "header_round": "Rodada",
         "watch_label": "Assistir no YouTube",
         "cta": "Ler todas as not\u00edcias de {date} \u2192",
+        "promo_headline": "Os sinais que importam. Os fluxos que ajudam.",
         "footer_msg": "Voc\u00ea recebeu este e-mail por estar inscrito na newsletter Data Cube AI.",
         "unsubscribe": "Cancelar inscri\u00e7\u00e3o",
         "subject_week": "Not\u00edcias IA Semana {num}",
@@ -220,6 +225,7 @@ EMAIL_STRINGS: dict[str, dict[str, str]] = {
         "header_round": "\u30e9\u30a6\u30f3\u30c9",
         "watch_label": "YouTube\u3067\u898b\u308b",
         "cta": "{date}\u306e\u5168\u30cb\u30e5\u30fc\u30b9\u3092\u8aad\u3080 \u2192",
+        "promo_headline": "\u91cd\u8981\u306aAI\u30b7\u30b0\u30ca\u30eb\u3002\u4f7f\u3048\u308b\u30ef\u30fc\u30af\u30d5\u30ed\u30fc\u3002",
         "footer_msg": "Data Cube AI\u30cb\u30e5\u30fc\u30b9\u30ec\u30bf\u30fc\u3092\u8cfc\u8aad\u3057\u3066\u3044\u308b\u305f\u3081\u3053\u306e\u30e1\u30fc\u30eb\u304c\u5c4a\u3044\u3066\u3044\u307e\u3059\u3002",
         "unsubscribe": "\u8cfc\u8aad\u89e3\u9664",
         "subject_week": "AI\u30cb\u30e5\u30fc\u30b9 \u7b2c{num}\u9031",
@@ -240,6 +246,7 @@ EMAIL_STRINGS: dict[str, dict[str, str]] = {
         "header_round": "\ub77c\uc6b4\ub4dc",
         "watch_label": "YouTube\uc5d0\uc11c \ubcf4\uae30",
         "cta": "{date} \ubaa8\ub4e0 \ub274\uc2a4 \uc77d\uae30 \u2192",
+        "promo_headline": "\uc911\uc694\ud55c AI \uc2e0\ud638. \ubc14\ub85c \uc4f0\ub294 \uc6cc\ud06c\ud50c\ub85c.",
         "footer_msg": "Data Cube AI \ub274\uc2a4\ub808\ud130\ub97c \uad6c\ub3c5\ud558\uc168\uae30 \ub54c\ubb38\uc5d0 \uc774 \uc774\uba54\uc77c\uc744 \ubc1b\uc73c\uc168\uc2b5\ub2c8\ub2e4.",
         "unsubscribe": "\uad6c\ub3c5 \ud574\uc9c0",
         "subject_week": "AI \ub274\uc2a4 {num}\uc8fc\ucc28",
@@ -308,12 +315,59 @@ def _esc(text: str) -> str:
     return html.escape(text or "")
 
 
+def _clean_label(label: str) -> str:
+    for marker in ("🔬", "💰", "💡", "🎬"):
+        label = label.replace(marker, "")
+    return " ".join(label.split())
+
+
+def _brand_mark(size: int = 36) -> str:
+    """Email-safe cube mark built from table cells."""
+    cell = max(6, size // 4)
+    gap = 2
+    colors = [
+        ["#1c1a17", "#1c1a17", ACCENT_TECH],
+        ["#1c1a17", ACCENT_TIPS, ACCENT_INVEST],
+    ]
+    rows = ""
+    for row in colors:
+        cells = ""
+        for color in row:
+            cells += (
+                f'<td width="{cell}" height="{cell}" '
+                f'style="width:{cell}px;height:{cell}px;background-color:{color};font-size:0;line-height:0;">&nbsp;</td>'
+                f'<td width="{gap}" style="width:{gap}px;font-size:0;line-height:0;">&nbsp;</td>'
+            )
+        rows += f"<tr>{cells}</tr>"
+    return f"""
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0"
+           style="display:inline-table;background-color:{BG_SURFACE};padding:4px;border:1px solid {TEXT_HEADLINE};">
+      {rows}
+    </table>"""
+
+
+def _brand_lockup(text_color: str = TEXT_HEADLINE, muted_color: str = TEXT_META, align: str = "left") -> str:
+    align_attr = ' align="center"' if align == "center" else ""
+    return f"""
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0"{align_attr}>
+      <tr>
+        <td valign="middle" style="padding:0 10px 0 0;">{_brand_mark(34)}</td>
+        <td valign="middle" style="font-family:{FONT_SANS};font-size:13px;font-weight:800;letter-spacing:1.1px;text-transform:uppercase;color:{text_color};line-height:1.15;">
+          Data Cube AI
+          <div style="font-family:{FONT_SANS};font-size:11px;font-weight:600;letter-spacing:0.7px;text-transform:none;color:{muted_color};padding-top:3px;">
+            Intelligence memo
+          </div>
+        </td>
+      </tr>
+    </table>"""
+
+
 def _divider() -> str:
-    """Section divider — 1px gray line with vertical spacing."""
+    """Section divider with editorial whitespace."""
     return f"""
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
       <tr>
-        <td style="padding:24px 0;">
+        <td style="padding:22px 0;">
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
             <tr><td style="border-top:1px solid {BORDER_DIVIDER};font-size:0;line-height:0;" height="1">&nbsp;</td></tr>
           </table>
@@ -322,20 +376,105 @@ def _divider() -> str:
     </table>"""
 
 
-def _section_header(label: str, accent: str, text_color: str, bg_tint: str) -> str:
-    """Section header with left-border accent and tinted background."""
+def _section_header(label: str, accent: str, text_color: str) -> str:
+    """Editorial section header: label plus rule, no dashboard-card styling."""
+    label = _clean_label(label)
     return f"""
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
       <tr>
-        <td style="padding:0 0 12px 0;">
-          <table role="presentation" cellpadding="0" cellspacing="0" border="0">
-            <tr>
-              <td style="background-color:{accent};width:4px;font-size:0;">&nbsp;</td>
-              <td style="padding:8px 12px;background-color:{bg_tint};font-family:{FONT_SANS};font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:{text_color};">
-                {label}
-              </td>
-            </tr>
+        <td width="152" valign="middle" style="padding:0 14px 12px 0;font-family:{FONT_SANS};font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:{text_color};line-height:1.2;white-space:nowrap;">
+          {label}
+        </td>
+        <td valign="middle" style="padding:0 0 12px 0;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+            <tr><td style="border-top:1px solid {accent};font-size:0;line-height:0;" height="1">&nbsp;</td></tr>
           </table>
+        </td>
+      </tr>
+    </table>"""
+
+
+def _headline_limit(lang: str) -> int:
+    return 36 if lang in {"zh", "ja", "ko"} else 78
+
+
+def _sentence_case_fragment(text: str) -> str:
+    if not text:
+        return ""
+    return text[0].upper() + text[1:] if text[0].isascii() else text
+
+
+def _split_headline_deck(text: str, max_headline: int = 78) -> tuple[str, str]:
+    """Split summary text into a magazine-style headline and supporting deck."""
+    clean = " ".join((text or "").split())
+    if not clean:
+        return "", ""
+
+    for separator in (": ", " — ", " – ", " - "):
+        position = clean.find(separator)
+        if 20 <= position <= max_headline:
+            return clean[:position].rstrip(" ."), clean[position + len(separator):].strip()
+
+    for separator, include_separator in ((" that ", False), (" to ", True)):
+        position = clean.find(separator, 28, max_headline)
+        if position > 0:
+            if include_separator:
+                deck = clean[position + 1:].strip()
+                if separator == " to " and " from " in clean[:position].lower():
+                    deck = "toward " + clean[position + len(separator):].strip()
+            else:
+                deck = clean[position + len(separator):].strip()
+            return clean[:position].rstrip(" .,-;:"), _sentence_case_fragment(deck)
+
+    for separator in (". ", "? ", "! "):
+        position = clean.find(separator)
+        if 24 <= position <= max_headline and position + len(separator) < len(clean):
+            return clean[:position + 1], clean[position + len(separator):].strip()
+
+    if len(clean) <= max_headline:
+        return clean, ""
+
+    cut = -1
+    for separator in (",", ";"):
+        cut = max(cut, clean.rfind(separator, 35, max_headline))
+    if cut > 0:
+        return clean[:cut].rstrip(" ,;"), clean[cut + 1:].strip()
+
+    cut = clean.rfind(" ", 45, max_headline)
+    if cut == -1:
+        cut = max_headline
+    return clean[:cut].rstrip(" .,-;:"), clean[cut:].lstrip(" .,-;:")
+
+
+def _story_row(
+    index: int,
+    meta: str,
+    headline: str,
+    deck: str,
+    accent: str,
+    source_link: str = "",
+) -> str:
+    deck_block = ""
+    if deck or source_link:
+        deck_block = f"""
+          <div style="padding-top:10px;font-family:{FONT_SANS};font-size:14px;line-height:1.62;color:{TEXT_BODY};">
+            {deck}{source_link}
+          </div>"""
+
+    return f"""
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+      <tr>
+        <td width="54" valign="top" style="padding:19px 16px 20px 0;border-top:1px solid {BORDER_DIVIDER};font-family:{FONT_DISPLAY};font-size:28px;line-height:1;color:{accent};">
+          {index:02d}
+        </td>
+        <td valign="top" style="padding:17px 0 20px;border-top:1px solid {BORDER_DIVIDER};">
+          <div style="font-family:{FONT_SANS};font-size:11px;font-weight:800;letter-spacing:0.8px;text-transform:uppercase;color:{ACCENT_BRAND};line-height:1.4;padding-bottom:7px;">
+            {meta}
+          </div>
+          <div style="font-family:{FONT_DISPLAY};font-size:23px;line-height:1.22;color:{TEXT_HEADLINE};letter-spacing:-0.2px;padding-bottom:10px;border-bottom:1px solid {BORDER_DIVIDER};">
+            {headline}
+          </div>
+          {deck_block}
         </td>
       </tr>
     </table>"""
@@ -370,22 +509,25 @@ def _build_tldr(data: dict, lang: str) -> str:
 
     label = _s(lang, "tldr_label")
     bullets = ""
-    for h in highlights:
+    for idx, h in enumerate(highlights, start=1):
         bullets += f"""
         <tr>
-          <td style="padding:0 0 4px 0;font-family:{FONT_SANS};font-size:14px;line-height:1.5;color:{TEXT_BODY};">
-            \u2022 {_esc(h)}
+          <td width="28" valign="top" style="padding:0 12px 10px 0;font-family:{FONT_DISPLAY};font-size:18px;line-height:1.1;color:{ACCENT_BRAND};">
+            {idx}
+          </td>
+          <td style="padding:0 0 10px 0;font-family:{FONT_SANS};font-size:15px;line-height:1.6;color:{TEXT_BODY};">
+            {_esc(h)}
           </td>
         </tr>"""
 
     return f"""
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
       <tr>
-        <td style="padding:16px 20px;background-color:#f3f4f6;border-radius:8px;">
+        <td style="padding:18px 0 8px;background-color:{BG_SURFACE};border-top:2px solid {TEXT_HEADLINE};border-bottom:1px solid {BORDER_DIVIDER};">
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
             <tr>
-              <td style="padding:0 0 8px 0;font-family:{FONT_SANS};font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#4b5563;">
-                {_esc(label)}
+              <td colspan="2" style="padding:0 0 13px 0;font-family:{FONT_SANS};font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:{ACCENT_BRAND};">
+                {_esc(_clean_label(label))}
               </td>
             </tr>
             {bullets}
@@ -430,31 +572,63 @@ def _build_email_html(data: dict, lang: str) -> str:
     sections.append(f"""
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
       <tr>
-        <td align="center" style="padding:8px;background-color:#f3f4f6;font-family:{FONT_SANS};font-size:12px;color:#6b7280;">
-          <a href="{week_url}" style="color:#6b7280;text-decoration:underline;">{_s(lang, "view_in_browser")}</a>
+        <td align="center" style="padding:12px 16px;background-color:{BG_CANVAS};font-family:{FONT_SANS};font-size:12px;color:{TEXT_META};">
+          <a href="{week_url}" style="color:{TEXT_META};text-decoration:underline;">{_s(lang, "view_in_browser")}</a>
         </td>
       </tr>
     </table>""")
 
-    # ── Dark Header ──────────────────────────────────────────────
+    # ── Magazine Masthead ────────────────────────────────────────
     sections.append(f"""
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
       <tr>
-        <td style="background-color:{BG_DARK};padding:24px 24px 20px;">
+        <td style="background-color:{BG_SURFACE};padding:26px 32px 0;">
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
             <tr>
-              <td style="font-family:{FONT_SERIF};font-size:28px;font-weight:700;color:#ffffff;line-height:1.2;">
-                \U0001f9ca Data Cube AI
+              <td width="35%" valign="middle" style="font-family:{FONT_SANS};font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:{TEXT_META};line-height:1.3;">
+                AI Intelligence
               </td>
-              <td align="right" style="font-family:{FONT_SANS};font-size:13px;color:#9ca3af;line-height:1.4;">
+              <td width="30%" align="center" valign="middle">
+                {_brand_mark(30)}
+              </td>
+              <td width="35%" align="right" valign="middle" style="font-family:{FONT_SANS};font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:{TEXT_META};line-height:1.3;">
                 {_esc(date_label)}
               </td>
             </tr>
           </table>
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
             <tr>
-              <td style="padding-top:8px;font-family:{FONT_SANS};font-size:14px;color:#d1d5db;">
+              <td align="center" style="padding-top:16px;font-family:{FONT_DISPLAY};font-size:48px;font-weight:400;letter-spacing:-1.1px;color:{TEXT_HEADLINE};line-height:0.95;">
+                Data Cube AI
+              </td>
+            </tr>
+            <tr>
+              <td align="center" style="padding-top:8px;font-family:{FONT_SANS};font-size:11px;font-weight:800;letter-spacing:1.1px;text-transform:uppercase;color:{TEXT_META};line-height:1.4;">
+                The Intelligence Memo
+              </td>
+            </tr>
+            <tr>
+              <td align="center" style="padding-top:10px;font-family:{FONT_DISPLAY};font-size:17px;color:{TEXT_BODY};line-height:1.45;">
                 {_esc(tagline)}
+              </td>
+            </tr>
+            <tr>
+              <td style="padding-top:24px;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                  <tr><td style="border-top:2px solid {TEXT_HEADLINE};font-size:0;line-height:0;" height="2">&nbsp;</td></tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:10px 0;border-bottom:1px solid {BORDER_DIVIDER};font-family:{FONT_SANS};font-size:10px;font-weight:800;letter-spacing:0.9px;text-transform:uppercase;color:{TEXT_HEADLINE};line-height:1.4;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                  <tr>
+                    <td align="center" width="25%">Technology</td>
+                    <td align="center" width="25%">Capital</td>
+                    <td align="center" width="25%">Workflows</td>
+                    <td align="center" width="25%">Video</td>
+                  </tr>
+                </table>
               </td>
             </tr>
           </table>
@@ -476,57 +650,36 @@ def _build_email_html(data: dict, lang: str) -> str:
         sections.append(f"""
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
       <tr><td style="padding:24px 24px 0;">
-        {_section_header(_s(lang, "tech_label"), ACCENT_TECH, TEXT_TECH, BG_TECH)}
+        {_section_header(_s(lang, "tech_label"), TEXT_HEADLINE, ACCENT_BRAND)}
       </td></tr>
     </table>""")
 
-        for post in tech:
-            content = _esc(get_field(post, "content", lang) or "")
+        for idx, post in enumerate(tech, start=1):
+            raw_content = get_field(post, "content", lang) or ""
+            headline, deck = _split_headline_deck(raw_content, _headline_limit(lang))
             category = _esc(get_field(post, "category", lang) or "")
             impact = _esc(post.impact)
-
-            # Impact dot color
-            impact_lower = (post.impact or "").lower()
-            if impact_lower == "high":
-                dot_color = "#dc2626"
-            elif impact_lower == "medium":
-                dot_color = "#f59e0b"
-            else:
-                dot_color = "#22c55e"
 
             source_link = ""
             if post.source_url:
                 source_link = (
                     f' <a href="{_esc(post.source_url)}" '
-                    f'style="color:{LINK_COLOR};text-decoration:underline;'
-                    f'font-size:13px;">[{_esc(post.source)}]</a>'
+                    f'style="color:{LINK_COLOR};text-decoration:none;'
+                    f'border-bottom:1px solid {ACCENT_BRAND};font-size:13px;">{_esc(post.source)}</a>'
                 )
 
             sections.append(f"""
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
       <tr>
-        <td style="padding:0 24px 12px;">
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
-                 style="border-left:4px solid {ACCENT_TECH};">
-            <tr>
-              <td style="padding:10px 16px;">
-                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-                  <tr>
-                    <td style="font-family:{FONT_SANS};font-size:12px;color:{TEXT_META};padding-bottom:4px;">
-                      {category}
-                      <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background-color:{dot_color};vertical-align:middle;margin-left:6px;"></span>
-                      <span style="font-size:11px;color:{TEXT_META};vertical-align:middle;margin-left:2px;">{impact}</span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td style="font-family:{FONT_SANS};font-size:15px;line-height:1.55;color:{TEXT_BODY};">
-                      {content}{source_link}
-                    </td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-          </table>
+        <td style="padding:0 24px;">
+          {_story_row(
+              idx,
+              f'{category} &middot; {impact}',
+              _esc(headline),
+              _esc(deck),
+              ACCENT_BRAND,
+              source_link,
+          )}
         </td>
       </tr>
     </table>""")
@@ -545,7 +698,7 @@ def _build_email_html(data: dict, lang: str) -> str:
         sections.append(f"""
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
       <tr><td style="padding:0 24px;">
-        {_section_header(_s(lang, "invest_label"), ACCENT_INVEST, TEXT_INVEST, BG_INVEST)}
+        {_section_header(_s(lang, "invest_label"), TEXT_HEADLINE, ACCENT_BRAND)}
       </td></tr>
     </table>""")
 
@@ -556,9 +709,9 @@ def _build_email_html(data: dict, lang: str) -> str:
             amount = _esc(get_field(p, "amount", lang) or "N/A")
             rows += f"""
               <tr>
-                <td style="padding:8px 10px;border-bottom:1px solid #f3f4f6;font-family:{FONT_SANS};font-size:14px;color:{TEXT_BODY};">{_esc(p.company)}</td>
-                <td style="padding:8px 10px;border-bottom:1px solid #f3f4f6;font-family:{FONT_SANS};font-size:14px;color:{TEXT_BODY};white-space:nowrap;">{amount}</td>
-                <td style="padding:8px 10px;border-bottom:1px solid #f3f4f6;font-family:{FONT_SANS};font-size:14px;color:{TEXT_META};">{_esc(p.round)}</td>
+                <td style="padding:12px 0;border-bottom:1px solid {BORDER_DIVIDER};font-family:{FONT_SANS};font-size:14px;font-weight:700;color:{TEXT_HEADLINE};">{_esc(p.company)}</td>
+                <td style="padding:12px 10px;border-bottom:1px solid {BORDER_DIVIDER};font-family:{FONT_DISPLAY};font-size:18px;color:{TEXT_HEADLINE};white-space:nowrap;">{amount}</td>
+                <td style="padding:12px 0;border-bottom:1px solid {BORDER_DIVIDER};font-family:{FONT_SANS};font-size:13px;color:{TEXT_META};">{_esc(p.round)}</td>
               </tr>"""
 
         sections.append(f"""
@@ -567,17 +720,17 @@ def _build_email_html(data: dict, lang: str) -> str:
         <td style="padding:0 24px 16px;">
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
             <tr>
-              <td style="padding:0 0 8px 0;font-family:{FONT_SANS};font-size:13px;font-weight:600;color:{TEXT_INVEST};">
+              <td style="padding:0 0 8px 0;font-family:{FONT_SANS};font-size:11px;font-weight:800;letter-spacing:0.8px;text-transform:uppercase;color:{ACCENT_BRAND};">
                 {_esc(_s(lang, "primary_market"))}
               </td>
             </tr>
           </table>
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
-                 style="border:1px solid {BORDER_DIVIDER};border-radius:6px;">
-            <tr style="background-color:{BG_INVEST};">
-              <th style="text-align:left;padding:10px;font-family:{FONT_SANS};font-size:12px;font-weight:700;color:{TEXT_INVEST};border-bottom:2px solid {ACCENT_INVEST};">{_s(lang, "header_company")}</th>
-              <th style="text-align:left;padding:10px;font-family:{FONT_SANS};font-size:12px;font-weight:700;color:{TEXT_INVEST};border-bottom:2px solid {ACCENT_INVEST};">{_s(lang, "header_amount")}</th>
-              <th style="text-align:left;padding:10px;font-family:{FONT_SANS};font-size:12px;font-weight:700;color:{TEXT_INVEST};border-bottom:2px solid {ACCENT_INVEST};">{_s(lang, "header_round")}</th>
+                 style="border-top:1px solid {TEXT_HEADLINE};background-color:{BG_SURFACE};">
+            <tr>
+              <th style="text-align:left;padding:12px 0 8px;font-family:{FONT_SANS};font-size:10px;font-weight:800;letter-spacing:0.9px;text-transform:uppercase;color:{TEXT_META};border-bottom:1px solid {BORDER_DIVIDER};">{_s(lang, "header_company")}</th>
+              <th style="text-align:left;padding:12px 10px 8px;font-family:{FONT_SANS};font-size:10px;font-weight:800;letter-spacing:0.9px;text-transform:uppercase;color:{TEXT_META};border-bottom:1px solid {BORDER_DIVIDER};">{_s(lang, "header_amount")}</th>
+              <th style="text-align:left;padding:12px 0 8px;font-family:{FONT_SANS};font-size:10px;font-weight:800;letter-spacing:0.9px;text-transform:uppercase;color:{TEXT_META};border-bottom:1px solid {BORDER_DIVIDER};">{_s(lang, "header_round")}</th>
             </tr>
             {rows}
           </table>
@@ -593,7 +746,7 @@ def _build_email_html(data: dict, lang: str) -> str:
         <td style="padding:0 24px 4px;">
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
             <tr>
-              <td style="padding:0 0 8px 0;font-family:{FONT_SANS};font-size:13px;font-weight:600;color:{TEXT_INVEST};">
+              <td style="padding:0 0 8px 0;font-family:{FONT_SANS};font-size:11px;font-weight:800;letter-spacing:0.8px;text-transform:uppercase;color:{ACCENT_BRAND};">
                 M&amp;A
               </td>
             </tr>
@@ -602,27 +755,21 @@ def _build_email_html(data: dict, lang: str) -> str:
       </tr>
     </table>""")
 
-        for m in ma:
+        for idx, m in enumerate(ma, start=1):
             content = _esc(get_field(m, "content", lang) or "")
             deal_val = _esc(get_field(m, "deal_value", lang) or "")
             deal_info = f" ({deal_val})" if deal_val else ""
+            deal_headline = (
+                f'<strong style="color:{TEXT_HEADLINE};">{_esc(m.acquirer)}</strong> '
+                f'<span style="color:{TEXT_META};">&rarr;</span> '
+                f'<strong style="color:{TEXT_HEADLINE};">{_esc(m.target)}</strong>'
+                f'<span style="font-size:13px;color:{TEXT_META};">{deal_info}</span>'
+            )
             sections.append(f"""
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
       <tr>
-        <td style="padding:0 24px 10px;">
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
-                 style="border-left:4px solid {ACCENT_INVEST};">
-            <tr>
-              <td style="padding:8px 16px;font-family:{FONT_SANS};font-size:15px;line-height:1.5;color:{TEXT_BODY};">
-                <strong style="color:{TEXT_HEADLINE};">{_esc(m.acquirer)}</strong>
-                <span style="color:{TEXT_META};">\u2192</span>
-                <strong style="color:{TEXT_HEADLINE};">{_esc(m.target)}</strong>
-                <span style="font-size:13px;color:{TEXT_META};">{deal_info}</span>
-                <br>
-                <span style="font-size:14px;color:{TEXT_BODY};">{content}</span>
-              </td>
-            </tr>
-          </table>
+        <td style="padding:0 24px;">
+          {_story_row(idx, "M&amp;A", deal_headline, content, ACCENT_BRAND)}
         </td>
       </tr>
     </table>""")
@@ -640,32 +787,34 @@ def _build_email_html(data: dict, lang: str) -> str:
         sections.append(f"""
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
       <tr><td style="padding:0 24px;">
-        {_section_header(_s(lang, "tips_label"), ACCENT_TIPS, TEXT_TIPS, BG_TIPS)}
+        {_section_header(_s(lang, "tips_label"), TEXT_HEADLINE, ACCENT_BRAND)}
       </td></tr>
     </table>""")
 
         for t in tips:
-            content = _esc(get_field(t, "content", lang) or "")
+            raw_content = get_field(t, "content", lang) or ""
+            headline, deck = _split_headline_deck(raw_content, _headline_limit(lang))
             category = _esc(get_field(t, "category", lang) or "")
             sections.append(f"""
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
       <tr>
-        <td style="padding:0 24px 10px;">
+        <td style="padding:0 24px 14px;">
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
-                 style="border-left:4px solid {ACCENT_TIPS};">
+                 style="background-color:{BG_SURFACE};border-top:1px solid {TEXT_HEADLINE};border-bottom:1px solid {BORDER_DIVIDER};">
             <tr>
-              <td style="padding:10px 16px;">
+              <td style="padding:18px 20px;">
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                   <tr>
-                    <td style="font-family:{FONT_SANS};font-size:12px;color:{TEXT_META};padding-bottom:4px;">
+                    <td style="font-family:{FONT_SANS};font-size:11px;font-weight:800;letter-spacing:0.9px;text-transform:uppercase;color:{ACCENT_BRAND};padding-bottom:9px;">
                       {category}
                     </td>
                   </tr>
                   <tr>
-                    <td style="font-family:{FONT_SANS};font-size:15px;line-height:1.55;color:{TEXT_BODY};">
-                      {content}
+                    <td style="font-family:{FONT_DISPLAY};font-size:23px;line-height:1.22;color:{TEXT_HEADLINE};letter-spacing:-0.2px;padding-bottom:10px;border-bottom:1px solid {BORDER_DIVIDER};">
+                      {_esc(headline)}
                     </td>
                   </tr>
+                  {f'<tr><td style="padding-top:10px;font-family:{FONT_SANS};font-size:14px;line-height:1.62;color:{TEXT_BODY};">{_esc(deck)}</td></tr>' if deck else ''}
                 </table>
               </td>
             </tr>
@@ -681,58 +830,60 @@ def _build_email_html(data: dict, lang: str) -> str:
       <tr><td style="padding:0 24px;">{_divider()}</td></tr>
     </table>""")
 
-    # ── Videos Section (vertical card layout) ────────────────────
+    # ── Videos Section (editorial media list) ────────────────────
     videos = data["videos"]
     if videos:
         sections.append(f"""
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
       <tr><td style="padding:0 24px;">
-        {_section_header(_s(lang, "videos_label"), ACCENT_VIDEO, TEXT_VIDEO, BG_VIDEO)}
+        {_section_header(_s(lang, "videos_label"), TEXT_HEADLINE, ACCENT_BRAND)}
       </td></tr>
     </table>""")
 
-        for v in videos:
-            content = _esc(get_field(v, "content", lang) or "")
+        for idx, v in enumerate(videos, start=1):
+            raw_content = get_field(v, "content", lang) or ""
+            headline, deck = _split_headline_deck(raw_content, _headline_limit(lang))
             yt_url = f"https://youtube.com/watch?v={_esc(v.video_id)}"
             thumb = f"https://img.youtube.com/vi/{_esc(v.video_id)}/hqdefault.jpg"
             channel = _esc(getattr(v, "source", "") or "")
+            video_deck = f"""
+                <div style="padding-top:10px;font-family:{FONT_SANS};font-size:14px;line-height:1.55;color:{TEXT_BODY};">
+                  {_esc(deck)}
+                </div>""" if deck else ""
 
             sections.append(f"""
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
       <tr>
-        <td style="padding:0 24px 20px;">
+        <td style="padding:0 24px 16px;">
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
-                 style="border:1px solid {BORDER_DIVIDER};border-radius:8px;">
+                 style="border-top:1px solid {TEXT_HEADLINE};border-bottom:1px solid {BORDER_DIVIDER};background-color:{BG_SURFACE};">
             <tr>
-              <td style="padding:0;">
+              <td width="178" valign="top" style="padding:18px 18px 18px 0;">
                 <a href="{yt_url}" target="_blank" style="text-decoration:none;">
                   <img src="{thumb}"
-                       alt="{_esc(content[:60])}"
-                       width="552"
-                       height="310"
-                       style="display:block;width:100%;max-width:552px;height:auto;border:0;border-radius:8px 8px 0 0;" />
+                       alt="{_esc(raw_content[:60])}"
+                       width="178"
+                       style="display:block;width:178px;max-width:178px;height:auto;border:1px solid {BORDER_DIVIDER};" />
                 </a>
               </td>
-            </tr>
-            <tr>
-              <td style="padding:12px 16px 14px;background-color:#fafafa;border-radius:0 0 8px 8px;">
+              <td valign="top" style="padding:18px 0 18px;">
+                <div style="font-family:{FONT_DISPLAY};font-size:21px;line-height:1;color:{ACCENT_BRAND};padding-bottom:8px;">
+                  {idx:02d}
+                </div>
+                <div style="font-family:{FONT_SANS};font-size:11px;font-weight:800;letter-spacing:0.9px;text-transform:uppercase;color:{ACCENT_BRAND};line-height:1.4;padding-bottom:7px;">
+                  {channel}
+                </div>
                 <a href="{yt_url}" target="_blank"
-                   style="text-decoration:none;color:{TEXT_HEADLINE};font-family:{FONT_SANS};font-size:16px;font-weight:600;line-height:1.35;">
-                  {content[:120]}
+                   style="display:block;text-decoration:none;color:{TEXT_HEADLINE};font-family:{FONT_DISPLAY};font-size:21px;font-weight:400;line-height:1.22;letter-spacing:-0.2px;padding-bottom:10px;border-bottom:1px solid {BORDER_DIVIDER};">
+                  {_esc(headline)}
                 </a>
-                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-                  <tr>
-                    <td style="padding:6px 0 0;font-family:{FONT_SANS};font-size:13px;color:{TEXT_META};line-height:1.4;">
-                      <strong style="color:#4b5563;">{channel}</strong>
-                    </td>
-                  </tr>
-                </table>
+                {video_deck}
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                   <tr>
                     <td style="padding:10px 0 0;">
                       <a href="{yt_url}" target="_blank"
-                         style="font-family:{FONT_SANS};font-size:13px;font-weight:600;color:{TEXT_VIDEO};text-decoration:none;">
-                        &#9654; {_s(lang, "watch_label")}
+                         style="font-family:{FONT_SANS};font-size:13px;font-weight:700;color:{TEXT_HEADLINE};text-decoration:none;border-bottom:1px solid {TEXT_HEADLINE};">
+                        {_s(lang, "watch_label")}
                       </a>
                     </td>
                   </tr>
@@ -744,19 +895,36 @@ def _build_email_html(data: dict, lang: str) -> str:
       </tr>
     </table>""")
 
-    # ── CTA Button ───────────────────────────────────────────────
+    # ── Magazine Ad CTA ──────────────────────────────────────────
     cta_text = _s(lang, "cta").format(date=date_label)
     sections.append(f"""
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
       <tr>
-        <td align="center" style="padding:32px 24px;">
-          <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+        <td align="center" style="padding:34px 24px 40px;border-top:1px solid {BORDER_DIVIDER};">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+                 style="background-color:{BG_PROMO};border:1px solid {TEXT_HEADLINE};">
             <tr>
-              <td align="center" style="background-color:{LINK_COLOR};border-radius:8px;">
-                <a href="{week_url}" target="_blank"
-                   style="display:inline-block;padding:14px 32px;font-family:{FONT_SANS};font-size:16px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:8px;">
-                  {cta_text}
-                </a>
+              <td align="center" style="padding:34px 28px 10px;font-family:{FONT_SANS};font-size:11px;font-weight:800;letter-spacing:1.1px;text-transform:uppercase;color:{TEXT_HEADLINE};">
+                Data Cube AI
+              </td>
+            </tr>
+            <tr>
+              <td align="center" style="padding:0 28px 22px;font-family:{FONT_DISPLAY};font-size:30px;font-weight:400;letter-spacing:-0.5px;line-height:1.12;color:{TEXT_HEADLINE};">
+                {_esc(_s(lang, "promo_headline"))}
+              </td>
+            </tr>
+            <tr>
+              <td align="center" style="padding:0 28px 34px;">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                  <tr>
+                    <td align="center" style="background-color:{TEXT_HEADLINE};border-radius:4px;">
+                      <a href="{week_url}" target="_blank"
+                         style="display:inline-block;padding:13px 24px;font-family:{FONT_SANS};font-size:15px;font-weight:800;color:{BG_SURFACE};text-decoration:none;border-radius:4px;">
+                        {cta_text}
+                      </a>
+                    </td>
+                  </tr>
+                </table>
               </td>
             </tr>
           </table>
@@ -764,40 +932,40 @@ def _build_email_html(data: dict, lang: str) -> str:
       </tr>
     </table>""")
 
-    # ── Dark Footer ──────────────────────────────────────────────
+    # ── Editorial Footer ─────────────────────────────────────────
     sections.append(f"""
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
       <tr>
-        <td style="background-color:{BG_DARK};padding:24px;text-align:center;">
+        <td style="background-color:{BG_SURFACE};padding:28px 32px;border-top:2px solid {TEXT_HEADLINE};">
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
             <tr>
-              <td style="font-family:{FONT_SERIF};font-size:18px;color:#ffffff;padding-bottom:8px;">
-                \U0001f9ca Data Cube AI
+              <td style="padding-bottom:14px;">
+                {_brand_lockup(TEXT_HEADLINE, TEXT_META)}
               </td>
             </tr>
             <tr>
-              <td style="padding-bottom:12px;">
-                <a href="{SITE_URL}" style="font-family:{FONT_SANS};font-size:13px;color:#60a5fa;text-decoration:underline;">datacubeai.space</a>
+              <td style="padding-bottom:10px;">
+                <a href="{SITE_URL}" style="font-family:{FONT_SANS};font-size:13px;font-weight:700;color:{LINK_COLOR};text-decoration:none;border-bottom:1px solid {ACCENT_BRAND};">datacubeai.space</a>
               </td>
             </tr>
             <tr>
-              <td style="font-family:{FONT_SANS};font-size:12px;color:#9ca3af;line-height:1.6;">
+              <td style="font-family:{FONT_SANS};font-size:12px;color:{TEXT_META};line-height:1.6;">
                 {_esc(_s(lang, "footer_msg"))}
               </td>
             </tr>
             <tr>
-              <td style="padding-top:8px;font-family:{FONT_SANS};font-size:12px;color:#9ca3af;">
+              <td style="padding-top:8px;font-family:{FONT_SANS};font-size:12px;color:{TEXT_META};">
                 Open Source &bull; MIT License
               </td>
             </tr>
             <tr>
-              <td style="padding-top:8px;font-family:{FONT_SANS};font-size:12px;color:#9ca3af;">
+              <td style="padding-top:8px;font-family:{FONT_SANS};font-size:12px;color:{TEXT_META};">
                 Data Cube AI &bull; Frankfurt am Main, Germany
               </td>
             </tr>
             <tr>
               <td style="padding-top:8px;font-family:{FONT_SANS};font-size:12px;">
-                <a href="{SITE_URL}/unsubscribe" style="color:#9ca3af;text-decoration:underline;">{_s(lang, "unsubscribe")}</a>
+                <a href="{SITE_URL}/unsubscribe" style="color:{TEXT_META};text-decoration:underline;">{_s(lang, "unsubscribe")}</a>
               </td>
             </tr>
           </table>
@@ -825,11 +993,11 @@ def _build_email_html(data: dict, lang: str) -> str:
   </noscript>
   <![endif]-->
 </head>
-<body style="margin:0;padding:0;background-color:#f3f4f6;font-family:{FONT_SANS};-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;">
+<body style="margin:0;padding:0;background-color:{BG_CANVAS};font-family:{FONT_SANS};-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;">
   <!--[if mso]>
-  <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" align="center"><tr><td>
+  <table role="presentation" width="{EMAIL_CONTAINER_WIDTH}" cellpadding="0" cellspacing="0" border="0" align="center"><tr><td>
   <![endif]-->
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;margin:0 auto;background-color:#ffffff;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:{EMAIL_CONTAINER_WIDTH}px;margin:0 auto;background-color:{BG_SURFACE};">
     <tr>
       <td>
         {body}

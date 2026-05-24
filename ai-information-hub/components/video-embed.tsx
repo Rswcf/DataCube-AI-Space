@@ -38,7 +38,7 @@ export function VideoEmbed({
 
   if (isPlaying) {
     return (
-      <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-black">
+      <div className="relative aspect-video w-full overflow-hidden border border-foreground bg-black">
         {/* youtube-nocookie.com: YouTube "privacy-enhanced" mode. No cookies
             are set until the user interacts with the player. This is a GDPR
             mitigation and a common AdSense-review expectation. */}
@@ -55,7 +55,7 @@ export function VideoEmbed({
 
   return (
     <div
-      className="relative w-full aspect-video rounded-xl overflow-hidden bg-secondary cursor-pointer group"
+      className="group relative aspect-video w-full cursor-pointer overflow-hidden border border-foreground bg-secondary"
       onClick={handlePlay}
       role="button"
       tabIndex={0}
@@ -76,14 +76,14 @@ export function VideoEmbed({
 
       {/* Play button */}
       <div className="absolute inset-0 flex items-center justify-center">
-        <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-red-600 flex items-center justify-center shadow-lg transition-transform duration-300 group-hover:scale-110">
+        <div className="flex h-16 w-16 items-center justify-center border border-white/80 bg-red-600 shadow-lg transition-transform duration-300 group-hover:scale-105 md:h-20 md:w-20">
           <Play className="w-8 h-8 md:w-10 md:h-10 text-white fill-white ml-1" />
         </div>
       </div>
 
       {/* Video badge */}
       <div className="absolute top-3 left-3">
-        <Badge className="bg-red-600 text-white border-0 font-semibold">
+        <Badge className="rounded-none border-0 bg-red-600 font-semibold text-white">
           Video
         </Badge>
       </div>
@@ -121,7 +121,7 @@ export function VideoBadge({
 }) {
   return (
     <div className="flex items-center gap-2 flex-wrap">
-      <Badge className="bg-red-600 text-white border-0 text-xs font-semibold">
+      <Badge className="rounded-none border-0 bg-red-600 text-xs font-semibold text-white">
         Video
       </Badge>
       {duration && (

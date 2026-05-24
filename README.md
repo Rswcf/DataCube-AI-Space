@@ -122,7 +122,7 @@ python -m scripts.weekly_collect --week 2026-kw06  # Specific week
 | **Frontend** | Next.js 16, React 19, Tailwind CSS 4, Shadcn/ui, TypeScript |
 | **Backend** | FastAPI, SQLAlchemy, Alembic, PostgreSQL |
 | **LLM Classification** | GLM-4.5-Air (OpenRouter, free tier) |
-| **LLM Processing** | DeepSeek V3.2 (OpenRouter) |
+| **LLM Processing** | DeepSeek V4 Flash (OpenRouter, primary; V3.2 fallback) |
 | **Translation** | Free model chain: 6 models (OpenRouter, zero cost) |
 | **Chat & Reports** | openrouter/free (OpenRouter, smart router) |
 | **Newsletter** | Resend (sending) + Beehiiv (subscribers) |
