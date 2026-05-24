@@ -42,6 +42,9 @@
   --sidebar-accent-foreground: oklch(0.15 0.01 260);
   --sidebar-border: oklch(0.88 0.005 260);
   --sidebar-ring: oklch(0.55 0.2 250);
+  --font-locale-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-locale-mono: var(--font-geist-mono), "SFMono-Regular", "Cascadia Mono", "Roboto Mono", "Menlo", "Monaco", "Consolas", ui-monospace, monospace;
+  --font-locale-display: var(--font-locale-sans);
 }
 
 .dark {
@@ -87,9 +90,9 @@
 }
 
 @theme inline {
-  --font-sans: 'Geist', 'Geist Fallback';
-  --font-mono: 'Geist Mono', 'Geist Mono Fallback';
-  --font-display: 'Newsreader', serif;
+  --font-sans: var(--font-locale-sans);
+  --font-mono: var(--font-locale-mono);
+  --font-display: var(--font-locale-display);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -134,8 +137,29 @@
 }
 
 @layer base {
+  html[lang^="zh"] {
+    --font-locale-sans: var(--font-geist-sans), "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", "Noto Sans CJK SC", ui-sans-serif, system-ui, sans-serif;
+    --font-locale-mono: var(--font-geist-mono), "SFMono-Regular", "Cascadia Mono", "Menlo", "Consolas", "PingFang SC", "Microsoft YaHei", ui-monospace, monospace;
+    --font-locale-display: var(--font-locale-sans);
+  }
+
+  html[lang^="ja"] {
+    --font-locale-sans: var(--font-geist-sans), "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "YuGothic", "Noto Sans JP", "Noto Sans CJK JP", ui-sans-serif, system-ui, sans-serif;
+    --font-locale-mono: var(--font-geist-mono), "SFMono-Regular", "Cascadia Mono", "Menlo", "Consolas", "Hiragino Sans", "Yu Gothic", ui-monospace, monospace;
+    --font-locale-display: var(--font-locale-sans);
+  }
+
+  html[lang^="ko"] {
+    --font-locale-sans: var(--font-geist-sans), "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", "Noto Sans CJK KR", ui-sans-serif, system-ui, sans-serif;
+    --font-locale-mono: var(--font-geist-mono), "SFMono-Regular", "Cascadia Mono", "Menlo", "Consolas", "Apple SD Gothic Neo", "Malgun Gothic", ui-monospace, monospace;
+    --font-locale-display: var(--font-locale-sans);
+  }
+
   * {
     @apply border-border outline-ring/50;
+  }
+  html {
+    text-rendering: optimizeLegibility;
   }
   body {
     @apply bg-background text-foreground overflow-x-hidden;

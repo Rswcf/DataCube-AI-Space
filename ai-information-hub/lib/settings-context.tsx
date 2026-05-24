@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { translations, type Language, type TranslationKey } from "./translations";
-import { getLanguageFromPathname, toLocalizedPath } from "./i18n";
+import { getLanguageFromPathname, toBcp47, toLocalizedPath } from "./i18n";
 
 type Theme = "dark" | "light";
 
@@ -85,7 +85,7 @@ export function SettingsProvider({
   useEffect(() => {
     if (!mounted) return;
     localStorage.setItem("language", language);
-    document.documentElement.lang = language;
+    document.documentElement.lang = toBcp47(language);
   }, [language, mounted]);
 
   const setTheme = (newTheme: Theme) => {

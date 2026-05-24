@@ -586,7 +586,7 @@ export default async function AINewsAPIToolPage({ params }: Props) {
         {/* Section A: Hero                                                   */}
         {/* ================================================================= */}
         <section className="py-12 sm:py-16 text-center">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold font-[family-name:var(--font-display)] leading-tight">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold font-display leading-tight">
             {t(H1, lang)}
           </h1>
 
@@ -627,7 +627,7 @@ export default async function AINewsAPIToolPage({ params }: Props) {
         {/* Section B: API Endpoints                                          */}
         {/* ================================================================= */}
         <section id="endpoints" className="py-12 sm:py-16 scroll-mt-20">
-          <h2 className="text-2xl sm:text-3xl font-bold font-[family-name:var(--font-display)]">
+          <h2 className="text-2xl sm:text-3xl font-bold font-display">
             {t(H2_ENDPOINTS, lang)}
           </h2>
           <p className="mt-4 text-muted-foreground leading-relaxed">
@@ -644,7 +644,7 @@ export default async function AINewsAPIToolPage({ params }: Props) {
                   <span className="inline-flex items-center rounded-md bg-green-100 px-2.5 py-1 text-xs font-bold text-green-800 dark:bg-green-900/30 dark:text-green-400">
                     GET
                   </span>
-                  <code className="font-[family-name:var(--font-mono)] text-sm font-medium">
+                  <code className="font-mono text-sm font-medium">
                     {ep.path}
                   </code>
                 </div>
@@ -660,7 +660,7 @@ export default async function AINewsAPIToolPage({ params }: Props) {
         {/* Section C: Code Examples                                          */}
         {/* ================================================================= */}
         <section className="py-12 sm:py-16">
-          <h2 className="text-2xl sm:text-3xl font-bold font-[family-name:var(--font-display)]">
+          <h2 className="text-2xl sm:text-3xl font-bold font-display">
             {t(H2_CODE, lang)}
           </h2>
           <p className="mt-4 text-muted-foreground leading-relaxed">
@@ -675,7 +675,7 @@ export default async function AINewsAPIToolPage({ params }: Props) {
                 cURL
               </h3>
               <pre className="bg-zinc-900 text-zinc-100 rounded-lg p-4 overflow-x-auto text-sm">
-                <code className="font-[family-name:var(--font-mono)]">{`curl -s ${API_BASE_URL}/api/tech/2026-02-26 | python -m json.tool`}</code>
+                <code className="font-mono">{`curl -s ${API_BASE_URL}/api/tech/2026-02-26 | python -m json.tool`}</code>
               </pre>
             </div>
 
@@ -686,7 +686,7 @@ export default async function AINewsAPIToolPage({ params }: Props) {
                 JavaScript
               </h3>
               <pre className="bg-zinc-900 text-zinc-100 rounded-lg p-4 overflow-x-auto text-sm">
-                <code className="font-[family-name:var(--font-mono)]">{`// Fetch today's AI tech news
+                <code className="font-mono">{`// Fetch today's AI tech news
 const response = await fetch(
   '${API_BASE_URL}/api/tech/2026-02-26'
 );
@@ -706,7 +706,7 @@ console.log(data.en[0].content);`}</code>
                 Python
               </h3>
               <pre className="bg-zinc-900 text-zinc-100 rounded-lg p-4 overflow-x-auto text-sm">
-                <code className="font-[family-name:var(--font-mono)]">{`import requests
+                <code className="font-mono">{`import requests
 
 # Fetch today's AI tech news
 response = requests.get(
@@ -727,7 +727,7 @@ for article in data['en']:
         {/* Section D: Response Format                                        */}
         {/* ================================================================= */}
         <section className="py-12 sm:py-16">
-          <h2 className="text-2xl sm:text-3xl font-bold font-[family-name:var(--font-display)]">
+          <h2 className="text-2xl sm:text-3xl font-bold font-display">
             {t(H2_RESPONSE, lang)}
           </h2>
           <p className="mt-4 text-muted-foreground leading-relaxed">
@@ -736,7 +736,7 @@ for article in data['en']:
 
           <div className="mt-8">
             <pre className="bg-zinc-900 text-zinc-100 rounded-lg p-4 overflow-x-auto text-sm">
-              <code className="font-[family-name:var(--font-mono)]">{`{
+              <code className="font-mono">{`{
   "de": [
     {
       "id": 1,
@@ -772,7 +772,7 @@ for article in data['en']:
         {/* Section E: Features Grid                                          */}
         {/* ================================================================= */}
         <section className="py-12 sm:py-16">
-          <h2 className="text-2xl sm:text-3xl font-bold font-[family-name:var(--font-display)] text-center">
+          <h2 className="text-2xl sm:text-3xl font-bold font-display text-center">
             {t(H2_FEATURES, lang)}
           </h2>
 
@@ -800,7 +800,7 @@ for article in data['en']:
         {/* Section F: FAQ                                                    */}
         {/* ================================================================= */}
         <section className="py-12 sm:py-16">
-          <h2 className="text-2xl sm:text-3xl font-bold font-[family-name:var(--font-display)] text-center">
+          <h2 className="text-2xl sm:text-3xl font-bold font-display text-center">
             {t(H2_FAQ, lang)}
           </h2>
 
@@ -826,7 +826,7 @@ for article in data['en']:
         {/* Cross-Tool Navigation                                             */}
         {/* ================================================================= */}
         <section className="py-12 sm:py-16">
-          <h2 className="text-2xl sm:text-3xl font-bold font-[family-name:var(--font-display)] text-center">
+          <h2 className="text-2xl sm:text-3xl font-bold font-display text-center">
             {t(H2_OTHER_TOOLS, lang)}
           </h2>
 
@@ -868,7 +868,7 @@ for article in data['en']:
         {/* Section G: Final CTA                                              */}
         {/* ================================================================= */}
         <section className="py-12 sm:py-16 my-8 rounded-2xl bg-primary/5 text-center px-6">
-          <h2 className="text-2xl sm:text-3xl font-bold font-[family-name:var(--font-display)]">
+          <h2 className="text-2xl sm:text-3xl font-bold font-display">
             {t(H2_CTA_FINAL, lang)}
           </h2>
 

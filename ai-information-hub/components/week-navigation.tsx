@@ -113,7 +113,7 @@ export function WeekNavigation({ selectedWeekId, onWeekChange }: WeekNavigationP
       <div className="flex items-center justify-between px-4 py-3">
         <div className="flex items-center gap-2">
           <Calendar className="h-5 w-5 text-primary" aria-hidden="true" />
-          <h2 className="font-display text-lg font-bold text-foreground">{t("weekOverview")}</h2>
+          <h2 className="text-lg font-bold text-foreground">{t("weekOverview")}</h2>
         </div>
         <div className="flex items-center gap-2">
           <Button

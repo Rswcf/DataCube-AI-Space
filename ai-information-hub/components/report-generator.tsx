@@ -415,7 +415,7 @@ export function ReportGenerator({ weekId }: ReportGeneratorProps) {
                   <FileText className="h-5 w-5 text-primary" aria-hidden="true" />
                 </div>
                 <div>
-                  <h2 className="font-display text-xl font-bold">{t("reportTitle")}</h2>
+                  <h2 className="text-xl font-bold">{t("reportTitle")}</h2>
                   <p className="text-xs text-muted-foreground">{weekId}</p>
                 </div>
               </div>
@@ -463,18 +463,18 @@ export function ReportGenerator({ weekId }: ReportGeneratorProps) {
                     remarkPlugins={[remarkGfm]}
                     components={{
                       h1: ({ children }) => (
-                        <h1 className="font-display text-2xl font-bold mt-8 mb-4 pb-3 border-b-2 border-primary/20 text-foreground first:mt-0">
+                        <h1 className="text-2xl font-bold mt-8 mb-4 pb-3 border-b-2 border-primary/20 text-foreground first:mt-0">
                           {children}
                         </h1>
                       ),
                       h2: ({ children }) => (
-                        <h2 className="font-display text-xl font-semibold mt-8 mb-3 pb-2 border-b border-border text-foreground flex items-center gap-2">
+                        <h2 className="text-xl font-semibold mt-8 mb-3 pb-2 border-b border-border text-foreground flex items-center gap-2">
                           <span className="inline-block w-1 h-5 rounded-full bg-primary" aria-hidden="true" />
                           {children}
                         </h2>
                       ),
                       h3: ({ children }) => (
-                        <h3 className="font-display text-lg font-semibold mt-6 mb-2 text-primary">
+                        <h3 className="text-lg font-semibold mt-6 mb-2 text-primary">
                           {children}
                         </h3>
                       ),

@@ -679,7 +679,7 @@ export default async function AINewsAggregatorToolPage({ params }: Props) {
         {/* Section A: Hero                                                   */}
         {/* ================================================================= */}
         <section className="py-12 sm:py-16 text-center">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold font-[family-name:var(--font-display)] leading-tight">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold font-display leading-tight">
             {t(H1, lang)}
           </h1>
 
@@ -720,7 +720,7 @@ export default async function AINewsAggregatorToolPage({ params }: Props) {
         {/* Section B: Live News Preview                                      */}
         {/* ================================================================= */}
         <section className="py-12 sm:py-16">
-          <h2 className="text-2xl sm:text-3xl font-bold font-[family-name:var(--font-display)]">
+          <h2 className="text-2xl sm:text-3xl font-bold font-display">
             {t(H2_PREVIEW, lang)}
           </h2>
           <p className="mt-4 text-muted-foreground leading-relaxed">
@@ -772,7 +772,7 @@ export default async function AINewsAggregatorToolPage({ params }: Props) {
         {/* Section C: Features Grid                                          */}
         {/* ================================================================= */}
         <section className="py-12 sm:py-16">
-          <h2 className="text-2xl sm:text-3xl font-bold font-[family-name:var(--font-display)] text-center">
+          <h2 className="text-2xl sm:text-3xl font-bold font-display text-center">
             {t(H2_FEATURES, lang)}
           </h2>
 
@@ -800,7 +800,7 @@ export default async function AINewsAggregatorToolPage({ params }: Props) {
         {/* Section D: How It Works                                           */}
         {/* ================================================================= */}
         <section className="py-12 sm:py-16">
-          <h2 className="text-2xl sm:text-3xl font-bold font-[family-name:var(--font-display)] text-center">
+          <h2 className="text-2xl sm:text-3xl font-bold font-display text-center">
             {t(H2_HOW, lang)}
           </h2>
 
@@ -823,7 +823,7 @@ export default async function AINewsAggregatorToolPage({ params }: Props) {
         {/* Section E: Comparison Table                                       */}
         {/* ================================================================= */}
         <section className="py-12 sm:py-16">
-          <h2 className="text-2xl sm:text-3xl font-bold font-[family-name:var(--font-display)] text-center">
+          <h2 className="text-2xl sm:text-3xl font-bold font-display text-center">
             {t(H2_COMPARE, lang)}
           </h2>
 
@@ -867,7 +867,7 @@ export default async function AINewsAggregatorToolPage({ params }: Props) {
         {/* Section F: FAQ                                                    */}
         {/* ================================================================= */}
         <section className="py-12 sm:py-16">
-          <h2 className="text-2xl sm:text-3xl font-bold font-[family-name:var(--font-display)] text-center">
+          <h2 className="text-2xl sm:text-3xl font-bold font-display text-center">
             {t(H2_FAQ, lang)}
           </h2>
 
@@ -893,7 +893,7 @@ export default async function AINewsAggregatorToolPage({ params }: Props) {
         {/* Cross-Tool Navigation                                             */}
         {/* ================================================================= */}
         <section className="py-12 sm:py-16">
-          <h2 className="text-2xl sm:text-3xl font-bold font-[family-name:var(--font-display)] text-center">
+          <h2 className="text-2xl sm:text-3xl font-bold font-display text-center">
             {t(H2_OTHER_TOOLS, lang)}
           </h2>
 
@@ -935,7 +935,7 @@ export default async function AINewsAggregatorToolPage({ params }: Props) {
         {/* Section G: Final CTA                                              */}
         {/* ================================================================= */}
         <section className="py-12 sm:py-16 my-8 rounded-2xl bg-primary/5 text-center px-6">
-          <h2 className="text-2xl sm:text-3xl font-bold font-[family-name:var(--font-display)]">
+          <h2 className="text-2xl sm:text-3xl font-bold font-display">
             {t(H2_CTA_FINAL, lang)}
           </h2>
 

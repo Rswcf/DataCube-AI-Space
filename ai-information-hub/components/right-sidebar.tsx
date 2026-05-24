@@ -151,7 +151,7 @@ export function RightSidebar({ weekId, onSearchChange }: RightSidebarProps) {
         <div className="mt-4 rounded-xl border border-primary/40 bg-gradient-to-br from-primary/10 to-accent/10 p-4">
           <div className="flex items-center gap-2 mb-1">
             <Mail aria-hidden="true" className="h-4 w-4 text-primary" />
-            <h3 className="font-display text-lg text-foreground">{t("newsletterHeading")}</h3>
+            <h3 className="text-lg font-semibold text-foreground">{t("newsletterHeading")}</h3>
           </div>
           <p className="text-xs text-muted-foreground mb-1">{t("newsletterDescription")}</p>
           <p className="text-xs text-muted-foreground/80 italic mt-1 mb-3">{t("newsletterSocialProof")}</p>
@@ -254,7 +254,7 @@ export function RightSidebar({ weekId, onSearchChange }: RightSidebarProps) {
         <div className="mt-4 rounded-xl bg-secondary/50 p-4">
           <div className="flex items-center gap-2">
             <TrendingUp aria-hidden="true" className="h-5 w-5 text-primary" />
-            <h3 className="font-display text-xl font-bold text-foreground">{t("whatsNew")}</h3>
+            <h3 className="text-xl font-bold text-foreground">{t("whatsNew")}</h3>
           </div>
           <div className="mt-3 space-y-1">
             {trends.slice(0, 10).map((trend, index) => (

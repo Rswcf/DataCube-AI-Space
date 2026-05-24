@@ -240,7 +240,7 @@ export function ChatWidget({ weekId }: ChatWidgetProps) {
         >
           {/* Header */}
           <div className="flex items-center justify-between border-b border-border px-4 py-3">
-            <h3 className="font-display text-lg font-semibold">{t("chatTitle")}</h3>
+            <h3 className="text-lg font-semibold">{t("chatTitle")}</h3>
             <div className="flex items-center gap-1">
               {messages.length > 0 && (
                 <Button variant="ghost" size="icon" className="h-11 w-11" onClick={clearMessages} title={t("chatClear")}>

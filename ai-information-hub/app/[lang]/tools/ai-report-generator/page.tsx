@@ -667,7 +667,7 @@ export default async function AIReportGeneratorToolPage({ params }: Props) {
         {/* Section A: Hero                                                   */}
         {/* ================================================================= */}
         <section className="py-12 sm:py-16 text-center">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold font-[family-name:var(--font-display)] leading-tight">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold font-display leading-tight">
             {t(H1, lang)}
           </h1>
 
@@ -708,7 +708,7 @@ export default async function AIReportGeneratorToolPage({ params }: Props) {
         {/* Section B: Sample Report Preview                                  */}
         {/* ================================================================= */}
         <section id="sample-preview" className="py-12 sm:py-16 scroll-mt-20">
-          <h2 className="text-2xl sm:text-3xl font-bold font-[family-name:var(--font-display)]">
+          <h2 className="text-2xl sm:text-3xl font-bold font-display">
             {t(H2_PREVIEW, lang)}
           </h2>
           <p className="mt-4 text-muted-foreground leading-relaxed">
@@ -760,7 +760,7 @@ The convergence of multimodal AI...`}
         {/* Section C: Export Formats                                          */}
         {/* ================================================================= */}
         <section className="py-12 sm:py-16">
-          <h2 className="text-2xl sm:text-3xl font-bold font-[family-name:var(--font-display)] text-center">
+          <h2 className="text-2xl sm:text-3xl font-bold font-display text-center">
             {t(H2_FORMATS, lang)}
           </h2>
 
@@ -788,7 +788,7 @@ The convergence of multimodal AI...`}
         {/* Section D: Features Grid                                          */}
         {/* ================================================================= */}
         <section className="py-12 sm:py-16">
-          <h2 className="text-2xl sm:text-3xl font-bold font-[family-name:var(--font-display)] text-center">
+          <h2 className="text-2xl sm:text-3xl font-bold font-display text-center">
             {t(H2_FEATURES, lang)}
           </h2>
 
@@ -816,7 +816,7 @@ The convergence of multimodal AI...`}
         {/* Section E: How It Works                                           */}
         {/* ================================================================= */}
         <section className="py-12 sm:py-16">
-          <h2 className="text-2xl sm:text-3xl font-bold font-[family-name:var(--font-display)] text-center">
+          <h2 className="text-2xl sm:text-3xl font-bold font-display text-center">
             {t(H2_HOW, lang)}
           </h2>
 
@@ -839,7 +839,7 @@ The convergence of multimodal AI...`}
         {/* Section F: FAQ                                                    */}
         {/* ================================================================= */}
         <section className="py-12 sm:py-16">
-          <h2 className="text-2xl sm:text-3xl font-bold font-[family-name:var(--font-display)] text-center">
+          <h2 className="text-2xl sm:text-3xl font-bold font-display text-center">
             {t(H2_FAQ, lang)}
           </h2>
 
@@ -865,7 +865,7 @@ The convergence of multimodal AI...`}
         {/* Cross-Tool Navigation                                             */}
         {/* ================================================================= */}
         <section className="py-12 sm:py-16">
-          <h2 className="text-2xl sm:text-3xl font-bold font-[family-name:var(--font-display)] text-center">
+          <h2 className="text-2xl sm:text-3xl font-bold font-display text-center">
             {t(H2_OTHER_TOOLS, lang)}
           </h2>
 
@@ -907,7 +907,7 @@ The convergence of multimodal AI...`}
         {/* Section G: Final CTA                                              */}
         {/* ================================================================= */}
         <section className="py-12 sm:py-16 my-8 rounded-2xl bg-primary/5 text-center px-6">
-          <h2 className="text-2xl sm:text-3xl font-bold font-[family-name:var(--font-display)]">
+          <h2 className="text-2xl sm:text-3xl font-bold font-display">
             {t(H2_CTA_FINAL, lang)}
           </h2>
 

@@ -43,6 +43,11 @@ const platformColors: Record<string, string> = {
   Reddit: "bg-chart-4 text-chart-4-foreground",
 };
 
+function isCodeLikeTip(value: string): boolean {
+  const text = value.trim();
+  return /```|^\s*(curl|npm|pnpm|yarn|pip|python|git|docker|kubectl|const|let|var|function|import|from|def|class|select|with)\b|[{};]/im.test(text);
+}
+
 export function TipsFeed({ weekId, searchQuery }: TipsFeedProps) {
   const { language, t } = useSettings();
   const [posts, setPosts] = useState<TipPost[]>([]);
@@ -115,7 +120,7 @@ export function TipsFeed({ weekId, searchQuery }: TipsFeedProps) {
       <div className="section-header-tips border-l-4 border-tips-accent px-3 py-2 sm:px-4 sm:py-3">
         <div className="flex items-center gap-2">
           <Lightbulb className="h-5 w-5 text-tips-accent" aria-hidden="true" />
-          <h3 className="font-display text-base sm:text-lg font-semibold text-foreground">{t("practicalTipsTitle")}</h3>
+          <h3 className="text-base sm:text-lg font-semibold text-foreground">{t("practicalTipsTitle")}</h3>
           {!loading && filteredPosts.length > 0 && (
             <Badge variant="outline" className="text-xs text-tips-accent border-tips-accent/30">
               {filteredPosts.length}
@@ -147,96 +152,106 @@ export function TipsFeed({ weekId, searchQuery }: TipsFeedProps) {
       )}
 
       {/* Tips Posts */}
-      {filteredPosts.map((post, index) => (
-        <article
-          key={post.id}
-          className="border-l-2 border-l-tips-accent/30 px-3 py-3 sm:px-4 sm:py-4 transition-colors hover:bg-tips-accent/5 cursor-pointer animate-fade-up"
-          style={{ animationDelay: `${Math.min(index, 10) * 50}ms` }}
-        >
-          <div className="flex gap-2 sm:gap-3">
-            {/* Avatar */}
-            <div className="flex h-10 w-10 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-full bg-chart-3/20 text-chart-3 font-bold text-sm sm:text-base">
-              {post.author.avatar}
-            </div>
+      {filteredPosts.map((post, index) => {
+        const tipIsCodeLike = isCodeLikeTip(post.tip);
 
-            {/* Content */}
-            <div className="flex-1 min-w-0">
-              {/* Author Info */}
-              <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
-                <span className="font-bold text-sm sm:text-base text-foreground">{post.author.name}</span>
-                {post.author.verified && <VerifiedBadge />}
-                <span className="text-xs sm:text-sm text-muted-foreground">{post.author.handle}</span>
-                <span className="text-xs sm:text-sm text-muted-foreground">·</span>
-                <span className="text-xs sm:text-sm text-muted-foreground">{post.timestamp}</span>
-                <Badge className={`text-xs ${platformColors[post.platform] || ""}`}>
-                  {post.platform}
-                </Badge>
+        return (
+          <article
+            key={post.id}
+            className="border-l-2 border-l-tips-accent/30 px-3 py-3 sm:px-4 sm:py-4 transition-colors hover:bg-tips-accent/5 cursor-pointer animate-fade-up"
+            style={{ animationDelay: `${Math.min(index, 10) * 50}ms` }}
+          >
+            <div className="flex gap-2 sm:gap-3">
+              {/* Avatar */}
+              <div className="flex h-10 w-10 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-full bg-chart-3/20 text-chart-3 font-bold text-sm sm:text-base">
+                {post.author.avatar}
               </div>
 
-              {/* Category & Difficulty */}
-              <div className="mt-1 flex items-center gap-2 flex-wrap">
-                <Badge variant="outline" className="text-xs">
-                  {post.category}
-                </Badge>
-                <Badge className={`text-xs border ${difficultyColors[post.difficulty] || ""}`}>
-                  {post.difficulty}
-                </Badge>
-              </div>
+              {/* Content */}
+              <div className="flex-1 min-w-0">
+                {/* Author Info */}
+                <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                  <span className="font-bold text-sm sm:text-base text-foreground">{post.author.name}</span>
+                  {post.author.verified && <VerifiedBadge />}
+                  <span className="text-xs sm:text-sm text-muted-foreground">{post.author.handle}</span>
+                  <span className="text-xs sm:text-sm text-muted-foreground">·</span>
+                  <span className="text-xs sm:text-sm text-muted-foreground">{post.timestamp}</span>
+                  <Badge className={`text-xs ${platformColors[post.platform] || ""}`}>
+                    {post.platform}
+                  </Badge>
+                </div>
 
-              {/* Post Content */}
-              <p className="mt-2 text-[15px] sm:text-base text-foreground leading-relaxed">{post.content}</p>
+                {/* Category & Difficulty */}
+                <div className="mt-1 flex items-center gap-2 flex-wrap">
+                  <Badge variant="outline" className="text-xs">
+                    {post.category}
+                  </Badge>
+                  <Badge className={`text-xs border ${difficultyColors[post.difficulty] || ""}`}>
+                    {post.difficulty}
+                  </Badge>
+                </div>
 
-              {/* Tip Code Block */}
-              <div className="mt-3 rounded-lg border border-tips-accent/20 bg-tips-accent/5 p-3">
-                <div className="flex items-start justify-between gap-2">
-                  <pre className="flex-1 overflow-x-auto whitespace-pre-wrap break-all text-sm font-mono text-foreground leading-relaxed">
-                    {post.tip}
-                  </pre>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 shrink-0"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleCopy(post.id, post.tip);
-                    }}
-                  >
-                    {copiedId === post.id ? (
-                      <Check className="h-4 w-4 text-accent" />
+                {/* Post Content */}
+                <p className="mt-2 text-[15px] sm:text-base text-foreground leading-relaxed">{post.content}</p>
+
+                {/* Tip Code Block */}
+                <div className="mt-3 rounded-lg border border-tips-accent/20 bg-tips-accent/5 p-3">
+                  <div className="flex items-start justify-between gap-2">
+                    {tipIsCodeLike ? (
+                      <pre className="flex-1 overflow-x-auto whitespace-pre-wrap break-all text-sm font-mono text-foreground leading-relaxed">
+                        {post.tip}
+                      </pre>
                     ) : (
-                      <Copy className="h-4 w-4" />
+                      <p className="flex-1 whitespace-pre-wrap break-words text-sm text-foreground leading-relaxed">
+                        {post.tip}
+                      </p>
                     )}
-                  </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 shrink-0"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleCopy(post.id, post.tip);
+                      }}
+                    >
+                      {copiedId === post.id ? (
+                        <Check className="h-4 w-4 text-accent" />
+                      ) : (
+                        <Copy className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
                 </div>
-              </div>
 
-              {/* Source */}
-              {post.sourceUrl && (
-                <div className="mt-2 flex items-center gap-1 text-xs sm:text-sm text-muted-foreground">
-                  <ExternalLink className="h-3 w-3" aria-hidden="true" />
-                  <a
-                    href={post.sourceUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:text-primary hover:underline transition-colors"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    {t("source")}
-                  </a>
+                {/* Source */}
+                {post.sourceUrl && (
+                  <div className="mt-2 flex items-center gap-1 text-xs sm:text-sm text-muted-foreground">
+                    <ExternalLink className="h-3 w-3" aria-hidden="true" />
+                    <a
+                      href={post.sourceUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:text-primary hover:underline transition-colors"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {t("source")}
+                    </a>
+                  </div>
+                )}
+
+                <div className="mt-3">
+                  <ShareButton
+                    title={post.category}
+                    text={`${post.content}\n\n${post.tip}`}
+                    url={post.sourceUrl}
+                  />
                 </div>
-              )}
-
-              <div className="mt-3">
-                <ShareButton
-                  title={post.category}
-                  text={`${post.content}\n\n${post.tip}`}
-                  url={post.sourceUrl}
-                />
               </div>
             </div>
-          </div>
-        </article>
-      ))}
+          </article>
+        );
+      })}
     </div>
   );
 }
