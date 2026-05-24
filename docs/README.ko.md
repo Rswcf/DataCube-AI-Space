@@ -4,7 +4,7 @@
 
 ### AI가 큐레이션하는 일간 AI 뉴스.
 
-**이중 언어(독일어/영어) AI 뉴스 애그리게이터** — 기술 혁신, 투자 동향, 실용 팁, YouTube 동영상을 4단계 LLM 파이프라인으로 큐레이션합니다.
+**8개 언어 AI 뉴스 애그리게이터(DE/EN/ZH/FR/ES/PT/JA/KO)** — 기술 혁신, 투자 동향, 실용 팁, YouTube 동영상을 4.5단계 LLM 파이프라인으로 큐레이션합니다.
 
 [![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](../LICENSE)
 [![Live Demo](https://img.shields.io/badge/demo-datacubeai.space-brightgreen)](https://www.datacubeai.space)
@@ -18,7 +18,7 @@
 
 ## Data Cube AI란?
 
-Data Cube AI는 **22개 RSS 피드**, **Hacker News**, **YouTube**에서 AI 뉴스를 자동으로 수집, 분류, 요약하여 깔끔한 이중 언어(독일어/영어) 인터페이스에 일간 및 주간 뷰로 제공합니다.
+Data Cube AI는 **22개 RSS 피드**, **Hacker News**, **YouTube**에서 AI 뉴스를 자동으로 수집, 분류, 요약하여 깔끔한 8개 언어 인터페이스에 일간 및 주간 뷰로 제공합니다.
 
 **[datacubeai.space](https://www.datacubeai.space)에서 바로 확인** — 로그인이 필요 없습니다.
 
@@ -33,7 +33,7 @@ https://github.com/user-attachments/assets/9dddaaed-e473-4350-97de-0346cacb6660
 - **기술 피드** — YouTube 동영상 임베딩 및 영향력 등급이 포함된 AI/ML 혁신 뉴스
 - **투자 트래커** — 1차 시장 펀딩 라운드, 2차 시장 데이터(Polygon.io를 통한 실시간 주가), M&A 거래
 - **실용 팁** — 14개 Reddit 커뮤니티 및 전문 블로그에서 큐레이션
-- **이중 언어** — 모든 기사를 독일어와 영어로 제공
+- **8개 언어** — DE, EN, ZH, FR, ES, PT, JA, KO 지원
 - **일간 + 주간** — 자동 일간 수집 및 주간 종합 뷰
 - **AI 채팅** — 이번 주의 AI 뉴스에 대해 질문하기
 - **AI 보고서** — 원클릭 스트리밍 보고서, Word, HTML, Markdown, Text, JSON으로 내보내기 가능
@@ -48,7 +48,7 @@ Frontend (Vercel)                    Backend (Railway)
 ┌─────────────────────┐             ┌──────────────────────────────┐
 │  Next.js 16         │    REST     │  FastAPI + PostgreSQL        │
 │  React 19           │◄───────────►│                              │
-│  Tailwind CSS 4     │    API      │  4-Stage Pipeline:           │
+│  Tailwind CSS 4     │    API      │  4.5-Stage Pipeline:         │
 │  Shadcn/ui          │             │  1. Fetch (RSS, HN, YouTube) │
 │                     │             │  2. Classify (LLM)           │
 │  Pages:             │             │  3. Process (LLM, parallel)  │
@@ -57,7 +57,8 @@ Frontend (Vercel)                    Backend (Railway)
 │  • Tips Feed        │             │  Data Sources:               │
 │  • AI Chat          │             │  • 22 RSS Feeds              │
 │  • AI Reports       │             │  • Hacker News (Algolia)     │
-│  • SSR Week Pages   │             │  • YouTube Data API v3       │
+│  • SSR Week/Article │             │  • YouTube Data API v3       │
+│  • Topic/Tool Pages │             │                              │
 └─────────────────────┘             └──────────────────────────────┘
 ```
 
@@ -113,20 +114,21 @@ python -m scripts.weekly_collect --week 2026-kw06
 | **백엔드** | FastAPI, SQLAlchemy, Alembic, PostgreSQL |
 | **LLM 분류** | GLM-4.5-Air (OpenRouter, 무료 티어) |
 | **LLM 처리** | DeepSeek V4 Flash (OpenRouter, 주 모델; V3.2는 폴백) |
-| **채팅 및 보고서** | Aurora Alpha (OpenRouter) |
+| **채팅 및 보고서** | openrouter/free (OpenRouter) |
 | **주가 데이터** | Polygon.io API |
 | **호스팅** | Vercel (프론트엔드), Railway (백엔드 + DB + 크론) |
 | **디자인** | Newsreader 글꼴, 아이소메트릭 큐브 로고, 섹션별 색상 강조, 시차 애니메이션 |
 
 ## 데이터 파이프라인
 
-백엔드는 4단계 파이프라인을 통해 뉴스를 처리합니다:
+백엔드는 4.5단계 파이프라인을 통해 뉴스를 처리합니다:
 
 | 단계 | 처리 내용 | 출력 |
 |-------|-------------|--------|
 | **1. 수집** | RSS, Hacker News, YouTube에서 수집; 기간 경계 필터링 | ~210개 원시 항목 |
 | **2. 분류** | LLM이 기술/투자/팁으로 분류 (팁 소스는 이 단계를 건너뜀) | 카테고리별 풀 |
-| **3. 처리** | 병렬 LLM 처리: 이중 언어 요약 생성, 엔티티 추출 | 30 기술 + 21 투자 + 15 팁 + 5 동영상 |
+| **3. 처리** | 병렬 LLM 처리: DE/EN 기본 요약 생성, 엔티티 추출 | 30 기술 + 21 투자 + 15 팁 + 5 동영상 |
+| **3.5. 번역** | EN → ZH, FR, ES, PT, JA, KO를 모델 체인으로 번역 | 항목당 6개 언어 추가 |
 | **4. 저장** | PostgreSQL에 저장, 동영상을 기술 피드에 배치 | 데이터베이스 레코드 |
 
 일간 수집은 축소된 수량으로 생성됩니다 (10 기술, 5 투자, 5 팁, 2 동영상).
@@ -139,6 +141,7 @@ python -m scripts.weekly_collect --week 2026-kw06
 | `/api/tech/{periodId}` | GET | 동영상이 포함된 기술 피드 |
 | `/api/investment/{periodId}` | GET | 1차 시장/2차 시장/M&A 데이터 |
 | `/api/tips/{periodId}` | GET | 큐레이션된 팁 |
+| `/api/trends/{periodId}` | GET | 기간별 트렌드 주제 |
 | `/api/videos/{periodId}` | GET | YouTube 동영상 요약 |
 | `/api/stock/{ticker}` | GET | 실시간 주가 데이터 |
 | `/api/stock/batch/?tickers=AAPL,NVDA` | GET | 배치 주가 데이터 |
@@ -198,6 +201,9 @@ DataCube-AI-Space/
 │   │   ├── api/chat/            # AI 채팅 엔드포인트
 │   │   ├── api/report/          # AI 보고서 생성기
 │   │   ├── [lang]/week/         # SSR 주간 페이지 (SEO)
+│   │   ├── [lang]/news/         # 기사 페이지 (SEO/GEO)
+│   │   ├── [lang]/topic/        # 토픽 허브
+│   │   ├── [lang]/tools/        # 현지화된 도구 페이지
 │   │   └── feed.xml/            # Atom 1.0 피드
 │   ├── components/              # React 컴포넌트
 │   │   ├── feeds/               # 기술, 투자, 팁 피드
@@ -210,7 +216,7 @@ DataCube-AI-Space/
 │   │   ├── models/              # SQLAlchemy 모델
 │   │   ├── routers/             # API 엔드포인트
 │   │   └── services/            # 비즈니스 로직
-│   │       ├── collector.py     # 4단계 파이프라인
+│   │       ├── collector.py     # 4.5단계 파이프라인
 │   │       ├── llm_processor.py # 이중 모델 LLM 접근법
 │   │       └── youtube_fetcher.py
 │   ├── alembic/                 # DB 마이그레이션

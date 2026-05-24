@@ -4,7 +4,7 @@
 
 ### AI がキュレーションする、毎日の AI ニュース。
 
-**バイリンガル（独/英）AI ニュースアグリゲーター** — テクノロジーの進展、投資案件、実践的なヒント、YouTube 動画を 4 段階の LLM パイプラインで自動キュレーション。
+**8 言語対応 AI ニュースアグリゲーター（DE/EN/ZH/FR/ES/PT/JA/KO）** — テクノロジーの進展、投資案件、実践的なヒント、YouTube 動画を 4.5 段階の LLM パイプラインで自動キュレーション。
 
 [![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Live Demo](https://img.shields.io/badge/demo-datacubeai.space-brightgreen)](https://www.datacubeai.space)
@@ -18,7 +18,7 @@
 
 ## Data Cube AI とは？
 
-Data Cube AI は **22 の RSS フィード**、**Hacker News**、**YouTube** から AI 関連ニュースを自動で収集・分類・要約し、クリーンなバイリンガル（ドイツ語/英語）インターフェースでデイリービューとウィークリービューを提供します。
+Data Cube AI は **22 の RSS フィード**、**Hacker News**、**YouTube** から AI 関連ニュースを自動で収集・分類・要約し、クリーンな 8 言語インターフェースでデイリービューとウィークリービューを提供します。
 
 **[datacubeai.space](https://www.datacubeai.space) で公開中** — ログイン不要。
 
@@ -33,7 +33,7 @@ https://github.com/user-attachments/assets/9dddaaed-e473-4350-97de-0346cacb6660
 - **テックフィード** — YouTube 動画の埋め込みとインパクト評価付きの AI/ML ブレイクスルー
 - **投資トラッカー** — プライマリー資金調達ラウンド、セカンダリーマーケットデータ（Polygon.io 経由のリアルタイム株価）、M&A 案件
 - **実践ヒント** — 14 の Reddit コミュニティとエキスパートブログから厳選
-- **バイリンガル** — すべての記事をドイツ語と英語で提供
+- **8 言語** — DE、EN、ZH、FR、ES、PT、JA、KO に対応
 - **デイリー + ウィークリー** — 自動デイリー収集とウィークリーロールアップビュー
 - **AI チャット** — 今週の AI ニュースについて質問可能
 - **AI レポート** — ワンクリックでストリーミングレポートを生成、Word・HTML・Markdown・テキスト・JSON にエクスポート
@@ -48,7 +48,7 @@ Frontend (Vercel)                    Backend (Railway)
 ┌─────────────────────┐             ┌──────────────────────────────┐
 │  Next.js 16         │    REST     │  FastAPI + PostgreSQL        │
 │  React 19           │◄───────────►│                              │
-│  Tailwind CSS 4     │    API      │  4-Stage Pipeline:           │
+│  Tailwind CSS 4     │    API      │  4.5-Stage Pipeline:         │
 │  Shadcn/ui          │             │  1. Fetch (RSS, HN, YouTube) │
 │                     │             │  2. Classify (LLM)           │
 │  Pages:             │             │  3. Process (LLM, parallel)  │
@@ -57,7 +57,8 @@ Frontend (Vercel)                    Backend (Railway)
 │  • Tips Feed        │             │  Data Sources:               │
 │  • AI Chat          │             │  • 22 RSS Feeds              │
 │  • AI Reports       │             │  • Hacker News (Algolia)     │
-│  • SSR Week Pages   │             │  • YouTube Data API v3       │
+│  • SSR Week/Article │             │  • YouTube Data API v3       │
+│  • Topic/Tool Pages │             │                              │
 └─────────────────────┘             └──────────────────────────────┘
 ```
 
@@ -113,20 +114,21 @@ python -m scripts.weekly_collect --week 2026-kw06
 | **バックエンド** | FastAPI, SQLAlchemy, Alembic, PostgreSQL |
 | **LLM 分類** | GLM-4.5-Air (OpenRouter, 無料枠) |
 | **LLM 処理** | DeepSeek V4 Flash (OpenRouter、プライマリ; V3.2 はフォールバック) |
-| **チャット & レポート** | Aurora Alpha (OpenRouter) |
+| **チャット & レポート** | openrouter/free (OpenRouter) |
 | **株価データ** | Polygon.io API |
 | **ホスティング** | Vercel（フロントエンド）、Railway（バックエンド + DB + cron） |
 | **デザイン** | Newsreader フォント、アイソメトリックキューブロゴ、セクション別カラーアクセント、スタガードアニメーション |
 
 ## データパイプライン
 
-バックエンドは 4 段階のパイプラインでニュースを処理します:
+バックエンドは 4.5 段階のパイプラインでニュースを処理します:
 
 | ステージ | 処理内容 | 出力 |
 |---------|---------|------|
 | **1. 取得** | RSS、Hacker News、YouTube から収集; 期間境界でフィルタリング | 約 210 件の生データ |
 | **2. 分類** | LLM が tech/investment/tips に分類（tips ソースはスキップ） | カテゴリ分けされたプール |
-| **3. 処理** | 並列 LLM 処理: バイリンガル要約の生成、エンティティの抽出 | tech 30 件 + investment 21 件 + tips 15 件 + videos 5 件 |
+| **3. 処理** | 並列 LLM 処理: DE/EN ベース要約の生成、エンティティの抽出 | tech 30 件 + investment 21 件 + tips 15 件 + videos 5 件 |
+| **3.5. 翻訳** | EN → ZH、FR、ES、PT、JA、KO をモデルチェーンで翻訳 | 各項目に 6 言語を追加 |
 | **4. 保存** | PostgreSQL に保存、動画をテックフィードに挿入 | データベースレコード |
 
 デイリー収集では件数が少なくなります（tech 10 件、investment 5 件、tips 5 件、videos 2 件）。
@@ -139,6 +141,7 @@ python -m scripts.weekly_collect --week 2026-kw06
 | `/api/tech/{periodId}` | GET | 埋め込み動画付きテックフィード |
 | `/api/investment/{periodId}` | GET | プライマリー/セカンダリー/M&A データ |
 | `/api/tips/{periodId}` | GET | キュレーションされたヒント |
+| `/api/trends/{periodId}` | GET | 期間ごとのトレンドトピック |
 | `/api/videos/{periodId}` | GET | YouTube 動画の要約 |
 | `/api/stock/{ticker}` | GET | リアルタイム株価データ |
 | `/api/stock/batch/?tickers=AAPL,NVDA` | GET | バッチ株価データ |
@@ -198,6 +201,9 @@ DataCube-AI-Space/
 │   │   ├── api/chat/            # AI チャットエンドポイント
 │   │   ├── api/report/          # AI レポートジェネレーター
 │   │   ├── [lang]/week/         # SSR ウィークページ (SEO)
+│   │   ├── [lang]/news/         # 記事ページ (SEO/GEO)
+│   │   ├── [lang]/topic/        # トピックハブ
+│   │   ├── [lang]/tools/        # ローカライズ済みツールページ
 │   │   └── feed.xml/            # Atom 1.0 フィード
 │   ├── components/              # React コンポーネント
 │   │   ├── feeds/               # テック、投資、ヒントフィード
@@ -210,7 +216,7 @@ DataCube-AI-Space/
 │   │   ├── models/              # SQLAlchemy モデル
 │   │   ├── routers/             # API エンドポイント
 │   │   └── services/            # ビジネスロジック
-│   │       ├── collector.py     # 4 段階パイプライン
+│   │       ├── collector.py     # 4.5 段階パイプライン
 │   │       ├── llm_processor.py # 2 モデル LLM アプローチ
 │   │       └── youtube_fetcher.py
 │   ├── alembic/                 # DB マイグレーション

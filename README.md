@@ -51,11 +51,11 @@ https://github.com/user-attachments/assets/9dddaaed-e473-4350-97de-0346cacb6660
 | 🤖 | **AI Chat** | Ask questions about the current week's AI news |
 | 📊 | **AI Reports** | One-click streaming report — export to Word, HTML, Markdown, Text, JSON |
 | 📧 | **Newsletter** | Two-step subscribe with 8-language selector — one email per subscriber in their preferred language |
-| 🔍 | **SEO/GEO** | SSR pages, JSON-LD, Atom feed (8 langs), Google News Sitemap, llms.txt, dynamic OG images, security headers, keyword-localized metadata in all 8 languages |
+| 🔍 | **SEO/GEO** | SSR home/week/article/topic/tool pages, JSON-LD, Atom feed (8 langs), Google News Sitemap, llms.txt, dynamic OG images, security headers, keyword-localized metadata in all 8 languages |
 | ♿ | **Accessible** | WCAG-compliant: focus-visible, ARIA, reduced-motion, skip links |
 | 📝 | **Editorial Standards** | Transparent AI methodology, data sources, pipeline documentation |
 | 📱 | **Mobile-First** | Dynamic viewport, safe area insets, touch-optimized navigation |
-| 💸 | **Monetization** | Developer API portal, Stripe premium tier, AI job board (DACH) |
+| 💸 | **Monetization** | Premium and team landing pages, Stripe checkout proxy, backend developer API/job board endpoints |
 
 ## Architecture
 
@@ -73,8 +73,8 @@ Frontend (Vercel)                    Backend (Railway)
 │  • Tips Feed        │             │                              │
 │  • AI Chat          │             │  Data Sources:               │
 │  • AI Reports       │             │  • 22 RSS Feeds              │
-│  • SSR Week Pages   │             │  • Hacker News (Algolia)     │
-│                     │             │  • YouTube Data API v3       │
+│  • SSR Week/Article │             │  • Hacker News (Algolia)     │
+│  • Topic/Tool Pages │             │  • YouTube Data API v3       │
 └─────────────────────┘             └──────────────────────────────┘
 ```
 
@@ -123,7 +123,7 @@ python -m scripts.weekly_collect --week 2026-kw06  # Specific week
 | **Backend** | FastAPI, SQLAlchemy, Alembic, PostgreSQL |
 | **LLM Classification** | GLM-4.5-Air (OpenRouter, free tier) |
 | **LLM Processing** | DeepSeek V4 Flash (OpenRouter, primary; V3.2 fallback) |
-| **Translation** | Free model chain: 6 models (OpenRouter, zero cost) |
+| **Translation** | Free model chain + paid tail (OpenRouter, free-first) |
 | **Chat & Reports** | openrouter/free (OpenRouter, smart router) |
 | **Newsletter** | Resend (sending) + Beehiiv (subscribers) |
 | **Stock Data** | Polygon.io API |
@@ -132,13 +132,13 @@ python -m scripts.weekly_collect --week 2026-kw06  # Specific week
 
 ## Data Pipeline
 
-The backend processes news through a 4-stage pipeline:
+The backend processes news through a 4.5-stage pipeline:
 
 | Stage | What happens | Output |
 |-------|-------------|--------|
 | **1. Fetch** | Collect from RSS, Hacker News, YouTube; filter by period boundaries | ~210 raw items |
 | **2. Classify** | LLM classifies into tech/investment/tips (tips sources skip this) | Categorized pool |
-| **3. Process** | Parallel LLM processing: generate bilingual summaries, extract entities | 30 tech + 21 investment + 15 tips + 5 videos |
+| **3. Process** | Parallel LLM processing: generate DE/EN base summaries, extract entities | 30 tech + 21 investment + 15 tips + 5 videos |
 | **3.5. Translate** | Translate EN → ZH, FR, ES, PT, JA, KO via free model chain (resilient: JSON validation + small-batch retry) | 6 extra languages per item |
 | **4. Save** | Store in PostgreSQL, intersperse videos into tech feed | Database records |
 
@@ -152,6 +152,7 @@ Daily collections produce reduced counts (10 tech, 5 investment, 5 tips, 2 video
 | `/api/tech/{periodId}` | GET | Tech feed with embedded videos |
 | `/api/investment/{periodId}` | GET | Primary/Secondary/M&A data |
 | `/api/tips/{periodId}` | GET | Curated tips |
+| `/api/trends/{periodId}` | GET | Period trend topics for the magazine-style trend index |
 | `/api/videos/{periodId}` | GET | YouTube video summaries |
 | `/api/stock/{ticker}` | GET | Real-time stock data |
 | `/api/stock/batch/?tickers=AAPL,NVDA` | GET | Batch stock data |
@@ -227,18 +228,24 @@ DataCube-AI-Space/
 │   │   ├── api/subscribe/       # Newsletter signup (Beehiiv, 8 langs)
 │   │   ├── api/og/             # Dynamic OG images
 │   │   ├── [lang]/week/         # SSR week pages (SEO)
+│   │   ├── [lang]/news/         # SSR article pages (SEO/GEO)
+│   │   ├── [lang]/topic/        # Topic hubs with period-scoped story links
+│   │   ├── [lang]/tools/        # Localized tool landing pages
 │   │   ├── feed.xml/            # Atom 1.0 feed (8 languages)
 │   │   ├── about/              # Editorial standards
+│   │   ├── editorial-policy/   # Publishing principles
+│   │   ├── source-methodology/ # Source and curation methodology
+│   │   ├── corrections/        # Corrections policy
+│   │   ├── ai-disclosure/      # AI-use disclosure
+│   │   ├── contact/            # Publisher contact
 │   │   ├── unsubscribe/        # Newsletter unsubscribe
 │   │   ├── news-sitemap.xml/   # Google News Sitemap
-│   │   ├── developers/         # API developer portal
-│   │   ├── pricing/            # Pricing page
 │   │   ├── for-teams/          # Enterprise landing
-│   │   ├── jobs/               # AI job board
 │   │   ├── premium/            # Premium upgrade
 │   │   └── api/checkout/       # Stripe checkout
 │   ├── components/              # React components
 │   │   ├── feeds/               # Tech, Investment, Tips feeds
+│   │   ├── trend-index.tsx      # Period trend index and topic entry points
 │   │   └── video-embed.tsx      # YouTube player
 │   ├── lib/                     # Utils, types, API client
 │   ├── vercel.json              # Non-www → www redirect
@@ -256,7 +263,7 @@ DataCube-AI-Space/
 │   │   │   ├── jobs.py         # Job board CRUD
 │   │   │   └── stripe_webhook.py  # Stripe payments
 │   │   └── services/            # Business logic
-│   │       ├── collector.py     # 4-stage pipeline
+│   │       ├── collector.py     # 4.5-stage pipeline
 │   │       ├── llm_processor.py # LLM processing + resilient translation
 │   │       ├── youtube_fetcher.py
 │   │       └── newsletter_sender.py  # Resend + Beehiiv
@@ -264,7 +271,7 @@ DataCube-AI-Space/
 │   ├── scripts/                 # CLI tools (daily/weekly collect)
 │   └── Dockerfile
 │
-├── docs/                        # Translated READMEs (8 languages)
+├── docs/                        # Translated READMEs, brand, SEO/GEO, documentation maintenance
 └── LICENSE
 ```
 

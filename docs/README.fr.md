@@ -4,7 +4,7 @@
 
 ### Votre actualité IA quotidienne, curée par l'IA.
 
-**Agrégateur d'actualités IA bilingue (DE/EN)** qui sélectionne les avancées technologiques, les investissements, les conseils pratiques et les vidéos YouTube — alimenté par un pipeline LLM en 4 étapes.
+**Agrégateur d'actualités IA multilingue (8 langues : DE/EN/ZH/FR/ES/PT/JA/KO)** qui sélectionne les avancées technologiques, les investissements, les conseils pratiques et les vidéos YouTube — alimenté par un pipeline LLM en 4,5 étapes.
 
 [![Licence MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Démo en ligne](https://img.shields.io/badge/demo-datacubeai.space-brightgreen)](https://www.datacubeai.space)
@@ -18,7 +18,7 @@
 
 ## Qu'est-ce que Data Cube AI ?
 
-Data Cube AI collecte, classe et résume automatiquement les actualités IA provenant de **22 flux RSS**, **Hacker News** et **YouTube** — puis les présente dans une interface bilingue (allemand/anglais) claire avec des vues quotidiennes et hebdomadaires.
+Data Cube AI collecte, classe et résume automatiquement les actualités IA provenant de **22 flux RSS**, **Hacker News** et **YouTube** — puis les présente dans une interface claire en 8 langues avec des vues quotidiennes et hebdomadaires.
 
 **Accessible sur [datacubeai.space](https://www.datacubeai.space)** — aucune connexion requise.
 
@@ -33,7 +33,7 @@ https://github.com/user-attachments/assets/9dddaaed-e473-4350-97de-0346cacb6660
 - **Fil Tech** — Avancées IA/ML avec vidéos YouTube intégrées et évaluations d'impact
 - **Suivi des investissements** — Levées de fonds primaires, données du marché secondaire (cours boursiers en temps réel via Polygon.io) et fusions-acquisitions
 - **Conseils pratiques** — Sélection provenant de 14 communautés Reddit et de blogs d'experts
-- **Bilingue** — Chaque article en allemand et en anglais
+- **8 langues** — Contenu disponible en DE, EN, ZH, FR, ES, PT, JA et KO
 - **Quotidien + Hebdomadaire** — Collecte quotidienne automatisée avec vues récapitulatives hebdomadaires
 - **Chat IA** — Posez des questions sur les actualités IA de la semaine en cours
 - **Rapports IA** — Génération de rapports en streaming en un clic, avec export en Word, HTML, Markdown, texte brut ou JSON
@@ -48,7 +48,7 @@ Frontend (Vercel)                    Backend (Railway)
 ┌─────────────────────┐             ┌──────────────────────────────┐
 │  Next.js 16         │    REST     │  FastAPI + PostgreSQL        │
 │  React 19           │◄───────────►│                              │
-│  Tailwind CSS 4     │    API      │  Pipeline en 4 étapes :      │
+│  Tailwind CSS 4     │    API      │  Pipeline en 4,5 étapes :    │
 │  Shadcn/ui          │             │  1. Fetch (RSS, HN, YouTube) │
 │                     │             │  2. Classify (LLM)           │
 │  Pages :            │             │  3. Process (LLM, parallel)  │
@@ -57,7 +57,8 @@ Frontend (Vercel)                    Backend (Railway)
 │  • Fil Conseils     │             │  Sources de données :        │
 │  • Chat IA          │             │  • 22 flux RSS               │
 │  • Rapports IA      │             │  • Hacker News (Algolia)     │
-│  • Pages SSR        │             │  • YouTube Data API v3       │
+│  • SSR Week/Article │             │  • YouTube Data API v3       │
+│  • Topic/Tool Pages │             │                              │
 └─────────────────────┘             └──────────────────────────────┘
 ```
 
@@ -113,20 +114,21 @@ python -m scripts.weekly_collect --week 2026-kw06
 | **Backend** | FastAPI, SQLAlchemy, Alembic, PostgreSQL |
 | **Classification LLM** | GLM-4.5-Air (OpenRouter, niveau gratuit) |
 | **Traitement LLM** | DeepSeek V4 Flash (OpenRouter, principal ; V3.2 en fallback) |
-| **Chat et rapports** | Aurora Alpha (OpenRouter) |
+| **Chat et rapports** | openrouter/free (OpenRouter) |
 | **Données boursières** | API Polygon.io |
 | **Hébergement** | Vercel (frontend), Railway (backend + BDD + cron) |
 | **Design** | Police Newsreader, logo cube isométrique, accents de couleur par section, animations échelonnées |
 
 ## Pipeline de données
 
-Le backend traite les actualités via un pipeline en 4 étapes :
+Le backend traite les actualités via un pipeline en 4,5 étapes :
 
 | Étape | Description | Résultat |
 |-------|------------|----------|
 | **1. Collecte** | Récupération depuis RSS, Hacker News, YouTube ; filtrage par limites de période | ~210 éléments bruts |
 | **2. Classification** | Le LLM classe en tech/investissement/conseils (les sources de conseils sautent cette étape) | Pool catégorisé |
-| **3. Traitement** | Traitement LLM en parallèle : génération de résumés bilingues, extraction d'entités | 30 tech + 21 investissement + 15 conseils + 5 vidéos |
+| **3. Traitement** | Traitement LLM en parallèle : génération de résumés de base DE/EN, extraction d'entités | 30 tech + 21 investissement + 15 conseils + 5 vidéos |
+| **3.5. Traduction** | Traduction EN → ZH, FR, ES, PT, JA, KO via une chaîne de modèles résiliente | 6 langues supplémentaires par élément |
 | **4. Sauvegarde** | Stockage dans PostgreSQL, intégration des vidéos dans le fil tech | Enregistrements en base |
 
 Les collectes quotidiennes produisent des volumes réduits (10 tech, 5 investissement, 5 conseils, 2 vidéos).
@@ -139,6 +141,7 @@ Les collectes quotidiennes produisent des volumes réduits (10 tech, 5 investiss
 | `/api/tech/{periodId}` | GET | Fil tech avec vidéos intégrées |
 | `/api/investment/{periodId}` | GET | Données primaire/secondaire/fusions-acquisitions |
 | `/api/tips/{periodId}` | GET | Conseils sélectionnés |
+| `/api/trends/{periodId}` | GET | Tendances de la période |
 | `/api/videos/{periodId}` | GET | Résumés de vidéos YouTube |
 | `/api/stock/{ticker}` | GET | Données boursières en temps réel |
 | `/api/stock/batch/?tickers=AAPL,NVDA` | GET | Données boursières par lot |
@@ -198,6 +201,9 @@ DataCube-AI-Space/
 │   │   ├── api/chat/            # Point d'accès du chat IA
 │   │   ├── api/report/          # Générateur de rapports IA
 │   │   ├── [lang]/week/         # Pages SSR par semaine (SEO)
+│   │   ├── [lang]/news/         # Pages article (SEO/GEO)
+│   │   ├── [lang]/topic/        # Topic hubs
+│   │   ├── [lang]/tools/        # Pages d'outils localisées
 │   │   └── feed.xml/            # Flux Atom 1.0
 │   ├── components/              # Composants React
 │   │   ├── feeds/               # Fils Tech, Investissement, Conseils
@@ -210,7 +216,7 @@ DataCube-AI-Space/
 │   │   ├── models/              # Modèles SQLAlchemy
 │   │   ├── routers/             # Points d'accès API
 │   │   └── services/            # Logique métier
-│   │       ├── collector.py     # Pipeline en 4 étapes
+│   │       ├── collector.py     # Pipeline en 4,5 étapes
 │   │       ├── llm_processor.py # Approche LLM à deux modèles
 │   │       └── youtube_fetcher.py
 │   ├── alembic/                 # Migrations BDD

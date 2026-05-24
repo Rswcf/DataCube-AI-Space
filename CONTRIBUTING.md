@@ -33,6 +33,7 @@ uvicorn app.main:app --reload # http://localhost:8000/docs
 4. Run the checks:
    - **Frontend**: `cd ai-information-hub && npx tsc --noEmit`
    - **Backend**: `cd ai-hub-backend && ruff check`
+   - **Docs-only**: `git diff --check`
 5. Commit: `git commit -m 'Add my feature'`
 6. Push: `git push origin feature/my-feature`
 7. Open a Pull Request
@@ -56,7 +57,11 @@ Look for issues labeled [`good first issue`](https://github.com/Rswcf/DataCube-A
 | `ai-information-hub/components/` | React components |
 | `ai-hub-backend/app/services/` | Business logic (collector, LLM processor) |
 | `ai-hub-backend/alembic/` | Database migrations |
-| `docs/` | Translated READMEs |
+| `docs/` | Translated READMEs, brand guidelines, SEO/GEO plan, documentation maintenance |
+
+## Documentation Changes
+
+When changing routes, APIs, data models, SEO/GEO behavior, newsletter behavior, deployment, or the design system, update the related docs in the same PR. Start with [`docs/documentation-maintenance.md`](docs/documentation-maintenance.md) for the source-of-truth checklist.
 
 ## Questions?
 

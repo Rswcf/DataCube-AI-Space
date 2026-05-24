@@ -69,6 +69,16 @@ Expected local results after this pass:
 - `/editorial-policy`: `200`
 - Sitemap includes all trust URLs.
 
+### 2026-05-24 - Article Pages, Topic Hubs, And Trend Discovery Pass
+
+Completed in the frontend without changing the upstream data model:
+
+- Added stable first-party article pages at `/{lang}/news/{periodId}/{storyId}`.
+- Connected feed, news-sitemap, and story links to first-party article URLs where story IDs are available.
+- Added topic hubs at `/{lang}/topic/{topic}` with period-aware story discovery.
+- Updated the homepage trend index to link trend items into topic hubs using the current period and display query.
+- Preserved the existing feed data shape; all changes are routing, metadata, and presentation-layer additions.
+
 This file is the execution base for future SEO and GEO work. It combines:
 
 - local codebase review of `ai-information-hub`
@@ -79,27 +89,34 @@ This file is the execution base for future SEO and GEO work. It combines:
 
 ## Executive Summary
 
-Data Cube AI already has a solid SEO foundation: SSR pages, localized metadata, hreflang on main route families, JSON-LD, sitemap, News sitemap, Atom feeds, `llms.txt`, and an AI-oriented Markdown summary endpoint.
+Data Cube AI already has a solid SEO foundation: SSR pages, localized metadata, hreflang on main route families, article pages, topic hubs, JSON-LD, sitemap, News sitemap, Atom feeds, `llms.txt`, and an AI-oriented Markdown summary endpoint.
 
-The current opportunity is not "add more keywords". The highest-leverage work is to make the site consistently crawlable for humans, bots, AI search crawlers, and framework prefetch requests; then make each item more uniquely citeable through stable first-party URLs, source-backed factual blocks, and stronger publisher trust signals.
+The current opportunity is not "add more keywords". The highest-leverage work is to keep the site consistently crawlable for humans, bots, AI search crawlers, and framework prefetch requests; then make each item more uniquely citeable through stable first-party URLs, source-backed factual blocks, and stronger publisher trust signals.
 
 Current strongest assets:
 
 - 8-language route architecture: `de`, `en`, `zh`, `fr`, `es`, `pt`, `ja`, `ko`
-- localized home, week, topic, and tool metadata
+- localized home, week, article, topic, and tool metadata
 - `robots.txt`, `sitemap.xml`, `news-sitemap.xml`, `feed.xml`, `newsletter.xml`, `llms.txt`
 - `Organization`, `WebSite`, `FAQPage`, `CollectionPage`, `NewsArticle`, `VideoObject`, `SoftwareApplication`, `BreadcrumbList`, `ItemList` schema support in code
 - public Markdown content API at `/api/content-summary`
+- public trust pages for about, editorial policy, source methodology, corrections, AI disclosure, and contact
 
-Current highest-risk issues:
+Resolved or partially mitigated from the original audit baseline:
 
-- Human first-visit browser traffic is gated to `/login`, while crawlers and non-human agents see content. This is a user-experience and cloaking-risk decision, even if Googlebot itself currently gets content.
-- `Next-Router-Prefetch: 1` against `/de` returns `500` in production.
-- `news-sitemap.xml` repeats the same week URL for many different news titles.
-- `feed.xml?lang=en` currently returns zero entries.
-- AI crawler policy is missing newer search-specific agents such as `OAI-SearchBot`, `Claude-SearchBot`, `Claude-User`, and `Perplexity-User`.
-- Topic hreflang can point translated languages at non-equivalent slugs.
-- E-E-A-T/trust infrastructure is thin: no dedicated About, editorial policy, corrections policy, author/editor pages, source methodology, or AI-use disclosure.
+- Public SEO routes now bypass the login gate for humans and crawlers.
+- Malformed `Next-Router-Prefetch` requests are handled with a noop response.
+- News sitemap strategy now uses first-party article/period URLs instead of many titles pointing at the same week URL.
+- Atom feeds are populated from recent day periods and use first-party links.
+- AI crawler policy includes newer search/user agents such as `OAI-SearchBot`, `Claude-SearchBot`, `Claude-User`, and `Perplexity-User`.
+- Trust pages now exist and are linked from schema and discovery surfaces.
+
+Current remaining risks:
+
+- Topic canonical/hreflang is improved by topic hubs but still needs a canonical topic-entity model with localized slugs.
+- A localized tools index at `/{lang}/tools` is still missing while individual tool pages exist.
+- Legal pages still require real business/contact placeholder values before high-trust ad/search review.
+- Author/editor attribution remains publisher-level; person/team pages would improve E-E-A-T.
 
 ## Audit Baseline
 
@@ -151,7 +168,7 @@ These decisions should be made before code work starts.
 | Decision | Recommended Default | Why It Matters |
 | --- | --- | --- |
 | Public SEO content vs login gate | Make SEO routes public to humans and crawlers. Gate only premium/account features. | Avoids crawler/user mismatch and lets organic traffic land on the content it searched for. |
-| News article granularity | Create stable first-party URLs/fragments for individual stories, or reduce News sitemap to one roundup URL per period. | Google News sitemap should not list many titles against the same `<loc>`. |
+| News article granularity | Stable first-party article URLs are now implemented at `/{lang}/news/{periodId}/{storyId}`. Continue using fragments only as fallback. | Google News sitemap should not list many titles against the same `<loc>`. |
 | AI training crawler policy | Allow search/retrieval bots; decide separately on training bots. | `OAI-SearchBot`, `Claude-SearchBot`, `PerplexityBot` affect AI search visibility; `GPTBot`, `ClaudeBot`, `Google-Extended`, `CCBot` are training/grounding policy choices. |
 | API summary indexation | Keep API crawlable for AI tools but add traditional-search `X-Robots-Tag: noindex, follow`, then create selected static AI summary pages if needed. | Avoids parameterized duplicate Markdown in Google while preserving GEO utility. |
 | Google News positioning | Treat Data Cube as an intelligence/briefing publisher unless unique article pages and editorial trust policies are ready. | News surfaces require stronger publisher transparency and article-level URL hygiene. |
@@ -161,6 +178,8 @@ These decisions should be made before code work starts.
 ### P0 - Routing, Crawlability, And Cloaking Risk
 
 #### SEO-001: Resolve login gate mismatch
+
+Status: implemented for public SEO, trust, and marketing routes on 2026-05-24. Keep this section as regression guidance.
 
 Current files:
 
@@ -197,6 +216,8 @@ curl -I -A 'Mozilla/5.0 (compatible; OAI-SearchBot/1.3; +https://openai.com/sear
 
 #### SEO-002: Fix Next prefetch 500
 
+Status: implemented on 2026-05-24 with a malformed-prefetch noop route/response. Keep this section as regression guidance.
+
 Current files:
 
 - `ai-information-hub/middleware.ts`
@@ -227,6 +248,8 @@ curl -I -H 'Next-Router-Prefetch: 1' https://www.datacubeai.space/de
 ### P1 - Indexation And URL Hygiene
 
 #### SEO-003: Rebuild News sitemap strategy
+
+Status: partially implemented. First-party article pages now exist; continue validating that every News sitemap entry uses a unique, visible, first-party URL.
 
 Current files:
 
@@ -260,6 +283,8 @@ curl -s https://www.datacubeai.space/news-sitemap.xml
 
 #### SEO-004: Fix Atom feed output and first-party permalinks
 
+Status: partially implemented. Atom feeds now pull recent daily periods and use first-party links; continue monitoring non-empty entries across all 8 languages.
+
 Current files:
 
 - `ai-information-hub/app/feed.xml/route.ts`
@@ -284,6 +309,8 @@ Acceptance criteria:
 - Entry IDs are stable across rebuilds.
 
 #### SEO-005: Repair topic canonical/hreflang behavior
+
+Status: partially mitigated. Topic hubs now exist and trend links route into them, but the canonical topic entity model is still open.
 
 Current files:
 
@@ -311,6 +338,8 @@ Acceptance criteria:
 - Sitemap only includes topic URLs that resolve to meaningful content.
 
 #### SEO-006: Add missing `/[lang]/tools` index page or remove links to it
+
+Status: open. Individual localized tool pages exist, but the parent `/{lang}/tools` route is still missing.
 
 Current files:
 
@@ -440,6 +469,8 @@ Acceptance criteria:
 
 #### GEO-003: Give every story a stable first-party identity
 
+Status: implemented at the route layer with `/{lang}/news/{periodId}/{storyId}`. Remaining work is to verify stable story IDs across regenerations and every feed/news sitemap path.
+
 Current files:
 
 - `ai-information-hub/app/[lang]/week/[weekId]/page.tsx`
@@ -454,8 +485,8 @@ Problem:
 
 Recommendation:
 
-- Add stable fragment IDs first: `/{lang}/week/{periodId}#tech-{id}`, `#investment-{id}`, `#tip-{id}`, `#video-{id}`.
-- Later evaluate individual article pages if needed.
+- Prefer the implemented article URLs: `/{lang}/news/{periodId}/{storyId}`.
+- Keep stable week-page fragment IDs as fallback anchors: `/{lang}/week/{periodId}#story-tech-{id}`, `#story-investment-{id}`, `#story-tip-{id}`, `#story-video-{id}`.
 - Use these IDs in feed, ItemList, NewsArticle `url`, `mainEntityOfPage`, and internal links.
 
 Acceptance criteria:
@@ -504,12 +535,14 @@ Acceptance criteria:
 
 #### TRUST-001: Add publisher trust pages
 
+Status: mostly implemented. `/about`, `/editorial-policy`, `/source-methodology`, `/corrections`, `/contact`, and `/ai-disclosure` exist; legal placeholder values still need final business data.
+
 Recommended new routes:
 
 - `/about`
 - `/editorial-policy`
 - `/corrections`
-- `/sources-methodology`
+- `/source-methodology`
 - `/contact`
 - `/ai-disclosure`
 
@@ -604,6 +637,8 @@ Acceptance criteria:
 
 #### SEO-008: Add explicit Twitter metadata on dynamic and tool pages
 
+Status: partially implemented. Localized home, period, and tool pages have page-specific Twitter metadata; continue validating topic, premium, and team pages.
+
 Current files:
 
 - `ai-information-hub/app/[lang]/week/[weekId]/page.tsx`
@@ -654,6 +689,8 @@ Recommendation:
 - Measure before changing visual assets.
 
 #### A11Y-001: Fix newsletter/sign-up form labels and contrast
+
+Status: partially implemented. Newsletter forms have associated labels/sr-only labels in the current sidebar/mobile flows; contrast still needs periodic visual and automated audit.
 
 Current files:
 

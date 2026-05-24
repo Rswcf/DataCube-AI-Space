@@ -4,7 +4,7 @@
 
 ### Deine täglichen KI-Nachrichten, kuratiert von KI.
 
-**Zweisprachiger (DE/EN) KI-Nachrichtenaggregator**, der technologische Durchbrüche, Investmentdeals, praktische Tipps und YouTube-Videos kuratiert — angetrieben durch eine 4-stufige LLM-Pipeline.
+**Mehrsprachiger KI-Nachrichtenaggregator (8 Sprachen: DE/EN/ZH/FR/ES/PT/JA/KO)**, der technologische Durchbrüche, Investmentdeals, praktische Tipps und YouTube-Videos kuratiert — angetrieben durch eine 4,5-stufige LLM-Pipeline.
 
 [![MIT-Lizenz](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Live-Demo](https://img.shields.io/badge/demo-datacubeai.space-brightgreen)](https://www.datacubeai.space)
@@ -18,7 +18,7 @@
 
 ## Was ist Data Cube AI?
 
-Data Cube AI sammelt, klassifiziert und fasst automatisch KI-Nachrichten aus **22 RSS-Feeds**, **Hacker News** und **YouTube** zusammen — und präsentiert diese in einer übersichtlichen zweisprachigen (Deutsch/Englisch) Oberfläche mit Tages- und Wochenansichten.
+Data Cube AI sammelt, klassifiziert und fasst automatisch KI-Nachrichten aus **22 RSS-Feeds**, **Hacker News** und **YouTube** zusammen — und präsentiert diese in einer übersichtlichen 8-sprachigen Oberfläche mit Tages- und Wochenansichten.
 
 **Live unter [datacubeai.space](https://www.datacubeai.space)** — keine Anmeldung erforderlich.
 
@@ -33,7 +33,7 @@ https://github.com/user-attachments/assets/9dddaaed-e473-4350-97de-0346cacb6660
 - **Tech-Feed** — KI/ML-Durchbrüche mit eingebetteten YouTube-Videos und Bewertungen der Tragweite
 - **Investment-Tracker** — Primärmarkt-Finanzierungsrunden, Sekundärmarktdaten (Echtzeit-Aktienkurse über Polygon.io) und M&A-Deals
 - **Praktische Tipps** — Kuratiert aus 14 Reddit-Communities und Experten-Blogs
-- **Zweisprachig** — Jeder Artikel in Deutsch und Englisch
+- **8 Sprachen** — Inhalte für DE, EN, ZH, FR, ES, PT, JA und KO
 - **Täglich + Wöchentlich** — Automatisierte tägliche Erfassung mit wöchentlichen Zusammenfassungen
 - **KI-Chat** — Stelle Fragen zu den KI-Nachrichten der aktuellen Woche
 - **KI-Berichte** — Streaming-Bericht per Knopfdruck mit Export in Word, HTML, Markdown, Text oder JSON
@@ -48,7 +48,7 @@ Frontend (Vercel)                    Backend (Railway)
 ┌─────────────────────┐             ┌──────────────────────────────┐
 │  Next.js 16         │    REST     │  FastAPI + PostgreSQL        │
 │  React 19           │◄───────────►│                              │
-│  Tailwind CSS 4     │    API      │  4-Stage Pipeline:           │
+│  Tailwind CSS 4     │    API      │  4.5-Stage Pipeline:         │
 │  Shadcn/ui          │             │  1. Fetch (RSS, HN, YouTube) │
 │                     │             │  2. Classify (LLM)           │
 │  Pages:             │             │  3. Process (LLM, parallel)  │
@@ -57,7 +57,8 @@ Frontend (Vercel)                    Backend (Railway)
 │  • Tips Feed        │             │  Data Sources:               │
 │  • AI Chat          │             │  • 22 RSS Feeds              │
 │  • AI Reports       │             │  • Hacker News (Algolia)     │
-│  • SSR Week Pages   │             │  • YouTube Data API v3       │
+│  • SSR Week/Article │             │  • YouTube Data API v3       │
+│  • Topic/Tool Pages │             │                              │
 └─────────────────────┘             └──────────────────────────────┘
 ```
 
@@ -113,20 +114,21 @@ python -m scripts.weekly_collect --week 2026-kw06
 | **Backend** | FastAPI, SQLAlchemy, Alembic, PostgreSQL |
 | **LLM-Klassifikation** | GLM-4.5-Air (OpenRouter, kostenlose Stufe) |
 | **LLM-Verarbeitung** | DeepSeek V4 Flash (OpenRouter, primär; V3.2 als Fallback) |
-| **Chat & Berichte** | Aurora Alpha (OpenRouter) |
+| **Chat & Berichte** | openrouter/free (OpenRouter) |
 | **Aktiendaten** | Polygon.io API |
 | **Hosting** | Vercel (Frontend), Railway (Backend + DB + Cron) |
 | **Design** | Newsreader-Schrift, isometrisches Würfel-Logo, sektionsspezifische Farbakzente, gestaffelte Animationen |
 
 ## Datenpipeline
 
-Das Backend verarbeitet Nachrichten durch eine 4-stufige Pipeline:
+Das Backend verarbeitet Nachrichten durch eine 4,5-stufige Pipeline:
 
 | Stufe | Was passiert | Ergebnis |
 |-------|-------------|--------|
 | **1. Abruf** | Daten aus RSS, Hacker News, YouTube sammeln; nach Zeitraumgrenzen filtern | ~210 Rohdatensätze |
 | **2. Klassifikation** | LLM klassifiziert in Tech/Investment/Tipps (Tipps-Quellen überspringen diesen Schritt) | Kategorisierter Pool |
-| **3. Verarbeitung** | Parallele LLM-Verarbeitung: zweisprachige Zusammenfassungen generieren, Entitäten extrahieren | 30 Tech + 21 Investment + 15 Tipps + 5 Videos |
+| **3. Verarbeitung** | Parallele LLM-Verarbeitung: DE/EN-Basiszusammenfassungen generieren, Entitäten extrahieren | 30 Tech + 21 Investment + 15 Tipps + 5 Videos |
+| **3.5. Übersetzung** | EN → ZH, FR, ES, PT, JA, KO über eine resiliente Modellkette übersetzen | 6 zusätzliche Sprachen pro Eintrag |
 | **4. Speicherung** | In PostgreSQL speichern, Videos in den Tech-Feed einstreuen | Datenbankeinträge |
 
 Tägliche Erfassungen erzeugen reduzierte Mengen (10 Tech, 5 Investment, 5 Tipps, 2 Videos).
@@ -139,6 +141,7 @@ Tägliche Erfassungen erzeugen reduzierte Mengen (10 Tech, 5 Investment, 5 Tipps
 | `/api/tech/{periodId}` | GET | Tech-Feed mit eingebetteten Videos |
 | `/api/investment/{periodId}` | GET | Primär-/Sekundärmarkt-/M&A-Daten |
 | `/api/tips/{periodId}` | GET | Kuratierte Tipps |
+| `/api/trends/{periodId}` | GET | Trendthemen für den Zeitraum |
 | `/api/videos/{periodId}` | GET | YouTube-Video-Zusammenfassungen |
 | `/api/stock/{ticker}` | GET | Echtzeit-Aktiendaten |
 | `/api/stock/batch/?tickers=AAPL,NVDA` | GET | Batch-Aktiendaten |
@@ -198,6 +201,9 @@ DataCube-AI-Space/
 │   │   ├── api/chat/            # KI-Chat-Endpunkt
 │   │   ├── api/report/          # KI-Berichtsgenerator
 │   │   ├── [lang]/week/         # SSR-Wochenseiten (SEO)
+│   │   ├── [lang]/news/         # Artikelseiten (SEO/GEO)
+│   │   ├── [lang]/topic/        # Topic Hubs
+│   │   ├── [lang]/tools/        # Lokalisierte Tool-Seiten
 │   │   └── feed.xml/            # Atom 1.0 Feed
 │   ├── components/              # React-Komponenten
 │   │   ├── feeds/               # Tech-, Investment-, Tipps-Feeds
@@ -210,7 +216,7 @@ DataCube-AI-Space/
 │   │   ├── models/              # SQLAlchemy-Modelle
 │   │   ├── routers/             # API-Endpunkte
 │   │   └── services/            # Geschäftslogik
-│   │       ├── collector.py     # 4-stufige Pipeline
+│   │       ├── collector.py     # 4,5-stufige Pipeline
 │   │       ├── llm_processor.py # Zwei-Modell-LLM-Ansatz
 │   │       └── youtube_fetcher.py
 │   ├── alembic/                 # DB-Migrationen

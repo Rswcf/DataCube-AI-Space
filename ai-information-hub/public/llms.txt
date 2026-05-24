@@ -41,6 +41,7 @@ Base URL: https://api-production-3ee5.up.railway.app/api
 - GET /api/tech/{periodId} — Technology feed (multilingual JSON, 8 languages)
 - GET /api/investment/{periodId} — Investment feed (multilingual JSON, 8 languages)
 - GET /api/tips/{periodId} — Tips feed (multilingual JSON, 8 languages)
+- GET /api/trends/{periodId} — Period trend topics used by topic hub discovery
 - GET /api/videos/{periodId} — Video summaries
 
 Period ID format: YYYY-kwWW (weekly) or YYYY-MM-DD (daily)
@@ -49,6 +50,14 @@ Period ID format: YYYY-kwWW (weekly) or YYYY-MM-DD (daily)
 Each period has a dedicated localized page with full HTML content.
 Canonical format: https://www.datacubeai.space/{lang}/week/{periodId}
 Example: https://www.datacubeai.space/en/week/2026-05-23
+
+## Article Pages And Topic Hubs
+Each curated story can be cited through a stable first-party article URL.
+Article canonical format: https://www.datacubeai.space/{lang}/news/{periodId}/{storyId}
+
+Topic hubs collect related period stories and can be scoped by period.
+Topic canonical format: https://www.datacubeai.space/{lang}/topic/{topic}
+Scoped topic example: https://www.datacubeai.space/en/topic/openai?period=2026-05-23
 
 ## Languages
 German (de) — default | English (en) | Chinese (zh) | French (fr) | Spanish (es) | Portuguese (pt) | Japanese (ja) | Korean (ko)
@@ -75,7 +84,7 @@ Data Cube AI (datacubeai.space)
 - Google News sitemap: https://www.datacubeai.space/news-sitemap.xml
 - Atom feeds: https://www.datacubeai.space/feed.xml?lang=en and https://www.datacubeai.space/feed.xml?lang=de
 - Newsletter feed: https://www.datacubeai.space/newsletter.xml
-- Public site pages: https://www.datacubeai.space/{lang}, https://www.datacubeai.space/{lang}/week/{periodId}
+- Public site pages: https://www.datacubeai.space/{lang}, https://www.datacubeai.space/{lang}/week/{periodId}, https://www.datacubeai.space/{lang}/news/{periodId}/{storyId}, https://www.datacubeai.space/{lang}/topic/{topic}, https://www.datacubeai.space/{lang}/tools/{tool}
 
 ## AI Content Endpoint
 For structured AI-consumable content, use the Markdown summary API:

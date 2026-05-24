@@ -11,7 +11,7 @@ FastAPI backend for the AI Information Hub — multilingual (8 languages) daily 
 - YouTube video integration (interspersed in tech feed)
 - **Real-time stock data** via Polygon.io API (Secondary Market)
 - PostgreSQL database with SQLAlchemy ORM
-- 4-stage data collection pipeline
+- 4.5-stage data collection pipeline
 - Two-model LLM approach (classifier + processor)
 - Tips sources bypass classification (Reddit, Simon Willison)
 - **8-language support** (DE, EN, ZH, FR, ES, PT, JA, KO) with resilient free-model translation pipeline
@@ -26,7 +26,7 @@ FastAPI backend for the AI Information Hub — multilingual (8 languages) daily 
 | Purpose | Model | Notes |
 |---------|-------|-------|
 | **Classification** | `z-ai/glm-4.5-air:free` | Free tier, classifies tech/investment |
-| **Content Processing** | `deepseek/deepseek-v4-flash` | Generates bilingual content (DE/EN), translated to 6 more via free chain. `deepseek/deepseek-v3.2` as paid fallback |
+| **Content Processing** | `deepseek/deepseek-v4-flash` | Generates DE/EN base content, translated to 6 more languages via free chain. `deepseek/deepseek-v3.2` as paid fallback |
 | **Translation** | 8 free models + paid tail (`deepseek-v4-flash` → `v3.2`) | EN → ZH, FR, ES, PT, JA, KO. Paid tier only fires when full free chain 429s — historical cost ~$0/day |
 
 ## Data Collection Pipeline (Overview)
@@ -49,7 +49,7 @@ Stage 3: Parallel LLM processing
     ↓
 Stage 3.5: Translate EN → 6 languages (free model chain)
     • ZH, FR, ES, PT, JA, KO
-    • Resilient: JSON validation retries across 6-model chain
+    • Resilient: JSON validation retries across the model chain
     • Smaller batch fallback (size=3) on parse failure
     ↓
 Stage 4: Save to PostgreSQL (translations in JSONB column)
@@ -348,7 +348,7 @@ Daily collections use reduced output counts to match the smaller time window:
 | Investment processing | `llm_processor.py` | 273-425 |
 | Tips processing | `llm_processor.py` | 435-485 |
 | Video processing | `llm_processor.py` | 217-271 |
-| 4-stage pipeline | `collector.py` | 242-781 |
+| 4.5-stage pipeline | `collector.py` | 242-781 |
 | Video interspersion | `collector.py` | 210-239 |
 | HN fetching | `hn_fetcher.py` | 248-279 |
 | Period boundary filter | `collector.py` / `period_utils.py` | — |
@@ -716,9 +716,9 @@ These sources are fetched as part of the investment RSS collection but processed
 
 M&A data has two collection paths:
 
-**Full Collection** (4-stage pipeline):
+**Full Collection** (4.5-stage pipeline):
 ```
-RSS Fetch (all sources) → Classification → LLM Processing → Database
+RSS Fetch (all sources) → Classification → LLM Processing → Translation → Database
                                               ↓
                                process_investment_articles()
                                internally splits articles into:
@@ -793,7 +793,7 @@ ai-hub-backend/
 │   │   ├── stripe_webhook.py  # Stripe payments (webhook, checkout, subscriptions)
 │   │   └── ...
 │   └── services/            # Business logic
-│       ├── collector.py     # 4-stage pipeline
+│       ├── collector.py     # 4.5-stage pipeline
 │       ├── period_utils.py  # Period ID utilities (daily/weekly)
 │       ├── rss_fetcher.py   # RSS feeds
 │       ├── hn_fetcher.py    # Hacker News
