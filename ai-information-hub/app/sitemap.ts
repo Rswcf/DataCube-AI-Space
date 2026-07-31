@@ -221,11 +221,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })),
   )
 
+  // Article pages: only DE/EN/ZH are indexed (middleware sends noindex for the
+  // other languages) — keep the sitemap consistent with that decision.
+  const INDEXED_ARTICLE_LANGS = ['de', 'en', 'zh']
   const articleEntries = articlePeriods.flatMap(({ periodId, candidates }) =>
     candidates.flatMap((candidate) => {
       const lastModified = candidateLastModified(candidate, periodId)
       const changeFrequency: 'daily' | 'weekly' = lastModified < sevenDaysAgo ? 'weekly' : 'daily'
-      return SUPPORTED_LANGUAGES.map((lang) => ({
+      return INDEXED_ARTICLE_LANGS.map((lang) => ({
         url: `${baseUrl}${articleHref(lang, periodId, candidate.storyId)}`,
         lastModified,
         changeFrequency,

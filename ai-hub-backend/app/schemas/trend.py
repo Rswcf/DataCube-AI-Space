@@ -12,6 +12,14 @@ class TrendResponse(BaseModel):
     category: str  # "AI · Trending" or "KI · Trend"
     title: str
     posts: Optional[int] = None
+    # Proprietary momentum signal computed from our own topic history
+    # (information-gain layer — no aggregation source has this view):
+    #   "new"       — topic did not appear in recent prior periods
+    #   "rising"    — topic also appeared in the immediately previous period
+    #   "returning" — topic appeared earlier but skipped the previous period
+    momentum: Optional[str] = None
+    # Consecutive periods (including the current one) the topic has trended.
+    streak: Optional[int] = None
 
     class Config:
         from_attributes = True

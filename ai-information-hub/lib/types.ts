@@ -167,6 +167,10 @@ export interface TrendItem {
   category: string; // e.g., "AI · Trending" or "KI · Trend"
   title: string;
   posts?: number;
+  /** Proprietary momentum signal from our own topic history (backend-computed) */
+  momentum?: "new" | "rising" | "returning";
+  /** Consecutive periods (incl. current) this topic has trended */
+  streak?: number;
 }
 
 /** A team member for display in sidebar */

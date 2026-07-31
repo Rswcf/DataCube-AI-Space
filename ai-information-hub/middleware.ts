@@ -50,6 +50,19 @@ function isCrawler(request: NextRequest): boolean {
 
 const LANG_RE = '(?:de|en|zh|fr|es|pt|ja|ko)'
 
+// Article pages are indexed only in languages with a real audience (DE/EN/ZH).
+// The other five languages stay served (with hreflang) but send
+// `X-Robots-Tag: noindex` — 8x-ing thin article pages amplifies the
+// "scaled content" footprint that suppresses the whole site on Google
+// (see .ai-collab/context/seo-growth-ads-strategy-2026-07.md §4.2).
+// Revisit once domain authority is established.
+const INDEXED_ARTICLE_LANGS = new Set(['de', 'en', 'zh'])
+
+function isNoindexArticlePath(pathname: string): boolean {
+  const match = pathname.match(/^\/(de|en|zh|fr|es|pt|ja|ko)\/news\/[^/]+\/[^/]+$/)
+  return match !== null && !INDEXED_ARTICLE_LANGS.has(match[1])
+}
+
 function isLocalizablePath(pathname: string): boolean {
   return (
     pathname === '/' ||
@@ -174,7 +187,11 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL(target, request.url), 308)
   }
 
-  return nextWithLang(request)
+  const response = nextWithLang(request)
+  if (isNoindexArticlePath(pathname)) {
+    response.headers.set('X-Robots-Tag', 'noindex, follow')
+  }
+  return response
 }
 
 export const config = {

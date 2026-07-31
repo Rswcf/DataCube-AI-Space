@@ -346,6 +346,53 @@ jobs:
       # Newsletter is sent by a separate workflow (daily-newsletter.yml) at
       # 08:xx Berlin the next morning, not right after collection at 23:xx.
 
+      - name: Ping IndexNow (Bing / ChatGPT Search / Copilot fast indexing)
+        # Bing is our top search referrer and its index powers ChatGPT Search
+        # and Microsoft Copilot. IndexNow gets same-day articles indexed within
+        # hours instead of days. Key file lives at /<key>.txt on the frontend.
+        if: steps.poll.outputs.RESULT == 'completed' || steps.retry.outputs.RETRY_OK == 'true'
+        run: |
+          set +e
+          SITE="https://www.datacubeai.space"
+          KEY="6abe6c46976ff8d24ca82aeb2a2dfb4c"
+          PERIOD="${{ steps.period.outputs.PERIOD }}"
+
+          # Fresh article URLs (last 72h) come from the news sitemap; add the
+          # day page and indexed-language homepages on top.
+          curl -sS --max-time 60 "$SITE/news-sitemap.xml" -o news.xml || true
+          python3 - "$SITE" "$KEY" "$PERIOD" <<'EOF'
+          import json, re, sys, urllib.request
+
+          site, key, period = sys.argv[1], sys.argv[2], sys.argv[3]
+          urls = set()
+          try:
+              xml = open("news.xml", encoding="utf-8").read()
+              urls.update(re.findall(r"<loc>([^<]+)</loc>", xml))
+          except OSError:
+              pass
+          for lang in ("de", "en", "zh"):
+              urls.add(f"{site}/{lang}")
+              urls.add(f"{site}/{lang}/week/{period}")
+
+          payload = {
+              "host": "www.datacubeai.space",
+              "key": key,
+              "keyLocation": f"{site}/{key}.txt",
+              "urlList": sorted(urls)[:10000],
+          }
+          req = urllib.request.Request(
+              "https://api.indexnow.org/indexnow",
+              data=json.dumps(payload).encode(),
+              headers={"Content-Type": "application/json; charset=utf-8"},
+          )
+          try:
+              with urllib.request.urlopen(req, timeout=60) as resp:
+                  print(f"IndexNow: HTTP {resp.status}, submitted {len(payload['urlList'])} URLs")
+          except Exception as exc:
+              print(f"IndexNow ping failed (non-fatal): {exc}")
+          EOF
+          exit 0
+
       - name: Keepalive (reset 60-day inactivity auto-disable)
         # GitHub disables scheduled workflows 60 days after the last repo
         # activity (this bit us 2026-07-24). Re-enabling via API resets the

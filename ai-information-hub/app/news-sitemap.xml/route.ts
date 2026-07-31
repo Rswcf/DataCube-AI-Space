@@ -4,7 +4,9 @@ import { absoluteArticleUrl, techStoryId } from '@/lib/article-routes';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api-production-3ee5.up.railway.app/api';
 const SITE_URL = 'https://www.datacubeai.space';
-const SUPPORTED_LANGS = ['de', 'en', 'zh', 'fr', 'es', 'pt', 'ja', 'ko'] as const;
+// Only the indexed article languages (middleware noindexes the rest —
+// a news sitemap must not advertise URLs that carry noindex).
+const SUPPORTED_LANGS = ['de', 'en', 'zh'] as const;
 
 const LANG_NAMES: Record<string, string> = {
   de: 'de', en: 'en', zh: 'zh', fr: 'fr', es: 'es', pt: 'pt', ja: 'ja', ko: 'ko',

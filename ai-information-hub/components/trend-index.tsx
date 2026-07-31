@@ -12,6 +12,9 @@ type TrendLabels = {
   empty: string;
   issueIndex: string;
   posts: string;
+  momentumNew: string;
+  momentumRising: string;
+  momentumReturning: string;
 };
 
 const labels: Record<string, TrendLabels> = {
@@ -21,6 +24,9 @@ const labels: Record<string, TrendLabels> = {
     empty: "Keine Trends verfügbar.",
     issueIndex: "Issue Index",
     posts: "Beiträge",
+    momentumNew: "NEU",
+    momentumRising: "Im Trend",
+    momentumReturning: "Zurück",
   },
   en: {
     filter: "Filter current view",
@@ -28,6 +34,9 @@ const labels: Record<string, TrendLabels> = {
     empty: "No trends available.",
     issueIndex: "Issue Index",
     posts: "posts",
+    momentumNew: "NEW",
+    momentumRising: "Rising",
+    momentumReturning: "Back",
   },
   zh: {
     filter: "筛选当前视图",
@@ -35,6 +44,9 @@ const labels: Record<string, TrendLabels> = {
     empty: "暂无趋势。",
     issueIndex: "选题索引",
     posts: "条",
+    momentumNew: "新",
+    momentumRising: "持续升温",
+    momentumReturning: "回归",
   },
   fr: {
     filter: "Filtrer la vue actuelle",
@@ -42,6 +54,9 @@ const labels: Record<string, TrendLabels> = {
     empty: "Aucune tendance disponible.",
     issueIndex: "Index",
     posts: "publications",
+    momentumNew: "NOUVEAU",
+    momentumRising: "En hausse",
+    momentumReturning: "De retour",
   },
   es: {
     filter: "Filtrar vista actual",
@@ -49,6 +64,9 @@ const labels: Record<string, TrendLabels> = {
     empty: "No hay tendencias.",
     issueIndex: "Índice",
     posts: "publicaciones",
+    momentumNew: "NUEVO",
+    momentumRising: "En alza",
+    momentumReturning: "De vuelta",
   },
   pt: {
     filter: "Filtrar vista atual",
@@ -56,6 +74,9 @@ const labels: Record<string, TrendLabels> = {
     empty: "Sem tendências.",
     issueIndex: "Índice",
     posts: "publicações",
+    momentumNew: "NOVO",
+    momentumRising: "Em alta",
+    momentumReturning: "De volta",
   },
   ja: {
     filter: "現在の表示を絞り込む",
@@ -63,6 +84,9 @@ const labels: Record<string, TrendLabels> = {
     empty: "トレンドはありません。",
     issueIndex: "索引",
     posts: "件",
+    momentumNew: "新着",
+    momentumRising: "上昇中",
+    momentumReturning: "再浮上",
   },
   ko: {
     filter: "현재 보기 필터링",
@@ -70,6 +94,9 @@ const labels: Record<string, TrendLabels> = {
     empty: "트렌드가 없습니다.",
     issueIndex: "이슈 색인",
     posts: "개",
+    momentumNew: "신규",
+    momentumRising: "상승",
+    momentumReturning: "재등장",
   },
 };
 
@@ -184,6 +211,20 @@ export function TrendIndex({
                       {posts ? (
                         <span className="shrink-0 border border-border px-1.5 py-0.5 font-sans text-[9px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
                           {posts} {copy.posts}
+                        </span>
+                      ) : null}
+                      {trend.momentum === "rising" ? (
+                        <span className="shrink-0 border border-primary/50 px-1.5 py-0.5 font-sans text-[9px] font-bold uppercase tracking-[0.08em] text-primary">
+                          ↑ {copy.momentumRising}
+                          {typeof trend.streak === "number" && trend.streak > 1 ? ` ·${trend.streak}` : ""}
+                        </span>
+                      ) : trend.momentum === "new" ? (
+                        <span className="shrink-0 border border-tips-accent/50 px-1.5 py-0.5 font-sans text-[9px] font-bold uppercase tracking-[0.08em] text-tips-accent">
+                          {copy.momentumNew}
+                        </span>
+                      ) : trend.momentum === "returning" ? (
+                        <span className="shrink-0 border border-border px-1.5 py-0.5 font-sans text-[9px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
+                          ↩ {copy.momentumReturning}
                         </span>
                       ) : null}
                     </div>
