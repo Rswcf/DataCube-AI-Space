@@ -13,6 +13,11 @@ on:
         description: "Period ID (e.g. 2026-02-08 or 2026-kw06)"
         required: false
 
+# GITHUB_TOKEN only needs actions:write (self re-enable in the keepalive step);
+# no checkout happens, so no contents scope required.
+permissions:
+  actions: write
+
 jobs:
   collect:
     name: Trigger daily collection
@@ -340,3 +345,12 @@ jobs:
 
       # Newsletter is sent by a separate workflow (daily-newsletter.yml) at
       # 08:xx Berlin the next morning, not right after collection at 23:xx.
+
+      - name: Keepalive (reset 60-day inactivity auto-disable)
+        # GitHub disables scheduled workflows 60 days after the last repo
+        # activity (this bit us 2026-07-24). Re-enabling via API resets the
+        # per-workflow timer. always(): must run even when gate steps skip.
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh api -X PUT "repos/${{ github.repository }}/actions/workflows/daily-collect.yml/enable"

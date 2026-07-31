@@ -21,6 +21,11 @@ on:
         description: "Period ID to send newsletter for (e.g. 2026-04-10). Default: yesterday"
         required: false
 
+# GITHUB_TOKEN only needs actions:write (self re-enable in the keepalive step);
+# no checkout happens, so no contents scope required.
+permissions:
+  actions: write
+
 jobs:
   send:
     name: Send daily newsletter
@@ -93,3 +98,13 @@ jobs:
             echo "ERROR: Newsletter API returned HTTP $HTTP_CODE"
             exit 1
           fi
+
+      - name: Keepalive (reset 60-day inactivity auto-disable)
+        # GitHub disables scheduled workflows 60 days after the last repo
+        # activity (this bit us 2026-07-24). Re-enabling via API resets the
+        # per-workflow timer. always(): must run even when gate steps skip
+        # or the send step fails.
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh api -X PUT "repos/${{ github.repository }}/actions/workflows/daily-newsletter.yml/enable"
