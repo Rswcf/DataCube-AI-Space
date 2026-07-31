@@ -25,9 +25,9 @@ FastAPI backend for the AI Information Hub — multilingual (8 languages) daily 
 
 | Purpose | Model | Notes |
 |---------|-------|-------|
-| **Classification** | `z-ai/glm-4.5-air:free` | Free tier, classifies tech/investment |
-| **Content Processing** | `deepseek/deepseek-v4-flash` | Generates DE/EN base content, translated to 6 more languages via free chain. `deepseek/deepseek-v3.2` as paid fallback |
-| **Translation** | 8 free models + paid tail (`deepseek-v4-flash` → `v3.2`) | EN → ZH, FR, ES, PT, JA, KO. Paid tier only fires when full free chain 429s — historical cost ~$0/day |
+| **Classification** | `deepseek/deepseek-v4-flash-0731` → `qwen/qwen3.7-flash` → 3 free fallbacks | Paid-first since 2026-07-31 (5 free models were delisted from OpenRouter) |
+| **Content Processing** | `deepseek/deepseek-v4-flash-0731` → `qwen/qwen3.7-flash` → 3 free fallbacks | Generates DE/EN base content |
+| **Translation** | `deepseek/deepseek-v4-flash-0731` → `qwen/qwen3.7-flash` → 3 free fallbacks | EN → ZH, FR, ES, PT, JA, KO. Short prompts keep cost ~$0.05-0.15/day; paid-first eliminates free-tier 429-cascade wipeouts |
 
 ## Data Collection Pipeline (Overview)
 
@@ -140,7 +140,7 @@ This section provides a comprehensive overview of the entire data flow from sour
                                                       ▼
                               ┌────────────────────────────────────────────────┐
                               │           LLM Classifier                       │
-                              │   Model: z-ai/glm-4.5-air:free (OpenRouter)    │
+                              │   Model: deepseek-v4-flash-0731 chain (OpenRouter) │
                               │   Temperature: 0.1 (very low randomness)       │
                               ├────────────────────────────────────────────────┤
                               │   Input: ~100 articles (title + summary)       │

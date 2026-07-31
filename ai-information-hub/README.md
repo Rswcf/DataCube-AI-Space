@@ -21,7 +21,7 @@ vercel --prod
 
 - **Frontend**: Next.js 16, React 19, Tailwind CSS 4, Shadcn/ui
 - **Backend**: FastAPI + PostgreSQL on Railway
-- **LLM**: OpenRouter (openrouter/free for chat, deepseek-v4-flash for processing with deepseek-v3.2 fallback)
+- **LLM**: OpenRouter (openrouter/free for chat, deepseek-v4-flash-0731 for processing with qwen3.7-flash fallback)
 - **Data**: RSS feeds, Hacker News, YouTube
 
 ## Features
