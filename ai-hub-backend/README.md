@@ -33,7 +33,7 @@ FastAPI backend for the AI Information Hub — multilingual (8 languages) daily 
 
 ```
 Stage 1: Fetch raw data
-    • RSS Feeds (38 sources — see load_sources())
+    • RSS Feeds (see load_sources() — counts drift; code is truth)
     • Hacker News (Algolia API)
     • YouTube (Data API v3)
     ↓
@@ -87,9 +87,10 @@ before 4. Any logic that depends on translations must respect both orders.
 ### Sources
 
 All feed sources (tech / investment / ma / tips) are defined in
-`collector.load_sources()` — 38 verified feeds as of 2026-08-02 (Tech
-Funding News / Crunchbase News / Sifted removed on data-rights grounds —
-see docs/data-rights.md), including
+`collector.load_sources()` — 34 configured feed entries as of 2026-08-02
+(tech 16, investment 6, M&A 2, tips 10). Tech Funding News, Crunchbase
+News, Sifted and PR Newswire were removed on data-rights grounds (their
+terms bar automated retrieval — see docs/data-rights.md), including
 first-party lab blogs, funding verticals, ZH ecosystem sources and four
 Reddit communities. YouTube uses a 15-channel allowlist
 (`youtube_fetcher.CHANNEL_ALLOWLIST`) plus two discovery queries. HN queries

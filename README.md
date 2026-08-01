@@ -44,7 +44,7 @@ https://github.com/user-attachments/assets/9dddaaed-e473-4350-97de-0346cacb6660
 | | Feature | Description |
 |---|---------|-------------|
 | 📡 | **Tech Feed** | AI/ML breakthroughs with embedded YouTube videos and impact ratings |
-| 💰 | **Investment Tracker** | Funding rounds, live stock prices (Polygon.io), M&A deals |
+| 💰 | **Investment Tracker** | Funding rounds, M&A deals, evidence-linked AI Funding Tracker with free CSV export |
 | 💡 | **Practical Tips** | Curated from 14 Reddit communities and expert blogs |
 | 🌐 | **8 Languages** | DE, EN, ZH, FR, ES, PT, JA, KO — free-model translation pipeline |
 | 📅 | **Daily + Weekly** | Automated daily collection with weekly rollup views |
@@ -83,7 +83,7 @@ Frontend (Vercel)                    Backend (Railway)
 ### Prerequisites
 
 - Node.js 18+, Python 3.11+, PostgreSQL
-- API keys: [OpenRouter](https://openrouter.ai), [YouTube Data API v3](https://console.cloud.google.com), [Polygon.io](https://polygon.io) (optional)
+- API keys: [OpenRouter](https://openrouter.ai), [YouTube Data API v3](https://console.cloud.google.com)
 
 ### Frontend
 
@@ -126,7 +126,7 @@ python -m scripts.weekly_collect --week 2026-kw06  # Specific week
 | **Translation** | Free model chain + paid tail (OpenRouter, free-first) |
 | **Chat & Reports** | openrouter/free (OpenRouter, smart router) |
 | **Newsletter** | Resend (sending) + Beehiiv (subscribers) |
-| **Stock Data** | Polygon.io API |
+| **Stock Data** | Disabled (HTTP 410) pending market-data licensing — see docs/data-rights.md |
 | **Hosting** | Vercel (frontend), Railway (backend + DB), GitHub Actions (cron) |
 | **Design** | Newsreader display font, isometric cube logo, section-specific color accents, staggered animations |
 
@@ -154,8 +154,8 @@ Daily collections produce reduced counts (10 tech, 5 investment, 5 tips, 2 video
 | `/api/tips/{periodId}` | GET | Curated tips |
 | `/api/trends/{periodId}` | GET | Period trend topics for the magazine-style trend index |
 | `/api/videos/{periodId}` | GET | YouTube video summaries |
-| `/api/stock/{ticker}` | GET | Real-time stock data |
-| `/api/stock/batch/?tickers=AAPL,NVDA` | GET | Batch stock data |
+| `/api/stock/{ticker}` | GET | Disabled — 410 (licensing) |
+| `/api/stock/batch/?tickers=AAPL,NVDA` | GET | Disabled — 410 (licensing) |
 | `/api/admin/collect` | POST | Trigger full data collection |
 | `/api/admin/newsletter` | POST | Send newsletter (per-subscriber language) |
 | `/api/admin/newsletter/diagnose` | POST | Diagnostic: test Beehiiv, Resend, content |
@@ -187,7 +187,7 @@ NEXT_PUBLIC_API_URL=http://localhost:8000/api  # Backend URL
 DATABASE_URL=postgresql://user:pass@localhost:5432/aihub
 OPENROUTER_API_KEY=sk-or-v1-...     # For LLM classification & processing
 YOUTUBE_API_KEY=AIza...              # For video fetching
-POLYGON_API_KEY=...                  # Optional: real-time stock data
+POLYGON_API_KEY=...                  # Unused while stock endpoints are disabled (410)
 ADMIN_API_KEY=your-secret-key       # Protects admin endpoints
 RESEND_API_KEY=re_...               # Newsletter sending
 BEEHIIV_API_KEY=...                 # Subscriber management

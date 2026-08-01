@@ -452,7 +452,10 @@ def load_sources() -> dict:
             # See .ai-collab/context/data-rights-register-2026-08.md.
             {"url": "https://techcrunch.com/tag/mergers-and-acquisitions/feed/", "name": "TechCrunch M&A"},
             {"url": "https://www.globenewswire.com/RssFeed/subjectcode/15-Mergers%20and%20Acquisitions/feedTitle/GlobeNewswire%20-%20Mergers%20and%20Acquisitions", "name": "GlobeNewswire M&A"},
-            {"url": "https://www.prnewswire.com/rss/financial-services-latest-news/acquisitions-mergers-and-takeovers-list.rss", "name": "PR Newswire M&A"},
+            # 2026-08-02 (Codex round-6 R3): PR Newswire removed — its Terms
+            # of Use prohibit scraping/automatic retrieval and its RSS page
+            # points online publishers to separate publishing arrangements,
+            # so the acquisition layer is not clear. See docs/data-rights.md.
         ],
         "tips": [
             # 2026-08-01 refresh: Reddit now rate-limits unauthenticated .rss

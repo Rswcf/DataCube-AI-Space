@@ -41,7 +41,6 @@ Disp: facts + short attributed quotation on our pages · Exp: facts in CSV.
 | Pandaily | funding | none published (verified 2026-08-02; about: https://pandaily.com/about/) | 2026-08-02 | ✅ | ✅ | ✅ | ✅ | Strictest-publisher default (as above) |
 | 36Kr | funding | https://36kr.com/policy | 2026-08-02 | ✅ | ✅ | ✅ | ✅ | Facts are unprotected; short attributed quotation with link |
 | GlobeNewswire | M&A | https://notified.com/terms-of-use | 2026-08-01 | ✅ | ✅ | ✅ | ✅ | Press releases are distribution-intended; preferred evidence source |
-| PR Newswire | M&A | https://www.prnewswire.com/terms-of-use.html | 2026-08-01 | ✅ | ✅ | ✅ | ✅ | Preferred evidence source |
 | Reddit (tips only) | n/a | https://www.redditinc.com/policies/user-agreement | 2026-08-01 | ✅ | ✅ | ✅ | n/a | Tips section only; short excerpt + link; not part of the deals product |
 
 ### Removed feeds (acquisition blocked)
@@ -57,6 +56,7 @@ permission or qualified legal clearance.
 | Tech Funding News | https://techfundingnews.com/terms-of-use/ | 2026-08-02 | Personal, non-commercial use; prohibits automated access, systematic retrieval, data-mining tools |
 | Sifted | https://sifted.eu/terms-of-use | 2026-08-02 | Prohibits automated text/data mining and web scraping; commercial use requires a licence |
 | Crunchbase News | https://about.crunchbase.com/terms-of-service/ | 2026-08-02 | Prohibits crawling/scraping content by manual or automated means |
+| PR Newswire | https://www.prnewswire.com/terms-of-use/ + https://www.prnewswire.com/rss/ | 2026-08-02 | Terms prohibit scraping/automatic retrieval and restrict commercial redistribution; the RSS page directs online publishers to separate publishing arrangements |
 
 Historical rows extracted from these feeds before 2026-08-02 remain in the
 database as facts with provenance; their evidence excerpts remain subject
