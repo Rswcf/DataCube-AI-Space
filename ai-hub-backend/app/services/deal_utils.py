@@ -67,8 +67,11 @@ def parse_amount(raw: Optional[str]) -> tuple[Optional[int], Optional[str]]:
 
     multiplier = 1
     tail = text[num_match.end():]
+    # Anchor the multiplier token at the START of the tail — otherwise the
+    # trailing 'B' of a currency code like "RMB" matches the billion token
+    # ("351M RMB" must be 351e6, not 351e9).
     for pattern, value in _MULTIPLIERS:
-        if re.search(pattern, tail, re.IGNORECASE):
+        if re.match(rf"\s*(?:{pattern})", tail, re.IGNORECASE):
             multiplier = value
             break
 
@@ -76,6 +79,10 @@ def parse_amount(raw: Optional[str]) -> tuple[Optional[int], Optional[str]]:
     # Bare small numbers without a multiplier are almost never real deal
     # sizes ("raised 3" is noise, "$3" is noise) — refuse to guess.
     if multiplier == 1 and value < 10_000:
+        return None, currency
+    # Plausibility cap: no single AI deal is anywhere near $500B — values
+    # that large are macro-report numbers misread as deals. Refuse.
+    if value > 500_000_000_000:
         return None, currency
     return value, currency
 
