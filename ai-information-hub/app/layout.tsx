@@ -147,9 +147,9 @@ export default async function RootLayout({
   children: React.ReactNode
 }>) {
   const headersList = await headers()
-  const rawLang = headersList.get('x-lang') || 'de'
+  const rawLang = headersList.get('x-lang') || 'en'
   const htmlLang = isSupportedLanguage(rawLang) ? toBcp47(rawLang as AppLanguage) : rawLang
-  const initialLanguage: AppLanguage = isSupportedLanguage(rawLang) ? rawLang : 'de'
+  const initialLanguage: AppLanguage = isSupportedLanguage(rawLang) ? rawLang : 'en'
 
   return (
     <html lang={htmlLang} suppressHydrationWarning>

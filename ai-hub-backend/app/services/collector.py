@@ -39,6 +39,85 @@ def _nn(value, default=""):
     return value if value is not None else default
 
 
+def _source_author(item: dict) -> dict:
+    """Honest attribution for an aggregated item: its real source.
+
+    Replaces the fake-social scaffold (invented @handles, verified badges,
+    zeroed engagement metrics) inherited from the internal-tool era.
+    """
+    name = item.get("source") or item.get("platform")
+    if not name:
+        url = item.get("sourceUrl") or item.get("source_url") or ""
+        try:
+            from urllib.parse import urlparse
+
+            host = urlparse(str(url)).netloc
+            name = host.removeprefix("www.") if host else ""
+        except (ValueError, AttributeError):
+            name = ""
+    name = str(name) if name else "DataCube AI"
+    words = [w for w in name.replace(".", " ").split() if w]
+    initials = "".join(w[0] for w in words[:2]).upper() or "AI"
+    return {"name": name, "handle": "", "avatar": initials, "verified": False}
+
+
+# Maps Stage 3.5 DB field names back to the LLM/prompt field names used by
+# the stage-4 save sites (only M&A differs).
+_TRANSLATION_REVERSE_MAPS = {"ma": {"deal_value": "dealValue", "deal_type": "dealType"}}
+
+
+def _mirror_de_from_translations(results: dict) -> None:
+    """Build the DE arrays from EN items + Stage 3.5 German translations.
+
+    EN is the only natively generated language since 2026-08 (the site
+    generalized from a DACH-internal tool to a global audience). German is
+    translated in Stage 3.5 like the other languages, then mirrored here into
+    full DE item dicts so the existing `_de`-column save sites keep working
+    unchanged. The 'de' key is removed from `_translations` afterwards —
+    native columns own German, the JSONB column owns the other six languages.
+    Items whose DE translation failed keep their EN values (same graceful
+    degradation the JSONB languages already have via `get_field`).
+    """
+
+    def build(section: str, en_items: list) -> list:
+        reverse = _TRANSLATION_REVERSE_MAPS.get(section, {})
+        de_items = []
+        for item in en_items:
+            if not isinstance(item, dict):
+                continue
+            de_item = {k: v for k, v in item.items() if k != "_translations"}
+            translations = item.get("_translations")
+            de_fields = translations.pop("de", None) if isinstance(translations, dict) else None
+            if de_fields:
+                for db_name, value in de_fields.items():
+                    de_item[reverse.get(db_name, db_name)] = value
+            de_items.append(de_item)
+        return de_items
+
+    tech = results.get("tech")
+    if isinstance(tech, dict):
+        tech["de"] = build("tech", tech.get("en", []))
+    videos = results.get("videos")
+    if isinstance(videos, dict):
+        videos["de"] = build("video", videos.get("en", []))
+    tips = results.get("tips")
+    if isinstance(tips, dict):
+        tips["de"] = build("tip", tips.get("en", []))
+    inv = results.get("investment")
+    if isinstance(inv, dict):
+        for key, section in (
+            ("primaryMarket", "primary_market"),
+            ("secondaryMarket", "secondary_market"),
+            ("ma", "ma"),
+        ):
+            sub = inv.get(key)
+            if isinstance(sub, dict):
+                sub["de"] = build(section, sub.get("en", []))
+    trends = results.get("trends")
+    if isinstance(trends, dict) and isinstance(trends.get("trends"), dict):
+        trends["trends"]["de"] = build("trend", trends["trends"].get("en", []))
+
+
 def _pair_de_en(de_items: list, en_items: list, section: str) -> list:
     """Pair DE+EN items, padding with {} on length mismatch.
 
@@ -962,6 +1041,10 @@ def stage3_5_translate_content(results: dict) -> dict:
             except Exception as e:
                 logger.warning(f"Translation failed (skipping): {task_name}: {e}")
 
+    # EN is the only natively generated language — mirror the German
+    # translations into full DE item arrays for the stage-4 save sites.
+    _mirror_de_from_translations(results)
+
     logger.info("Stage 3.5 complete")
     return results
 
@@ -1152,7 +1235,7 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
             content_en=_nn(en_v.get("summary"), ""),
             category_de=_nn(de_v.get("category"), "Video"),
             category_en=_nn(en_v.get("category"), "Video"),
-            author={"name": _nn(meta.get("channel_name"), "YouTube"), "handle": "@youtube", "avatar": "YT", "verified": True},
+            author={"name": _nn(meta.get("channel_name"), "YouTube"), "handle": "", "avatar": "YT", "verified": False},
             tags_de=["Video", "YouTube"],
             tags_en=["Video", "YouTube"],
             icon_type="Zap",
@@ -1176,7 +1259,6 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
 
     # Save tech posts with interspersed videos
     regular_posts = []
-    _default_author = {"name": "Unknown", "handle": "@unknown", "avatar": "??", "verified": False}
     skipped_tech = 0
     for i, (de_p, en_p) in enumerate(_pair_de_en(tech_data.get("de", []), tech_data.get("en", []), "tech")):
         # Drop records where BOTH languages have empty content — these
@@ -1191,7 +1273,7 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
             content_en=_nn(en_p.get("content"), ""),
             category_de=_nn(de_p.get("category"), ""),
             category_en=_nn(en_p.get("category"), ""),
-            author=_nn(de_p.get("author"), _default_author),
+            author=_source_author(en_p),
             tags_de=_nn(de_p.get("tags"), []),
             tags_en=_nn(en_p.get("tags"), []),
             icon_type=_nn(de_p.get("iconType"), "Brain"),
@@ -1253,7 +1335,7 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
                     investors=_nn(de_p.get("investors"), []),
                     valuation_de=de_p.get("valuation"),
                     valuation_en=en_p.get("valuation"),
-                    author=_nn(de_p.get("author"), {}),
+                    author=_source_author(en_p),
                     timestamp=_nn(de_p.get("timestamp"), ""),
                     source_url=de_p.get("sourceUrl"),
                     metrics=_nn(de_p.get("metrics"), {}),
@@ -1277,7 +1359,7 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
                     direction="up",  # Determined by real-time API
                     market_cap_de=None,  # Fetched from real-time API
                     market_cap_en=None,  # Fetched from real-time API
-                    author=_nn(de_p.get("author"), {}),
+                    author=_source_author(en_p),
                     timestamp=_nn(de_p.get("timestamp"), ""),
                     source_url=de_p.get("sourceUrl"),
                     metrics=_nn(de_p.get("metrics"), {}),
@@ -1303,7 +1385,7 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
                     deal_type_de=_nn(de_p.get("dealType"), ""),
                     deal_type_en=_nn(en_p.get("dealType"), ""),
                     industry=de_p.get("industry") or en_p.get("industry"),
-                    author=_nn(de_p.get("author"), {}),
+                    author=_source_author(en_p),
                     timestamp=_nn(de_p.get("timestamp"), ""),
                     source_url=de_p.get("sourceUrl"),
                     metrics=_nn(de_p.get("metrics"), {}),
@@ -1331,7 +1413,7 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
             platform=_nn(de_p.get("platform"), "X"),
             difficulty_de=_nn(de_p.get("difficulty"), "Mittel"),
             difficulty_en=_nn(en_p.get("difficulty"), "Intermediate"),
-            author=_nn(de_p.get("author"), {}),
+            author=_source_author(en_p),
             timestamp=_nn(de_p.get("timestamp"), ""),
             source_url=de_p.get("sourceUrl"),
             metrics=_nn(de_p.get("metrics"), {}),
@@ -1615,7 +1697,7 @@ def stage4_save_ma_to_database(db: Session, week_id: str, investment_data: dict)
             deal_type_de=de_p.get("dealType", ""),
             deal_type_en=en_p.get("dealType", ""),
             industry=de_p.get("industry") or en_p.get("industry"),
-            author=de_p.get("author", {}),
+            author=_source_author(en_p),
             timestamp=de_p.get("timestamp", ""),
             source_url=de_p.get("sourceUrl"),
             metrics=de_p.get("metrics", {}),

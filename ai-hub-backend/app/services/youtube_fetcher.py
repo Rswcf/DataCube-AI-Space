@@ -79,44 +79,40 @@ def fetch_youtube_videos(
         return []
 
     if queries is None:
-        # Business-oriented queries for consultants and analytics teams
+        # General-audience queries (2026-08: generalized from the old
+        # consultant/analytics-team set as part of the public repositioning)
         queries = [
-            # AI News (general)
+            # AI News (core)
             "AI news this week",
-            "AI business news",
+            "AI news today",
 
-            # Major Tool Tutorials
-            "ChatGPT tutorial",
-            "ChatGPT for business",
+            # Major model / lab coverage
+            "GPT-5 explained",
             "Claude AI tutorial",
             "Gemini tutorial",
-            "Perplexity AI tutorial",
-            "NotebookLM tutorial",
+            "open source LLM",
 
-            # Workplace Productivity (core category)
-            "AI productivity tips",
-            "AI tools for work",
+            # Tools & tutorials (high search volume)
+            "ChatGPT tutorial",
             "best AI tools",
-            "AI for Excel",
-            "AI presentation",
-            "AI automation workflow",
+            "AI agents tutorial",
             "prompt engineering guide",
+            "NotebookLM tutorial",
+            "Perplexity AI tutorial",
 
-            # Image & Video (marketing use)
-            "Midjourney tips",
+            # Coding & builders (large enthusiast audience)
+            "AI coding assistant",
+            "build with AI tutorial",
+
+            # Creative AI
             "AI image generation",
-            "Sora tutorial",
+            "AI video generation",
+            "Midjourney tips",
 
-            # Business & Strategy
-            "AI in finance",
-            "AI for consulting",
-            "AI strategy business",
-            "AI transformation",
-
-            # German Content
-            "KI News deutsch",
-            "ChatGPT Tutorial deutsch",
-            "KI Tools deutsch",
+            # Explainers & analysis
+            "how LLMs work",
+            "AI research explained",
+            "AI safety explained",
         ]
 
     try:

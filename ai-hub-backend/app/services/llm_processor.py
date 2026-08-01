@@ -410,7 +410,7 @@ Output the translated JSON array with the same structure. Output ONLY the JSON a
             )
         articles_text = "\n\n".join(article_entries)
 
-        prompt = f"""You are an AI news classifier for a bilingual (German/English) AI newsletter.
+        prompt = f"""You are an AI news classifier for DataCube AI, a daily AI briefing for a global audience.
 
 Your task: classify each article into EXACTLY ONE section.
 
@@ -484,7 +484,11 @@ Output ONLY the JSON array, no markdown fences."""
         articles: list[dict],
         count: int = 30,
     ) -> dict:
-        """Process tech articles into bilingual feed format."""
+        """Process tech articles into the EN-native feed format.
+
+        Returns {"de": [], "en": [...]} — the DE array is filled later by
+        Stage 3.5 translation + `_mirror_de_from_translations`.
+        """
         if not articles:
             return {"de": [], "en": []}
 
@@ -493,35 +497,35 @@ Output ONLY the JSON array, no markdown fences."""
             for a in articles[:40]
         )
 
-        prompt = f"""You are a tech news editor for a German/English bilingual AI newsletter.
-Target audience: Non-technical professionals who want to stay informed about AI.
+        prompt = f"""You are an editor for DataCube AI, a daily AI news briefing read by a global
+audience of professionals, developers, and AI enthusiasts.
 
-From the following articles, select EXACTLY {count} of the most important/interesting ones.
+From the following articles, select EXACTLY {count} of the most important ones.
 
 ARTICLES:
 {articles_text}
 
 Output a JSON object with this structure:
 {{
-  "de": [
+  "en": [
     {{
       "id": 1,
-      "author": {{"name": "Source Name", "handle": "@source", "avatar": "XX", "verified": true}},
-      "content": "German summary (2-3 sentences, non-technical)",
+      "content": "English summary (2-3 sentences)",
       "tags": ["Tag1", "Tag2", "Tag3"],
-      "category": "Category name in German",
+      "category": "Category name",
       "iconType": "Brain|Server|Zap|Cpu",
       "impact": "critical|high|medium|low",
       "timestamp": "YYYY-MM-DD",
-      "metrics": {{"comments": 0, "retweets": 0, "likes": 0, "views": "0"}},
       "source": "Source Name",
       "sourceUrl": "https://original-article-url"
     }}
-  ],
-  "en": [
-    // Same structure but English content
   ]
 }}
+
+Editorial voice:
+- Clear, direct, specific. Lead with what happened, then why it matters.
+- Include concrete numbers, model names, and company names when available.
+- No hype, no marketing language, no rhetorical questions.
 
 Rules:
 - iconType: Brain (LLM/AI models), Server (infrastructure), Zap (research), Cpu (safety/technical)
@@ -531,14 +535,18 @@ Rules:
 - Output ONLY valid JSON"""
 
         response = self._call_llm(prompt, temperature=0.3)
-        return parse_llm_json(response, fallback={"de": [], "en": []})
+        result = parse_llm_json(response, fallback={"en": []})
+        if isinstance(result, dict):
+            result.setdefault("de", [])
+            result.setdefault("en", [])
+        return result
 
     def process_youtube_videos(
         self,
         videos: list[dict],
         count: int = 5,
     ) -> dict:
-        """Process YouTube videos into bilingual feed format."""
+        """Process YouTube videos into the EN-native feed format."""
         if not videos:
             return {"de": [], "en": []}
 
@@ -549,31 +557,22 @@ Rules:
             for v in videos[:20]
         )
 
-        prompt = f"""You are a video content curator for a German/English bilingual AI newsletter.
-Target audience: Non-technical professionals interested in AI.
+        prompt = f"""You are a video curator for DataCube AI, a daily AI briefing for a global
+audience of professionals, developers, and AI enthusiasts.
 
 From these YouTube videos, select the {count} most valuable and relevant ones.
-Create bilingual summaries for each.
 
 VIDEOS:
 {videos_text}
 
 Output a JSON object:
 {{
-  "de": [
-    {{
-      "video_id": "XXXXX",
-      "title": "German title (translated/adapted)",
-      "summary": "German summary (2-3 sentences explaining value for viewers)",
-      "category": "Category in German"
-    }}
-  ],
   "en": [
     {{
       "video_id": "XXXXX",
       "title": "English title (can match original or be improved)",
-      "summary": "English summary (2-3 sentences)",
-      "category": "Category in English"
+      "summary": "English summary (2-3 sentences, specific about what the viewer learns)",
+      "category": "Category"
     }}
   ]
 }}
@@ -587,10 +586,14 @@ Select videos that:
 Output ONLY valid JSON."""
 
         response = self._call_llm(prompt, temperature=0.3)
-        return parse_llm_json(response, fallback={"de": [], "en": []})
+        result = parse_llm_json(response, fallback={"en": []})
+        if isinstance(result, dict):
+            result.setdefault("de", [])
+            result.setdefault("en", [])
+        return result
 
     def process_investment_articles(self, articles: list[dict], count: int = 10) -> dict:
-        """Process investment articles into bilingual feed format."""
+        """Process investment articles into the EN-native feed format."""
         if not articles:
             return {
                 "primaryMarket": {"de": [], "en": []},
@@ -603,7 +606,8 @@ Output ONLY valid JSON."""
             for a in articles[:40]
         )
 
-        prompt = f"""You are a financial news editor for a German/English bilingual AI investment newsletter.
+        prompt = f"""You are a financial news editor for DataCube AI, a daily AI briefing read by a
+global audience of investors, founders, and technology professionals.
 Content may be in English OR Chinese (from 36Kr) - process both languages equally.
 
 Categorize these articles into:
@@ -617,22 +621,6 @@ ARTICLES:
 Output a JSON object with this EXACT structure:
 {{
   "primaryMarket": {{
-    "de": [
-      {{
-        "id": 1,
-        "company": "Company Name",
-        "amount": "$50 Mio.",
-        "round": "Series B",
-        "roundCategory": "Series B",
-        "investors": ["Investor 1", "Investor 2"],
-        "valuation": "$500 Mio.",
-        "content": "German description (2-3 sentences)",
-        "author": {{"name": "Source Name", "handle": "@source", "avatar": "XX", "verified": true}},
-        "timestamp": "YYYY-MM-DD",
-        "sourceUrl": "https://...",
-        "metrics": {{"comments": 0, "retweets": 0, "likes": 0, "views": "0"}}
-      }}
-    ],
     "en": [
       {{
         "id": 1,
@@ -642,54 +630,24 @@ Output a JSON object with this EXACT structure:
         "roundCategory": "Series B",
         "investors": ["Investor 1", "Investor 2"],
         "valuation": "$500M",
-        "content": "English description (2-3 sentences)",
-        "author": {{"name": "Source Name", "handle": "@source", "avatar": "XX", "verified": true}},
+        "content": "English description (2-3 sentences, specific numbers and investors)",
         "timestamp": "YYYY-MM-DD",
-        "sourceUrl": "https://...",
-        "metrics": {{"comments": 0, "retweets": 0, "likes": 0, "views": "0"}}
+        "sourceUrl": "https://..."
       }}
     ]
   }},
   "secondaryMarket": {{
-    "de": [
-      {{
-        "id": 1,
-        "ticker": "NVDA",
-        "content": "German description of stock news/movement (2-3 sentences)",
-        "author": {{"name": "Source Name", "handle": "@source", "avatar": "XX", "verified": true}},
-        "timestamp": "YYYY-MM-DD",
-        "sourceUrl": "https://...",
-        "metrics": {{"comments": 0, "retweets": 0, "likes": 0, "views": "0"}}
-      }}
-    ],
     "en": [
       {{
         "id": 1,
         "ticker": "NVDA",
         "content": "English description of stock news/movement (2-3 sentences)",
-        "author": {{"name": "Source Name", "handle": "@source", "avatar": "XX", "verified": true}},
         "timestamp": "YYYY-MM-DD",
-        "sourceUrl": "https://...",
-        "metrics": {{"comments": 0, "retweets": 0, "likes": 0, "views": "0"}}
+        "sourceUrl": "https://..."
       }}
     ]
   }},
   "ma": {{
-    "de": [
-      {{
-        "id": 1,
-        "acquirer": "Acquiring Company",
-        "target": "Target Company",
-        "dealValue": "$1,5 Mrd.",
-        "dealType": "Akquisition",
-        "industry": "Enterprise",
-        "content": "German description",
-        "author": {{"name": "Source Name", "handle": "@source", "avatar": "XX", "verified": true}},
-        "timestamp": "YYYY-MM-DD",
-        "sourceUrl": "https://...",
-        "metrics": {{"comments": 0, "retweets": 0, "likes": 0, "views": "0"}}
-      }}
-    ],
     "en": [
       {{
         "id": 1,
@@ -699,10 +657,8 @@ Output a JSON object with this EXACT structure:
         "dealType": "Acquisition",
         "industry": "Enterprise",
         "content": "English description",
-        "author": {{"name": "Source Name", "handle": "@source", "avatar": "XX", "verified": true}},
         "timestamp": "YYYY-MM-DD",
-        "sourceUrl": "https://...",
-        "metrics": {{"comments": 0, "retweets": 0, "likes": 0, "views": "0"}}
+        "sourceUrl": "https://..."
       }}
     ]
   }}
@@ -710,12 +666,10 @@ Output a JSON object with this EXACT structure:
 
 Rules:
 - Include EXACTLY {count} items per category (primaryMarket, secondaryMarket, ma) - select the most important/newsworthy ones
-- Use German number formatting for 'de' (e.g., $2,75 Mrd., $500 Mio.)
-- Use English number formatting for 'en' (e.g., $2.75B, $500M)
-- dealType German: "Akquisition", "Fusion", "Übernahme"
-- dealType English: "Acquisition", "Merger", "Buyout"
+- Use English number formatting (e.g., $2.75B, $500M)
+- dealType: "Acquisition", "Merger", "Buyout"
 - sourceUrl: copy the exact Link URL from the article
-- IMPORTANT: Each category MUST have both "de" and "en" arrays, even if empty
+- IMPORTANT: Each category MUST have an "en" array, even if empty
 - For secondaryMarket: ONLY include ticker and content. Price/change/marketCap will be fetched from real-time API.
 
 ROUND CATEGORY CLASSIFICATION (for Primary Market):
@@ -763,14 +717,15 @@ Output ONLY valid JSON."""
             for key in ["primaryMarket", "secondaryMarket", "ma"]:
                 section = result.get(key)
                 if isinstance(section, dict):
-                    for lang in ["de", "en"]:
-                        arr = section.get(lang)
-                        if isinstance(arr, list) and len(arr) > count:
-                            section[lang] = arr[:count]
+                    section.setdefault("de", [])
+                    section.setdefault("en", [])
+                    arr = section.get("en")
+                    if isinstance(arr, list) and len(arr) > count:
+                        section["en"] = arr[:count]
         return result
 
     def process_ma_articles(self, articles: list[dict], count: int = 10) -> dict:
-        """Process only M&A articles into bilingual feed format."""
+        """Process only M&A articles into the EN-native feed format."""
         if not articles:
             return {"ma": {"de": [], "en": []}}
 
@@ -779,7 +734,8 @@ Output ONLY valid JSON."""
             for a in articles  # Use all articles
         )
 
-        prompt = f"""You are a financial news editor for a German/English bilingual AI newsletter.
+        prompt = f"""You are a financial news editor for DataCube AI, a daily AI briefing read by a
+global audience of investors, founders, and technology professionals.
 Your task: extract up to {count} notable M&A and investment deals from the articles below.
 
 ARTICLES:
@@ -788,21 +744,6 @@ ARTICLES:
 Output a JSON object with EXACTLY this structure:
 {{
   "ma": {{
-    "de": [
-      {{
-        "id": 1,
-        "acquirer": "Käufer/Investor",
-        "target": "Zielunternehmen",
-        "dealValue": "€1,2 Mrd.",
-        "dealType": "Akquisition|Fusion|Übernahme|Investition|Beteiligung|Partnerschaft",
-        "industry": "AI Infrastructure|AI Healthcare|AI Finance|AI Enterprise|AI Consumer|AI Robotics|AI Security|AI Creative|AI Education|Other AI|null",
-        "content": "Deutsche Zusammenfassung (2-3 Sätze, geschäftsrelevant)",
-        "author": {{"name": "Quelle", "handle": "@source", "avatar": "XX", "verified": true}},
-        "timestamp": "YYYY-MM-DD",
-        "sourceUrl": "https://...",
-        "metrics": {{"comments": 0, "retweets": 0, "likes": 0, "views": "0"}}
-      }}
-    ],
     "en": [
       {{
         "id": 1,
@@ -811,11 +752,9 @@ Output a JSON object with EXACTLY this structure:
         "dealValue": "$1.2B",
         "dealType": "Acquisition|Merger|Buyout|Investment|Stake|Partnership",
         "industry": "AI Infrastructure|AI Healthcare|AI Finance|AI Enterprise|AI Consumer|AI Robotics|AI Security|AI Creative|AI Education|Other AI|null",
-        "content": "English summary (2-3 sentences, business-relevant)",
-        "author": {{"name": "Source", "handle": "@source", "avatar": "XX", "verified": true}},
+        "content": "English summary (2-3 sentences, specific about terms and strategy)",
         "timestamp": "YYYY-MM-DD",
-        "sourceUrl": "https://...",
-        "metrics": {{"comments": 0, "retweets": 0, "likes": 0, "views": "0"}}
+        "sourceUrl": "https://..."
       }}
     ]
   }}
@@ -838,14 +777,15 @@ Output ONLY valid JSON."""
         if isinstance(result, dict):
             ma = result.get("ma")
             if isinstance(ma, dict):
-                for lang in ["de", "en"]:
-                    arr = ma.get(lang)
-                    if isinstance(arr, list) and len(arr) > count:
-                        ma[lang] = arr[:count]
+                ma.setdefault("de", [])
+                ma.setdefault("en", [])
+                arr = ma.get("en")
+                if isinstance(arr, list) and len(arr) > count:
+                    ma["en"] = arr[:count]
         return result
 
     def process_tips_articles(self, articles: list[dict], count: int = 15) -> dict:
-        """Process tips articles into bilingual feed format."""
+        """Process tips articles into the EN-native feed format."""
         if not articles:
             return {"de": [], "en": []}
 
@@ -865,34 +805,35 @@ Output ONLY valid JSON."""
             )
         articles_text = "\n".join(article_lines)
 
-        prompt = f"""Extract {count} AI tips from these articles. Output JSON only.
+        prompt = f"""Extract {count} practical AI tips from these articles for a global audience of
+AI users (from beginners to power users). Output JSON only.
 
 ARTICLES:
 {articles_text}
 
 Output format:
-{{"de":[{{"id":1,"content":"German tip description","tip":"The tip in German","category":"Produktivität","platform":"Reddit","sourceUrl":"url"}}],"en":[{{"id":1,"content":"English tip description","tip":"The tip in English","category":"Productivity","platform":"Reddit","sourceUrl":"url"}}]}}
+{{"en":[{{"id":1,"content":"English tip description","tip":"The tip, concrete and actionable","category":"Productivity","platform":"Reddit","sourceUrl":"url"}}]}}
 
 Rules:
-- {count} items in both de and en arrays
-- category: Produktivität/Productivity, Prompt-Tipps/Prompt Tips, Kreativität/Creativity
+- {count} items in the en array
+- category: Productivity, Prompt Tips, Creativity
 - platform: Reddit, Blog, or X
-- Keep tips short and actionable
+- Keep tips short, specific, and actionable (name the tool and the exact technique)
 - No special characters in strings
 
 JSON:"""
 
         response = self._call_llm(prompt, temperature=0.2)
-        result = parse_llm_json(response, fallback={"de": [], "en": []})
+        result = parse_llm_json(response, fallback={"en": []})
+        if isinstance(result, dict):
+            result.setdefault("de", [])
+            result.setdefault("en", [])
 
         # Add missing fields with defaults
-        for lang in ["de", "en"]:
-            for i, tip in enumerate(result.get(lang, [])):
-                tip.setdefault("id", i + 1)
-                tip.setdefault("author", {"name": "AI Tips", "handle": "@tips", "avatar": "TI", "verified": True})
-                tip.setdefault("difficulty", "Mittel" if lang == "de" else "Intermediate")
-                tip.setdefault("timestamp", "2026-02-01")
-                tip.setdefault("metrics", {"comments": 0, "retweets": 0, "likes": 0, "views": "0"})
+        for i, tip in enumerate(result.get("en", [])):
+            tip.setdefault("id", i + 1)
+            tip.setdefault("difficulty", "Intermediate")
+            tip.setdefault("timestamp", "2026-02-01")
 
         return result
 
@@ -917,7 +858,7 @@ JSON:"""
 
         context = "\n".join(all_content[:30])
 
-        prompt = f"""Based on this week's AI news, generate EXACTLY 10 trending topics.
+        prompt = f"""Based on this period's AI news, generate EXACTLY 10 trending topics.
 
 CONTENT:
 {context}
@@ -925,17 +866,19 @@ CONTENT:
 Output JSON:
 {{
   "trends": {{
-    "de": [{{"category": "KI · Trend", "title": "Topic Name"}}],
     "en": [{{"category": "AI · Trending", "title": "Topic Name"}}]
   }}
 }}
 
-Categories: KI, Technologie, Finanzen, Wissenschaft, Startups (German)
-           AI, Technology, Finance, Science, Startups (English)
+Categories: AI, Technology, Finance, Science, Startups
+Topic titles: short, specific, entity-first (e.g. "GPT-5.6 price cuts", not "Big AI news").
 Output ONLY valid JSON."""
 
         response = self._call_llm(prompt, temperature=0.5)
         result = parse_llm_json(response, fallback={"trends": {"de": [], "en": []}})
+        if isinstance(result, dict) and isinstance(result.get("trends"), dict):
+            result["trends"].setdefault("de", [])
+            result["trends"].setdefault("en", [])
         # BUG-H8: Handle non-dict trends result
         if not isinstance(result, dict):
             logger.warning(f"Trends result is not a dict (got {type(result).__name__}), using fallback")

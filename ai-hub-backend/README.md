@@ -26,8 +26,8 @@ FastAPI backend for the AI Information Hub — multilingual (8 languages) daily 
 | Purpose | Model | Notes |
 |---------|-------|-------|
 | **Classification** | `deepseek/deepseek-v4-flash-0731` → `qwen/qwen3.7-flash` → 3 free fallbacks | Paid-first since 2026-07-31 (5 free models were delisted from OpenRouter) |
-| **Content Processing** | `deepseek/deepseek-v4-flash-0731` → `qwen/qwen3.7-flash` → 3 free fallbacks | Generates DE/EN base content |
-| **Translation** | `deepseek/deepseek-v4-flash-0731` → `qwen/qwen3.7-flash` → 3 free fallbacks | EN → ZH, FR, ES, PT, JA, KO. Short prompts keep cost ~$0.05-0.15/day; paid-first eliminates free-tier 429-cascade wipeouts |
+| **Content Processing** | `deepseek/deepseek-v4-flash-0731` → `qwen/qwen3.7-flash` → 3 free fallbacks | Generates EN base content (all other languages translated) |
+| **Translation** | `deepseek/deepseek-v4-flash-0731` → `qwen/qwen3.7-flash` → 3 free fallbacks | EN → DE, ZH, FR, ES, PT, JA, KO. Short prompts keep cost ~$0.05-0.15/day; paid-first eliminates free-tier 429-cascade wipeouts |
 
 ## Data Collection Pipeline (Overview)
 

@@ -336,7 +336,7 @@ function FloatingParticles() {
 }
 
 export default function LoginPage() {
-  const [language, setLanguage] = useState<LoginLanguage>("de");
+  const [language, setLanguage] = useState<LoginLanguage>("en");
   const [email, setEmail] = useState("");
   const router = useRouter();
 

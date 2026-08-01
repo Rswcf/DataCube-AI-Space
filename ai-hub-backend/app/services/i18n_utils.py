@@ -1,7 +1,11 @@
 """
 Internationalization utilities for 8-language support.
 
-Supported languages: DE, EN (native via LLM), ZH, FR, ES, PT, JA, KO (translated).
+Since 2026-08 (generalization to a global audience): EN is the only
+natively generated language. All other 7 languages — including DE —
+are translated from the EN base content in Stage 3.5. DE translations
+are mirrored into the native `_de` columns (see collector
+`_mirror_de_from_translations`), the other 6 live in the JSONB column.
 """
 
 from typing import Any
@@ -9,11 +13,13 @@ from typing import Any
 # All supported language codes
 SUPPORTED_LANGUAGES = ["de", "en", "zh", "fr", "es", "pt", "ja", "ko"]
 
-# Languages that require translation from EN base content
-TRANSLATION_LANGUAGES = ["zh", "fr", "es", "pt", "ja", "ko"]
+# Languages that require translation from EN base content.
+# "de" is first so German translations land early in the Stage 3.5 run.
+TRANSLATION_LANGUAGES = ["de", "zh", "fr", "es", "pt", "ja", "ko"]
 
 # Human-readable names for translation prompts
 LANGUAGE_NAMES = {
+    "de": "German",
     "zh": "Simplified Chinese",
     "fr": "French",
     "es": "Spanish",

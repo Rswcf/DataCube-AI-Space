@@ -47,7 +47,8 @@ function nextWithLang(request: NextRequest): NextResponse {
   const { pathname } = request.nextUrl
   const segments = pathname.split('/')
   const langSegment = segments[1]
-  const lang = isSupportedLanguage(langSegment) ? langSegment : 'de'
+  // EN is the default language since 2026-08 (global audience).
+  const lang = isSupportedLanguage(langSegment) ? langSegment : 'en'
 
   const requestHeaders = new Headers(request.headers)
   if (requestHeaders.get('next-router-prefetch') && !requestHeaders.get('rsc')) {
@@ -97,19 +98,19 @@ export function middleware(request: NextRequest) {
 
   const legacyWeek = pathname.match(/^\/week\/([^/]+)$/)
   if (legacyWeek) {
-    const target = buildTarget(`/de/week/${legacyWeek[1]}`, searchParams)
+    const target = buildTarget(`/en/week/${legacyWeek[1]}`, searchParams)
     return NextResponse.redirect(new URL(target, request.url), 308)
   }
 
   const legacyTopic = pathname.match(/^\/topic\/([^/]+)$/)
   if (legacyTopic) {
-    const target = buildTarget(`/de/topic/${legacyTopic[1]}`, searchParams)
+    const target = buildTarget(`/en/topic/${legacyTopic[1]}`, searchParams)
     return NextResponse.redirect(new URL(target, request.url), 308)
   }
 
   const legacyNews = pathname.match(/^\/news\/([^/]+)\/([^/]+)$/)
   if (legacyNews) {
-    const target = buildTarget(`/de/news/${legacyNews[1]}/${legacyNews[2]}`, searchParams)
+    const target = buildTarget(`/en/news/${legacyNews[1]}/${legacyNews[2]}`, searchParams)
     return NextResponse.redirect(new URL(target, request.url), 308)
   }
 

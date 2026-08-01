@@ -6,7 +6,6 @@ import { ExternalLink, TrendingUp, TrendingDown, Building2, Briefcase, GitMerge 
 import { Badge } from "@/components/ui/badge";
 import { ShareButton } from "@/components/share-button";
 import { cn } from "@/lib/utils";
-import { VerifiedBadge } from "@/components/verified-badge";
 import { FeedSkeleton } from "@/components/feeds/feed-skeleton";
 import { useSettings } from "@/lib/settings-context";
 import { getPeriodLabel } from "@/lib/period-utils";
@@ -363,8 +362,6 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-1.5 font-sans text-[11px] font-extrabold uppercase tracking-[0.12em] text-primary sm:gap-2">
                     <span>{post.author.name}</span>
-                    {post.author.verified && <VerifiedBadge />}
-                    <span className="text-muted-foreground">{post.author.handle}</span>
                     <span className="text-muted-foreground">·</span>
                     <span className="text-muted-foreground">{post.timestamp}</span>
                   </div>
@@ -442,8 +439,6 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-1.5 font-sans text-[11px] font-extrabold uppercase tracking-[0.12em] text-primary sm:gap-2">
                     <span>{post.author.name}</span>
-                    {post.author.verified && <VerifiedBadge />}
-                    <span className="text-muted-foreground">{post.author.handle}</span>
                     <span className="text-muted-foreground">·</span>
                     <span className="text-muted-foreground">{post.timestamp}</span>
                   </div>
@@ -530,8 +525,6 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-1.5 font-sans text-[11px] font-extrabold uppercase tracking-[0.12em] text-primary sm:gap-2">
                     <span>{post.author.name}</span>
-                    {post.author.verified && <VerifiedBadge />}
-                    <span className="text-muted-foreground">{post.author.handle}</span>
                     <span className="text-muted-foreground">·</span>
                     <span className="text-muted-foreground">{post.timestamp}</span>
                   </div>

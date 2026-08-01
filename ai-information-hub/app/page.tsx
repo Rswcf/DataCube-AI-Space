@@ -9,19 +9,20 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api-production-3ee5
 
 export const revalidate = 3600
 
-// Root / and /de render the same German homepage. Consolidate indexing on /de
-// by declaring it canonical here, so search engines don't treat both as dupes.
-// The sitemap includes root as a discoverable entry, while the canonical tag
-// points at the German homepage.
+// Root / and /en render the same English homepage (EN became the default
+// language 2026-08 as part of the generalization to a global audience).
+// Consolidate indexing on /en by declaring it canonical here, so search
+// engines don't treat both as dupes. The sitemap includes root as a
+// discoverable entry, while the canonical tag points at the English homepage.
 //
 // The full hreflang `languages` map is restated here because Next.js merges
 // metadata shallowly — setting `alternates` at page level would otherwise blow
 // away the layout-level `alternates.languages` map.
 export const metadata: Metadata = {
-  title: { absolute: 'Data Cube AI | Tägliche KI-News' },
-  description: 'Kuratierte KI-News, Investment-Signale, Quellenlinks und praktische Workflows, täglich aus 40+ Quellen aktualisiert.',
+  title: { absolute: 'Data Cube AI | Daily AI News' },
+  description: 'Curated AI news, investment signals, source links and practical workflows — updated daily from 35+ sources in 8 languages.',
   alternates: {
-    canonical: 'https://www.datacubeai.space/de',
+    canonical: 'https://www.datacubeai.space/en',
     languages: {
       'de': 'https://www.datacubeai.space/de',
       'en': 'https://www.datacubeai.space/en',
@@ -35,26 +36,26 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    url: 'https://www.datacubeai.space/de',
-    title: 'Data Cube AI | Tägliche KI-News',
-    description: 'Kuratierte KI-News, Investments und Workflows, täglich aktualisiert.',
+    url: 'https://www.datacubeai.space/en',
+    title: 'Data Cube AI | Daily AI News',
+    description: 'Curated AI news, investments and workflows, updated daily.',
     images: [
       {
         url: '/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'Data Cube AI – Wo KI auf menschliche Einsicht trifft',
+        alt: 'Data Cube AI – Where AI meets human insight',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Data Cube AI | Tägliche KI-News',
-    description: 'Kuratierte KI-News, Investments und Workflows, täglich aktualisiert.',
+    title: 'Data Cube AI | Daily AI News',
+    description: 'Curated AI news, investments and workflows, updated daily.',
     images: [
       {
         url: '/og-image.jpg',
-        alt: 'Data Cube AI – Wo KI auf menschliche Einsicht trifft',
+        alt: 'Data Cube AI – Where AI meets human insight',
       },
     ],
   },
@@ -324,5 +325,5 @@ export async function HomePageContent({ language = 'de' }: HomePageContentProps 
 }
 
 export default async function HomePage() {
-  return HomePageContent({ language: 'de' })
+  return HomePageContent({ language: 'en' })
 }

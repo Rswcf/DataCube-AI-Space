@@ -163,7 +163,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     )
   )
 
-  const langPriority: Record<string, number> = { de: 0.8, en: 0.7 }
+  const langPriority: Record<string, number> = { en: 0.8, de: 0.7, zh: 0.7 }
   const defaultPriority = 0.5
 
   const now = new Date()
@@ -237,7 +237,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }),
   )
 
-  const homePriority: Record<string, number> = { de: 0.9, en: 0.9 }
+  const homePriority: Record<string, number> = { en: 1.0, de: 0.9, zh: 0.9 }
   const homeDefault = 0.7
 
   const langHomeEntries = SUPPORTED_LANGUAGES.map((lang) => ({
