@@ -53,8 +53,11 @@ function condenseWeekData(
   if (primary.length) {
     lines.push("## Primary Market");
     for (const item of primary) {
+      const investors = Array.isArray(item.investors) && item.investors.length
+        ? ` — investors: ${item.investors.join(", ")}`
+        : "";
       lines.push(
-        `- ${item.company}: ${item.amount || "undisclosed"} (${item.round || "N/A"})`
+        `- ${item.company}: ${item.amount || "undisclosed"} (${item.round || "N/A"})${investors}`
       );
     }
   }
@@ -66,8 +69,12 @@ function condenseWeekData(
   if (secondary.length) {
     lines.push("## Secondary Market");
     for (const item of secondary) {
+      const quote =
+        item.price && item.price !== "N/A"
+          ? ` (${item.price}, ${item.direction === "up" ? "+" : ""}${item.change})`
+          : "";
       lines.push(
-        `- ${item.ticker}: ${item.price} (${item.direction === "up" ? "+" : ""}${item.change})`
+        `- ${item.ticker}: ${item.content || ""}${quote}`
       );
     }
   }

@@ -180,7 +180,7 @@ export async function GET(request: NextRequest) {
     md += `## Summary Statistics\n`;
     md += `- **Tech articles**: ${techArticles.length} posts covering ${techCategories.size} categories\n`;
     md += `- **Funding rounds**: ${fundingSummary}\n`;
-    md += `- **Stock movements**: ${smPosts.length} tickers tracked\n`;
+    md += `- **Market updates**: ${smPosts.length} as-reported items\n`;
     md += `- **M&A deals**: ${maPosts.length} deals\n`;
     md += `- **Tips**: ${tipsPosts.length} practical tips\n`;
     md += `- **Videos**: ${techVideos.length} curated videos\n`;
@@ -228,9 +228,16 @@ export async function GET(request: NextRequest) {
 
     if (smPosts.length > 0) {
       md += `### Secondary Market\n\n`;
-      md += `| Ticker | Price | Change |\n|--------|-------|--------|\n`;
-      for (const s of smPosts) {
-        md += `| ${s.ticker} | ${s.price} | ${s.change} |\n`;
+      const hasQuotes = smPosts.some((s) => s.price && s.price !== 'N/A');
+      if (hasQuotes) {
+        md += `| Ticker | Price | Change |\n|--------|-------|--------|\n`;
+        for (const s of smPosts) {
+          md += `| ${s.ticker} | ${s.price} | ${s.change} |\n`;
+        }
+      } else {
+        for (const s of smPosts) {
+          md += `- **${s.ticker}**: ${s.content}\n`;
+        }
       }
       md += '\n';
     }
@@ -267,7 +274,7 @@ export async function GET(request: NextRequest) {
 
   md += `---\n\n`;
   md += `## About Data Cube AI\n`;
-  md += `Data Cube AI is a multilingual (8 languages) daily AI news aggregator curating content from 40+ sources including RSS feeds, Hacker News, YouTube, and Reddit communities. Content is AI-assisted and updated daily at 22:00 UTC.\n\n`;
+  md += `Data Cube AI is a multilingual (8 languages) daily AI news aggregator curating content from 40+ sources including RSS feeds, Hacker News, YouTube, and Reddit communities. Content is AI-assisted and updated daily in the late evening (Europe/Berlin time).\n\n`;
   md += `Source: [Data Cube AI](https://www.datacubeai.space) | [API Documentation](https://www.datacubeai.space/llms.txt)\n\n`;
   md += `Canonical URL: https://www.datacubeai.space/api/content-summary?${permalinkParams.toString()}\n\n`;
   md += `*Citation: Data Cube AI (datacubeai.space), ${periodId}*\n`;

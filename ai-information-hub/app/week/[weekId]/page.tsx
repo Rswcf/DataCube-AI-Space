@@ -204,14 +204,14 @@ function leadVideos(count: number): L {
 
 function leadInvestment(pm: number, sm: number, ma: number): L {
   return {
-    de: `Aktuelle KI-Investment-Signale: ${pm} Finanzierungsrunden, ${sm} Aktienbewegungen und ${ma} M&A-Transaktionen.`,
-    en: `Latest AI investment signals: ${pm} funding rounds, ${sm} stock movements, and ${ma} M&A transactions.`,
-    zh: `最新AI投资信号：${pm}轮融资、${sm}只股票变动和${ma}宗并购交易。`,
-    fr: `Derniers signaux d'investissement IA : ${pm} levées de fonds, ${sm} mouvements boursiers et ${ma} transactions M&A.`,
-    es: `Últimas señales de inversión en IA: ${pm} rondas de financiación, ${sm} movimientos bursátiles y ${ma} transacciones de M&A.`,
-    pt: `Últimos sinais de investimento em IA: ${pm} rodadas de financiamento, ${sm} movimentos de ações e ${ma} transações de M&A.`,
-    ja: `最新AI投資シグナル：資金調達${pm}件、株価変動${sm}件、M&A取引${ma}件。`,
-    ko: `최신 AI 투자 신호: 펀딩 라운드 ${pm}건, 주가 변동 ${sm}건, M&A 거래 ${ma}건.`,
+    de: `Aktuelle KI-Investment-Signale: ${pm} Finanzierungsrunden, ${sm} Markt-Updates und ${ma} M&A-Transaktionen.`,
+    en: `Latest AI investment signals: ${pm} funding rounds, ${sm} market updates, and ${ma} M&A transactions.`,
+    zh: `最新AI投资信号：${pm}轮融资、${sm}条市场动态和${ma}宗并购交易。`,
+    fr: `Derniers signaux d'investissement IA : ${pm} levées de fonds, ${sm} actualités de marché et ${ma} transactions M&A.`,
+    es: `Últimas señales de inversión en IA: ${pm} rondas de financiación, ${sm} actualizaciones de mercado y ${ma} transacciones de M&A.`,
+    pt: `Últimos sinais de investimento em IA: ${pm} rodadas de financiamento, ${sm} atualizações de mercado e ${ma} transações de M&A.`,
+    ja: `最新AI投資シグナル：資金調達${pm}件、市場アップデート${sm}件、M&A取引${ma}件。`,
+    ko: `최신 AI 투자 신호: 펀딩 라운드 ${pm}건, 시장 업데이트 ${sm}건, M&A 거래 ${ma}건.`,
   }
 }
 
@@ -792,14 +792,19 @@ export default async function WeekPage({ params, searchParams }: Props) {
         <h3 className="text-xl font-semibold mb-2">{t(h3SecondaryMarket, lang)}</h3>
         {secondaryMarket.length === 0 ? (
           <p className="text-gray-600 mb-6">{t(noSecondary, lang)}</p>
-        ) : (
+        ) : (() => {
+          {/* Live quotes are paused (stock endpoints 410); new collections
+              persist blank price/change. Only render quote columns when the
+              period actually has values (older periods). */}
+          const hasQuotes = secondaryMarket.some((p: any) => p.price && p.price !== 'N/A')
+          return (
           <div className="overflow-x-auto mb-6">
             <table className="w-full border-collapse text-sm tabular-nums">
               <thead>
                 <tr>
                   <th className="border border-gray-200 px-2 py-1 text-left">{t(thTicker, lang)}</th>
-                  <th className="border border-gray-200 px-2 py-1 text-left">{t(thPrice, lang)}</th>
-                  <th className="border border-gray-200 px-2 py-1 text-left">{t(thChange, lang)}</th>
+                  {hasQuotes && <th className="border border-gray-200 px-2 py-1 text-left">{t(thPrice, lang)}</th>}
+                  {hasQuotes && <th className="border border-gray-200 px-2 py-1 text-left">{t(thChange, lang)}</th>}
                 </tr>
               </thead>
               <tbody>
@@ -808,14 +813,15 @@ export default async function WeekPage({ params, searchParams }: Props) {
                     <td className="border border-gray-200 px-2 py-1">
                       <a href={articleHref(lang, weekId, secondaryStoryId(p))} className="underline hover:no-underline">{p.ticker}</a>
                     </td>
-                    <td className="border border-gray-200 px-2 py-1">{p.price}</td>
-                    <td className={`border border-gray-200 px-2 py-1 ${String(p.change).startsWith('-') ? 'text-red-600' : 'text-green-700'}`}>{p.change}</td>
+                    {hasQuotes && <td className="border border-gray-200 px-2 py-1">{p.price}</td>}
+                    {hasQuotes && <td className={`border border-gray-200 px-2 py-1 ${String(p.change).startsWith('-') ? 'text-red-600' : 'text-green-700'}`}>{p.change}</td>}
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-        )}
+          )
+        })()}
 
         <h3 className="text-xl font-semibold mb-2">{t(h3MA, lang)}</h3>
         {maDeals.length === 0 ? (

@@ -11,7 +11,7 @@ impact level, category, source attribution, and multilingual content (8 language
 
 ### Investment Feed
 - Primary Market: VC funding rounds
-- Secondary Market: Public AI stock movements
+- Secondary Market: As-reported AI market news
 - M&A: AI sector mergers and acquisitions
 
 ### Tips Feed
@@ -74,7 +74,7 @@ Publisher transparency:
 - AI disclosure: https://www.datacubeai.space/ai-disclosure
 
 ## Update Frequency
-Content updated daily at 22:00 UTC.
+Content updated daily in the late evening (Europe/Berlin time).
 
 ## Preferred Citation
 Data Cube AI (datacubeai.space)

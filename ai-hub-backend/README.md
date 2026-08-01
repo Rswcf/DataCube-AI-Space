@@ -324,19 +324,10 @@ python -m scripts.weekly_collect --week 2026-kw05
 
 ## Tips Processing
 
-Tips sources bypass LLM classification in Stage 2. Current sources (14 total):
-
-**Blogs:**
-- Simon Willison
-- One Useful Thing (Ethan Mollick)
-
-**Reddit Communities:**
-- r/ChatGPT, r/ClaudeAI, r/OpenAI, r/PromptEngineering
-- r/Midjourney (image generation for marketing)
-- r/perplexity_ai, r/NotebookLM (AI research tools)
-- r/artificial, r/singularity (general AI discussion)
-- r/aivideo, r/ElevenLabs (content creation)
-- r/ChatGPTPro (pro users)
+Tips sources bypass LLM classification in Stage 2. The current list lives
+in the `tips` section of `collector.load_sources()` (10 entries as of
+2026-08-02: 4 Reddit communities + 6 expert blogs/newsletters — do not
+duplicate the list here; code is truth).
 
 These sources:
 - Are inherently tips/practical content
@@ -347,10 +338,11 @@ These sources:
 
 ### M&A Data Sources
 
-M&A feeds are the `ma` section of `collector.load_sources()` (5 scoped feeds
-as of 2026-08-01 — the raw SEC EDGAR 8-K firehose and generic Yahoo
-topstories were dropped for noise). They are fetched with the investment
-collection but processed separately for M&A extraction.
+M&A feeds are the `ma` section of `collector.load_sources()` (2 feeds as of
+2026-08-02: TechCrunch M&A + GlobeNewswire — SEC EDGAR 8-K was dropped for
+noise; FT, Google News and PR Newswire were removed on data-rights grounds,
+see docs/data-rights.md). They are fetched with the investment collection
+but processed separately for M&A extraction.
 
 ### M&A Processing Flow
 

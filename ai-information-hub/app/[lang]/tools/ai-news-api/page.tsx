@@ -120,14 +120,14 @@ const SUBTITLE: L = {
 }
 
 const CTA_GET_KEY: L = {
-  de: 'API-Key erhalten',
-  en: 'Get API Key',
-  zh: '\u83b7\u53d6 API \u5bc6\u94a5',
-  fr: 'Obtenir une cl\u00e9 API',
-  es: 'Obtener clave API',
-  pt: 'Obter chave API',
-  ja: 'API\u30ad\u30fc\u3092\u53d6\u5f97',
-  ko: 'API \ud0a4 \ubc1b\uae30',
+  de: 'Loslegen \u2014 kein API-Key n\u00f6tig',
+  en: 'Start now \u2014 no API key needed',
+  zh: '\u7acb\u5373\u4f7f\u7528 \u2014 \u65e0\u9700 API \u5bc6\u94a5',
+  fr: 'Commencer \u2014 aucune cl\u00e9 API requise',
+  es: 'Empezar \u2014 sin clave API',
+  pt: 'Come\u00e7ar \u2014 sem chave API',
+  ja: '\u4eca\u3059\u3050\u5229\u7528 \u2014 API\u30ad\u30fc\u4e0d\u8981',
+  ko: '\ubc14\ub85c \uc0ac\uc6a9 \u2014 API \ud0a4 \ubd88\ud544\uc694',
 }
 
 const CTA_VIEW_DOCS: L = {
@@ -606,7 +606,7 @@ export default async function AINewsAPIToolPage({ params }: Props) {
           {/* CTA buttons */}
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <Link
-              href={`/${lang}`}
+              href="#endpoints"
               className="inline-flex items-center gap-2 rounded-lg bg-primary text-primary-foreground px-6 py-3 font-medium hover:bg-primary/90 transition-colors focus-visible:ring-2 focus-visible:ring-primary"
             >
               {t(CTA_GET_KEY, lang)} <ArrowRight className="h-4 w-4" />
