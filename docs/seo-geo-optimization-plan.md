@@ -1,5 +1,7 @@
 # Data Cube AI SEO/GEO Optimization Plan
 
+> **Status: dated snapshot (2026-05-24).** Not maintained as current truth — for the live SEO strategy see `.ai-collab/context/seo-growth-ads-strategy-2026-07.md`; for implementation facts see code.
+
 Last audited: 2026-05-24
 Site: https://www.datacubeai.space
 Scope: Next.js frontend, public routes, crawler access, structured data, feeds, sitemap, llms.txt, AI-search citation readiness.

@@ -1,6 +1,6 @@
 # Documentation Maintenance
 
-Last reviewed: 2026-05-24
+Last reviewed: 2026-08-01
 
 This guide defines which docs are authoritative and what must be updated when the codebase changes.
 
@@ -19,8 +19,8 @@ Some assistant-context files (`CLAUDE.md` and `.ai-collab/context/*`) may be git
 | `ai-information-hub/CLAUDE.md` | Frontend AI-assistant context |
 | `.ai-collab/context/project-overview.md` | Shared current project summary |
 | `.ai-collab/context/codebase-map.md` | Current route and file map |
-| `docs/brand-guidelines.md` | Brand, typography, tone, and editorial design system |
-| `docs/seo-geo-optimization-plan.md` | SEO/GEO backlog, implementation log, and audit base |
+| `docs/brand-guidelines.md` | Brand system (dated snapshot — design principles only) |
+| `docs/seo-geo-optimization-plan.md` | Dated snapshot (2026-05); live SEO strategy lives in `.ai-collab/context/seo-growth-ads-strategy-2026-07.md` |
 | `ai-information-hub/public/llms.txt` | AI crawler and citation-facing site description |
 | `ai-information-hub/public/robots.txt` | Crawler access policy |
 
@@ -45,5 +45,6 @@ When a change touches one of these areas, update all matching docs in the same c
 - Separate current-state docs from historical planning notes.
 - Prefer stable route patterns over examples that can drift.
 - Mark open risks explicitly instead of implying that planned features already exist.
-- Keep translated READMEs structurally aligned with the root README when architecture or pipeline basics change.
+- Translated READMEs (`docs/README.*.md`) are intentionally ~30-line summaries linking to the English README — do NOT expand them back into full translations (they rot in 7 languages at once; decided 2026-08-01).
+- **Invariants principle**: docs describe invariants and point to code for specifics. Never hardcode source lists, query lists, model IDs-in-prose, or line numbers — reference the owning function instead (`collector.load_sources()`, `youtube_fetcher.CHANNEL_ALLOWLIST`, `llm_processor.*_MODELS`).
 - For docs-only changes, run `git diff --check` at minimum.

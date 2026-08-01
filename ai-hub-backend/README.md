@@ -33,7 +33,7 @@ FastAPI backend for the AI Information Hub — multilingual (8 languages) daily 
 
 ```
 Stage 1: Fetch raw data
-    • RSS Feeds (22 sources)
+    • RSS Feeds (41 sources — see load_sources())
     • Hacker News (Algolia API)
     • YouTube (Data API v3)
     ↓
@@ -47,8 +47,8 @@ Stage 3: Parallel LLM processing
     • Tips: 15 per language (weekly) / 5 (daily)
     • Videos: 5 summaries (weekly) / 2 (daily)
     ↓
-Stage 3.5: Translate EN → 6 languages (free model chain)
-    • ZH, FR, ES, PT, JA, KO
+Stage 3.5: Translate EN → 7 languages incl. DE (paid-first chain)
+    • DE, ZH, FR, ES, PT, JA, KO
     • Resilient: JSON validation retries across the model chain
     • Smaller batch fallback (size=3) on parse failure
     ↓
@@ -63,357 +63,52 @@ Stage 4: Save to PostgreSQL (translations in JSONB column)
 
 ---
 
-## Complete Data Pipeline (Deep Dive)
+## Data Pipeline (Details)
 
-This section provides a comprehensive overview of the entire data flow from source fetching to frontend display.
+> Docs describe invariants; specifics live in code. Source lists, query
+> lists and model chains change often — always check the referenced
+> functions rather than trusting numbers written in prose.
 
-```
-╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
-║                                    AI HUB BACKEND - COMPLETE DATA PIPELINE                                    ║
-╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+### Stage responsibilities & code locations
 
-┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                         STAGE 1: DATA FETCHING                                               │
-│                                         collector.py: stage1_fetch_and_store()                               │
-└──────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
-                                                      │
-        ┌─────────────────────────────────────────────┼─────────────────────────────────────────────┐
-        │                                             │                                             │
-        ▼                                             ▼                                             ▼
-┌───────────────────────┐                 ┌───────────────────────┐                 ┌───────────────────────┐
-│   RSS FEEDS (22)      │                 │    HACKER NEWS API    │                 │    YOUTUBE API        │
-│   rss_fetcher.py      │                 │    hn_fetcher.py      │                 │   youtube_fetcher.py  │
-├───────────────────────┤                 ├───────────────────────┤                 ├───────────────────────┤
-│ Tech Sources:         │                 │ Algolia Search API    │                 │ Search keywords (25): │
-│ • Hugging Face Blog   │                 │ • 18 business queries │                 │ • "AI news this week" │
-│ • MIT Tech Review     │                 │ • min_points: 100     │                 │ • "ChatGPT for biz"   │
-│ • The Decoder         │                 │ • days: 7             │                 │ • "AI for Excel"      │
-│                       │                 │ • limit: 50           │                 │ • "KI News deutsch"   │
-│ Investment Sources:   │                 │                       │                 │                       │
-│ • TechCrunch Funding  │                 │ HN Queries include:   │                 │ Fetches:              │
-│ • Crunchbase News     │                 │ • AI, LLM, ChatGPT    │                 │ • Video metadata      │
-│ • Sifted, VentureBeat │                 │ • Perplexity, DeepSeek│                 │ • Channel info        │
-│ • 36Kr (Chinese)      │                 │ • AI startup/funding  │                 │ • Transcripts         │
-│                       │                 │                       │                 │                       │
-│ M&A Sources (7):      │                 │                       │                 │                       │
-│ • See M&A section     │                 │                       │                 │                       │
-│                       │                 │                       │                 │                       │
-│ Tips Sources (14):    │                 │                       │                 │                       │
-│ • Simon Willison Blog │                 │                       │                 │                       │
-│ • One Useful Thing    │                 │                       │                 │                       │
-│ • Reddit: ChatGPT,    │                 │                       │                 │                       │
-│   ClaudeAI, OpenAI,   │                 │                       │                 │                       │
-│   perplexity_ai,      │                 │                       │                 │                       │
-│   NotebookLM, etc.    │                 │                       │                 │                       │
-└───────────┬───────────┘                 └───────────┬───────────┘                 └───────────┬───────────┘
-            │ ~150 articles                           │ ~50 articles                            │ ~10 videos
-            │                                         │                                         │
-            └─────────────────────────────────────────┼─────────────────────────────────────────┘
-                                                      │
-                                                      ▼
-                                    ┌─────────────────────────────────────┐
-                                    │      Period Boundary Filter          │
-                                    │   get_period_boundaries(period_id)  │
-                                    │   is_article_in_period()            │
-                                    ├─────────────────────────────────────┤
-                                    │ Weekly: Week 06 = 2026-02-02 ~      │
-                                    │         2026-02-08                  │
-                                    │ Daily:  2026-02-07 = single day     │
-                                    │ Articles outside boundary filtered  │
-                                    │ No-date articles: lenient (keep)    │
-                                    └─────────────────┬───────────────────┘
-                                                      │
-                                                      │ After filter: ~100 articles + 10 videos
-                                                      ▼
-                                    ┌─────────────────────────────────────┐
-                                    │        Save to Database             │
-                                    │   RawArticle / RawVideo tables      │
-                                    └─────────────────┬───────────────────┘
-                                                      │
-                                                      ▼
-┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                         STAGE 2: LLM CLASSIFICATION                                          │
-│                                         collector.py: stage2_classify_articles()                             │
-│                                         llm_processor.py: classify_articles()                                │
-└──────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
-                                                      │
-                                                      ▼
-                              ┌────────────────────────────────────────────────┐
-                              │           LLM Classifier                       │
-                              │   Model: deepseek-v4-flash-0731 chain (OpenRouter) │
-                              │   Temperature: 0.1 (very low randomness)       │
-                              ├────────────────────────────────────────────────┤
-                              │   Input: ~100 articles (title + summary)       │
-                              │                                                │
-                              │   Classification Rules:                        │
-                              │   • "tech": breakthroughs, models, papers      │
-                              │   • "investment": funding, VC, IPO, M&A        │
-                              │   • "tips": tutorials, prompts, workflows      │
-                              │                                                │
-                              │   Output per article:                          │
-                              │   {                                            │
-                              │     "index": 0,                                │
-                              │     "section": "tech",                         │
-                              │     "relevance": 0.9,    ← importance score    │
-                              │     "duplicate_of": null ← deduplication       │
-                              │   }                                            │
-                              └────────────────────┬───────────────────────────┘
-                                                   │
-                    ┌──────────────────────────────┼──────────────────────────────┐
-                    │                              │                              │
-                    ▼                              ▼                              ▼
-        ┌───────────────────┐          ┌───────────────────┐          ┌───────────────────┐
-        │  Tips Sources     │          │  Sort by          │          │  Duplicate        │
-        │  Special Handling │          │  Relevance DESC   │          │  Detection        │
-        ├───────────────────┤          ├───────────────────┤          ├───────────────────┤
-        │ Reddit/Simon skip │          │ High-score first  │          │ duplicate_of →    │
-        │ LLM classification│          │ for selection     │          │ points to better  │
-        │ Direct tags:      │          │                   │          │ article on same   │
-        │ section="tips"    │          │                   │          │ topic             │
-        │ relevance=0.8     │          │                   │          │                   │
-        └───────────────────┘          └───────────────────┘          └───────────────────┘
-                    │                              │                              │
-                    └──────────────────────────────┼──────────────────────────────┘
-                                                   │
-                                                   ▼
-                              ┌────────────────────────────────────────────────┐
-                              │              Classified Article Pool           │
-                              ├────────────────────────────────────────────────┤
-                              │   tech_articles:       ~15-30 (by relevance)   │
-                              │   investment_articles: ~60-100                 │
-                              │   tips_articles:       ~10-15                  │
-                              │   videos:              ~10                     │
-                              └────────────────────┬───────────────────────────┘
-                                                   │
-                                                   ▼
-┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                    STAGE 3: PARALLEL LLM PROCESSING                                          │
-│                                    collector.py: stage3_parallel_processing()                                │
-│                                    ThreadPoolExecutor(max_workers=4)                                         │
-└──────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
-                                                   │
-         ┌─────────────────────┬───────────────────┼───────────────────┬─────────────────────┐
-         │                     │                   │                   │                     │
-         ▼                     ▼                   ▼                   ▼                     ▼
-┌─────────────────┐   ┌─────────────────┐   ┌─────────────────┐   ┌─────────────────┐   ┌─────────────────┐
-│  process_tech   │   │process_investment│  │  process_tips   │   │ process_videos  │   │ generate_trends │
-│    _articles()  │   │   _articles()   │   │   _articles()   │   │       ()        │   │       ()        │
-├─────────────────┤   ├─────────────────┤   ├─────────────────┤   ├─────────────────┤   ├─────────────────┤
-│ Model:          │   │ Model:          │   │ Model:          │   │ Model:          │   │ Model:          │
-│ deepseek-v4     │   │ deepseek-v4     │   │ deepseek-v4     │   │ deepseek-v4     │   │ deepseek-v4     │
-│ Temp: 0.3       │   │ Temp: 0.3       │   │ Temp: 0.2       │   │ Temp: 0.3       │   │ Temp: 0.3       │
-├─────────────────┤   ├─────────────────┤   ├─────────────────┤   ├─────────────────┤   ├─────────────────┤
-│ Input: top 40   │   │ Input: all      │   │ Input: top 15   │   │ Input: top 20   │   │ Input: tech +   │
-│ (by relevance)  │   │ investment      │   │ tips articles   │   │ videos          │   │ investment      │
-│                 │   │ articles        │   │                 │   │                 │   │ results         │
-│ LLM Prompt:     │   │ LLM Prompt:     │   │ LLM Prompt:     │   │ LLM Prompt:     │   │ LLM Prompt:     │
-│ "Select 30 most │   │ "Categorize to  │   │ "Extract 15     │   │ "Select 5 most  │   │ "Generate 10    │
-│  important"     │   │  3 categories   │   │  practical      │   │  valuable"      │   │  trends"        │
-│                 │   │  max 7 each"    │   │  tips"          │   │                 │   │                 │
-├─────────────────┤   ├─────────────────┤   ├─────────────────┤   ├─────────────────┤   ├─────────────────┤
-│ Output:         │   │ Output:         │   │ Output:         │   │ Output:         │   │ Output:         │
-│ 30 posts DE/EN  │   │ 3 categories    │   │ 15 tips DE/EN   │   │ 5 videos DE/EN  │   │ 10 trends       │
-│                 │   │ DE/EN each:     │   │                 │   │                 │   │                 │
-│ Per post:       │   │ • primaryMarket │   │ Per tip:        │   │ Per video:      │   │                 │
-│ • content       │   │ • secondaryMkt  │   │ • content       │   │ • title         │   │                 │
-│ • category      │   │ • ma            │   │ • tip           │   │ • summary       │   │                 │
-│ • tags          │   │                 │   │ • category      │   │ • category      │   │                 │
-│ • impact        │   │ Per entry:      │   │ • platform      │   │ • video_id      │   │                 │
-│ • iconType      │   │ • content       │   │ • difficulty    │   │                 │   │                 │
-│ • source        │   │ • company       │   │                 │   │                 │   │                 │
-│ • sourceUrl     │   │ • amount        │   │                 │   │                 │   │                 │
-│ • timestamp     │   │ • investors     │   │                 │   │                 │   │                 │
-│                 │   │ • roundCategory │   │                 │   │                 │   │                 │
-└────────┬────────┘   └────────┬────────┘   └────────┬────────┘   └────────┬────────┘   └────────┬────────┘
-         │ 30 posts            │ 7×3=21              │ 15 tips             │ 5 videos            │ 10 trends
-         │                     │                     │                     │                     │
-         └─────────────────────┴─────────────────────┼─────────────────────┴─────────────────────┘
-                                                     │
-                                                     ▼
-┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                    STAGE 4: SAVE TO DATABASE                                                 │
-│                                    collector.py: stage4_save_to_database()                                   │
-└──────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
-                                                     │
-                                                     ▼
-                              ┌────────────────────────────────────────────────┐
-                              │           Video Interspersion Strategy         │
-                              │   intersperse_videos()                         │
-                              ├────────────────────────────────────────────────┤
-                              │   30 Tech posts + 5 Videos                     │
-                              │   Insert positions: 5, 11, 17, 23, 29          │
-                              │   Result: 35 mixed items (with display_order)  │
-                              └────────────────────┬───────────────────────────┘
-                                                   │
-         ┌─────────────────────┬───────────────────┼───────────────────┬─────────────────────┐
-         │                     │                   │                   │                     │
-         ▼                     ▼                   ▼                   ▼                     ▼
-┌─────────────────┐   ┌─────────────────┐   ┌─────────────────┐   ┌─────────────────┐   ┌─────────────────┐
-│    TechPost     │   │ PrimaryMarket   │   │ SecondaryMarket │   │     MAPost      │   │    TipPost      │
-│     Table       │   │   Post Table    │   │   Post Table    │   │     Table       │   │     Table       │
-├─────────────────┤   ├─────────────────┤   ├─────────────────┤   ├─────────────────┤   ├─────────────────┤
-│ 35 records      │   │ ~7 records      │   │ ~7 records      │   │ ~7 records      │   │ 15 records      │
-│ (30 posts +     │   │                 │   │                 │   │                 │   │                 │
-│  5 videos)      │   │ Round types:    │   │ Stock market:   │   │ M&A deals:      │   │ Tips with:      │
-│                 │   │ • Early         │   │ • ticker        │   │ • acquirer      │   │ • tip           │
-│ Fields:         │   │ • Series A      │   │ • price         │   │ • target        │   │ • category      │
-│ • content_de/en │   │ • Series B      │   │ • change        │   │ • deal_value    │   │ • platform      │
-│ • category      │   │ • Series C+     │   │ • direction     │   │ • deal_type     │   │ • difficulty    │
-│ • tags          │   │ • Late/PE       │   │ • market_cap    │   │ • industry      │   │                 │
-│ • impact        │   │                 │   │                 │   │                 │   │                 │
-│ • is_video      │   │                 │   │                 │   │                 │   │                 │
-│ • display_order │   │                 │   │                 │   │                 │   │                 │
-└────────┬────────┘   └────────┬────────┘   └────────┬────────┘   └────────┬────────┘   └────────┬────────┘
-         │                     │                     │                     │                     │
-         └─────────────────────┴─────────────────────┼─────────────────────┴─────────────────────┘
-                                                     │
-                                                     ▼
-┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                              API ENDPOINTS                                                   │
-│                                              app/routers/                                                    │
-└──────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
-                                                     │
-         ┌─────────────────────┬───────────────────┼───────────────────┬─────────────────────┐
-         │                     │                   │                   │                     │
-         ▼                     ▼                   ▼                   ▼                     ▼
-┌─────────────────┐   ┌─────────────────┐   ┌─────────────────┐   ┌─────────────────┐   ┌─────────────────┐
-│ GET /api/tech/  │   │GET /api/invest- │   │ GET /api/tips/  │   │GET /api/videos/ │   │ GET /api/weeks  │
-│    {weekId}     │   │ ment/{weekId}   │   │    {weekId}     │   │    {weekId}     │   │                 │
-├─────────────────┤   ├─────────────────┤   ├─────────────────┤   ├─────────────────┤   ├─────────────────┤
-│ Returns:        │   │ Returns:        │   │ Returns:        │   │ Returns:        │   │ Returns:        │
-│ {               │   │ {               │   │ {               │   │ {               │   │ {               │
-│  "de": [...],   │   │  "primaryMkt":  │   │  "de": [...],   │   │  "de": [...],   │   │  "weeks": [     │
-│  "en": [...]    │   │    {...},       │   │  "en": [...]    │   │  "en": [...]    │   │   {id, label,   │
-│ }               │   │  "secondaryMkt" │   │ }               │   │ }               │   │    current}     │
-│                 │   │    {...},       │   │                 │   │                 │   │  ]              │
-│ 35 mixed items  │   │  "ma": {...}    │   │ 15 Tips         │   │ 5 video details │   │ }               │
-│ (posts+videos)  │   │ }               │   │                 │   │                 │   │                 │
-└─────────────────┘   └─────────────────┘   └─────────────────┘   └─────────────────┘   └─────────────────┘
-         │                     │                     │                     │                     │
-         └─────────────────────┴─────────────────────┼─────────────────────┴─────────────────────┘
-                                                     │
-                                                     ▼
-┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                            FRONTEND DISPLAY                                                  │
-│                                            ai-information-hub/ (Next.js)                                     │
-└──────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
-                                                     │
-         ┌─────────────────────┬───────────────────┼───────────────────┬─────────────────────┐
-         │                     │                   │                   │                     │
-         ▼                     ▼                   ▼                   ▼                     ▼
-┌─────────────────┐   ┌─────────────────┐   ┌─────────────────┐   ┌─────────────────┐   ┌─────────────────┐
-│   TECH FEED     │   │   INVESTMENT    │   │   TIPS FEED     │   │   VIDEO FEED    │   │   WEEK NAV      │
-├─────────────────┤   ├─────────────────┤   ├─────────────────┤   ├─────────────────┤   ├─────────────────┤
-│ 35 cards        │   │ 3 category tabs │   │ 15 tip cards    │   │ 5 video embeds  │   │ Week selector   │
-│ • Article cards │   │ • Primary Mkt   │   │ • Title + detail│   │ • YouTube player│   │ • Current week  │
-│ • Video cards   │   │ • Secondary Mkt │   │ • Difficulty    │   │ • Thumbnail     │   │   highlighted   │
-│  (at 5,11,17..) │   │ • M&A           │   │ • Platform      │   │ • Duration/views│   │ • History list  │
-│                 │   │                 │   │                 │   │                 │   │                 │
-│ Impact badges:  │   │ Round badges:   │   │ Difficulty:     │   │ Categories:     │   │                 │
-│ 🔴 Critical     │   │ 🌱 Early        │   │ 🟢 Beginner     │   │ 📚 Tutorial     │   │                 │
-│ 🟠 High         │   │ 🚀 Series A     │   │ 🟡 Intermediate │   │ 📰 News         │   │                 │
-│ 🟡 Medium       │   │ 📈 Series B     │   │ 🔴 Advanced     │   │ 💡 Explanation  │   │                 │
-│ 🟢 Low          │   │ 🏢 Series C+    │   │                 │   │                 │   │                 │
-│                 │   │ 💼 Late/PE      │   │                 │   │                 │   │                 │
-└─────────────────┘   └─────────────────┘   └─────────────────┘   └─────────────────┘   └─────────────────┘
-```
+| Stage | What it does | Code |
+|-------|--------------|------|
+| 1. Fetch | Pull all RSS feeds (parallel pool + serial Reddit lane with 75s spacing — Reddit limits unauth RSS to ~1 req/min/IP), HN (Algolia), YouTube (channel allowlist via uploads playlists + small discovery search); filter to period boundary; store raw | `collector.stage1_fetch_and_store`, `rss_fetcher.fetch_rss_feeds_parallel`, `hn_fetcher`, `youtube_fetcher.fetch_youtube_videos` |
+| 2. Classify | LLM classifies articles into tech/investment (tips sources skip) | `collector.stage2_classify_articles`, `llm_processor.CLASSIFIER_MODELS` |
+| 3. Process | Parallel LLM processing, EN-native (global-audience voice); also trends + AI editorial brief ("Why Today Matters") | `collector.stage3_parallel_processing`, `llm_processor.process_*`, `generate_trends`, `generate_editorial` |
+| 4a. Save base | Validate (EN counts; refuses to clear existing data on empty output), mirror EN→DE arrays as fallback, save with honest source attribution | `collector.stage4_save_to_database`, `_mirror_de_from_translations`, `_source_author` |
+| 3.5 Translate | EN → 7 languages (DE + ZH/FR/ES/PT/JA/KO) via paid-first chain; non-blocking after base save | `collector.stage3_5_translate_content`, `llm_processor.TRANSLATOR_MODELS`, `translate_batch` |
+| Backfill | Write German into native `_de` columns, other 6 languages into `translations` JSONB | `collector._backfill_translations_to_db`, `_apply_translations_to_record` |
 
-### Data Volume Summary (Weekly)
+Full-collection order is 1 → 2 → 3 → 4a → 3.5 → backfill (base content is
+visible even if translation fails). The process-only admin path runs 3.5
+before 4. Any logic that depends on translations must respect both orders.
 
-| Stage | Input | Output |
-|-------|-------|--------|
-| Stage 1 (Fetch) | RSS ~150 + HN ~50 + YouTube ~10 | ~210 raw items |
-| Stage 1 (Filter) | ~210 items | ~100 articles + 10 videos |
-| Stage 2 (Classify) | ~100 articles | tech ~20 + investment ~80 + tips ~10 |
-| Stage 3 (Process) | Classified articles | tech 30 + investment 21 + tips 15 + videos 5 (DE/EN, translated to 6 more) |
-| Stage 4 (Save) | Processed content | 71 database records total |
+### Sources
 
-### Data Volume Summary (Daily)
+All feed sources (tech / investment / ma / tips) are defined in
+`collector.load_sources()` — 41 verified feeds as of 2026-08-01, including
+first-party lab blogs, funding verticals, ZH ecosystem sources and four
+Reddit communities. YouTube uses a 15-channel allowlist
+(`youtube_fetcher.CHANNEL_ALLOWLIST`) plus two discovery queries. HN queries
+live in `hn_fetcher.py`. Do not duplicate these lists here.
 
-Daily collections use reduced output counts to match the smaller time window:
+### Data volume (approximate)
 
-| Section | Daily Output |
-|---------|-------------|
-| Tech | 10 posts |
-| Investment | 5 entries |
-| Tips | 5 tips |
-| Videos | 2 videos |
+| Mode | Output |
+|------|--------|
+| Weekly | 30 tech + 21 investment + 15 tips + 5 videos |
+| Daily | 10 tech + 5 investment + 5 tips + 2 videos |
 
-### Key Code Locations
-
-| Functionality | File | Lines |
-|--------------|------|-------|
-| Classification logic | `llm_processor.py` | 95-161 |
-| Tech article selection | `llm_processor.py` | 163-215 |
-| Investment processing | `llm_processor.py` | 273-425 |
-| Tips processing | `llm_processor.py` | 435-485 |
-| Video processing | `llm_processor.py` | 217-271 |
-| 4.5-stage pipeline | `collector.py` | 242-781 |
-| Video interspersion | `collector.py` | 210-239 |
-| HN fetching | `hn_fetcher.py` | 248-279 |
-| Period boundary filter | `collector.py` / `period_utils.py` | — |
-| Config settings | `config.py` | 31-37 |
-
-### Importance Evaluation System
-
-Articles are evaluated and selected based on multiple dimensions:
+### Importance evaluation
 
 | Dimension | Source | Purpose |
 |-----------|--------|---------|
-| **Relevance Score** | LLM Classification (0.0-1.0) | Initial sorting + selection |
-| **Impact Level** | LLM Processing (critical/high/medium/low) | UI display weight |
-| **HN Points** | Hacker News API | Community engagement signal |
-| **Source Authority** | Feed reputation (MIT Tech Review, etc.) | LLM implicit consideration |
-| **Duplicate Detection** | LLM identifies `duplicate_of` | Deduplication + best selection |
-
----
-
-## Data Source Configuration
-
-The data sources are optimized for **business users** (consultants, analytics teams) rather than developers.
-
-### Hacker News Queries (18 keywords)
-
-```python
-HN_DEFAULT_QUERIES = [
-    # General AI
-    "AI", "LLM", "generative AI",
-    # Major Products & Companies
-    "ChatGPT", "Claude", "Gemini", "OpenAI", "Anthropic", "Perplexity",
-    # Emerging Models
-    "DeepSeek", "Grok",
-    # Image & Video Generation
-    "Sora", "Midjourney", "Stable Diffusion",
-    # Business Applications
-    "AI startup", "AI funding", "AI acquisition", "AI enterprise",
-]
-```
-
-### YouTube Queries (25 keywords)
-
-```python
-queries = [
-    # AI News
-    "AI news this week", "AI business news",
-    # Tool Tutorials
-    "ChatGPT tutorial", "ChatGPT for business", "Claude AI tutorial",
-    "Perplexity AI tutorial", "NotebookLM tutorial",
-    # Workplace Productivity
-    "AI productivity tips", "AI tools for work", "AI for Excel",
-    "AI presentation", "AI automation workflow",
-    # Business & Strategy
-    "AI in finance", "AI for consulting", "AI strategy business",
-    # German Content
-    "KI News deutsch", "ChatGPT Tutorial deutsch", "KI Tools deutsch",
-]
-```
-
-### Excluded (Too Technical)
-
-The following were intentionally excluded as they target developers rather than business users:
-- `transformer`, `neural network`, `deep learning`, `machine learning`
-- `r/LocalLLaMA`, `r/StableDiffusion`, `r/MachineLearning`
-- Developer tools: Cursor, Copilot, Devin
+| Relevance Score | LLM classification (0.0-1.0) | Initial sorting + selection |
+| Impact Level | LLM processing (critical/high/medium/low) | UI display weight |
+| HN Points | Hacker News API | Community engagement signal |
+| Trend Momentum | Own topic history (`routers/trends._compute_momentum`) | new/rising/returning badges |
+| Duplicate Detection | LLM `duplicate_of` | Deduplication |
 
 ---
 
@@ -696,21 +391,12 @@ These sources:
 
 ## M&A Processing
 
-### M&A Data Sources (7 feeds)
+### M&A Data Sources
 
-M&A news is collected from dedicated financial and business news sources:
-
-| Source | Type | URL |
-|--------|------|-----|
-| TechCrunch M&A | Tech M&A | `techcrunch.com/tag/mergers-and-acquisitions/feed/` |
-| SEC EDGAR 8-K | Regulatory | `sec.gov/cgi-bin/browse-edgar?action=getcurrent&type=8-K&output=atom` |
-| Financial Times M&A | Financial | `ft.com/mergers-acquisitions?format=rss` |
-| Yahoo Finance | General | `finance.yahoo.com/rss/topstories` |
-| GlobeNewswire M&A | PR | `globenewswire.com/.../Mergers%20and%20Acquisitions/...` |
-| PR Newswire | PR | `prnewswire.com/rss/news-releases-list.rss` |
-| Google News M&A | Aggregator | `news.google.com/rss/search?q=mergers+acquisitions+AI` |
-
-These sources are fetched as part of the investment RSS collection but processed separately for M&A extraction.
+M&A feeds are the `ma` section of `collector.load_sources()` (5 scoped feeds
+as of 2026-08-01 — the raw SEC EDGAR 8-K firehose and generic Yahoo
+topstories were dropped for noise). They are fetched with the investment
+collection but processed separately for M&A extraction.
 
 ### M&A Processing Flow
 

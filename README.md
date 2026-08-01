@@ -33,9 +33,9 @@ https://github.com/user-attachments/assets/9dddaaed-e473-4350-97de-0346cacb6660
 
 | Problem | Solution |
 |---------|----------|
-| 500+ AI articles published daily — you read 3 | **22 sources scanned automatically**, top stories surface |
+| 500+ AI articles published daily — you read 3 | **40+ sources scanned automatically**, top stories surface |
 | Scattered across Hacker News, Reddit, ArXiv, RSS | **One unified dashboard** with tech, investment, tips |
-| English-only or single-language tools | **8 languages** (DE, EN, ZH, FR, ES, PT, JA, KO) — free-model translation |
+| English-only or single-language tools | **8 languages** (EN, DE, ZH, FR, ES, PT, JA, KO) — resilient LLM translation |
 | Paid tools (Feedly AI $18/mo, etc.) | **Free & open source**, MIT licensed, self-hostable |
 | No actionable context | **AI Chat** to ask questions, **AI Reports** with one-click export |
 
@@ -138,8 +138,8 @@ The backend processes news through a 4.5-stage pipeline:
 |-------|-------------|--------|
 | **1. Fetch** | Collect from RSS, Hacker News, YouTube; filter by period boundaries | ~210 raw items |
 | **2. Classify** | LLM classifies into tech/investment/tips (tips sources skip this) | Categorized pool |
-| **3. Process** | Parallel LLM processing: generate DE/EN base summaries, extract entities | 30 tech + 21 investment + 15 tips + 5 videos |
-| **3.5. Translate** | Translate EN → ZH, FR, ES, PT, JA, KO via free model chain (resilient: JSON validation + small-batch retry) | 6 extra languages per item |
+| **3. Process** | Parallel LLM processing: EN-native summaries (global-audience voice), trends + AI editorial brief | 30 tech + 21 investment + 15 tips + 5 videos |
+| **3.5. Translate** | Translate EN → DE, ZH, FR, ES, PT, JA, KO (paid-first chain, JSON validation + small-batch retry) | 7 languages per item |
 | **4. Save** | Store in PostgreSQL, intersperse videos into tech feed | Database records |
 
 Daily collections produce reduced counts (10 tech, 5 investment, 5 tips, 2 videos).
@@ -249,8 +249,8 @@ DataCube-AI-Space/
 │   │   └── video-embed.tsx      # YouTube player
 │   ├── lib/                     # Utils, types, API client
 │   ├── vercel.json              # Non-www → www redirect
-│   ├── login/                  # Welcome gate (8 languages)
-│   └── middleware.ts            # Dynamic html lang + crawler bypass + welcome gate
+│   ├── login/                  # Legacy welcome page (gate removed 2026-08)
+│   └── middleware.ts            # Dynamic html lang + visited cookie + noindex policy
 │
 ├── ai-hub-backend/              # Backend (FastAPI)
 │   ├── app/
