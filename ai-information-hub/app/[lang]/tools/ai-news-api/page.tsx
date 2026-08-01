@@ -175,8 +175,6 @@ const ENDPOINTS = [
   { path: '/api/investment/{periodId}', description: { de: 'Finanzierungsrunden, M&A, Aktiendaten', en: 'Funding rounds, M&A, stock data', zh: '\u878d\u8d44\u8f6e\u6b21\u3001\u5e76\u8d2d\u3001\u80a1\u7968\u6570\u636e', fr: 'Tours de financement, M&A, donn\u00e9es boursi\u00e8res', es: 'Rondas de financiaci\u00f3n, M&A, datos burs\u00e1tiles', pt: 'Rodadas de financiamento, M&A, dados de a\u00e7\u00f5es', ja: '\u8cc7\u91d1\u8abf\u9054\u30e9\u30a6\u30f3\u30c9\u3001M&A\u3001\u682a\u4fa1\u30c7\u30fc\u30bf', ko: '\ud380\ub529 \ub77c\uc6b4\ub4dc, M&A, \uc8fc\uc2dd \ub370\uc774\ud130' } },
   { path: '/api/tips/{periodId}', description: { de: 'Praktische KI-Tipps aus Reddit + Blogs', en: 'Practical AI tips from Reddit + blogs', zh: '\u6765\u81ea Reddit + \u535a\u5ba2\u7684\u5b9e\u7528 AI \u6280\u5de7', fr: 'Conseils IA pratiques de Reddit + blogs', es: 'Consejos pr\u00e1cticos de IA de Reddit + blogs', pt: 'Dicas pr\u00e1ticas de IA do Reddit + blogs', ja: 'Reddit + \u30d6\u30ed\u30b0\u304b\u3089\u306e\u5b9f\u8df5\u7684AI\u30d2\u30f3\u30c8', ko: 'Reddit + \ube14\ub85c\uadf8\uc758 \uc2e4\uc6a9 AI \ud301' } },
   { path: '/api/videos/{periodId}', description: { de: 'Kuratierte YouTube-Video-Zusammenfassungen', en: 'Curated YouTube video summaries', zh: '\u7cbe\u9009 YouTube \u89c6\u9891\u6458\u8981', fr: 'R\u00e9sum\u00e9s vid\u00e9o YouTube s\u00e9lectionn\u00e9s', es: 'Res\u00famenes de videos de YouTube curados', pt: 'Resumos de v\u00eddeos curados do YouTube', ja: '\u53b3\u9078YouTube\u52d5\u753b\u8981\u7d04', ko: '\ud050\ub808\uc774\uc158 YouTube \ub3d9\uc601\uc0c1 \uc694\uc57d' } },
-  { path: '/api/stock/{ticker}', description: { de: 'Echtzeit-Aktiendaten (Polygon.io)', en: 'Real-time stock data (Polygon.io)', zh: '\u5b9e\u65f6\u80a1\u7968\u6570\u636e (Polygon.io)', fr: 'Donn\u00e9es boursi\u00e8res en temps r\u00e9el (Polygon.io)', es: 'Datos burs\u00e1tiles en tiempo real (Polygon.io)', pt: 'Dados de a\u00e7\u00f5es em tempo real (Polygon.io)', ja: '\u30ea\u30a2\u30eb\u30bf\u30a4\u30e0\u682a\u4fa1\u30c7\u30fc\u30bf (Polygon.io)', ko: '\uc2e4\uc2dc\uac04 \uc8fc\uc2dd \ub370\uc774\ud130 (Polygon.io)' } },
-  { path: '/api/stock/batch/?tickers=X,Y', description: { de: 'Batch-Aktienabfrage', en: 'Batch stock lookup', zh: '\u6279\u91cf\u80a1\u7968\u67e5\u8be2', fr: 'Recherche par lot d\'actions', es: 'Consulta de acciones por lotes', pt: 'Consulta de a\u00e7\u00f5es em lote', ja: '\u30d0\u30c3\u30c1\u682a\u4fa1\u691c\u7d22', ko: '\ub300\ub7c9 \uc8fc\uc2dd \uc870\ud68c' } },
   { path: '/api/trends/{periodId}', description: { de: 'Trendende KI-Themen', en: 'Trending AI topics', zh: '\u70ed\u95e8 AI \u8bdd\u9898', fr: 'Sujets IA tendance', es: 'Temas de IA en tendencia', pt: 'T\u00f3picos de IA em alta', ja: '\u30c8\u30ec\u30f3\u30c9AI\u30c8\u30d4\u30c3\u30af', ko: '\ud2b8\ub80c\ub529 AI \ud1a0\ud53d' } },
 ]
 
@@ -242,7 +240,7 @@ const FEATURE_TITLES: Record<string, L> = {
   noAuth: { de: 'Keine Authentifizierung n\u00f6tig', en: 'No Auth Required', zh: '\u65e0\u9700\u8ba4\u8bc1', fr: 'Sans authentification', es: 'Sin autenticaci\u00f3n', pt: 'Sem autentica\u00e7\u00e3o', ja: '\u8a8d\u8a3c\u4e0d\u8981', ko: '\uc778\uc99d \ubd88\ud544\uc694' },
   languages: { de: '8 Sprachen Daten', en: '8 Language Data', zh: '8 \u79cd\u8bed\u8a00\u6570\u636e', fr: 'Donn\u00e9es en 8 langues', es: 'Datos en 8 idiomas', pt: 'Dados em 8 idiomas', ja: '8\u8a00\u8a9e\u30c7\u30fc\u30bf', ko: '8\uac1c \uc5b8\uc5b4 \ub370\uc774\ud130' },
   sources: { de: '22+ Quellen', en: '22+ Sources', zh: '22+ \u4fe1\u606f\u6e90', fr: '22+ Sources', es: '22+ Fuentes', pt: '22+ Fontes', ja: '22\u4ee5\u4e0a\u306e\u30bd\u30fc\u30b9', ko: '22\uac1c+ \uc18c\uc2a4' },
-  stock: { de: 'Echtzeit-Aktiendaten', en: 'Real-Time Stock Data', zh: '\u5b9e\u65f6\u80a1\u7968\u6570\u636e', fr: 'Donn\u00e9es boursi\u00e8res en temps r\u00e9el', es: 'Datos burs\u00e1tiles en tiempo real', pt: 'Dados de a\u00e7\u00f5es em tempo real', ja: '\u30ea\u30a2\u30eb\u30bf\u30a4\u30e0\u682a\u4fa1\u30c7\u30fc\u30bf', ko: '\uc2e4\uc2dc\uac04 \uc8fc\uc2dd \ub370\uc774\ud130' },
+  stock: { de: 'Aktiendaten (pausiert)', en: 'Stock Data (paused)', zh: '\u5b9e\u65f6\u80a1\u7968\u6570\u636e', fr: 'Donn\u00e9es boursi\u00e8res en temps r\u00e9el', es: 'Datos burs\u00e1tiles en tiempo real', pt: 'Dados de a\u00e7\u00f5es em tempo real', ja: '\u30ea\u30a2\u30eb\u30bf\u30a4\u30e0\u682a\u4fa1\u30c7\u30fc\u30bf', ko: '\uc2e4\uc2dc\uac04 \uc8fc\uc2dd \ub370\uc774\ud130' },
   daily: { de: 'T\u00e4gliche Updates', en: 'Daily Updates', zh: '\u6bcf\u65e5\u66f4\u65b0', fr: 'Mises \u00e0 jour quotidiennes', es: 'Actualizaciones diarias', pt: 'Atualiza\u00e7\u00f5es di\u00e1rias', ja: '\u6bce\u65e5\u66f4\u65b0', ko: '\ub9e4\uc77c \uc5c5\ub370\uc774\ud2b8' },
   json: { de: 'JSON-Format', en: 'JSON Format', zh: 'JSON \u683c\u5f0f', fr: 'Format JSON', es: 'Formato JSON', pt: 'Formato JSON', ja: 'JSON\u5f62\u5f0f', ko: 'JSON \ud615\uc2dd' },
 }
@@ -279,14 +277,14 @@ const FEATURE_DESCRIPTIONS: Record<string, L> = {
     ko: 'TechCrunch, MIT Technology Review, Ars Technica, Hacker News, Reddit, YouTube\uc758 \ud050\ub808\uc774\uc158 \ucf58\ud150\uce20.',
   },
   stock: {
-    de: 'Echtzeit-B\u00f6rsendaten \u00fcber Polygon.io integriert. Einzel- und Batch-Abfragen f\u00fcr KI-Aktien verf\u00fcgbar.',
-    en: 'Real-time stock market data integrated via Polygon.io. Single and batch queries for AI-sector stocks available.',
-    zh: '\u901a\u8fc7 Polygon.io \u96c6\u6210\u5b9e\u65f6\u80a1\u7968\u5e02\u573a\u6570\u636e\u3002\u652f\u6301 AI \u677f\u5757\u80a1\u7968\u7684\u5355\u4e2a\u548c\u6279\u91cf\u67e5\u8be2\u3002',
-    fr: "Donn\u00e9es boursi\u00e8res en temps r\u00e9el int\u00e9gr\u00e9es via Polygon.io. Requ\u00eates individuelles et par lot pour les actions du secteur IA.",
-    es: 'Datos burs\u00e1tiles en tiempo real integrados v\u00eda Polygon.io. Consultas individuales y por lotes para acciones del sector IA.',
-    pt: 'Dados do mercado de a\u00e7\u00f5es em tempo real integrados via Polygon.io. Consultas individuais e em lote para a\u00e7\u00f5es do setor IA.',
-    ja: 'Polygon.io\u7d4c\u7531\u306e\u30ea\u30a2\u30eb\u30bf\u30a4\u30e0\u682a\u5f0f\u5e02\u5834\u30c7\u30fc\u30bf\u3002AI\u30bb\u30af\u30bf\u30fc\u682a\u306e\u5358\u4e00\u304a\u3088\u3073\u30d0\u30c3\u30c1\u30af\u30a8\u30ea\u5bfe\u5fdc\u3002',
-    ko: 'Polygon.io\ub97c \ud1b5\ud55c \uc2e4\uc2dc\uac04 \uc8fc\uc2dd \uc2dc\uc7a5 \ub370\uc774\ud130 \ud1b5\ud569. AI \uc139\ud130 \uc8fc\uc2dd\uc758 \ub2e8\uc77c \ubc0f \ub300\ub7c9 \uc870\ud68c \uac00\ub2a5.',
+    de: 'Aktiendaten sind pausiert, während wir die Marktdaten-Lizenzierung prüfen (Stock-Endpunkte liefern HTTP 410).',
+    en: 'Stock data is paused while we review market-data licensing (stock endpoints return HTTP 410).',
+    zh: '行情数据在市场数据授权审查期间暂停(stock 端点返回 HTTP 410)。',
+    fr: 'Les données boursières sont en pause pendant la revue de licence (les endpoints stock renvoient HTTP 410).',
+    es: 'Los datos bursátiles están en pausa durante la revisión de licencias (los endpoints stock devuelven HTTP 410).',
+    pt: 'Os dados de ações estão em pausa durante a revisão de licenciamento (endpoints stock retornam HTTP 410).',
+    ja: '株価データはライセンス審査のため一時停止中です(stock エンドポイントは HTTP 410 を返します)。',
+    ko: '주식 데이터는 라이선스 검토 기간 동안 일시 중지됩니다(stock 엔드포인트는 HTTP 410 반환).',
   },
   daily: {
     de: 'Daten werden t\u00e4glich um 23:00 Uhr Berliner Zeit automatisch aktualisiert. W\u00f6chentliche Zusammenfassungen sind ebenfalls verf\u00fcgbar.',
@@ -500,7 +498,7 @@ const CROSS_NEWS_DESC: L = { de: '22+ Quellen, 8 Sprachen, t\u00e4glich aktualis
 const CROSS_REPORT_NAME: L = { de: 'KI-Bericht-Generator', en: 'AI Report Generator', zh: 'AI\u62a5\u544a\u751f\u6210\u5668', fr: 'G\u00e9n\u00e9rateur de rapports IA', es: 'Generador de informes IA', pt: 'Gerador de relat\u00f3rios IA', ja: 'AI\u30ec\u30dd\u30fc\u30c8\u30b8\u30a7\u30cd\u30ec\u30fc\u30bf\u30fc', ko: 'AI \ubcf4\uace0\uc11c \uc0dd\uc131\uae30' }
 const CROSS_REPORT_DESC: L = { de: 'Streaming-Berichte, 5 Exportformate.', en: 'Streaming reports, 5 export formats.', zh: '\u6d41\u5f0f\u62a5\u544a\uff0c5\u79cd\u5bfc\u51fa\u683c\u5f0f\u3002', fr: 'Rapports en streaming, 5 formats.', es: 'Informes en streaming, 5 formatos.', pt: 'Relat\u00f3rios em streaming, 5 formatos.', ja: '\u30b9\u30c8\u30ea\u30fc\u30df\u30f3\u30b0\u30ec\u30dd\u30fc\u30c8\u30015\u3064\u306e\u30a8\u30af\u30b9\u30dd\u30fc\u30c8\u5f62\u5f0f\u3002', ko: '\uc2a4\ud2b8\ub9ac\ubc0d \ubcf4\uace0\uc11c, 5\uac00\uc9c0 \ub0b4\ubcf4\ub0b4\uae30 \ud615\uc2dd.' }
 const CROSS_STOCK_NAME: L = { de: 'KI-Aktien-Tracker', en: 'AI Stock Tracker', zh: 'AI\u80a1\u7968\u8ffd\u8e2a\u5668', fr: 'Tracker actions IA', es: 'Rastreador acciones IA', pt: 'Rastreador a\u00e7\u00f5es IA', ja: 'AI\u682a\u5f0f\u30c8\u30e9\u30c3\u30ab\u30fc', ko: 'AI \uc8fc\uc2dd \ucd94\uc801\uae30' }
-const CROSS_STOCK_DESC: L = { de: 'Echtzeit-Kurse, Finanzierungsrunden, M&A.', en: 'Real-time stocks, funding rounds, M&A.', zh: '\u5b9e\u65f6\u80a1\u4ef7\u3001\u878d\u8d44\u8f6e\u6b21\u3001\u5e76\u8d2d\u3002', fr: 'Actions en temps r\u00e9el, lev\u00e9es de fonds, M&A.', es: 'Acciones en tiempo real, rondas de financiaci\u00f3n, M&A.', pt: 'A\u00e7\u00f5es em tempo real, rodadas de financiamento, M&A.', ja: '\u30ea\u30a2\u30eb\u30bf\u30a4\u30e0\u682a\u4fa1\u3001\u8cc7\u91d1\u8abf\u9054\u3001M&A\u3002', ko: '\uc2e4\uc2dc\uac04 \uc8fc\uac00, \ud380\ub529 \ub77c\uc6b4\ub4dc, M&A.' }
+const CROSS_STOCK_DESC: L = { de: 'Pausiert — Lizenzprüfung läuft.', en: 'Paused — licensing review in progress.', zh: '暂停中 — 授权审查进行中。', fr: 'En pause — revue de licence en cours.', es: 'En pausa — revisión de licencias en curso.', pt: 'Em pausa — revisão de licenciamento em andamento.', ja: '一時停止中 — ライセンス審査中。', ko: '일시 중지 — 라이선스 검토 중.' }
 
 // ---------------------------------------------------------------------------
 // Page component
@@ -538,7 +536,6 @@ export default async function AINewsAPIToolPage({ params }: Props) {
       'JSON responses',
       'No authentication required',
       'Daily updates',
-      'Real-time stock data',
     ],
   }
 

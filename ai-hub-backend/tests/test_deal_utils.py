@@ -157,6 +157,36 @@ def test_deal_fingerprint():
            fp("ma", "Acme AI", None, d1, 20_000_000, "USD")
 
 
+
+def test_validate_deal_figures_currency_binding():
+    # Codex round-3 R1 repro: $20M must NOT be supported by "€20 million"
+    article = m.normalize_text("Acme AI raised €20 million in a Series A round.")
+    ev = "Acme AI raised €20 million in a Series A round"
+    a_raw, a_val, cur, v_raw, _ = m.validate_deal_figures(
+        "$20M", None, ev, "funding", article)
+    assert a_raw is None and a_val is None and cur is None
+
+    # Same currency passes
+    a_raw, a_val, cur, _, _ = m.validate_deal_figures(
+        "€20M", None, ev, "funding", article)
+    assert (a_val, cur) == (20_000_000, "EUR")
+
+    # Bare number in evidence ("20 million" without symbol) supports either
+    art2 = m.normalize_text("Beta Corp secured 20 million in fresh funding.")
+    ev2 = "Beta Corp secured 20 million in fresh funding"
+    a_raw, a_val, cur, _, _ = m.validate_deal_figures(
+        "$20M", None, ev2, "funding", art2)
+    assert (a_val, cur) == (20_000_000, "USD")
+
+    # Cross-currency valuation also fails closed
+    art3 = m.normalize_text("Gamma raised $10 million at a €500 million valuation.")
+    ev3 = "Gamma raised $10 million at a €500 million valuation"
+    _, _, _, v_raw, _ = m.validate_deal_figures("$10M", "$500M", ev3, "funding", art3)
+    assert v_raw is None
+    _, _, _, v_raw, _ = m.validate_deal_figures("$10M", "€500M", ev3, "funding", art3)
+    assert v_raw == "€500M"
+
+
 if __name__ == "__main__":
     failures = 0
     for name, fn in sorted(globals().items()):

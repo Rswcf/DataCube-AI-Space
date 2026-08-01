@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { track } from "@vercel/analytics";
 import { ExternalLink, Download, Search } from "lucide-react";
 
@@ -22,6 +22,7 @@ interface DealRow {
   investors: string[];
   announcedDate: string | null;
   content: string;
+  hasEvidence: boolean;
   evidence: string | null;
   sourceUrl: string | null;
   sourceName: string | null;
@@ -85,6 +86,30 @@ export function FundingTracker() {
   const [qDebounced, setQDebounced] = useState("");
   const [sort, setSort] = useState<"date" | "amount">("date");
   const [page, setPage] = useState(0);
+  // Quotation excerpts are fetched per record on demand (the collection
+  // endpoint never returns them — data-rights rule).
+  const [evidenceById, setEvidenceById] = useState<Record<number, string>>({});
+  const [openEvidenceId, setOpenEvidenceId] = useState<number | null>(null);
+
+  const toggleEvidence = useCallback(
+    (id: number) => {
+      if (openEvidenceId === id) {
+        setOpenEvidenceId(null);
+        return;
+      }
+      setOpenEvidenceId(id);
+      if (evidenceById[id] === undefined) {
+        fetch(`${API_BASE}/deals/${id}`)
+          .then((r) => (r.ok ? r.json() : null))
+          .then((d) => {
+            if (d) setEvidenceById((prev) => ({ ...prev, [id]: d.evidence || "" }));
+          })
+          .catch(() => {});
+      }
+      track("funding_evidence_view", { id });
+    },
+    [openEvidenceId, evidenceById],
+  );
 
   // Debounce search so we don't fire a query per keystroke (Codex F9).
   useEffect(() => {
@@ -269,7 +294,8 @@ export function FundingTracker() {
           </thead>
           <tbody>
             {deals.map((d) => (
-              <tr key={d.id} className="border-b border-border align-top transition-colors hover:bg-secondary/50">
+              <Fragment key={d.id}>
+              <tr className="border-b border-border align-top transition-colors hover:bg-secondary/50">
                 <td className="py-2.5 pr-3 font-sans text-xs tabular-nums text-muted-foreground whitespace-nowrap">
                   {d.announcedDate || "—"}
                 </td>
@@ -284,12 +310,20 @@ export function FundingTracker() {
                 <td className="py-2.5 pr-3 font-sans text-xs text-foreground whitespace-nowrap">
                   {d.dealType === "funding" ? d.round || "Funding" : d.maType || "M&A"}
                 </td>
-                <td
-                  className="py-2.5 pr-3 font-sans text-sm font-bold tabular-nums text-foreground whitespace-nowrap"
-                  title={d.evidence ? `Evidence: "${d.evidence}"` : undefined}
-                >
+                <td className="py-2.5 pr-3 font-sans text-sm font-bold tabular-nums text-foreground whitespace-nowrap">
                   {formatAmount(d)}
-                  {d.evidence ? <span aria-hidden="true" className="ml-1 cursor-help text-muted-foreground">*</span> : null}
+                  {d.hasEvidence ? (
+                    <button
+                      type="button"
+                      onClick={() => toggleEvidence(d.id)}
+                      aria-expanded={openEvidenceId === d.id}
+                      aria-label="Show supporting evidence"
+                      title="Show supporting evidence"
+                      className="ml-1 cursor-pointer text-muted-foreground hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    >
+                      *
+                    </button>
+                  ) : null}
                 </td>
                 <td className="py-2.5 pr-3 font-sans text-xs text-muted-foreground">
                   {d.dealType === "ma"
@@ -317,6 +351,20 @@ export function FundingTracker() {
                   )}
                 </td>
               </tr>
+              {openEvidenceId === d.id ? (
+                <tr className="border-b border-border bg-secondary/40">
+                  <td colSpan={7} className="px-3 py-2 font-sans text-xs italic leading-relaxed text-muted-foreground">
+                    {evidenceById[d.id] === undefined ? "Loading evidence…" : evidenceById[d.id] ? (
+                      <>
+                        <span className="not-italic font-bold text-foreground">Evidence: </span>
+                        &ldquo;{evidenceById[d.id]}&rdquo;
+                        <span className="not-italic"> — quoted from the linked source; not licensed for redistribution.</span>
+                      </>
+                    ) : "No evidence excerpt on this row."}
+                  </td>
+                </tr>
+              ) : null}
+              </Fragment>
             ))}
             {!loading && deals.length === 0 && !error ? (
               <tr>

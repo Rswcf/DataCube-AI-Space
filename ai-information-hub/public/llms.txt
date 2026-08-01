@@ -28,8 +28,8 @@ DataCube AI offers free, multilingual AI-powered tools:
   Curates daily AI news from 35+ sources in 8 languages.
 - AI Report Generator: https://www.datacubeai.space/en/tools/ai-report-generator
   Generate structured AI reports with streaming output and 5 export formats (DOCX, HTML, MD, TXT, JSON).
-- AI Stock Tracker: https://www.datacubeai.space/en/tools/ai-stock-tracker
-  Real-time stock data for AI companies. Funding rounds, M&A, market movements.
+- AI Funding Tracker: https://www.datacubeai.space/funding
+  Open, evidence-linked AI funding and M&A deal data with free CSV export.
 - AI News API: https://www.datacubeai.space/en/tools/ai-news-api
   Free REST API for curated AI news data in 8 languages. JSON responses, no auth required.
 

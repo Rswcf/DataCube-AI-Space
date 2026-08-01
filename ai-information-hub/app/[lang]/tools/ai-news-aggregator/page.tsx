@@ -244,8 +244,8 @@ const FEATURE_DESCRIPTIONS: Record<string, L> = {
     ko: '\ub9e4\uc77c \ubca0\ub97c\ub9b0 \uc2dc\uac04 23:00\uc5d0 \uc790\ub3d9 \uc218\uc9d1. \ub354 \ub9ce\uc740 \uae30\uc0ac\ub97c \ud3ec\ud568\ud55c \uc8fc\uac04 \ub2e4\uc774\uc81c\uc2a4\ud2b8\ub3c4 \uc81c\uacf5.',
   },
   investment: {
-    de: 'Finanzierungsrunden, M&A-Deals und Aktienbewegungen im KI-Sektor. Echtzeit-Aktienkurse via Polygon.io.',
-    en: 'Funding rounds, M&A deals, and stock movements in the AI sector. Real-time stock data via Polygon.io.',
+    de: 'Finanzierungsrunden, M&A-Deals und Marktbewegungen im KI-Sektor — mit Quellenlinks.',
+    en: 'Funding rounds, M&A deals, and market movements in the AI sector — with source links.',
     zh: 'AI \u9886\u57df\u7684\u878d\u8d44\u8f6e\u6b21\u3001\u5e76\u8d2d\u4ea4\u6613\u548c\u80a1\u7968\u53d8\u52a8\u3002\u901a\u8fc7 Polygon.io \u63d0\u4f9b\u5b9e\u65f6\u80a1\u7968\u6570\u636e\u3002',
     fr: "Tours de financement, op\u00e9rations M&A et mouvements boursiers dans le secteur IA. Donn\u00e9es boursi\u00e8res en temps r\u00e9el via Polygon.io.",
     es: 'Rondas de financiaci\u00f3n, operaciones M&A y movimientos burs\u00e1tiles en el sector IA. Datos de acciones en tiempo real v\u00eda Polygon.io.',

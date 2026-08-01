@@ -239,18 +239,31 @@ def validate_deal_figures(
         return None, None, None, None, None if evidence is None else None
 
     evidence_amounts = amounts_in_text(evidence)
-    evidence_values = {v for v, _ in evidence_amounts}
+
+    def figure_supported(value: Optional[int], cur: Optional[str]) -> bool:
+        """Currency-aware match (Codex round-3 R1): the excerpt must mention
+        the same value with the SAME currency, or with no currency marker at
+        all (bare "20 million"). A different explicit currency fails closed —
+        "$20M" is NOT supported by "€20 million"."""
+        if value is None:
+            return False
+        for ev_value, ev_cur in evidence_amounts:
+            if ev_value != value:
+                continue
+            if ev_cur is None or cur is None or ev_cur == cur:
+                return True
+        return False
 
     if amount_value is not None:
-        supported = amount_value in evidence_values
-        plausible = plausible_amount(amount_value, currency, deal_type)
-        if not supported or not plausible:
+        if not figure_supported(amount_value, currency) or not plausible_amount(
+            amount_value, currency, deal_type
+        ):
             amount_raw, amount_value, currency = None, None, None
     else:
         amount_raw = None
 
-    valuation_value, _ = parse_amount(valuation_raw)
-    if valuation_value is None or valuation_value not in evidence_values:
+    valuation_value, valuation_currency = parse_amount(valuation_raw)
+    if not figure_supported(valuation_value, valuation_currency):
         valuation_raw = None
 
     return amount_raw, amount_value, currency, valuation_raw, evidence

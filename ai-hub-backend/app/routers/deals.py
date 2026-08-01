@@ -84,7 +84,7 @@ DISCLOSURE = (
 )
 
 
-def _deal_dict(d: Deal, include_evidence: bool = True) -> dict:
+def _deal_dict(d: Deal, include_evidence: bool = False) -> dict:
     return {
         "id": d.id,
         "dealType": d.deal_type,
@@ -101,8 +101,11 @@ def _deal_dict(d: Deal, include_evidence: bool = True) -> dict:
         "investors": d.investors or [],
         "announcedDate": d.announced_date.isoformat() if d.announced_date else None,
         "content": d.content_en,
-        # Quotation excerpts are served only in display-sized pages (<=50)
-        # and never in exports — see the data-rights register (Codex R3).
+        # Quotation excerpts are NEVER served from the collection endpoint
+        # (pagination would allow bulk download of the quotation corpus —
+        # Codex round-3 R3). The UI fetches them per record on demand via
+        # GET /deals/{id}; the list only signals availability.
+        "hasEvidence": bool(d.evidence),
         "evidence": d.evidence if include_evidence else None,
         "sourceUrl": d.source_url,
         "sourceName": d.source_name,
@@ -188,12 +191,11 @@ def list_deals(
     sorted_query = _sorted(query, sort, currency)
     total = sorted_query.count() if sort == "amount" else query.count()
     rows = sorted_query.offset(offset).limit(limit).all()
-    include_evidence = limit <= 50
     return {
         "total": total,
         "limit": limit,
         "offset": offset,
-        "deals": [_deal_dict(d, include_evidence=include_evidence) for d in rows],
+        "deals": [_deal_dict(d) for d in rows],
         "disclosure": DISCLOSURE,
     }
 
@@ -278,3 +280,19 @@ def export_deals_csv(
             "X-Data-Source": "datacubeai.space/funding",
         },
     )
+
+
+# NOTE: registered LAST so the static paths above (/facets, /export.csv)
+# match before the {deal_id} catch-all.
+@router.get("/{deal_id}")
+def get_deal(
+    deal_id: int,
+    request: Request,
+    db: Session = Depends(get_db),
+):
+    """Single deal incl. its quotation excerpt (per-record delivery only)."""
+    _rate_limit(request, "deal_detail", limit=30)
+    d = db.query(Deal).filter(Deal.id == deal_id).first()
+    if d is None:
+        raise HTTPException(status_code=404, detail="Deal not found")
+    return {**_deal_dict(d, include_evidence=True), "disclosure": DISCLOSURE}
