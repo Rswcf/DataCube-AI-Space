@@ -148,6 +148,28 @@ const h2Takeaways: L = {
   ko: '핵심 요약',
 }
 
+const h2Editorial: L = {
+  de: 'Warum das heute zählt',
+  en: 'Why Today Matters',
+  zh: '今日看点',
+  fr: "L'essentiel du jour",
+  es: 'Por qué importa hoy',
+  pt: 'Por que importa hoje',
+  ja: '今日の注目点',
+  ko: '오늘의 포인트',
+}
+
+const labelEditorialAttribution: L = {
+  de: 'KI-generierte Analyse von DataCube AI Editorial — mehr erfahren',
+  en: 'AI-generated analysis by DataCube AI Editorial — learn how we work',
+  zh: '由 DataCube AI Editorial 生成的 AI 分析 — 了解我们的方法',
+  fr: 'Analyse générée par IA — DataCube AI Editorial',
+  es: 'Análisis generado por IA — DataCube AI Editorial',
+  pt: 'Análise gerada por IA — DataCube AI Editorial',
+  ja: 'DataCube AI Editorial による AI 生成分析',
+  ko: 'DataCube AI Editorial의 AI 생성 분석',
+}
+
 // periodPublishedDate is imported from lib/period-utils — shared with
 // sitemap.ts so freshness signals can't drift.
 
@@ -387,16 +409,18 @@ export default async function WeekPage({ params, searchParams }: Props) {
   const lang = isSupportedLanguage(rawLang) ? rawLang : 'de'
   const periodLabel = formatPeriodTitle(weekId, lang)
 
-  // Fetch the three feeds in parallel
-  const [techRes, investmentRes, tipsRes] = await Promise.all([
+  // Fetch the feeds in parallel (trends carries the AI editorial brief)
+  const [techRes, investmentRes, tipsRes, trendsRes] = await Promise.all([
     fetch(`${API_BASE}/tech/${weekId}`, { next: { revalidate: 3600 } }),
     fetch(`${API_BASE}/investment/${weekId}`, { next: { revalidate: 3600 } }),
     fetch(`${API_BASE}/tips/${weekId}`, { next: { revalidate: 3600 } }),
+    fetch(`${API_BASE}/trends/${weekId}`, { next: { revalidate: 3600 } }),
   ])
 
   let techData: MultilingualData<TechPost> | null = null
   let investmentData: InvestmentData | null = null
   let tipsData: MultilingualData<TipPost> | null = null
+  let editorialData: Record<string, { text: string; topic?: string }[]> | null = null
 
   try {
     if (techRes.ok) techData = await techRes.json()
@@ -407,6 +431,18 @@ export default async function WeekPage({ params, searchParams }: Props) {
   try {
     if (tipsRes.ok) tipsData = await tipsRes.json()
   } catch {}
+  try {
+    if (trendsRes.ok) {
+      const trendsJson = await trendsRes.json()
+      if (trendsJson && typeof trendsJson.editorial === 'object') {
+        editorialData = trendsJson.editorial
+      }
+    }
+  } catch {}
+
+  const editorialBullets = editorialData
+    ? editorialData[lang] || editorialData.en || []
+    : []
 
   const techPostsAll: TechPost[] = techData ? (techData as any)[lang] || (techData as any).de || [] : []
   const nonVideoTechPosts = (techPostsAll || []).filter((p) => !p.isVideo)
@@ -560,6 +596,38 @@ export default async function WeekPage({ params, searchParams }: Props) {
               <li key={i}>{b}</li>
             ))}
           </ul>
+        </section>
+      )}
+
+      {/* AI Editorial Brief — the information-gain layer: synthesized
+          "why it matters" bullets citing concrete numbers across stories.
+          Honestly attributed to DataCube AI Editorial (never an invented
+          human) with a link to /ai-disclosure. */}
+      {editorialBullets.length > 0 && (
+        <section
+          aria-labelledby="editorial-heading"
+          className="mb-10 rounded-lg border border-gray-200 p-5"
+        >
+          <h2 id="editorial-heading" className="text-xl font-semibold mb-3">
+            {t(h2Editorial, lang)}
+          </h2>
+          <ul className="space-y-3 leading-relaxed">
+            {editorialBullets.map((b, i) => (
+              <li key={i}>
+                {b.topic ? (
+                  <span className="mr-2 inline-block rounded border border-gray-300 px-1.5 py-0.5 align-middle text-[10px] font-bold uppercase tracking-wide text-gray-500">
+                    {b.topic}
+                  </span>
+                ) : null}
+                {b.text}
+              </li>
+            ))}
+          </ul>
+          <p className="mt-3 text-xs text-gray-500">
+            <a href="/ai-disclosure" className="underline hover:no-underline">
+              {t(labelEditorialAttribution, lang)}
+            </a>
+          </p>
         </section>
       )}
 

@@ -407,6 +407,17 @@ def load_sources() -> dict:
             {"url": "https://huggingface.co/blog/feed.xml", "name": "Hugging Face Blog"},
             {"url": "https://www.technologyreview.com/topic/artificial-intelligence/feed", "name": "MIT Technology Review"},
             {"url": "https://the-decoder.com/feed/", "name": "The Decoder"},
+            # 2026-08 source expansion (generalization): first-party lab blogs +
+            # major tech-press AI verticals. All URLs verified 200 + valid XML.
+            # Source diversity also reduces the single-source-rewrite footprint
+            # that Google's scaled-content policy penalizes.
+            {"url": "https://openai.com/news/rss.xml", "name": "OpenAI News"},
+            {"url": "https://blog.google/technology/ai/rss/", "name": "Google AI Blog"},
+            {"url": "https://deepmind.google/blog/rss.xml", "name": "Google DeepMind"},
+            {"url": "https://techcrunch.com/category/artificial-intelligence/feed/", "name": "TechCrunch AI"},
+            {"url": "https://venturebeat.com/category/ai/feed/", "name": "VentureBeat AI"},
+            {"url": "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml", "name": "The Verge AI"},
+            {"url": "https://arstechnica.com/ai/feed/", "name": "Ars Technica AI"},
         ],
         "investment": [
             {"url": "https://techcrunch.com/tag/funding/feed/", "name": "TechCrunch Funding"},
@@ -935,6 +946,19 @@ def stage3_parallel_processing(db: Session, week_id: str, processor: LLMProcesso
         results.get("tech", {"de": [], "en": []}),
         results.get("investment", {})
     )
+
+    # Generate the AI editorial brief (information-gain layer). Non-fatal:
+    # a missing brief must never block the collection.
+    logger.info("Generating editorial brief...")
+    try:
+        results["editorial"] = processor.generate_editorial(
+            results.get("tech", {"de": [], "en": []}),
+            results.get("investment", {}),
+            results.get("trends", {}),
+        )
+    except Exception as e:
+        logger.warning(f"Editorial generation failed (non-fatal): {e}")
+        results["editorial"] = {}
 
     return results
 
@@ -1487,7 +1511,7 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
             title_de=_nn(de_t.get("title"), ""),
             title_en=_nn(en_t.get("title"), ""),
             posts=de_t.get("posts"),
-            translations=en_t.get("_translations") or None,
+            translations=_jsonb_translations(en_t),
         )
         db.add(trend)
 
@@ -1511,6 +1535,14 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
                 avatar=de_m.get("avatar", ""),
             )
             db.add(member)
+
+    # Save the AI editorial brief on the week row (information-gain layer;
+    # generated in stage 3, already multilingual: {"en": [...], "de": ..., "zh": ...})
+    editorial = results.get("editorial")
+    if editorial:
+        week_row = db.query(Week).filter(Week.id == week_id).first()
+        if week_row is not None:
+            week_row.editorial = editorial
 
     # BUG-H4: Add transaction rollback handling
     try:

@@ -6,6 +6,7 @@ from datetime import date as date_type
 from typing import Optional
 
 from sqlalchemy import String, Boolean, Integer, ForeignKey, Date
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import Base
@@ -27,6 +28,11 @@ class Week(Base):
     parent_week_id: Mapped[Optional[str]] = mapped_column(
         String(10), ForeignKey("weeks.id"), nullable=True
     )
+    # AI editorial brief ("why it matters" bullets citing our own data),
+    # keyed by language: {"en": [{"text": ..., "topic": ...}], "de": [...]}.
+    # Attributed to "DataCube AI Editorial" in the UI with an /ai-disclosure
+    # link — never to an invented human editor.
+    editorial: Mapped[Optional[dict]] = mapped_column(JSONB, nullable=True)
 
     def __repr__(self) -> str:
         return f"<Week {self.id}>"

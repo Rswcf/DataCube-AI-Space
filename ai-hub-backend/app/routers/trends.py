@@ -144,4 +144,5 @@ def get_trends_feed(week_id: str, db: Session = Depends(get_db)):
     return TrendsFeedResponse(
         trends=trends_dict,
         teamMembers={"de": [], "en": []},
+        editorial=week.editorial,
     )

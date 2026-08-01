@@ -837,6 +837,95 @@ JSON:"""
 
         return result
 
+    def generate_editorial(
+        self, tech_data: dict, investment_data: dict, trends_data: dict
+    ) -> dict:
+        """Generate the AI editorial brief: 3-5 "why it matters" bullets.
+
+        This is an information-gain layer, not a summary layer: bullets must
+        synthesize ACROSS stories and cite concrete numbers — things no single
+        upstream source states. The UI attributes it to "DataCube AI
+        Editorial" with an /ai-disclosure link (never to an invented human).
+
+        Returns {"en": [{"text": ..., "topic": ...}], "de": [...], "zh": [...]}
+        (DE/ZH translated immediately; other languages fall back to EN).
+        """
+        tech_lines = [
+            f"- [{p.get('impact', 'medium')}] {p.get('content', '')}"
+            for p in tech_data.get("en", [])[:12]
+            if isinstance(p, dict) and p.get("content")
+        ]
+        inv = investment_data or {}
+        inv_lines = []
+        for section in ["primaryMarket", "ma"]:
+            sec = inv.get(section, {})
+            items = sec.get("en", []) if isinstance(sec, dict) else []
+            for p in items[:5]:
+                if isinstance(p, dict) and p.get("content"):
+                    inv_lines.append(f"- {p.get('content', '')}")
+        trends_section = (trends_data or {}).get("trends", {})
+        trend_titles = [
+            t.get("title", "")
+            for t in (trends_section.get("en", []) if isinstance(trends_section, dict) else [])
+            if isinstance(t, dict) and t.get("title")
+        ]
+
+        if not tech_lines and not inv_lines:
+            return {}
+
+        prompt = f"""You are the editorial layer of DataCube AI, a daily AI briefing for a global
+audience. Below are today's processed stories and trending topics.
+
+TECH STORIES (with impact rating):
+{chr(10).join(tech_lines)}
+
+FUNDING / M&A:
+{chr(10).join(inv_lines) if inv_lines else "(none)"}
+
+TRENDING TOPICS:
+{", ".join(trend_titles) if trend_titles else "(none)"}
+
+Write 3-5 editorial bullets ("why today matters"). STRICT rules:
+- Each bullet 25-45 words, plain English, no hype, no rhetorical questions.
+- Each bullet must SYNTHESIZE (connect two or more stories, or place one
+  story in the context of the trend list) — never just restate one summary.
+- Each bullet must contain at least one concrete number, company, or model
+  name taken from the content above. Do not invent facts.
+- Write as neutral analysis, not opinion theater.
+
+Output ONLY valid JSON:
+{{"bullets": [{{"text": "...", "topic": "short topic tag"}}]}}"""
+
+        response = self._call_llm(prompt, temperature=0.4)
+        result = parse_llm_json(response, fallback={"bullets": []})
+        bullets = result.get("bullets") if isinstance(result, dict) else []
+        if not isinstance(bullets, list) or not bullets:
+            return {}
+        bullets = [
+            {"text": str(b.get("text", "")).strip(), "topic": str(b.get("topic", "")).strip()}
+            for b in bullets[:5]
+            if isinstance(b, dict) and b.get("text")
+        ]
+        if not bullets:
+            return {}
+
+        editorial: dict = {"en": bullets}
+        # DE/ZH are the co-primary languages — translate inline (2 short calls);
+        # the remaining languages fall back to EN in the frontend.
+        for lang in ["de", "zh"]:
+            try:
+                translated = self.translate_batch(bullets, lang, ["text"])
+                lang_bullets = []
+                for i, b in enumerate(bullets):
+                    t = translated[i] if i < len(translated) and translated[i] else {}
+                    lang_bullets.append(
+                        {"text": t.get("text") or b["text"], "topic": b["topic"]}
+                    )
+                editorial[lang] = lang_bullets
+            except Exception as e:
+                logger.warning(f"Editorial translation to {lang} failed (non-fatal): {e}")
+        return editorial
+
     def generate_trends(self, tech_data: dict, investment_data: dict) -> dict:
         """Generate trending topics from the week's content."""
         all_content = []

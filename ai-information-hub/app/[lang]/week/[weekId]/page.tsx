@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   // Override hreflang alternates to include all 8 languages
   const hreflangEntries: Record<string, string> = {
-    'x-default': `https://www.datacubeai.space/de/week/${weekId}`,
+    'x-default': `https://www.datacubeai.space/en/week/${weekId}`,
   }
   for (const code of SUPPORTED_LANGUAGES) {
     hreflangEntries[toBcp47(code)] = `https://www.datacubeai.space/${code}/week/${weekId}`
