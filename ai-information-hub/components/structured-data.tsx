@@ -270,7 +270,7 @@ export function SoftwareApplicationSchema({
     },
     inLanguage: ['de', 'en', 'zh-Hans', 'fr', 'es', 'pt', 'ja', 'ko'],
     featureList: [
-      '22+ curated news sources',
+      '35+ curated news sources',
       '8 language support',
       'Daily and weekly updates',
       'AI investment tracking',

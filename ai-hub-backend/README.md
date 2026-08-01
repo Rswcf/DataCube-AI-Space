@@ -14,7 +14,7 @@ FastAPI backend for the AI Information Hub — multilingual (8 languages) daily 
 - 4.5-stage data collection pipeline
 - Two-model LLM approach (classifier + processor)
 - Tips sources bypass classification (Reddit, Simon Willison)
-- **8-language support** (DE, EN, ZH, FR, ES, PT, JA, KO) with resilient free-model translation pipeline
+- **8-language support** (DE, EN, ZH, FR, ES, PT, JA, KO) with resilient paid-first translation pipeline
 - Period ID support: daily `YYYY-MM-DD` or weekly `YYYY-kwWW`
 - **Automated newsletter** via Resend + Beehiiv with per-subscriber language preference (idempotent send-lock per `(period_id, language)`; safe against dual-cron slots + manual re-triggers)
 - **Developer API** with tiered rate limiting (free/premium/business API keys)

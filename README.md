@@ -46,7 +46,7 @@ https://github.com/user-attachments/assets/9dddaaed-e473-4350-97de-0346cacb6660
 | 📡 | **Tech Feed** | AI/ML breakthroughs with embedded YouTube videos and impact ratings |
 | 💰 | **Investment Tracker** | Funding rounds, M&A deals, evidence-linked AI Funding Tracker with free CSV export |
 | 💡 | **Practical Tips** | Curated from hand-picked Reddit communities and expert blogs |
-| 🌐 | **8 Languages** | DE, EN, ZH, FR, ES, PT, JA, KO — free-model translation pipeline |
+| 🌐 | **8 Languages** | DE, EN, ZH, FR, ES, PT, JA, KO — EN-native, AI translation pipeline |
 | 📅 | **Daily + Weekly** | Automated daily collection with weekly rollup views |
 | 🤖 | **AI Chat** | Ask questions about the current week's AI news |
 | 📊 | **AI Reports** | One-click streaming report — export to Word, HTML, Markdown, Text, JSON |
