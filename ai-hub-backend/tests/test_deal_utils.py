@@ -233,6 +233,40 @@ def test_suffix_currency_binding():
     assert m.amounts_in_text("the 20m round closed") == [(20_000_000, None)]
 
 
+def test_symbol_suffix_and_chf_prefix():
+    # Codex round-5 R1: suffix SYMBOLS and prefix CHF must bind too.
+    assert m.amounts_in_text("Acme raised 20 million € in a Series A") == [
+        (20_000_000, "EUR")
+    ]
+    art = m.normalize_text("Acme raised 20 million € in a Series A.")
+    ev = "Acme raised 20 million € in a Series A"
+    a_raw, a_val, cur, _, _ = m.validate_deal_figures("$20M", None, ev, "funding", art)
+    assert a_raw is None and a_val is None and cur is None
+    a_raw, a_val, cur, _, _ = m.validate_deal_figures("€20M", None, ev, "funding", art)
+    assert (a_val, cur) == (20_000_000, "EUR")
+
+    # Suffix $ symbol
+    assert m.amounts_in_text("secured 20 million $ from backers") == [
+        (20_000_000, "USD")
+    ]
+
+    # CHF as a PREFIX indicator
+    assert m.amounts_in_text("Acme raised CHF 20 million from banks") == [
+        (20_000_000, "CHF")
+    ]
+    art_chf = m.normalize_text("Acme raised CHF 20 million from banks.")
+    ev_chf = "Acme raised CHF 20 million from banks"
+    a_raw, a_val, cur, _, _ = m.validate_deal_figures("$20M", None, ev_chf, "funding", art_chf)
+    assert a_raw is None and a_val is None and cur is None
+    a_raw, a_val, cur, _, _ = m.validate_deal_figures("CHF 20M", None, ev_chf, "funding", art_chf)
+    assert (a_val, cur) == (20_000_000, "CHF")
+
+    # CHF as a suffix code
+    assert m.amounts_in_text("a round of 20 million CHF closed") == [
+        (20_000_000, "CHF")
+    ]
+
+
 if __name__ == "__main__":
     failures = 0
     for name, fn in sorted(globals().items()):

@@ -9,7 +9,7 @@ FastAPI backend for the AI Information Hub — multilingual (8 languages) daily 
 - RESTful API for tech news, investment data, tips, trends
 - **Daily + weekly collection modes** (daily: reduced output; weekly: full output)
 - YouTube video integration (interspersed in tech feed)
-- **Real-time stock data** via Polygon.io API (Secondary Market)
+- Stock endpoints disabled (HTTP 410) pending market-data licensing — see docs/data-rights.md
 - PostgreSQL database with SQLAlchemy ORM
 - 4.5-stage data collection pipeline
 - Two-model LLM approach (classifier + processor)
@@ -33,7 +33,7 @@ FastAPI backend for the AI Information Hub — multilingual (8 languages) daily 
 
 ```
 Stage 1: Fetch raw data
-    • RSS Feeds (41 sources — see load_sources())
+    • RSS Feeds (38 sources — see load_sources())
     • Hacker News (Algolia API)
     • YouTube (Data API v3)
     ↓
@@ -87,7 +87,9 @@ before 4. Any logic that depends on translations must respect both orders.
 ### Sources
 
 All feed sources (tech / investment / ma / tips) are defined in
-`collector.load_sources()` — 41 verified feeds as of 2026-08-01, including
+`collector.load_sources()` — 38 verified feeds as of 2026-08-02 (Tech
+Funding News / Crunchbase News / Sifted removed on data-rights grounds —
+see docs/data-rights.md), including
 first-party lab blogs, funding verticals, ZH ecosystem sources and four
 Reddit communities. YouTube uses a 15-channel allowlist
 (`youtube_fetcher.CHANNEL_ALLOWLIST`) plus two discovery queries. HN queries
@@ -112,67 +114,18 @@ live in `hn_fetcher.py`. Do not duplicate these lists here.
 
 ---
 
-## Stock API (Polygon.io Integration)
+## Stock API (disabled — HTTP 410)
 
-The Secondary Market section now fetches **real-time stock data** from Polygon.io API instead of relying on LLM-generated prices.
+**All `/api/stock/*` endpoints are disabled since 2026-08-01** and return
+HTTP 410 (`STOCK_DATA_DISABLED = True` in `app/routers/stock.py`). The
+Polygon.io individual-tier Market Data Terms license data for personal,
+non-commercial use only, so the public display was paused pending a
+licensed data source — see `docs/data-rights.md`. The frontend no longer
+calls these endpoints; Secondary Market cards show only as-reported
+figures from the collection pipeline.
 
-### How It Works
-
-```
-Frontend (investment-feed.tsx)
-    │
-    │ 1. Load secondary market posts (ticker + content only)
-    │
-    ▼
-Backend Proxy (/api/stock/formatted/batch/)
-    │
-    │ 2. Fetch real-time data from Polygon.io
-    │
-    ▼
-Polygon.io API
-    │
-    │ 3. Return: price, change%, marketCap
-    │
-    ▼
-Frontend merges data + displays with "Live" badge
-```
-
-### API Endpoints
-
-| Endpoint | Description |
-|----------|-------------|
-| `GET /api/stock/{ticker}` | Single stock (raw data) |
-| `GET /api/stock/batch/?tickers=AAPL,NVDA` | Batch stocks (raw data) |
-| `GET /api/stock/formatted/{ticker}?language=en` | Pre-formatted for display |
-| `GET /api/stock/formatted/batch/?tickers=...&language=de` | Batch formatted |
-
-### Example Response
-
-```json
-// GET /api/stock/formatted/NVDA?language=en
-{
-  "ticker": "NVDA",
-  "price": "$180.06",
-  "change": "-2.98%",
-  "direction": "down",
-  "marketCap": "$4.5T",
-  "name": "Nvidia Corp"
-}
-
-// GET /api/stock/formatted/NVDA?language=de
-{
-  "ticker": "NVDA",
-  "price": "$180.06",
-  "change": "-2.98%",
-  "direction": "down",
-  "marketCap": "$4,5 Bio.",
-  "name": "Nvidia Corp"
-}
-```
-
-### Configuration
-
-Requires `POLYGON_API_KEY` environment variable (Polygon.io Starter Plan: $29/month, 15-min delayed data).
+Re-enablement requires a redistribution-licensed data plan (or another
+licensed provider), then flipping the kill switch.
 
 ---
 
@@ -256,10 +209,10 @@ Chain: 0006 -> 0007 -> 0008 -> 0009 -> 0011 -> 0012
 | `/api/tips/{periodId}` | GET | Tips feed |
 | `/api/trends/{periodId}` | GET | Trends feed |
 | `/api/videos/{periodId}` | GET | YouTube videos only |
-| `/api/stock/{ticker}` | GET | Real-time stock data |
-| `/api/stock/batch/?tickers=...` | GET | Batch stock data |
-| `/api/stock/formatted/{ticker}` | GET | Pre-formatted stock data |
-| `/api/stock/formatted/batch/` | GET | Batch formatted stock data |
+| `/api/stock/{ticker}` | GET | Disabled — 410 (licensing) |
+| `/api/stock/batch/?tickers=...` | GET | Disabled — 410 (licensing) |
+| `/api/stock/formatted/{ticker}` | GET | Disabled — 410 (licensing) |
+| `/api/stock/formatted/batch/` | GET | Disabled — 410 (licensing) |
 | `/api/admin/collect` | POST | Full collection (all stages) |
 | `/api/admin/collect/fetch` | POST | Stage 1 only |
 | `/api/admin/collect/process` | POST | Stages 2-4 only |
@@ -299,7 +252,7 @@ In Railway dashboard: **Add Service** → **PostgreSQL**
 railway variables set DATABASE_URL=$RAILWAY_DATABASE_URL
 railway variables set OPENROUTER_API_KEY=sk-or-v1-xxxxx
 railway variables set YOUTUBE_API_KEY=AIzaSyxxxxx
-railway variables set POLYGON_API_KEY=xxxxx              # For real-time stock data
+railway variables set POLYGON_API_KEY=xxxxx              # Unused while stock endpoints are disabled (410)
 railway variables set ADMIN_API_KEY=$ADMIN_API_KEY
 railway variables set RESEND_API_KEY=re_xxxxx
 railway variables set BEEHIIV_API_KEY=xxxxx
@@ -473,7 +426,7 @@ ai-hub-backend/
 │   ├── schemas/             # Pydantic schemas
 │   ├── routers/             # API routes
 │   │   ├── admin.py         # Collection endpoints
-│   │   ├── stock.py         # Real-time stock data (Polygon.io)
+│   │   ├── stock.py         # Stock endpoints (disabled, 410 — licensing)
 │   │   ├── developer.py     # Developer API (register, usage, rotate-key)
 │   │   ├── jobs.py          # Job board CRUD endpoints
 │   │   ├── stripe_webhook.py  # Stripe payments (webhook, checkout, subscriptions)

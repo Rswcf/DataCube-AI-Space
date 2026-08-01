@@ -174,18 +174,22 @@ def csv_safe(value) -> str:
     return text
 
 # Suffix currency indicators a money token may end with ("20 million EUR",
-# "20 million euros", "351M RMB"). Kept in sync with _CURRENCY_PATTERNS so
-# parse_amount() recognizes whatever this regex captures.
-_SUFFIX_CCY = (
-    r"US\$|\$|€|£|¥|₹|RMB|CNY|USD|EUR|GBP|INR|CHF|元"
+# "20 million euros", "20 million €", "351M RMB"). Kept in sync with
+# _CURRENCY_PATTERNS so parse_amount() recognizes whatever this regex
+# captures. Word-like indicators need a trailing \b (so "EUR" doesn't match
+# inside "EURope"); symbol suffixes (€, $, 元 …) are non-word chars or CJK
+# where \b misbehaves, so they are matched without one (Codex round-5 R1).
+_SUFFIX_CCY_WORD = (
+    r"RMB|CNY|USD|EUR|GBP|INR|CHF"
     r"|dollars?|euros?|pounds?|yuan|renminbi|rupees?|francs?"
 )
+_SUFFIX_CCY_SYM = r"US\$|\$|€|£|¥|₹|元"
 
 _MONEY_TOKEN_RE = re.compile(
-    rf"(?:US\$|\$|€|£|¥|₹|RMB|CNY|USD|EUR|GBP|INR)\s?\d[\d.,]*"
+    rf"(?:US\$|\$|€|£|¥|₹|RMB|CNY|USD|EUR|GBP|INR|CHF)\s?\d[\d.,]*"
     rf"(?:\s?(?:billions?|millions?|thousands?|bn|mn|mrd|mio|[bmk])\b\.?)?"
     rf"|\d[\d.,]*\s?(?:(?:billions?|millions?|bn|mn|mrd|mio)\b\.?|[bmk]\b|亿|万)"
-    rf"(?:\s?(?:{_SUFFIX_CCY})\b)?",
+    rf"(?:\s?(?:(?:{_SUFFIX_CCY_WORD})\b|{_SUFFIX_CCY_SYM}))?",
     re.IGNORECASE,
 )
 

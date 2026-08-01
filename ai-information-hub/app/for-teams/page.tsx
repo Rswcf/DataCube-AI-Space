@@ -28,7 +28,7 @@ const useCases = [
   {
     title: 'Investment Firms',
     description:
-      'Track AI funding rounds, M&A activity, and market movements in real time. Get structured intelligence on primary and secondary market activity with integrated stock data.',
+      'Track AI funding rounds, M&A activity, and market movements daily. Get structured, evidence-linked deal intelligence with free CSV export via the AI Funding Tracker.',
     icon: 'I',
     accent: 'bg-amber-100 text-amber-700',
   },

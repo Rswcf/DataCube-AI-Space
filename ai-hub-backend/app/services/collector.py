@@ -433,10 +433,12 @@ def load_sources() -> dict:
             # feed; NVCA/PEHub dropped (zero contribution over 6 days);
             # VentureBeat moved to tech (main feed, classifier routes).
             {"url": "https://techcrunch.com/category/fundraising/feed/", "name": "TechCrunch Fundraising"},
-            {"url": "https://techfundingnews.com/category/ai/feed/", "name": "Tech Funding News AI"},
-            {"url": "https://news.crunchbase.com/feed/", "name": "Crunchbase News"},
+            # 2026-08-02 data-rights review (Codex round-5 R3): Tech Funding
+            # News, Crunchbase News and Sifted removed — their site terms
+            # prohibit automated access / scraping / TDM, so acquisition is
+            # blocked pending explicit RSS permission or legal clearance.
+            # See docs/data-rights.md (acquisition column).
             {"url": "https://www.techmeme.com/feed.xml", "name": "Techmeme"},
-            {"url": "https://sifted.eu/feed", "name": "Sifted"},
             {"url": "https://36kr.com/feed", "name": "36Kr", "lang": "zh"},
             {"url": "https://tech.eu/feed", "name": "Tech.eu"},
             {"url": "https://technode.com/feed/", "name": "TechNode"},

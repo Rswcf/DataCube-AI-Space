@@ -95,7 +95,10 @@ export function FundingTracker() {
 
   const toggleEvidence = useCallback(
     (id: number) => {
-      if (openEvidenceId === id) {
+      // Clicking while open closes the row — EXCEPT when the last load
+      // failed (null): then the click retries in place (Codex round-5 N1:
+      // "click again to retry" must not require a close + reopen).
+      if (openEvidenceId === id && evidenceById[id] !== null) {
         setOpenEvidenceId(null);
         return;
       }
@@ -360,7 +363,7 @@ export function FundingTracker() {
                 <tr className="border-b border-border bg-secondary/40">
                   <td colSpan={7} className="px-3 py-2 font-sans text-xs italic leading-relaxed text-muted-foreground">
                     {evidenceById[d.id] === undefined ? "Loading evidence…" : evidenceById[d.id] === null ? (
-                      "Couldn't load the excerpt (rate limit or network issue) — click Evidence again to retry."
+                      "Couldn't load the excerpt (rate limit or network issue) — click Evidence to retry."
                     ) : evidenceById[d.id] ? (
                       <>
                         <span className="not-italic font-bold text-foreground">Evidence: </span>
