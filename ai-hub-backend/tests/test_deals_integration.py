@@ -51,6 +51,10 @@ def clean_state(db):
             date_range="01.08.", is_current=False, period_type="day",
             sort_date=date(2026, 8, 1),
         ))
+    # Commit the parent Week before inserting articles: without a
+    # relationship() SQLAlchemy does not order cross-mapper inserts by FK,
+    # so a single flush can emit raw_articles before weeks.
+    db.commit()
     db.add(RawArticle(
         week_id=WEEK_ID, source="Example Wire",
         title="Acme AI raises Series A",
