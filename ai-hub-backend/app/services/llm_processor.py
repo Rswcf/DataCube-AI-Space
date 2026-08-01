@@ -951,18 +951,8 @@ Output ONLY valid JSON."""
         }
 
     def _default_team_members(self) -> dict:
-        """Return default team members."""
-        return {
-            "de": [
-                {"name": "Anna Schmidt", "role": "KI-Technologie Lead", "handle": "@anna_tech", "avatar": "AS"},
-                {"name": "Max Weber", "role": "Investment Analyst", "handle": "@max_invest", "avatar": "MW"},
-                {"name": "Lisa Müller", "role": "Data Scientist", "handle": "@lisa_data", "avatar": "LM"},
-                {"name": "Tom Fischer", "role": "Research Lead", "handle": "@tom_research", "avatar": "TF"},
-            ],
-            "en": [
-                {"name": "Anna Schmidt", "role": "AI Technology Lead", "handle": "@anna_tech", "avatar": "AS"},
-                {"name": "Max Weber", "role": "Investment Analyst", "handle": "@max_invest", "avatar": "MW"},
-                {"name": "Lisa Müller", "role": "Data Scientist", "handle": "@lisa_data", "avatar": "LM"},
-                {"name": "Tom Fischer", "role": "Research Lead", "handle": "@tom_research", "avatar": "TF"},
-            ],
-        }
+        """Team members are gone — the roster used to contain fictional people
+        (an internal-tool artifact), which is an E-E-A-T liability on a public
+        site. Kept as empty lists for response-shape compatibility until the
+        table and model are fully removed."""
+        return {"de": [], "en": []}

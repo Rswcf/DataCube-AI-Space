@@ -52,7 +52,7 @@ const translations: Record<LoginLanguage, {
       "Praktische Tipps",
       "KI-Videos",
     ],
-    aiPipeline: "40+ Quellen t\u00e4glich",
+    aiPipeline: "35+ Quellen t\u00e4glich",
     aiProcess: "KI-kuratiert zu den wichtigsten Insights",
     sourceCategories: [
       "MIT Tech Review",
@@ -80,7 +80,7 @@ const translations: Record<LoginLanguage, {
       "Practical Tips",
       "AI Videos",
     ],
-    aiPipeline: "40+ sources daily",
+    aiPipeline: "35+ sources daily",
     aiProcess: "AI-curated to key insights",
     sourceCategories: [
       "MIT Tech Review",
@@ -103,7 +103,7 @@ const translations: Record<LoginLanguage, {
     tagline:
       "\u60a8\u7684\u667a\u80fd\u5165\u53e3\uff0c\u83b7\u53d6\u7cbe\u9009 AI \u65b0\u95fb\u3001\u6295\u8d44\u6d1e\u5bdf\u548c\u5b9e\u7528\u6280\u5de7 \u2013 \u6bcf\u65e5\u7531 AI \u5206\u6790\u548c\u7b5b\u9009\u3002",
     features: ["\u6280\u672f\u7a81\u7834", "\u6295\u8d44\u65b0\u95fb", "\u5b9e\u7528\u6280\u5de7", "AI \u89c6\u9891"],
-    aiPipeline: "\u6bcf\u65e5 40+ \u6765\u6e90",
+    aiPipeline: "\u6bcf\u65e5 35+ \u6765\u6e90",
     aiProcess: "AI \u7cbe\u9009\u5173\u952e\u6d1e\u5bdf",
     sourceCategories: [
       "MIT Tech Review",
@@ -131,7 +131,7 @@ const translations: Record<LoginLanguage, {
       "Astuces pratiques",
       "Vid\u00e9os IA",
     ],
-    aiPipeline: "40+ sources par jour",
+    aiPipeline: "35+ sources par jour",
     aiProcess: "S\u00e9lection IA des insights cl\u00e9s",
     sourceCategories: [
       "MIT Tech Review",
@@ -159,7 +159,7 @@ const translations: Record<LoginLanguage, {
       "Consejos pr\u00e1cticos",
       "V\u00eddeos IA",
     ],
-    aiPipeline: "40+ fuentes diarias",
+    aiPipeline: "35+ fuentes diarias",
     aiProcess: "IA selecciona insights clave",
     sourceCategories: [
       "MIT Tech Review",
@@ -187,7 +187,7 @@ const translations: Record<LoginLanguage, {
       "Dicas pr\u00e1ticas",
       "V\u00eddeos IA",
     ],
-    aiPipeline: "40+ fontes di\u00e1rias",
+    aiPipeline: "35+ fontes di\u00e1rias",
     aiProcess: "IA seleciona insights principais",
     sourceCategories: [
       "MIT Tech Review",
@@ -233,7 +233,7 @@ const translations: Record<LoginLanguage, {
     tagline:
       "\uc5c4\uc120\ub41c AI \ub274\uc2a4, \ud22c\uc790 \uc778\uc0ac\uc774\ud2b8, \uc2e4\uc6a9\uc801\uc778 \ud301\uc73c\ub85c \uac00\ub294 \uc2a4\ub9c8\ud2b8 \uac8c\uc774\ud2b8\uc6e8\uc774 \u2013 \ub9e4\uc77c AI\uac00 \ubd84\uc11d\u00b7\uc5c4\uc120.",
     features: ["\uae30\uc220 \ub3cc\ud30c\uad6c", "\ud22c\uc790 \ub274\uc2a4", "\uc2e4\uc6a9 \ud301", "AI \ub3d9\uc601\uc0c1"],
-    aiPipeline: "\ub9e4\uc77c 40+ \uc18c\uc2a4",
+    aiPipeline: "\ub9e4\uc77c 35+ \uc18c\uc2a4",
     aiProcess: "AI\uac00 \ud575\uc2ec \uc778\uc0ac\uc774\ud2b8 \uc5c4\uc120",
     sourceCategories: [
       "MIT Tech Review",

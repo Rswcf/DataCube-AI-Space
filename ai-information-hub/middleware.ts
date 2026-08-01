@@ -2,50 +2,16 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { isSupportedLanguage, toLocalizedPath } from './lib/i18n'
 
-const CRAWLER_PATTERNS = [
-  'googlebot',
-  'bingbot',
-  'yandexbot',
-  'duckduckbot',
-  'baiduspider',
-  'slurp',
-  'gptbot',
-  'chatgpt-user',
-  'oai-searchbot',
-  'perplexitybot',
-  'perplexity-user',
-  'claudebot',
-  'claude-searchbot',
-  'claude-user',
-  'anthropic-ai',
-  'google-extended',
-  'cohere-ai',
-  'bytespider',
-  'twitterbot',
-  'facebookexternalhit',
-  'linkedinbot',
-  'whatsapp',
-  'slackbot',
-  'telegrambot',
-  'discordbot',
-  'feedfetcher',
-  'feedly',
-  'applebot',
-  'ia_archiver',
-  'sogou',
-  'ccbot',
-  'meta-externalagent',
-  'amazonbot',
-]
+// 2026-08: The former login gate ("visited" cookie wall + crawler-UA bypass)
+// has been removed — it served no auth purpose, suppressed first-visit
+// conversion, and showing bots different behavior than humans is a cloaking
+// risk. The `visited` cookie is now set automatically on page responses
+// because the chat/report API guard still requires it as a cheap
+// must-have-visited-the-site abuse barrier (see lib/server/api-guard.ts).
 
 function buildTarget(pathname: string, searchParams: URLSearchParams): string {
   const query = searchParams.toString()
   return query ? `${pathname}?${query}` : pathname
-}
-
-function isCrawler(request: NextRequest): boolean {
-  const ua = request.headers.get('user-agent')?.toLowerCase() || ''
-  return CRAWLER_PATTERNS.some((pattern) => ua.includes(pattern))
 }
 
 const LANG_RE = '(?:de|en|zh|fr|es|pt|ja|ko)'
@@ -67,36 +33,6 @@ function isLocalizablePath(pathname: string): boolean {
   return (
     pathname === '/' ||
     new RegExp(`^\\/${LANG_RE}$`).test(pathname) ||
-    /^\/week\/[^/]+$/.test(pathname) ||
-    /^\/topic\/[^/]+$/.test(pathname) ||
-    /^\/news\/[^/]+\/[^/]+$/.test(pathname) ||
-    new RegExp(`^\\/${LANG_RE}\\/week\\/[^/]+$`).test(pathname) ||
-    new RegExp(`^\\/${LANG_RE}\\/topic\\/[^/]+$`).test(pathname) ||
-    new RegExp(`^\\/${LANG_RE}\\/news\\/[^/]+\\/[^/]+$`).test(pathname) ||
-    new RegExp(`^\\/${LANG_RE}\\/tools(\\/[^/]+)?$`).test(pathname)
-  )
-}
-
-// Paths that bypass the login gate entirely — accessible to ALL visitors,
-// not just crawlers or users with the `visited` cookie.
-const LOGIN_BYPASS_PATHS = new Set([
-  '/impressum',
-  '/datenschutz',
-  '/for-teams',
-  '/premium',
-  '/about',
-  '/contact',
-  '/editorial-policy',
-  '/source-methodology',
-  '/corrections',
-  '/ai-disclosure',
-])
-
-function isSeoAlwaysAllowedPath(pathname: string): boolean {
-  return (
-    pathname === '/' ||
-    new RegExp(`^\\/${LANG_RE}$`).test(pathname) ||
-    LOGIN_BYPASS_PATHS.has(pathname) ||
     /^\/week\/[^/]+$/.test(pathname) ||
     /^\/topic\/[^/]+$/.test(pathname) ||
     /^\/news\/[^/]+\/[^/]+$/.test(pathname) ||
@@ -145,16 +81,6 @@ export function middleware(request: NextRequest) {
     })
   }
 
-  // Public SEO and marketing pages must serve the same primary content to
-  // humans, search crawlers, AI retrieval bots, and framework prefetches.
-  const shouldBypassLoginGate = isSeoAlwaysAllowedPath(pathname) || isCrawler(request)
-  if (!shouldBypassLoginGate) {
-    const hasVisited = request.cookies.get('visited')
-    if (!hasVisited) {
-      return NextResponse.redirect(new URL('/login', request.url))
-    }
-  }
-
   const searchParams = new URLSearchParams(request.nextUrl.searchParams)
   const langParam = searchParams.get('lang')
 
@@ -190,6 +116,13 @@ export function middleware(request: NextRequest) {
   const response = nextWithLang(request)
   if (isNoindexArticlePath(pathname)) {
     response.headers.set('X-Robots-Tag', 'noindex, follow')
+  }
+  if (!request.cookies.get('visited')) {
+    response.cookies.set('visited', 'true', {
+      maxAge: 60 * 60 * 24 * 30,
+      sameSite: 'lax',
+      path: '/',
+    })
   }
   return response
 }

@@ -5,6 +5,7 @@ import {
   ApiRouteError,
   apiErrorResponse,
   enforceProtectedApiRequest,
+  enforceRateLimit,
   readJsonBody,
 } from "@/lib/server/api-guard";
 import {
@@ -179,6 +180,7 @@ async function fetchPeriodDataWithFallback(weekId: string): Promise<{
 export async function POST(req: Request) {
   try {
     enforceProtectedApiRequest(req);
+    enforceRateLimit(req, "report", { limit: 5, windowMs: 10 * 60 * 1000 });
 
     const { weekId, language } = await readJsonBody<{
       weekId?: string;

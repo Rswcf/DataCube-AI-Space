@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     default: 'Data Cube AI | Daily AI News, Investment Signals & Practical Tips',
     template: '%s | Data Cube AI',
   },
-  description: 'Free multilingual AI news aggregator covering generative AI breakthroughs, LLM updates, AI investment signals, and practical tips — curated daily from 40+ sources in 8 languages.',
+  description: 'Free multilingual AI news aggregator covering generative AI breakthroughs, LLM updates, AI investment signals, and practical tips — curated daily from 35+ sources in 8 languages.',
   keywords: [
     // English
     'AI news', 'artificial intelligence', 'machine learning', 'AI investment', 'AI tips',
@@ -75,7 +75,7 @@ export const metadata: Metadata = {
     url: 'https://www.datacubeai.space',
     siteName: 'Data Cube AI',
     title: 'Data Cube AI | Daily AI News & Insights',
-    description: 'Free AI news aggregator: generative AI breakthroughs, investment signals, and practical tips – curated daily from 40+ sources in 8 languages.',
+    description: 'Free AI news aggregator: generative AI breakthroughs, investment signals, and practical tips – curated daily from 35+ sources in 8 languages.',
     images: [
       {
         url: '/og-image.jpg',

@@ -6,12 +6,12 @@ export const revalidate = 86400
 export const metadata: Metadata = {
   title: 'For Teams & Enterprise',
   description:
-    'Enterprise AI intelligence for teams: custom feeds, dashboards, APIs, and reports from 40+ sources in 8 languages.',
+    'Enterprise AI intelligence for teams: custom feeds, dashboards, APIs, and reports from 35+ sources in 8 languages.',
   alternates: { canonical: 'https://www.datacubeai.space/for-teams' },
   openGraph: {
     title: 'For Teams & Enterprise',
     description:
-      'Enterprise AI intelligence for teams: custom feeds, dashboards, APIs, and reports from 40+ sources.',
+      'Enterprise AI intelligence for teams: custom feeds, dashboards, APIs, and reports from 35+ sources.',
     url: 'https://www.datacubeai.space/for-teams',
     images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: 'Data Cube AI' }],
   },
@@ -35,7 +35,7 @@ const useCases = [
   {
     title: 'Research Departments',
     description:
-      'Monitor AI breakthroughs and academic developments from 22+ curated sources. Receive daily digests covering technology, tools, and practical applications.',
+      'Monitor AI breakthroughs and academic developments from 35+ curated sources. Receive daily digests covering technology, tools, and practical applications.',
     icon: 'R',
     accent: 'bg-emerald-100 text-emerald-700',
   },
@@ -72,7 +72,7 @@ const products = [
 ]
 
 const benefits = [
-  '40+ curated sources, updated daily',
+  '35+ curated sources, updated daily',
   '8-language support (DACH + global coverage)',
   'Real-time stock data integration via Polygon.io',
   'REST API with full Swagger documentation',
@@ -103,7 +103,7 @@ export default function ForTeamsPage() {
         <p className="text-lg leading-relaxed text-gray-700">
           Data Cube AI delivers curated, multilingual AI news and market intelligence for corporate
           innovation teams, investment professionals, and technology leaders. Our automated pipeline
-          processes 40+ sources daily, producing structured intelligence in 8 languages — so your
+          processes 35+ sources daily, producing structured intelligence in 8 languages — so your
           team can focus on decisions, not discovery.
         </p>
       </section>

@@ -18,43 +18,10 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from app.database import Base, get_engine, get_session_local
-from app.models import TeamMember
 from app.services.migrator import migrate_weeks_json, migrate_week_data
 
 logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
 logger = logging.getLogger(__name__)
-
-
-DEFAULT_TEAM_MEMBERS = [
-    {
-        "name": "Anna Schmidt",
-        "role_de": "KI-Technologie Lead",
-        "role_en": "AI Technology Lead",
-        "handle": "@anna_tech",
-        "avatar": "AS",
-    },
-    {
-        "name": "Max Weber",
-        "role_de": "Investment Analyst",
-        "role_en": "Investment Analyst",
-        "handle": "@max_invest",
-        "avatar": "MW",
-    },
-    {
-        "name": "Lisa Müller",
-        "role_de": "Data Scientist",
-        "role_en": "Data Scientist",
-        "handle": "@lisa_data",
-        "avatar": "LM",
-    },
-    {
-        "name": "Tom Fischer",
-        "role_de": "Research Lead",
-        "role_en": "Research Lead",
-        "handle": "@tom_research",
-        "avatar": "TF",
-    },
-]
 
 
 def create_tables():
@@ -65,19 +32,10 @@ def create_tables():
 
 
 def insert_team_members(db):
-    """Insert default team members if not present."""
-    existing = db.query(TeamMember).count()
-    if existing > 0:
-        logger.info(f"Team members already exist ({existing}), skipping")
-        return
-
-    logger.info("Inserting default team members...")
-    for member_data in DEFAULT_TEAM_MEMBERS:
-        member = TeamMember(**member_data)
-        db.add(member)
-
-    db.commit()
-    logger.info(f"Inserted {len(DEFAULT_TEAM_MEMBERS)} team members")
+    """No-op. The fictional default roster was removed 2026-08 (internal-tool
+    artifact; fabricated bylines are an E-E-A-T liability on a public site).
+    Migration 0014 deletes any previously seeded rows."""
+    logger.info("Team member seeding disabled (roster removed 2026-08)")
 
 
 def migrate_existing_data(db, data_path: Path):

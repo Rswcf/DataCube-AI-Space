@@ -4,6 +4,7 @@ import {
   ApiRouteError,
   apiErrorResponse,
   enforceProtectedApiRequest,
+  enforceRateLimit,
   readJsonBody,
 } from "@/lib/server/api-guard";
 import {
@@ -19,16 +20,13 @@ const openrouter = createOpenAI({
   apiKey: process.env.OPENROUTER_API_KEY,
 });
 
-// SEC-H2: Rate limiting note - For production, consider adding rate limiting
-// via Vercel Edge Config, middleware, or a service like Upstash Redis.
-// This is currently not implemented as this is an internal tool.
-
 // SEC-H3: Allowed message roles - filter out any other roles (e.g., "system")
 const ALLOWED_ROLES = new Set(["user", "assistant"]);
 
 export async function POST(req: Request) {
   try {
     enforceProtectedApiRequest(req);
+    enforceRateLimit(req, "chat", { limit: 20, windowMs: 10 * 60 * 1000 });
 
     const { messages, weekId, language } = await readJsonBody<{
       messages?: { role: string; content: string }[];

@@ -57,9 +57,42 @@ export function enforceProtectedApiRequest(req: Request) {
     throw new ApiRouteError(403, "Forbidden origin");
   }
 
+  // The `visited` cookie is set automatically by the middleware on any page
+  // response (the login gate is gone) — this check only blocks direct API
+  // calls that never loaded a page.
   if (!hasVisitedCookie(req.headers.get("cookie"))) {
-    throw new ApiRouteError(401, "Login gate required");
+    throw new ApiRouteError(401, "Visit the site before using the API");
   }
+}
+
+// Best-effort per-IP rate limiting. In-memory per serverless instance, so it
+// is a deterrent rather than a hard guarantee — enough to stop casual abuse
+// of the public LLM endpoints without adding an external dependency.
+const rateBuckets = new Map<string, number[]>();
+const RATE_BUCKETS_MAX = 10_000;
+
+export function enforceRateLimit(
+  req: Request,
+  key: string,
+  { limit, windowMs }: { limit: number; windowMs: number },
+) {
+  const ip =
+    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    req.headers.get("x-real-ip") ||
+    "unknown";
+  const bucketKey = `${key}:${ip}`;
+  const now = Date.now();
+  const hits = (rateBuckets.get(bucketKey) || []).filter(
+    (t) => now - t < windowMs,
+  );
+  if (hits.length >= limit) {
+    throw new ApiRouteError(429, "Rate limit exceeded — try again later");
+  }
+  hits.push(now);
+  if (rateBuckets.size >= RATE_BUCKETS_MAX && !rateBuckets.has(bucketKey)) {
+    rateBuckets.clear();
+  }
+  rateBuckets.set(bucketKey, hits);
 }
 
 export async function readJsonBody<T>(
