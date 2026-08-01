@@ -22,7 +22,7 @@ from datetime import date
 import pytest
 from fastapi.testclient import TestClient
 
-from app.database import get_engine, get_session_local
+from app.database import get_session_local
 from app.main import app
 from app.models import Deal, RawArticle, Week
 from app.services.collector import _save_deals, delete_period
@@ -125,6 +125,100 @@ def test_save_deals_concurrent_writers():
         assert len(_deal_rows(session)) == 1
     finally:
         session.close()
+
+
+WEEK_ID_2 = "2026-08-02"
+SOURCE_URL_2 = "https://example.com/beta-round"
+
+
+def test_save_deals_concurrent_cross_period(db):
+    """Concurrent writers on DIFFERENT periods must not block or interfere:
+    the advisory lock is per-period, so both rows land."""
+    if not db.query(Week).filter(Week.id == WEEK_ID_2).first():
+        db.add(Week(
+            id=WEEK_ID_2, label="Aug 2", year=2026, week_num=None,
+            date_range="02.08.", is_current=False, period_type="day",
+            sort_date=date(2026, 8, 2),
+        ))
+    db.commit()
+    db.query(RawArticle).filter(RawArticle.week_id == WEEK_ID_2).delete()
+    db.add(RawArticle(
+        week_id=WEEK_ID_2, source="Example Wire",
+        title="Beta AI raises Series B",
+        link=SOURCE_URL_2,
+        summary="Beta AI raised $30 million in a Series B round.",
+        published="2026-08-02", original_section="investment",
+    ))
+    db.commit()
+
+    beta_data = {
+        "primaryMarket": {"en": [{
+            "company": "Beta AI", "amount": "$30M", "round": "Series B",
+            "roundCategory": "Series B", "investors": [],
+            "content": "Beta AI raised a Series B.",
+            "evidence": "Beta AI raised $30 million in a Series B round",
+            "timestamp": "2026-08-02", "sourceUrl": SOURCE_URL_2,
+        }]},
+        "ma": {"en": []},
+    }
+
+    factory = get_session_local()
+    errors = []
+
+    def worker(week_id, data):
+        session = factory()
+        try:
+            _save_deals(session, week_id, data)
+            session.commit()
+        except Exception as exc:  # pragma: no cover
+            errors.append(exc)
+            session.rollback()
+        finally:
+            session.close()
+
+    threads = [
+        threading.Thread(target=worker, args=(WEEK_ID, _investment_data())),
+        threading.Thread(target=worker, args=(WEEK_ID_2, beta_data)),
+    ]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+
+    assert not errors
+    session = factory()
+    try:
+        assert len(_deal_rows(session)) == 1
+        assert session.query(Deal).filter(Deal.company == "Beta AI").count() == 1
+    finally:
+        session.close()
+
+
+def test_distinct_months_both_persist(db):
+    """Same company/round/amount announced in DIFFERENT months are distinct
+    events — month is part of the fingerprint, so both rows must survive."""
+    db.add(RawArticle(
+        week_id=WEEK_ID, source="Example Wire",
+        title="Acme AI July round",
+        link="https://example.com/acme-july",
+        summary="Acme AI raised $20 million in a Series A round led by Foo Capital.",
+        published="2026-07-15", original_section="investment",
+    ))
+    db.commit()
+    data = _investment_data()
+    data["primaryMarket"]["en"].append({
+        "company": "Acme AI", "amount": "$20M", "round": "Series A",
+        "roundCategory": "Series A", "investors": ["Foo Capital"],
+        "content": "Acme AI raised a Series A (July report).",
+        "evidence": "Acme AI raised $20 million in a Series A round",
+        "timestamp": "2026-07-15", "sourceUrl": "https://example.com/acme-july",
+    })
+    _save_deals(db, WEEK_ID, data)
+    db.commit()
+    rows = _deal_rows(db)
+    assert len(rows) == 2
+    months = sorted(r.announced_date.strftime("%Y-%m") for r in rows)
+    assert months == ["2026-07", "2026-08"]
 
 
 def test_corrected_row_survives_reprocess(db):
@@ -234,3 +328,11 @@ def test_api_rate_limit(client):
     codes = [client.get("/api/deals?limit=1").status_code for _ in range(61)]
     assert 429 in codes
     assert codes[0] == 200
+
+
+def test_api_detail_rate_limit(client, db):
+    """The per-record evidence endpoint has its own 30/min bucket."""
+    deal_id = _deal_rows(db)[0].id
+    codes = [client.get(f"/api/deals/{deal_id}").status_code for _ in range(31)]
+    assert codes[0] == 200
+    assert codes[-1] == 429

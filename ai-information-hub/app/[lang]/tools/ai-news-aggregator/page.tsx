@@ -246,12 +246,12 @@ const FEATURE_DESCRIPTIONS: Record<string, L> = {
   investment: {
     de: 'Finanzierungsrunden, M&A-Deals und Marktbewegungen im KI-Sektor — mit Quellenlinks.',
     en: 'Funding rounds, M&A deals, and market movements in the AI sector — with source links.',
-    zh: 'AI \u9886\u57df\u7684\u878d\u8d44\u8f6e\u6b21\u3001\u5e76\u8d2d\u4ea4\u6613\u548c\u80a1\u7968\u53d8\u52a8\u3002\u901a\u8fc7 Polygon.io \u63d0\u4f9b\u5b9e\u65f6\u80a1\u7968\u6570\u636e\u3002',
-    fr: "Tours de financement, op\u00e9rations M&A et mouvements boursiers dans le secteur IA. Donn\u00e9es boursi\u00e8res en temps r\u00e9el via Polygon.io.",
-    es: 'Rondas de financiaci\u00f3n, operaciones M&A y movimientos burs\u00e1tiles en el sector IA. Datos de acciones en tiempo real v\u00eda Polygon.io.',
-    pt: 'Rodadas de financiamento, opera\u00e7\u00f5es M&A e movimentos de a\u00e7\u00f5es no setor IA. Dados de a\u00e7\u00f5es em tempo real via Polygon.io.',
-    ja: 'AI\u30bb\u30af\u30bf\u30fc\u306e\u8cc7\u91d1\u8abf\u9054\u30e9\u30a6\u30f3\u30c9\u3001M&A\u30c7\u30a3\u30fc\u30eb\u3001\u682a\u4fa1\u5909\u52d5\u3002Polygon.io\u7d4c\u7531\u306e\u30ea\u30a2\u30eb\u30bf\u30a4\u30e0\u682a\u4fa1\u30c7\u30fc\u30bf\u3002',
-    ko: 'AI \ubd84\uc57c\uc758 \ud380\ub529 \ub77c\uc6b4\ub4dc, M&A \uac70\ub798, \uc8fc\uac00 \ubcc0\ub3d9. Polygon.io\ub97c \ud1b5\ud55c \uc2e4\uc2dc\uac04 \uc8fc\uc2dd \ub370\uc774\ud130.',
+    zh: 'AI \u9886\u57df\u7684\u878d\u8d44\u8f6e\u6b21\u3001\u5e76\u8d2d\u4ea4\u6613\u548c\u5e02\u573a\u52a8\u5411 \u2014\u2014 \u9644\u6765\u6e90\u94fe\u63a5\u3002',
+    fr: "Tours de financement, op\u00e9rations M&A et mouvements de march\u00e9 dans le secteur IA \u2014 avec liens vers les sources.",
+    es: 'Rondas de financiaci\u00f3n, operaciones M&A y movimientos de mercado en el sector IA \u2014 con enlaces a las fuentes.',
+    pt: 'Rodadas de financiamento, opera\u00e7\u00f5es M&A e movimentos de mercado no setor IA \u2014 com links das fontes.',
+    ja: 'AI\u30bb\u30af\u30bf\u30fc\u306e\u8cc7\u91d1\u8abf\u9054\u30e9\u30a6\u30f3\u30c9\u3001M&A\u30c7\u30a3\u30fc\u30eb\u3001\u5e02\u5834\u52d5\u5411 \u2014 \u30bd\u30fc\u30b9\u30ea\u30f3\u30af\u4ed8\u304d\u3002',
+    ko: 'AI \ubd84\uc57c\uc758 \ud380\ub529 \ub77c\uc6b4\ub4dc, M&A \uac70\ub798, \uc2dc\uc7a5 \ub3d9\ud5a5 \u2014 \ucd9c\ucc98 \ub9c1\ud06c \ud3ec\ud568.',
   },
   tips: {
     de: 'Tipps aus 14 Reddit-Communities und kuratierten Blogs. Prompt-Engineering, lokale LLMs, Workflow-Automatisierung und mehr.',
@@ -561,8 +561,8 @@ const ALL_TOOLS_LABEL: L = {
 }
 const CROSS_REPORT_NAME: L = { de: 'KI-Bericht-Generator', en: 'AI Report Generator', zh: 'AI\u62a5\u544a\u751f\u6210\u5668', fr: 'G\u00e9n\u00e9rateur de rapports IA', es: 'Generador de informes IA', pt: 'Gerador de relat\u00f3rios IA', ja: 'AI\u30ec\u30dd\u30fc\u30c8\u30b8\u30a7\u30cd\u30ec\u30fc\u30bf\u30fc', ko: 'AI \ubcf4\uace0\uc11c \uc0dd\uc131\uae30' }
 const CROSS_REPORT_DESC: L = { de: 'Streaming-Berichte, 5 Exportformate.', en: 'Streaming reports, 5 export formats.', zh: '\u6d41\u5f0f\u62a5\u544a\uff0c5\u79cd\u5bfc\u51fa\u683c\u5f0f\u3002', fr: 'Rapports en streaming, 5 formats.', es: 'Informes en streaming, 5 formatos.', pt: 'Relat\u00f3rios em streaming, 5 formatos.', ja: '\u30b9\u30c8\u30ea\u30fc\u30df\u30f3\u30b0\u30ec\u30dd\u30fc\u30c8\u30015\u3064\u306e\u30a8\u30af\u30b9\u30dd\u30fc\u30c8\u5f62\u5f0f\u3002', ko: '\uc2a4\ud2b8\ub9ac\ubc0d \ubcf4\uace0\uc11c, 5\uac00\uc9c0 \ub0b4\ubcf4\ub0b4\uae30 \ud615\uc2dd.' }
-const CROSS_STOCK_NAME: L = { de: 'KI-Aktien-Tracker', en: 'AI Stock Tracker', zh: 'AI\u80a1\u7968\u8ffd\u8e2a\u5668', fr: 'Tracker actions IA', es: 'Rastreador acciones IA', pt: 'Rastreador a\u00e7\u00f5es IA', ja: 'AI\u682a\u5f0f\u30c8\u30e9\u30c3\u30ab\u30fc', ko: 'AI \uc8fc\uc2dd \ucd94\uc801\uae30' }
-const CROSS_STOCK_DESC: L = { de: 'Echtzeit-Kurse, Finanzierungsrunden, M&A.', en: 'Real-time stocks, funding rounds, M&A.', zh: '\u5b9e\u65f6\u80a1\u4ef7\u3001\u878d\u8d44\u8f6e\u6b21\u3001\u5e76\u8d2d\u3002', fr: 'Actions en temps r\u00e9el, lev\u00e9es de fonds, M&A.', es: 'Acciones en tiempo real, rondas de financiaci\u00f3n, M&A.', pt: 'A\u00e7\u00f5es em tempo real, rodadas de financiamento, M&A.', ja: '\u30ea\u30a2\u30eb\u30bf\u30a4\u30e0\u682a\u4fa1\u3001\u8cc7\u91d1\u8abf\u9054\u3001M&A\u3002', ko: '\uc2e4\uc2dc\uac04 \uc8fc\uac00, \ud380\ub529 \ub77c\uc6b4\ub4dc, M&A.' }
+const CROSS_STOCK_NAME: L = { de: 'AI Funding Tracker', en: 'AI Funding Tracker', zh: 'AI Funding Tracker', fr: 'AI Funding Tracker', es: 'AI Funding Tracker', pt: 'AI Funding Tracker', ja: 'AI Funding Tracker', ko: 'AI Funding Tracker' }
+const CROSS_STOCK_DESC: L = { de: 'Finanzierungsrunden, M&A-Deals, kostenloser CSV-Export.', en: 'Funding rounds, M&A deals, free CSV export.', zh: '\u878d\u8d44\u8f6e\u6b21\u3001\u5e76\u8d2d\u4ea4\u6613\u3001\u514d\u8d39 CSV \u5bfc\u51fa\u3002', fr: 'Lev\u00e9es de fonds, op\u00e9rations M&A, export CSV gratuit.', es: 'Rondas de financiaci\u00f3n, operaciones M&A, exportaci\u00f3n CSV gratuita.', pt: 'Rodadas de financiamento, opera\u00e7\u00f5es M&A, exporta\u00e7\u00e3o CSV gratuita.', ja: '\u8cc7\u91d1\u8abf\u9054\u30e9\u30a6\u30f3\u30c9\u3001M&A\u30c7\u30a3\u30fc\u30eb\u3001\u7121\u6599CSV\u30a8\u30af\u30b9\u30dd\u30fc\u30c8\u3002', ko: '\ud380\ub529 \ub77c\uc6b4\ub4dc, M&A \uac70\ub798, \ubb34\ub8cc CSV \ub0b4\ubcf4\ub0b4\uae30.' }
 const CROSS_API_NAME: L = { de: 'KI-News-API', en: 'AI News API', zh: 'AI\u65b0\u95fbAPI', fr: 'API actualit\u00e9s IA', es: 'API noticias IA', pt: 'API not\u00edcias IA', ja: 'AI\u30cb\u30e5\u30fc\u30b9API', ko: 'AI \ub274\uc2a4 API' }
 const CROSS_API_DESC: L = { de: 'REST API, JSON, keine Authentifizierung.', en: 'REST API, JSON, no authentication required.', zh: 'REST API\u3001JSON\u3001\u65e0\u9700\u8ba4\u8bc1\u3002', fr: 'API REST, JSON, sans authentification.', es: 'API REST, JSON, sin autenticaci\u00f3n.', pt: 'API REST, JSON, sem autentica\u00e7\u00e3o.', ja: 'REST API\u3001JSON\u3001\u8a8d\u8a3c\u4e0d\u8981\u3002', ko: 'REST API, JSON, \uc778\uc99d \ubd88\ud544\uc694.' }
 
@@ -918,7 +918,7 @@ export default async function AINewsAggregatorToolPage({ params }: Props) {
               <p className="mt-2 text-sm text-muted-foreground">{t(CROSS_REPORT_DESC, lang)}</p>
             </Link>
             <Link
-              href={`/${lang}/tools/ai-stock-tracker`}
+              href="/funding"
               className="rounded-xl border border-border/50 bg-card/50 p-6 transition-colors hover:bg-card/80 focus-visible:ring-2 focus-visible:ring-primary"
             >
               <h3 className="text-lg font-semibold">{t(CROSS_STOCK_NAME, lang)}</h3>

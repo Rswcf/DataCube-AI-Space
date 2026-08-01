@@ -74,7 +74,7 @@ const products = [
 const benefits = [
   '35+ curated sources, updated daily',
   '8-language support (DACH + global coverage)',
-  'Real-time stock data integration via Polygon.io',
+  'AI Funding & M&A deal tracker with free CSV export',
   'REST API with full Swagger documentation',
   'Custom filtering by topic, company, and technology',
   'Dedicated account support and SLA options',

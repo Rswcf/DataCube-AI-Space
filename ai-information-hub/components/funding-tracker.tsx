@@ -88,7 +88,9 @@ export function FundingTracker() {
   const [page, setPage] = useState(0);
   // Quotation excerpts are fetched per record on demand (the collection
   // endpoint never returns them — data-rights rule).
-  const [evidenceById, setEvidenceById] = useState<Record<number, string>>({});
+  // undefined = not loaded / loading; null = load failed (429/404/network);
+  // "" = row genuinely has no excerpt; string = the excerpt.
+  const [evidenceById, setEvidenceById] = useState<Record<number, string | null>>({});
   const [openEvidenceId, setOpenEvidenceId] = useState<number | null>(null);
 
   const toggleEvidence = useCallback(
@@ -98,13 +100,16 @@ export function FundingTracker() {
         return;
       }
       setOpenEvidenceId(id);
-      if (evidenceById[id] === undefined) {
+      if (evidenceById[id] === undefined || evidenceById[id] === null) {
+        setEvidenceById((prev) => {
+          const next = { ...prev };
+          delete next[id];
+          return next;
+        });
         fetch(`${API_BASE}/deals/${id}`)
-          .then((r) => (r.ok ? r.json() : null))
-          .then((d) => {
-            if (d) setEvidenceById((prev) => ({ ...prev, [id]: d.evidence || "" }));
-          })
-          .catch(() => {});
+          .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
+          .then((d) => setEvidenceById((prev) => ({ ...prev, [id]: d.evidence || "" })))
+          .catch(() => setEvidenceById((prev) => ({ ...prev, [id]: null })));
       }
       track("funding_evidence_view", { id });
     },
@@ -354,7 +359,9 @@ export function FundingTracker() {
               {openEvidenceId === d.id ? (
                 <tr className="border-b border-border bg-secondary/40">
                   <td colSpan={7} className="px-3 py-2 font-sans text-xs italic leading-relaxed text-muted-foreground">
-                    {evidenceById[d.id] === undefined ? "Loading evidence…" : evidenceById[d.id] ? (
+                    {evidenceById[d.id] === undefined ? "Loading evidence…" : evidenceById[d.id] === null ? (
+                      "Couldn't load the excerpt (rate limit or network issue) — click Evidence again to retry."
+                    ) : evidenceById[d.id] ? (
                       <>
                         <span className="not-italic font-bold text-foreground">Evidence: </span>
                         &ldquo;{evidenceById[d.id]}&rdquo;

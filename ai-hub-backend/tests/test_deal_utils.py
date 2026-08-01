@@ -187,6 +187,52 @@ def test_validate_deal_figures_currency_binding():
     assert v_raw == "€500M"
 
 
+def test_suffix_currency_binding():
+    # Codex round-4 R1 repro: suffix currency codes must be captured —
+    # "20 million EUR" is EUR, not a bare number, so it must NOT vouch
+    # for a claimed $20M.
+    assert m.amounts_in_text("Acme raised 20 million EUR in a Series A") == [
+        (20_000_000, "EUR")
+    ]
+    art = m.normalize_text("Acme raised 20 million EUR in a Series A.")
+    ev = "Acme raised 20 million EUR in a Series A"
+    a_raw, a_val, cur, _, _ = m.validate_deal_figures("$20M", None, ev, "funding", art)
+    assert a_raw is None and a_val is None and cur is None
+
+    # Matching suffix code passes
+    a_raw, a_val, cur, _, _ = m.validate_deal_figures("€20M", None, ev, "funding", art)
+    assert (a_val, cur) == (20_000_000, "EUR")
+
+    # GBP and USD suffix codes behave identically
+    assert m.amounts_in_text("secured 20 million GBP") == [(20_000_000, "GBP")]
+    assert m.amounts_in_text("secured 20 million USD") == [(20_000_000, "USD")]
+    art_usd = m.normalize_text("Delta secured 20 million USD from investors.")
+    ev_usd = "Delta secured 20 million USD from investors"
+    _, a_val, cur, _, _ = m.validate_deal_figures("$20M", None, ev_usd, "funding", art_usd)
+    assert (a_val, cur) == (20_000_000, "USD")
+
+    # Spelled-out currency words carry their currency too
+    assert m.amounts_in_text("raised 20 million euros") == [(20_000_000, "EUR")]
+    assert m.amounts_in_text("raised 20 million dollars") == [(20_000_000, "USD")]
+    assert m.amounts_in_text("raised 20 million pounds") == [(20_000_000, "GBP")]
+
+    # Suffix currency on the valuation path fails closed as well
+    art_v = m.normalize_text("Epsilon raised $10 million at a valuation of 500 million EUR.")
+    ev_v = "Epsilon raised $10 million at a valuation of 500 million EUR"
+    _, _, _, v_raw, _ = m.validate_deal_figures("$10M", "$500M", ev_v, "funding", art_v)
+    assert v_raw is None
+    _, _, _, v_raw, _ = m.validate_deal_figures("$10M", "€500M", ev_v, "funding", art_v)
+    assert v_raw == "€500M"
+
+    # "351M RMB" regression still holds with the suffix-aware token regex
+    assert m.amounts_in_text("a 351M RMB round") == [(351_000_000, "CNY")]
+
+    # Compact multiplier + suffix code ("20M EUR") is captured, and a bare
+    # compact mention ("the 20m round") stays a bare number
+    assert m.amounts_in_text("closed a 20M EUR round") == [(20_000_000, "EUR")]
+    assert m.amounts_in_text("the 20m round closed") == [(20_000_000, None)]
+
+
 if __name__ == "__main__":
     failures = 0
     for name, fn in sorted(globals().items()):

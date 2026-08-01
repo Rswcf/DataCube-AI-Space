@@ -127,9 +127,6 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
     return names[industry]?.[language] || industry;
   };
 
-  // State for real-time stock data loading
-  const [stockDataLoading, setStockDataLoading] = useState(false);
-
   useEffect(() => {
     setLoading(true);
 
@@ -174,51 +171,9 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
       });
   }, [weekId, language]);
 
-  // Fetch real-time stock data for secondary market posts
-  useEffect(() => {
-    const fetchRealTimeStockData = async () => {
-      if (!USE_API || secondaryPosts.length === 0) return;
-
-      // Get unique tickers from secondary posts
-      const tickers = [...new Set(secondaryPosts.map((p) => p.ticker).filter(Boolean))];
-      if (tickers.length === 0) return;
-
-      setStockDataLoading(true);
-
-      try {
-        const response = await fetch(
-          `${API_BASE}/stock/formatted/batch/?tickers=${tickers.join(",")}&language=${language}`
-        );
-        if (!response.ok) throw new Error("Failed to fetch stock data");
-
-        const stockData = await response.json();
-
-        // Merge real-time data into secondary posts
-        setSecondaryPosts((posts) =>
-          posts.map((post) => {
-            const realTimeData = stockData[post.ticker];
-            if (realTimeData && !realTimeData.error) {
-              return {
-                ...post,
-                price: realTimeData.price || post.price,
-                change: realTimeData.change || post.change,
-                direction: realTimeData.direction || post.direction,
-                marketCap: realTimeData.marketCap || post.marketCap,
-              };
-            }
-            return post;
-          })
-        );
-      } catch (error) {
-        console.error("Failed to fetch real-time stock data:", error);
-        // Keep existing data on error
-      } finally {
-        setStockDataLoading(false);
-      }
-    };
-
-    fetchRealTimeStockData();
-  }, [secondaryPosts.length, language]); // Only re-fetch when posts change or language changes
+  // Live stock quotes removed 2026-08-01: the backend stock endpoints are
+  // disabled (HTTP 410) pending market-data licensing. Secondary-market cards
+  // show only the as-reported figures from the collection pipeline.
 
   const periodLabel = getPeriodLabel(weekId, language);
 
@@ -410,13 +365,6 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
       {/* Secondary Market Posts */}
       {!loading && activeTab === "secondary" && (
         <div className="divide-y divide-border">
-          {/* Real-time data indicator */}
-          {stockDataLoading && (
-            <div className="px-4 py-2 bg-chart-3/10 border-b border-border flex items-center gap-2 text-sm text-chart-3">
-              <div className="h-3 w-3 animate-spin rounded-full border-2 border-chart-3 border-t-transparent" />
-              {language === "de" ? "Lade Echtzeit-Kursdaten..." : "Loading real-time stock data..."}
-            </div>
-          )}
           {filteredSecondary.length === 0 && (
             <div className="px-4 py-16 text-center">
               <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-secondary">
@@ -453,12 +401,6 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
                         {post.price && post.price !== "N/A" && (
                           <span className="font-display text-2xl font-normal tabular-nums text-primary">{post.price}</span>
                         )}
-                        {/* Live indicator for real-time data */}
-                        {post.price && post.price !== "N/A" && !stockDataLoading && (
-                          <Badge variant="outline" className="rounded-none border-chart-3/50 bg-chart-3/10 text-xs text-chart-3">
-                            {language === "de" ? "Live" : "Live"}
-                          </Badge>
-                        )}
                       </div>
                       {post.change && post.change !== "N/A" && (
                         <div
@@ -473,17 +415,11 @@ export function InvestmentFeed({ weekId, searchQuery }: InvestmentFeedProps) {
                           {post.change}
                         </div>
                       )}
-                      {(!post.change || post.change === "N/A") && stockDataLoading && (
-                        <div className="h-6 w-16 bg-secondary/50 animate-shimmer rounded-full" />
-                      )}
                     </div>
                     {post.marketCap && post.marketCap !== "N/A" && (
                       <div className="mt-2 text-sm text-muted-foreground">
                         {t("marketCap")}: <span className="text-foreground tabular-nums">{post.marketCap}</span>
                       </div>
-                    )}
-                    {(!post.marketCap || post.marketCap === "N/A") && stockDataLoading && (
-                      <div className="mt-2 h-4 w-32 bg-secondary/50 animate-shimmer rounded" />
                     )}
                   </div>
 

@@ -78,7 +78,7 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Lint (ruff)
-        run: ruff check app/ scripts/
+        run: ruff check app/ scripts/ tests/
 
       - name: Unit tests (deals normalization contracts)
         run: python tests/test_deal_utils.py

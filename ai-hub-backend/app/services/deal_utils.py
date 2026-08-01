@@ -12,14 +12,18 @@ import re
 from datetime import date, datetime
 from typing import Optional
 
-# Currency detection, longest indicators first.
+# Currency detection, longest indicators first. Includes spelled-out
+# currency words so suffix forms ("20 million euros", "20 million USD")
+# carry their currency instead of degrading to a bare number (Codex
+# round-4 R1: a bare evidence number must not vouch for a different
+# explicit currency).
 _CURRENCY_PATTERNS = [
-    (r"US\$|USD|\$", "USD"),
-    (r"€|EUR", "EUR"),
-    (r"£|GBP", "GBP"),
-    (r"¥|RMB|CNY|元", "CNY"),
-    (r"₹|INR", "INR"),
-    (r"CHF", "CHF"),
+    (r"US\$|USD|\$|dollars?", "USD"),
+    (r"€|EUR|euros?", "EUR"),
+    (r"£|GBP|pounds?", "GBP"),
+    (r"¥|RMB|CNY|元|yuan|renminbi", "CNY"),
+    (r"₹|INR|rupees?", "INR"),
+    (r"CHF|francs?", "CHF"),
 ]
 
 # Multiplier tokens (EN + DE + ZH), longest first to avoid prefix clashes.
@@ -169,10 +173,19 @@ def csv_safe(value) -> str:
         return "'" + text
     return text
 
+# Suffix currency indicators a money token may end with ("20 million EUR",
+# "20 million euros", "351M RMB"). Kept in sync with _CURRENCY_PATTERNS so
+# parse_amount() recognizes whatever this regex captures.
+_SUFFIX_CCY = (
+    r"US\$|\$|€|£|¥|₹|RMB|CNY|USD|EUR|GBP|INR|CHF|元"
+    r"|dollars?|euros?|pounds?|yuan|renminbi|rupees?|francs?"
+)
+
 _MONEY_TOKEN_RE = re.compile(
-    r"(?:US\$|\$|€|£|¥|₹|RMB|CNY|USD|EUR|GBP|INR)\s?\d[\d.,]*"
-    r"(?:\s?(?:billions?|millions?|thousands?|bn|mn|mrd|mio|[bmk])\b\.?)?"
-    r"|\d[\d.,]*\s?(?:billions?|millions?|bn|mn|mrd|mio|亿|万)",
+    rf"(?:US\$|\$|€|£|¥|₹|RMB|CNY|USD|EUR|GBP|INR)\s?\d[\d.,]*"
+    rf"(?:\s?(?:billions?|millions?|thousands?|bn|mn|mrd|mio|[bmk])\b\.?)?"
+    rf"|\d[\d.,]*\s?(?:(?:billions?|millions?|bn|mn|mrd|mio)\b\.?|[bmk]\b|亿|万)"
+    rf"(?:\s?(?:{_SUFFIX_CCY})\b)?",
     re.IGNORECASE,
 )
 
