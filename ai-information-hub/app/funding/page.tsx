@@ -6,13 +6,13 @@ export const revalidate = 3600
 export const metadata: Metadata = {
   title: 'AI Funding Tracker — Open, Evidence-Linked Deal Data',
   description:
-    'Free, open tracker of AI funding rounds and M&A deals. Every row is linked to its source article with an evidence excerpt. Filter by round, industry and amount — free CSV export, no signup.',
+    'Free, open tracker of AI funding rounds and M&A deals. New rows pass a server-side evidence gate and link to their sources; legacy rows are clearly labeled. Free CSV export, no signup.',
   alternates: { canonical: 'https://www.datacubeai.space/funding' },
   openGraph: {
     url: 'https://www.datacubeai.space/funding',
     title: 'AI Funding Tracker — Open, Evidence-Linked Deal Data',
     description:
-      'Free tracker of AI funding rounds and M&A deals, evidence-linked to sources. Free CSV export.',
+      'Free tracker of AI funding rounds and M&A deals with per-row provenance labels. Free CSV export.',
   },
 }
 
@@ -28,9 +28,11 @@ export default function FundingPage() {
         </h1>
         <p className="mt-3 max-w-2xl font-sans text-sm leading-relaxed text-muted-foreground">
           Funding rounds and M&A deals in AI, detected daily across our monitored
-          EN/ZH sources. Every row links to its original source; newer rows carry a
-          verbatim evidence excerpt (hover the <span aria-hidden="true">*</span> next
-          to an amount). Free to use and export — no signup.
+          EN/ZH sources. Rows link to their original source; rows labeled
+          &quot;evidence-gated&quot; only show figures whose verbatim supporting
+          sentence was found in the source text (hover the{' '}
+          <span aria-hidden="true">*</span> next to an amount). Older rows are
+          labeled &quot;legacy · unverified&quot;. Free to use and export — no signup.
         </p>
       </header>
 
@@ -41,11 +43,15 @@ export default function FundingPage() {
       >
         <p className="mb-1">
           <strong className="text-foreground">How this data is made:</strong>{' '}
-          deals are extracted by our AI pipeline from public articles and labeled{' '}
-          <strong className="text-foreground">AI-extracted</strong> until manually
-          verified. Amounts are never guessed — when a source doesn&apos;t state a
-          figure, the field stays empty. Coverage is limited to our monitored
-          sources; this is <em>not</em> a complete market picture.
+          deals are extracted by our AI pipeline from public articles. New rows
+          pass a server-side <strong className="text-foreground">evidence gate</strong>:
+          a financial figure is only published when its verbatim supporting sentence
+          is found in the source text — otherwise the figure is withheld. Rows from
+          before this gate are labeled{' '}
+          <strong className="text-foreground">legacy · unverified</strong>. Coverage
+          is limited to our monitored sources; this is <em>not</em> a complete
+          market picture, and reported dates reflect when our sources covered the
+          deal.
         </p>
         <p>
           Found an error?{' '}
@@ -65,7 +71,9 @@ export default function FundingPage() {
           <a href="/corrections" className="font-bold text-primary hover:underline">
             corrections policy
           </a>
-          . Data reuse is welcome with attribution and a link to this page.
+          . Facts (companies, amounts, rounds, dates) are free to reuse with
+          attribution and a link; evidence excerpts are quotations from the
+          linked sources and are not licensed for redistribution.
         </p>
       </aside>
 

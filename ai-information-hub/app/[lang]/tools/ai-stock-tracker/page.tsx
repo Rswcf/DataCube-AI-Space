@@ -59,6 +59,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   return {
+    // Noindex while live market data is paused pending licensing review.
+    robots: { index: false, follow: true },
     title: { absolute: t(META_TITLES, lang) },
     description: t(META_DESCRIPTIONS, lang),
     alternates: {

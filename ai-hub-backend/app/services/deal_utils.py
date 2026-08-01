@@ -115,3 +115,58 @@ def normalize_company(name: Optional[str]) -> Optional[str]:
     if len(cleaned) < 2 or cleaned.lower() in _PLACEHOLDER_NAMES:
         return None
     return cleaned or None
+
+# Per-currency plausibility ceilings for a SINGLE deal (F5: a flat USD cap
+# applied to CNY/INR magnitudes is meaningless). Largest AI round ever is
+# ~$40B; largest tech M&A ~$100B — anything far beyond is a misextraction.
+_FUNDING_CAPS = {"USD": 60e9, "EUR": 60e9, "GBP": 50e9, "CHF": 60e9,
+                 "CNY": 430e9, "INR": 5000e9, None: 60e9}
+_MA_CAPS = {"USD": 120e9, "EUR": 120e9, "GBP": 100e9, "CHF": 120e9,
+            "CNY": 860e9, "INR": 10000e9, None: 120e9}
+
+
+def plausible_amount(value: Optional[int], currency: Optional[str], deal_type: str) -> bool:
+    """False when a parsed amount exceeds the per-currency single-deal ceiling."""
+    if value is None:
+        return True
+    caps = _MA_CAPS if deal_type == "ma" else _FUNDING_CAPS
+    return value <= caps.get(currency, caps[None])
+
+
+_NORMALIZE_RE = re.compile(r"[^a-z0-9\u4e00-\u9fff]+")
+
+
+def normalize_text(text: Optional[str]) -> str:
+    """Lowercase alphanumeric normalization for evidence-substring checks."""
+    if not text:
+        return ""
+    return _NORMALIZE_RE.sub("", text.lower())
+
+
+def evidence_supported(evidence: Optional[str], corpus_normalized: str) -> bool:
+    """True when the evidence excerpt appears (normalized) in the raw corpus.
+
+    Enforces the verbatim-evidence contract server-side (Codex F1): the LLM
+    claims the sentence came from the articles we fed it — verify that.
+    Requires a minimum of 20 normalized characters to avoid trivial matches.
+    """
+    norm = normalize_text(evidence)
+    if len(norm) < 20:
+        return False
+    return norm in corpus_normalized
+
+
+# Cells beginning with these characters are interpreted as formulas by
+# Excel/Sheets — a classic CSV-injection vector for attacker-influenced
+# strings (Codex F6).
+_CSV_DANGEROUS_PREFIXES = ("=", "+", "-", "@", "\t", "\r")
+
+
+def csv_safe(value) -> str:
+    """Neutralize spreadsheet formula injection for one CSV cell."""
+    text = "" if value is None else str(value)
+    stripped = text.lstrip(" \t\r\n")
+    if stripped.startswith(_CSV_DANGEROUS_PREFIXES):
+        return "'" + text
+    return text
+

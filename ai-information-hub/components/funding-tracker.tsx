@@ -30,6 +30,7 @@ interface DealRow {
 
 interface Facets {
   dealTypes: Record<string, number>;
+  statuses: Record<string, number>;
   roundCategories: { value: string; count: number }[];
   industries: { value: string; count: number }[];
   dateRange: [string | null, string | null];
@@ -37,19 +38,26 @@ interface Facets {
 
 const PAGE_SIZE = 50;
 
+const UNDISCLOSED_RAWS = new Set(["undisclosed", "n/a", "na", "unknown", "not disclosed"]);
+
 function formatAmount(row: DealRow): string {
-  if (row.amountRaw) return row.amountRaw;
+  // Only figures that passed validation carry amountValue — raw strings
+  // whose numeric value was rejected are withheld, not showcased.
+  if (row.amountValue !== null && row.amountRaw) return row.amountRaw;
+  if (row.amountRaw && UNDISCLOSED_RAWS.has(row.amountRaw.trim().toLowerCase())) return "Undisclosed";
   return "—";
 }
 
 function StatusBadge({ status }: { status: string }) {
   const styles: Record<string, string> = {
-    ai_extracted: "border-border text-muted-foreground",
+    ai_extracted: "border-primary/40 text-primary",
+    legacy_unverified: "border-border border-dashed text-muted-foreground",
     verified: "border-tips-accent/60 text-tips-accent",
     corrected: "border-invest-accent/60 text-invest-accent",
   };
   const labels: Record<string, string> = {
-    ai_extracted: "AI-extracted",
+    ai_extracted: "AI-extracted · evidence-gated",
+    legacy_unverified: "Legacy · unverified",
     verified: "Verified",
     corrected: "Corrected",
   };
@@ -70,21 +78,30 @@ export function FundingTracker() {
   const [error, setError] = useState(false);
 
   const [dealType, setDealType] = useState<string>("");
+  const [status, setStatus] = useState<string>("");
   const [roundCategory, setRoundCategory] = useState<string>("");
   const [industry, setIndustry] = useState<string>("");
   const [q, setQ] = useState("");
+  const [qDebounced, setQDebounced] = useState("");
   const [sort, setSort] = useState<"date" | "amount">("date");
   const [page, setPage] = useState(0);
+
+  // Debounce search so we don't fire a query per keystroke (Codex F9).
+  useEffect(() => {
+    const t = setTimeout(() => setQDebounced(q.trim()), 350);
+    return () => clearTimeout(t);
+  }, [q]);
 
   const params = useMemo(() => {
     const p = new URLSearchParams();
     if (dealType) p.set("deal_type", dealType);
     if (roundCategory) p.set("round_category", roundCategory);
     if (industry) p.set("industry", industry);
-    if (q.trim()) p.set("q", q.trim());
+    if (status) p.set("status", status);
+    if (qDebounced) p.set("q", qDebounced);
     p.set("sort", sort);
     return p;
-  }, [dealType, roundCategory, industry, q, sort]);
+  }, [dealType, roundCategory, industry, status, qDebounced, sort]);
 
   useEffect(() => {
     fetch(`${API_BASE}/deals/facets`)
@@ -160,6 +177,22 @@ export function FundingTracker() {
         </select>
 
         <select
+          value={status}
+          onChange={(e) => {
+            setStatus(e.target.value);
+            onFilter("status", e.target.value);
+          }}
+          aria-label="Data status"
+          className={selectClass}
+        >
+          <option value="">All statuses</option>
+          <option value="ai_extracted">Evidence-gated{facets ? ` (${facets.statuses?.ai_extracted || 0})` : ""}</option>
+          <option value="legacy_unverified">Legacy unverified{facets ? ` (${facets.statuses?.legacy_unverified || 0})` : ""}</option>
+          <option value="verified">Verified{facets ? ` (${facets.statuses?.verified || 0})` : ""}</option>
+          <option value="corrected">Corrected{facets ? ` (${facets.statuses?.corrected || 0})` : ""}</option>
+        </select>
+
+        <select
           value={roundCategory}
           onChange={(e) => {
             setRoundCategory(e.target.value);
@@ -203,7 +236,7 @@ export function FundingTracker() {
           className={selectClass}
         >
           <option value="date">Newest first</option>
-          <option value="amount">Largest first</option>
+          <option value="amount">Largest first (USD)</option>
         </select>
 
         <a
@@ -225,7 +258,7 @@ export function FundingTracker() {
         <table className="w-full min-w-[760px] border-collapse text-left">
           <thead>
             <tr className="border-b border-border font-sans text-[10px] font-extrabold uppercase tracking-[0.14em] text-muted-foreground">
-              <th scope="col" className="py-2 pr-3">Date</th>
+              <th scope="col" className="py-2 pr-3">Reported</th>
               <th scope="col" className="py-2 pr-3">Company</th>
               <th scope="col" className="py-2 pr-3">Deal</th>
               <th scope="col" className="py-2 pr-3">Amount</th>
