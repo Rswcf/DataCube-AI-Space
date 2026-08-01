@@ -80,6 +80,9 @@ jobs:
       - name: Lint (ruff)
         run: ruff check app/ scripts/
 
+      - name: Unit tests (deals normalization contracts)
+        run: python tests/test_deal_utils.py
+
       - name: Syntax check (all Python files)
         run: |
           echo "Checking syntax for all .py files in app/ and scripts/..."

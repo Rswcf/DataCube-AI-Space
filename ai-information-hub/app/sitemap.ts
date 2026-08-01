@@ -248,7 +248,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }))
 
   // Tool pages - all 8 languages (individual tools)
-  const toolSlugs = ['ai-news-aggregator', 'ai-report-generator', 'ai-stock-tracker', 'ai-news-api']
+  // ai-stock-tracker removed: paused + noindexed pending market-data licensing
+  const toolSlugs = ['ai-news-aggregator', 'ai-report-generator', 'ai-news-api']
   const toolEntries = toolSlugs.flatMap((slug) =>
     SUPPORTED_LANGUAGES.map((lang) => ({
       url: `${baseUrl}/${lang}/tools/${slug}`,

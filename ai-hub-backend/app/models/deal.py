@@ -51,8 +51,13 @@ class Deal(Base):
     source_url: Mapped[str | None] = mapped_column(Text, nullable=True)
     source_name: Mapped[str | None] = mapped_column(String(200), nullable=True)
 
-    # ai_extracted | verified | corrected — published UI labels rows honestly.
+    # ai_extracted | legacy_unverified | verified | corrected —
+    # published UI labels rows honestly.
     status: Mapped[str] = mapped_column(String(20), default="ai_extracted", index=True)
+
+    # Stable event identity (deal_utils.deal_fingerprint) enforced by a DB
+    # unique index — the cross-process dedupe backstop (Codex R2).
+    fingerprint: Mapped[str | None] = mapped_column(String(32), nullable=True, unique=True)
 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 

@@ -12,7 +12,6 @@ import yaml
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
-from sqlalchemy import func
 
 from app.models import (
     Week, TechPost, Video, PrimaryMarketPost, SecondaryMarketPost, MAPost, Deal,
@@ -1199,26 +1198,27 @@ def _save_deals(db: Session, week_id: str, investment_data: dict,
                 deal_types: tuple = ("funding", "ma")) -> None:
     """Persist normalized Deal rows from processed investment items.
 
-    Hardened per Codex review F1/F3:
-    - A per-period PostgreSQL advisory lock serializes concurrent writers.
+    Hardened per Codex rounds 1-2 (F1/F3, R1/R2):
+    - Advisory lock serializes writers per period; a DB-unique fingerprint
+      (deal_utils.deal_fingerprint + ON CONFLICT DO NOTHING) is the
+      cross-period / cross-process dedupe backstop.
+    - Evidence binding: the LLM's sourceUrl must resolve to a raw article
+      stored for this period; the evidence excerpt must appear verbatim in
+      THAT article's text; a persisted amount must itself be mentioned in
+      the excerpt and pass per-currency plausibility; valuation is kept only
+      when the excerpt mentions it. Anything unsupported is stripped.
     - Only rows still in status 'ai_extracted' are replaced — verified /
-      corrected / legacy_unverified rows are never deleted or overwritten.
-    - The evidence contract is enforced server-side: a financial figure is
-      only persisted when its evidence excerpt verifiably appears in this
-      period's raw article corpus AND the amount passes the per-currency
-      plausibility ceiling; otherwise the figure is stripped (the deal row
-      itself is kept as a detection record without numbers).
-    - Dedupe includes the current period, distinguishes funding rounds by
-      round_category, and undated items only match recent (≤45d) rows.
+      corrected / legacy_unverified rows are never deleted; conflicting
+      re-inserts against them are no-ops (fingerprint conflict).
     """
     from sqlalchemy import text as sa_text
+    from sqlalchemy.dialects.postgresql import insert as pg_insert
 
     from app.services.deal_utils import (
-        evidence_supported, normalize_company, normalize_text,
-        parse_amount, parse_announced_date, plausible_amount,
+        deal_fingerprint, normalize_company, normalize_text,
+        parse_announced_date, validate_deal_figures,
     )
 
-    # Serialize deal writes per period across processes (F3).
     db.execute(sa_text("SELECT pg_advisory_xact_lock(hashtext(:key))"),
                {"key": f"deals:{week_id}"})
 
@@ -1228,123 +1228,97 @@ def _save_deals(db: Session, week_id: str, investment_data: dict,
         Deal.status == "ai_extracted",
     ).delete(synchronize_session=False)
 
-    # Evidence corpus: normalized concatenation of this period's raw articles.
+    # Evidence binding index: link -> normalized article text (R1: evidence
+    # must belong to the SPECIFIC linked source, not merely the period corpus).
     raw_rows = (
-        db.query(RawArticle.title, RawArticle.summary)
+        db.query(RawArticle.link, RawArticle.title, RawArticle.summary)
         .filter(RawArticle.week_id == week_id)
         .all()
     )
-    corpus = "".join(
-        normalize_text(f"{r.title} {r.summary}") for r in raw_rows
-    )
-
-    today = datetime.utcnow().date()
-    batch_keys: set = set()
-
-    def duplicate_exists(deal_type: str, company: str, round_category, announced) -> bool:
-        key = (deal_type, company.lower(), (round_category or "").lower())
-        if key in batch_keys:
-            return True
-        batch_keys.add(key)
-        q = db.query(Deal.id).filter(
-            Deal.deal_type == deal_type,
-            func.lower(Deal.company) == company.lower(),
-        )
-        if deal_type == "funding" and round_category:
-            q = q.filter(func.lower(func.coalesce(Deal.round_category, "")) == round_category.lower())
-        if announced is not None:
-            q = q.filter(
-                Deal.announced_date >= announced - timedelta(days=30),
-                Deal.announced_date <= announced + timedelta(days=30),
-            )
-        else:
-            # Undated item: only suppress against recent rows, not all history
-            # (an old row must not shadow future rounds forever — F3).
-            q = q.filter(Deal.announced_date >= today - timedelta(days=45))
-        return db.query(q.exists()).scalar()
-
-    def validated_figures(item: dict, deal_type: str, amount_key: str):
-        """Return (amount_raw, amount_value, currency, evidence) after the
-        server-side evidence + plausibility gates."""
-        amount_raw = item.get(amount_key)
-        evidence = item.get("evidence")
-        amount_value, currency = parse_amount(amount_raw)
-        evidence_ok = evidence_supported(evidence, corpus)
-        if not evidence_ok:
-            evidence = None
-        if amount_value is not None:
-            if not evidence_ok or not plausible_amount(amount_value, currency, deal_type):
-                # Figure not supported by verifiable evidence -> strip it.
-                amount_raw, amount_value, currency = None, None, None
-        return amount_raw, amount_value, currency, evidence
+    article_index = {
+        r.link: normalize_text(f"{r.title} {r.summary}")
+        for r in raw_rows if r.link
+    }
 
     saved = 0
     stripped = 0
+    conflicts = 0
+
+    def insert_deal(values: dict) -> None:
+        nonlocal saved, conflicts
+        stmt = pg_insert(Deal).values(**values).on_conflict_do_nothing(
+            index_elements=["fingerprint"]
+        )
+        result = db.execute(stmt)
+        if result.rowcount:
+            saved += 1
+        else:
+            conflicts += 1
+
+    def process_item(item: dict, deal_type: str, amount_key: str) -> None:
+        nonlocal stripped
+        if not isinstance(item, dict):
+            return
+        if deal_type == "ma":
+            company = normalize_company(item.get("target") or item.get("acquirer"))
+        else:
+            company = normalize_company(item.get("company"))
+        if not company:
+            return
+        announced = parse_announced_date(item.get("timestamp"))
+        source_url = item.get("sourceUrl")
+        article_text = article_index.get(source_url)
+
+        amount_raw, amount_value, currency, valuation_raw, evidence = (
+            validate_deal_figures(
+                item.get(amount_key),
+                item.get("valuation") if deal_type == "funding" else None,
+                item.get("evidence"),
+                deal_type,
+                article_text,
+            )
+        )
+        if item.get(amount_key) and amount_raw is None:
+            stripped += 1
+
+        round_or_type = (
+            item.get("roundCategory") if deal_type == "funding" else item.get("dealType")
+        )
+        values = dict(
+            week_id=week_id, deal_type=deal_type, company=company,
+            round=item.get("round") if deal_type == "funding" else None,
+            round_category=item.get("roundCategory") if deal_type == "funding" else None,
+            acquirer=normalize_company(item.get("acquirer")) if deal_type == "ma" else None,
+            ma_type=item.get("dealType") if deal_type == "ma" else None,
+            industry=item.get("industry") if deal_type == "ma" else None,
+            amount_raw=amount_raw, amount_value=amount_value, currency=currency,
+            valuation_raw=valuation_raw,
+            investors=_nn(item.get("investors"), []) if deal_type == "funding" else [],
+            announced_date=announced,
+            content_en=_nn(item.get("content"), ""),
+            evidence=evidence,
+            source_url=source_url,
+            source_name=_source_author(item).get("name"),
+            status="ai_extracted",
+            fingerprint=deal_fingerprint(
+                deal_type, company, round_or_type, announced, amount_value, currency
+            ),
+        )
+        insert_deal(values)
 
     if "funding" in deal_types:
         pm = investment_data.get("primaryMarket", {})
         for item in (pm.get("en", []) if isinstance(pm, dict) else []):
-            if not isinstance(item, dict):
-                continue
-            company = normalize_company(item.get("company"))
-            if not company:
-                continue
-            announced = parse_announced_date(item.get("timestamp"))
-            if duplicate_exists("funding", company, item.get("roundCategory"), announced):
-                continue
-            amount_raw, amount_value, currency, evidence = validated_figures(
-                item, "funding", "amount")
-            if item.get("amount") and amount_raw is None:
-                stripped += 1
-            db.add(Deal(
-                week_id=week_id, deal_type="funding", company=company,
-                round=item.get("round"), round_category=item.get("roundCategory"),
-                amount_raw=amount_raw, amount_value=amount_value,
-                currency=currency,
-                valuation_raw=item.get("valuation") if evidence else None,
-                investors=_nn(item.get("investors"), []),
-                announced_date=announced,
-                content_en=_nn(item.get("content"), ""),
-                evidence=evidence,
-                source_url=item.get("sourceUrl"),
-                source_name=_source_author(item).get("name"),
-                status="ai_extracted",
-            ))
-            saved += 1
+            process_item(item, "funding", "amount")
 
     if "ma" in deal_types:
         ma = investment_data.get("ma", {})
         for item in (ma.get("en", []) if isinstance(ma, dict) else []):
-            if not isinstance(item, dict):
-                continue
-            company = normalize_company(item.get("target") or item.get("acquirer"))
-            if not company:
-                continue
-            announced = parse_announced_date(item.get("timestamp"))
-            if duplicate_exists("ma", company, None, announced):
-                continue
-            amount_raw, amount_value, currency, evidence = validated_figures(
-                item, "ma", "dealValue")
-            if item.get("dealValue") and amount_raw is None:
-                stripped += 1
-            db.add(Deal(
-                week_id=week_id, deal_type="ma", company=company,
-                acquirer=normalize_company(item.get("acquirer")),
-                ma_type=item.get("dealType"), industry=item.get("industry"),
-                amount_raw=amount_raw, amount_value=amount_value,
-                currency=currency,
-                announced_date=announced,
-                content_en=_nn(item.get("content"), ""),
-                evidence=evidence,
-                source_url=item.get("sourceUrl"),
-                source_name=_source_author(item).get("name"),
-                status="ai_extracted",
-            ))
-            saved += 1
+            process_item(item, "ma", "dealValue")
 
     logger.info(
         f"Deals layer: saved {saved} deal(s) for {week_id} "
-        f"({stripped} unsupported figure(s) stripped by the evidence gate)"
+        f"({stripped} unsupported figure(s) stripped, {conflicts} duplicate(s) skipped)"
     )
 
 

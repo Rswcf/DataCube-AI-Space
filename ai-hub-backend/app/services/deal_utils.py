@@ -80,10 +80,9 @@ def parse_amount(raw: Optional[str]) -> tuple[Optional[int], Optional[str]]:
     # sizes ("raised 3" is noise, "$3" is noise) — refuse to guess.
     if multiplier == 1 and value < 10_000:
         return None, currency
-    # Plausibility cap: no single AI deal is anywhere near $500B — values
-    # that large are macro-report numbers misread as deals. Refuse.
-    if value > 500_000_000_000:
-        return None, currency
+    # NOTE: plausibility is policy, not parsing — callers apply
+    # plausible_amount() per currency (Codex R5: a flat cap here rejected
+    # legitimate INR/CNY magnitudes below their own ceilings).
     return value, currency
 
 
@@ -169,4 +168,90 @@ def csv_safe(value) -> str:
     if stripped.startswith(_CSV_DANGEROUS_PREFIXES):
         return "'" + text
     return text
+
+_MONEY_TOKEN_RE = re.compile(
+    r"(?:US\$|\$|€|£|¥|₹|RMB|CNY|USD|EUR|GBP|INR)\s?\d[\d.,]*"
+    r"(?:\s?(?:billions?|millions?|thousands?|bn|mn|mrd|mio|[bmk])\b\.?)?"
+    r"|\d[\d.,]*\s?(?:billions?|millions?|bn|mn|mrd|mio|亿|万)",
+    re.IGNORECASE,
+)
+
+
+def amounts_in_text(text: Optional[str]) -> list[tuple[int, Optional[str]]]:
+    """Extract every parseable monetary mention from a text snippet."""
+    if not text:
+        return []
+    results = []
+    for token in _MONEY_TOKEN_RE.findall(text):
+        value, currency = parse_amount(token)
+        if value is not None:
+            results.append((value, currency))
+    return results
+
+
+def deal_fingerprint(deal_type: str, company: str, round_or_ma_type: Optional[str],
+                     announced, amount_value: Optional[int],
+                     currency: Optional[str]) -> str:
+    """Stable identity for a deal event (Codex R2), enforced by a DB unique
+    index. Month granularity absorbs multi-day reporting spreads of the same
+    event while the amount keeps genuinely distinct events apart."""
+    import hashlib
+
+    month = announced.strftime("%Y-%m") if announced else "na"
+    key = "|".join([
+        deal_type,
+        (company or "").strip().lower(),
+        (round_or_ma_type or "").strip().lower(),
+        month,
+        str(amount_value) if amount_value is not None else "na",
+        currency or "na",
+    ])
+    return hashlib.md5(key.encode("utf-8")).hexdigest()
+
+
+def validate_deal_figures(
+    amount_raw: Optional[str],
+    valuation_raw: Optional[str],
+    evidence: Optional[str],
+    deal_type: str,
+    article_text_normalized: Optional[str],
+) -> tuple[Optional[str], Optional[int], Optional[str], Optional[str], Optional[str]]:
+    """Pure validation core for one deal item (Codex R1).
+
+    Contract enforced:
+    1. Evidence must appear verbatim (normalized) in the text of the SPECIFIC
+       linked source article — not merely anywhere in the period corpus.
+    2. A persisted amount must itself be mentioned in the evidence excerpt
+       (value match on any monetary token found there).
+    3. Valuation is kept only when the evidence also mentions its value.
+    4. Amount must pass the per-currency plausibility ceiling.
+
+    Returns (amount_raw, amount_value, currency, valuation_raw, evidence)
+    with unsupported pieces nulled.
+    """
+    amount_value, currency = parse_amount(amount_raw)
+
+    evidence_ok = (
+        article_text_normalized is not None
+        and evidence_supported(evidence, article_text_normalized)
+    )
+    if not evidence_ok:
+        return None, None, None, None, None if evidence is None else None
+
+    evidence_amounts = amounts_in_text(evidence)
+    evidence_values = {v for v, _ in evidence_amounts}
+
+    if amount_value is not None:
+        supported = amount_value in evidence_values
+        plausible = plausible_amount(amount_value, currency, deal_type)
+        if not supported or not plausible:
+            amount_raw, amount_value, currency = None, None, None
+    else:
+        amount_raw = None
+
+    valuation_value, _ = parse_amount(valuation_raw)
+    if valuation_value is None or valuation_value not in evidence_values:
+        valuation_raw = None
+
+    return amount_raw, amount_value, currency, valuation_raw, evidence
 

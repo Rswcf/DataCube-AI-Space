@@ -42,7 +42,13 @@ _RATE_BUCKETS_MAX = 20_000
 
 
 def _rate_limit(request: Request, key: str, limit: int, window_s: float = 60.0) -> None:
-    ip = (request.headers.get("x-forwarded-for") or "").split(",")[0].strip() \
+    # Trust the LAST X-Forwarded-For entry — it is appended by our own
+    # ingress proxy (Railway); the first entries are caller-controlled and
+    # trivially spoofable (Codex R4). In-memory per-process storage is
+    # acceptable because the service runs a single worker; revisit with a
+    # shared store if that changes.
+    xff = [p.strip() for p in (request.headers.get("x-forwarded-for") or "").split(",") if p.strip()]
+    ip = (xff[-1] if xff else None) \
         or (request.client.host if request.client else "unknown")
     bucket_key = f"{key}:{ip}"
     now = time.monotonic()
@@ -78,7 +84,7 @@ DISCLOSURE = (
 )
 
 
-def _deal_dict(d: Deal) -> dict:
+def _deal_dict(d: Deal, include_evidence: bool = True) -> dict:
     return {
         "id": d.id,
         "dealType": d.deal_type,
@@ -95,7 +101,9 @@ def _deal_dict(d: Deal) -> dict:
         "investors": d.investors or [],
         "announcedDate": d.announced_date.isoformat() if d.announced_date else None,
         "content": d.content_en,
-        "evidence": d.evidence,
+        # Quotation excerpts are served only in display-sized pages (<=50)
+        # and never in exports — see the data-rights register (Codex R3).
+        "evidence": d.evidence if include_evidence else None,
         "sourceUrl": d.source_url,
         "sourceName": d.source_name,
         "status": d.status,
@@ -180,11 +188,12 @@ def list_deals(
     sorted_query = _sorted(query, sort, currency)
     total = sorted_query.count() if sort == "amount" else query.count()
     rows = sorted_query.offset(offset).limit(limit).all()
+    include_evidence = limit <= 50
     return {
         "total": total,
         "limit": limit,
         "offset": offset,
-        "deals": [_deal_dict(d) for d in rows],
+        "deals": [_deal_dict(d, include_evidence=include_evidence) for d in rows],
         "disclosure": DISCLOSURE,
     }
 
