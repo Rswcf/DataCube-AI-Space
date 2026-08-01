@@ -66,6 +66,19 @@ def _source_author(item: dict) -> dict:
 _TRANSLATION_REVERSE_MAPS = {"ma": {"deal_value": "dealValue", "deal_type": "dealType"}}
 
 
+def _jsonb_translations(item: dict):
+    """Translations destined for the JSONB column: everything except 'de'.
+
+    German lives in the native `_de` columns (mirrored/backfilled), so
+    storing it in JSONB as well would be duplication `get_field` never reads.
+    """
+    translations = item.get("_translations")
+    if not isinstance(translations, dict):
+        return None
+    filtered = {k: v for k, v in translations.items() if k != "de"}
+    return filtered or None
+
+
 def _mirror_de_from_translations(results: dict) -> None:
     """Build the DE arrays from EN items + Stage 3.5 German translations.
 
@@ -73,10 +86,16 @@ def _mirror_de_from_translations(results: dict) -> None:
     generalized from a DACH-internal tool to a global audience). German is
     translated in Stage 3.5 like the other languages, then mirrored here into
     full DE item dicts so the existing `_de`-column save sites keep working
-    unchanged. The 'de' key is removed from `_translations` afterwards —
-    native columns own German, the JSONB column owns the other six languages.
-    Items whose DE translation failed keep their EN values (same graceful
-    degradation the JSONB languages already have via `get_field`).
+    unchanged.
+
+    Idempotent and order-tolerant: in the full-collection path Stage 4 runs
+    BEFORE Stage 3.5 (base save first, translations non-blocking), so the
+    first mirror call copies plain EN into the DE arrays (readable fallback);
+    `_backfill_translations_to_db` later overwrites the `_de` columns with
+    real German. In the process-only path Stage 3.5 runs first and the mirror
+    produces translated DE immediately. `_translations` is left untouched —
+    the 'de' key is stripped only when writing the JSONB column (see
+    `_jsonb_translations`), because native columns own German.
     """
 
     def build(section: str, en_items: list) -> list:
@@ -87,7 +106,7 @@ def _mirror_de_from_translations(results: dict) -> None:
                 continue
             de_item = {k: v for k, v in item.items() if k != "_translations"}
             translations = item.get("_translations")
-            de_fields = translations.pop("de", None) if isinstance(translations, dict) else None
+            de_fields = translations.get("de") if isinstance(translations, dict) else None
             if de_fields:
                 for db_name, value in de_fields.items():
                     de_item[reverse.get(db_name, db_name)] = value
@@ -1049,6 +1068,26 @@ def stage3_5_translate_content(results: dict) -> dict:
     return results
 
 
+def _apply_translations_to_record(record, trans) -> None:
+    """Write Stage 3.5 output onto an already-saved record.
+
+    German goes into the native `_de` columns (overwriting the EN fallback
+    that the stage-4 mirror saved); the other six languages go into the
+    JSONB `translations` column. Stage 3.5 emits DB field names, so the
+    `_de` attribute lookup is direct.
+    """
+    if not isinstance(trans, dict):
+        return
+    de_fields = trans.get("de")
+    if isinstance(de_fields, dict):
+        for db_name, value in de_fields.items():
+            attr = f"{db_name}_de"
+            if value is not None and hasattr(record, attr):
+                setattr(record, attr, value)
+    filtered = {k: v for k, v in trans.items() if k != "de"}
+    record.translations = filtered or None
+
+
 def _backfill_translations_to_db(db: Session, week_id: str, results: dict):
     """
     Update already-saved records with translations from Stage 3.5.
@@ -1070,7 +1109,7 @@ def _backfill_translations_to_db(db: Session, week_id: str, results: dict):
             if i < len(en_items):
                 trans = en_items[i].get("_translations")
                 if trans:
-                    record.translations = trans
+                    _apply_translations_to_record(record, trans)
 
     _update_translations(TechPost, "tech", results)
     _update_translations(Video, "videos", results)
@@ -1086,7 +1125,7 @@ def _backfill_translations_to_db(db: Session, week_id: str, results: dict):
             ).order_by(PrimaryMarketPost.id).all()
             for i, record in enumerate(records):
                 if i < len(pm_en) and pm_en[i].get("_translations"):
-                    record.translations = pm_en[i]["_translations"]
+                    _apply_translations_to_record(record, pm_en[i]["_translations"])
 
         sm_en = inv.get("secondaryMarket", {}).get("en", [])
         if sm_en:
@@ -1095,7 +1134,7 @@ def _backfill_translations_to_db(db: Session, week_id: str, results: dict):
             ).order_by(SecondaryMarketPost.id).all()
             for i, record in enumerate(records):
                 if i < len(sm_en) and sm_en[i].get("_translations"):
-                    record.translations = sm_en[i]["_translations"]
+                    _apply_translations_to_record(record, sm_en[i]["_translations"])
 
         ma_en = inv.get("ma", {}).get("en", [])
         if ma_en:
@@ -1104,7 +1143,7 @@ def _backfill_translations_to_db(db: Session, week_id: str, results: dict):
             ).order_by(MAPost.id).all()
             for i, record in enumerate(records):
                 if i < len(ma_en) and ma_en[i].get("_translations"):
-                    record.translations = ma_en[i]["_translations"]
+                    _apply_translations_to_record(record, ma_en[i]["_translations"])
 
     # Trends
     trends = results.get("trends", {})
@@ -1117,7 +1156,7 @@ def _backfill_translations_to_db(db: Session, week_id: str, results: dict):
             ).order_by(Trend.id).all()
             for i, record in enumerate(records):
                 if i < len(trends_en) and trends_en[i].get("_translations"):
-                    record.translations = trends_en[i]["_translations"]
+                    _apply_translations_to_record(record, trends_en[i]["_translations"])
 
     try:
         db.commit()
@@ -1141,18 +1180,24 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
     """
     logger.info("=== Stage 4: Saving to Database ===")
 
+    # EN is the only natively generated language. Ensure the DE arrays exist
+    # before validation/saving: in the full-collection path this copies EN as
+    # a readable fallback (Stage 3.5 + backfill deliver German later); in the
+    # process-only path Stage 3.5 already ran and this yields translated DE.
+    _mirror_de_from_translations(results)
+
     # --- Pre-save validation: reject empty results if raw data existed ---
     raw_article_count = db.query(RawArticle).filter(RawArticle.week_id == week_id).count()
     raw_video_count = db.query(RawVideo).filter(RawVideo.week_id == week_id).count()
 
-    tech_count = len(results.get("tech", {}).get("de", []))
-    tips_count = len(results.get("tips", {}).get("de", []))
-    video_count = len(results.get("videos", {}).get("de", []))
+    tech_count = len(results.get("tech", {}).get("en", []))
+    tips_count = len(results.get("tips", {}).get("en", []))
+    video_count = len(results.get("videos", {}).get("en", []))
     inv = results.get("investment", {})
     inv_count = (
-        len(inv.get("primaryMarket", {}).get("de", []))
-        + len(inv.get("secondaryMarket", {}).get("de", []))
-        + len(inv.get("ma", {}).get("de", []))
+        len(inv.get("primaryMarket", {}).get("en", []))
+        + len(inv.get("secondaryMarket", {}).get("en", []))
+        + len(inv.get("ma", {}).get("en", []))
     )
     total_output = tech_count + tips_count + video_count + inv_count
 
@@ -1283,7 +1328,7 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
             source_url=de_p.get("sourceUrl"),
             metrics=_nn(de_p.get("metrics"), {}),
             is_video=False,
-            translations=en_p.get("_translations") or None,
+            translations=_jsonb_translations(en_p),
         )
         regular_posts.append(post)
     if skipped_tech:
@@ -1339,7 +1384,7 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
                     timestamp=_nn(de_p.get("timestamp"), ""),
                     source_url=de_p.get("sourceUrl"),
                     metrics=_nn(de_p.get("metrics"), {}),
-                    translations=en_p.get("_translations") or None,
+                    translations=_jsonb_translations(en_p),
                 )
             elif model_class == SecondaryMarketPost:
                 # Drop secondary-market entries with no ticker — without a
@@ -1363,7 +1408,7 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
                     timestamp=_nn(de_p.get("timestamp"), ""),
                     source_url=de_p.get("sourceUrl"),
                     metrics=_nn(de_p.get("metrics"), {}),
-                    translations=en_p.get("_translations") or None,
+                    translations=_jsonb_translations(en_p),
                 )
             else:  # MAPost
                 # M&A needs at least an acquirer OR target. Empty for both
@@ -1389,7 +1434,7 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
                     timestamp=_nn(de_p.get("timestamp"), ""),
                     source_url=de_p.get("sourceUrl"),
                     metrics=_nn(de_p.get("metrics"), {}),
-                    translations=en_p.get("_translations") or None,
+                    translations=_jsonb_translations(en_p),
                 )
             db.add(post)
         if skipped_inv:
@@ -1417,7 +1462,7 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
             timestamp=_nn(de_p.get("timestamp"), ""),
             source_url=de_p.get("sourceUrl"),
             metrics=_nn(de_p.get("metrics"), {}),
-            translations=en_p.get("_translations") or None,
+            translations=_jsonb_translations(en_p),
         )
         db.add(post)
     if skipped_tips:
@@ -1606,27 +1651,28 @@ def run_collection(db: Session, week_id: Optional[str] = None):
         stage2_classify_articles(db, week_id, processor)
         set_collection_status(week_id, "running", stage="stage3")
 
-        # Stage 3: Parallel processing (produces DE + EN)
+        # Stage 3: Parallel processing (produces EN natively)
         results = stage3_parallel_processing(db, week_id, processor)
         set_collection_status(week_id, "running", stage="stage4_base")
 
         # Load raw videos for metadata
         raw_videos = db.query(RawVideo).filter(RawVideo.week_id == week_id).all()
 
-        # Stage 4a: Save base DE/EN content immediately
+        # Stage 4a: Save base content immediately (EN native; DE columns get
+        # an EN fallback via the stage-4 mirror until backfill delivers German).
         # This makes content visible even if translations fail
         stage4_save_to_database(db, week_id, results, raw_videos)
 
         _inv = results.get("investment", {}) or {}
         counts = {
-            "tech": len(results.get("tech", {}).get("de", [])),
-            "tips": len(results.get("tips", {}).get("de", [])),
+            "tech": len(results.get("tech", {}).get("en", [])),
+            "tips": len(results.get("tips", {}).get("en", [])),
             "investment": (
-                len((_inv.get("primaryMarket") or {}).get("de", []))
-                + len((_inv.get("secondaryMarket") or {}).get("de", []))
-                + len((_inv.get("ma") or {}).get("de", []))
+                len((_inv.get("primaryMarket") or {}).get("en", []))
+                + len((_inv.get("secondaryMarket") or {}).get("en", []))
+                + len((_inv.get("ma") or {}).get("en", []))
             ),
-            "videos": len(results.get("videos", {}).get("de", [])),
+            "videos": len(results.get("videos", {}).get("en", [])),
         }
 
         if sum(counts.values()) == 0:
@@ -1635,7 +1681,7 @@ def run_collection(db: Session, week_id: Optional[str] = None):
             logger.warning(f"Collection produced 0 items for {week_id}")
             return
 
-        # Stage 3.5: Translate EN content to 6 additional languages
+        # Stage 3.5: Translate EN content to 7 additional languages (incl. DE)
         # Now runs AFTER base save — failures here are non-blocking
         set_collection_status(week_id, "running", stage="stage3_5")
         try:
