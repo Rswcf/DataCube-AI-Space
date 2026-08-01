@@ -24,7 +24,7 @@
     },
     {
       "id": "scene4-tech",
-      "text": "Every morning, twenty-two sources are scanned. The most impactful breakthroughs surface to the top. Impact-rated, summarized, and ready to read.",
+      "text": "Every morning, dozens of curated sources are scanned. The most impactful breakthroughs surface to the top. Impact-rated, summarized, and ready to read.",
       "duration": 7.5,
       "character": "narrator"
     },
@@ -36,7 +36,7 @@
     },
     {
       "id": "scene6-tips",
-      "text": "Practical tips from fourteen Reddit communities. Actionable prompts, tools, and workflows. Rated by difficulty.",
+      "text": "Practical tips from curated Reddit communities and expert blogs. Actionable prompts, tools, and workflows. Rated by difficulty.",
       "duration": 5.5,
       "character": "conversational"
     },
@@ -48,7 +48,7 @@
     },
     {
       "id": "scene8-stats",
-      "text": "Twenty-two sources. Fourteen Reddit communities. Two languages. Updated daily. All completely free.",
+      "text": "Thirty-five plus curated sources. Eight languages. Updated daily. All completely free.",
       "duration": 5.5,
       "character": "expert"
     },

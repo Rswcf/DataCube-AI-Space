@@ -72,7 +72,7 @@ Frontend (Vercel)                    Backend (Railway)
 │  • Investment Feed  │             │  4. Save to PostgreSQL        │
 │  • Tips Feed        │             │                              │
 │  • AI Chat          │             │  Data Sources:               │
-│  • AI Reports       │             │  • 22 RSS Feeds              │
+│  • AI Reports       │             │  • RSS (load_sources())      │
 │  • SSR Week/Article │             │  • Hacker News (Algolia)     │
 │  • Topic/Tool Pages │             │  • YouTube Data API v3       │
 └─────────────────────┘             └──────────────────────────────┘

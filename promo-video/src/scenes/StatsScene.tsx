@@ -11,9 +11,9 @@ type Stat = {
 };
 
 const STATS: Stat[] = [
-  { target: 22, suffix: '+', label: 'RSS Sources', color: COLORS.tech },
-  { target: 14, suffix: '', label: 'Reddit Communities', color: COLORS.tips },
-  { target: 2, suffix: '', label: 'Languages: DE/EN', color: COLORS.accent },
+  { target: 35, suffix: '+', label: 'Curated Sources', color: COLORS.tech },
+  { target: 8, suffix: '', label: 'Languages', color: COLORS.tips },
+  { target: 1088, suffix: '+', label: 'Tracked AI Deals', color: COLORS.accent },
   { target: 0, suffix: '', label: 'Automated Updates', color: COLORS.invest, text: 'Daily' },
 ];
 

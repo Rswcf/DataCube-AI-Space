@@ -7,9 +7,11 @@ const FUNDING_DEALS = [
   { round: 'Series A', amount: '$12M', company: 'LLM Infrastructure' },
 ];
 
-const STOCKS = [
-  { ticker: 'NVDA', price: '$890.42', change: '+2.3%', positive: true },
-  { ticker: 'MSFT', price: '$425.18', change: '+0.8%', positive: true },
+// Live stock quotes were removed from the product (2026-08, market-data
+// licensing) — the middle panel now showcases the evidence gate instead.
+const EVIDENCE_DEALS = [
+  { company: 'Voice AI Platform', amount: '$30M', round: 'Series B' },
+  { company: 'AI Chip Design Lab', amount: '$85M', round: 'Series C' },
 ];
 
 const MA_DEAL = { type: 'Acquisition', amount: '$2.1B', target: 'Major AI Lab' };
@@ -181,55 +183,71 @@ export const InvestmentScene: React.FC = () => {
               marginBottom: 4,
             }}
           >
-            Secondary Market
+            Evidence-Gated
           </div>
-          {STOCKS.map((stock, i) => (
-            <FadeIn key={stock.ticker} delay={60 + i * 12} direction="up" distance={24} damping={14}>
+          {EVIDENCE_DEALS.map((deal, i) => (
+            <FadeIn key={deal.company} delay={60 + i * 12} direction="up" distance={24} damping={14}>
               <div
                 style={{
                   backgroundColor: COLORS.card,
                   borderRadius: 12,
                   padding: '22px 24px',
                   border: `1px solid ${COLORS.subtle}`,
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
                 }}
               >
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 10,
+                    marginBottom: 10,
+                  }}
+                >
                   <span
                     style={{
                       fontFamily: FONTS.mono,
-                      fontSize: 20,
+                      fontSize: 13,
                       fontWeight: 700,
-                      color: COLORS.foreground,
-                      letterSpacing: 1,
+                      color: COLORS.invest,
+                      backgroundColor: `${COLORS.invest}1A`,
+                      padding: '3px 10px',
+                      borderRadius: 6,
                     }}
                   >
-                    {stock.ticker}
+                    {deal.round}
                   </span>
                   <span
                     style={{
                       fontFamily: FONTS.mono,
-                      fontSize: 32,
+                      fontSize: 24,
                       fontWeight: 700,
                       color: COLORS.foreground,
                       fontVariantNumeric: 'tabular-nums',
                     }}
                   >
-                    {stock.price}
+                    {deal.amount}
                   </span>
+                </div>
+                <div
+                  style={{
+                    fontFamily: FONTS.body,
+                    fontSize: 18,
+                    color: COLORS.muted,
+                    lineHeight: 1.4,
+                    marginBottom: 8,
+                  }}
+                >
+                  {deal.company}
                 </div>
                 <span
                   style={{
                     fontFamily: FONTS.mono,
-                    fontSize: 22,
+                    fontSize: 14,
                     fontWeight: 700,
-                    fontVariantNumeric: 'tabular-nums',
-                    color: stock.positive ? '#22c55e' : COLORS.critical,
+                    color: '#22c55e',
                   }}
                 >
-                  {stock.positive ? '\u25B2' : '\u25BC'}{stock.change}
+                  {'\u2713'} Source excerpt linked
                 </span>
               </div>
             </FadeIn>
