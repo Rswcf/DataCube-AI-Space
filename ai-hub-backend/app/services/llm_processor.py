@@ -500,7 +500,8 @@ Output ONLY the JSON array, no markdown fences."""
         prompt = f"""You are an editor for DataCube AI, a daily AI news briefing read by a global
 audience of professionals, developers, and AI enthusiasts.
 
-From the following articles, select EXACTLY {count} of the most important ones.
+From the following articles, select UP TO {count} of the most important ones.
+Fewer is fine when the pool is thin — never pad with marginal or duplicate stories.
 
 ARTICLES:
 {articles_text}
@@ -631,6 +632,7 @@ Output a JSON object with this EXACT structure:
         "investors": ["Investor 1", "Investor 2"],
         "valuation": "$500M",
         "content": "English description (2-3 sentences, specific numbers and investors)",
+        "evidence": "verbatim supporting sentence from the article",
         "timestamp": "YYYY-MM-DD",
         "sourceUrl": "https://..."
       }}
@@ -642,6 +644,7 @@ Output a JSON object with this EXACT structure:
         "id": 1,
         "ticker": "NVDA",
         "content": "English description of stock news/movement (2-3 sentences)",
+        "evidence": "verbatim supporting sentence from the article",
         "timestamp": "YYYY-MM-DD",
         "sourceUrl": "https://..."
       }}
@@ -657,6 +660,7 @@ Output a JSON object with this EXACT structure:
         "dealType": "Acquisition",
         "industry": "Enterprise",
         "content": "English description",
+        "evidence": "verbatim supporting sentence from the article",
         "timestamp": "YYYY-MM-DD",
         "sourceUrl": "https://..."
       }}
@@ -665,7 +669,12 @@ Output a JSON object with this EXACT structure:
 }}
 
 Rules:
-- Include EXACTLY {count} items per category (primaryMarket, secondaryMarket, ma) - select the most important/newsworthy ones
+- Include UP TO {count} items per category (primaryMarket, secondaryMarket, ma),
+  and ONLY deals the articles actually support. Fewer is fine; EMPTY arrays are
+  valid. NEVER invent, merge, or pad deals to reach a count.
+- For every item include "evidence": one verbatim sentence copied from the
+  article summary above that supports the amount/deal. If no sentence supports
+  a financial figure, omit the figure (use null) rather than guessing.
 - Use English number formatting (e.g., $2.75B, $500M)
 - dealType: "Acquisition", "Merger", "Buyout"
 - sourceUrl: copy the exact Link URL from the article
@@ -753,6 +762,7 @@ Output a JSON object with EXACTLY this structure:
         "dealType": "Acquisition|Merger|Buyout|Investment|Stake|Partnership",
         "industry": "AI Infrastructure|AI Healthcare|AI Finance|AI Enterprise|AI Consumer|AI Robotics|AI Security|AI Creative|AI Education|Other AI|null",
         "content": "English summary (2-3 sentences, specific about terms and strategy)",
+        "evidence": "verbatim supporting sentence from the article",
         "timestamp": "YYYY-MM-DD",
         "sourceUrl": "https://..."
       }}
@@ -765,7 +775,10 @@ Rules:
 - Skip deals that have no clear AI connection
 - industry: MUST be one of the AI categories below (do NOT use null)
 - Prioritize deals with clear financial terms or strategic AI importance
-- Limit to at most {count} items per language
+- UP TO {count} items — only deals the articles support. An EMPTY list is a
+  valid answer. Never invent or pad. Include "evidence": one verbatim
+  supporting sentence per deal; omit financial figures (null) when no
+  sentence supports them.
 
 AI INDUSTRY TAXONOMY (required - skip deal if none apply):
 - AI Infrastructure, AI Healthcare, AI Finance, AI Enterprise, AI Consumer, AI Robotics, AI Security, AI Creative, AI Education, Other AI
@@ -815,7 +828,7 @@ Output format:
 {{"en":[{{"id":1,"content":"English tip description","tip":"The tip, concrete and actionable","category":"Productivity","platform":"Reddit","sourceUrl":"url"}}]}}
 
 Rules:
-- {count} items in the en array
+- UP TO {count} items in the en array — only tips the articles actually contain; fewer is fine
 - category: Productivity, Prompt Tips, Creativity
 - platform: Reddit, Blog, or X
 - Keep tips short, specific, and actionable (name the tool and the exact technique)
@@ -947,7 +960,7 @@ Output ONLY valid JSON:
 
         context = "\n".join(all_content[:30])
 
-        prompt = f"""Based on this period's AI news, generate EXACTLY 10 trending topics.
+        prompt = f"""Based on this period's AI news, generate UP TO 10 trending topics (only topics genuinely present in the content).
 
 CONTENT:
 {context}

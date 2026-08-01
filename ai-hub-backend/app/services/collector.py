@@ -12,8 +12,10 @@ import yaml
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
+from sqlalchemy import func
+
 from app.models import (
-    Week, TechPost, Video, PrimaryMarketPost, SecondaryMarketPost, MAPost,
+    Week, TechPost, Video, PrimaryMarketPost, SecondaryMarketPost, MAPost, Deal,
     TipPost, Trend, TeamMember, RawArticle, RawVideo,
 )
 from app.services.period_utils import (
@@ -1184,6 +1186,94 @@ def _backfill_translations_to_db(db: Session, week_id: str, results: dict):
         db.rollback()
 
 
+def _save_deals(db: Session, week_id: str, investment_data: dict,
+                deal_types: tuple = ("funding", "ma")) -> None:
+    """Persist normalized Deal rows from processed investment items.
+
+    Deals accumulate across periods (the compounding data asset behind the
+    Funding Tracker) — unlike the news-card tables they are NOT cleared by
+    clear_week_data. Idempotent per period: this period's rows of the given
+    deal_types are replaced. Cross-period dedupe: an identical
+    deal_type+company seen in another period within ±30 days is skipped.
+    """
+    from app.services.deal_utils import parse_amount, parse_announced_date, normalize_company
+
+    db.query(Deal).filter(
+        Deal.week_id == week_id, Deal.deal_type.in_(deal_types)
+    ).delete(synchronize_session=False)
+
+    def duplicate_elsewhere(deal_type: str, company: str, announced) -> bool:
+        q = db.query(Deal.id).filter(
+            Deal.deal_type == deal_type,
+            func.lower(Deal.company) == company.lower(),
+            Deal.week_id != week_id,
+        )
+        if announced is not None:
+            q = q.filter(
+                Deal.announced_date >= announced - timedelta(days=30),
+                Deal.announced_date <= announced + timedelta(days=30),
+            )
+        return db.query(q.exists()).scalar()
+
+    saved = 0
+
+    if "funding" in deal_types:
+        pm = investment_data.get("primaryMarket", {})
+        for item in (pm.get("en", []) if isinstance(pm, dict) else []):
+            if not isinstance(item, dict):
+                continue
+            company = normalize_company(item.get("company"))
+            if not company:
+                continue
+            announced = parse_announced_date(item.get("timestamp"))
+            if duplicate_elsewhere("funding", company, announced):
+                continue
+            amount_value, currency = parse_amount(item.get("amount"))
+            db.add(Deal(
+                week_id=week_id, deal_type="funding", company=company,
+                round=item.get("round"), round_category=item.get("roundCategory"),
+                amount_raw=item.get("amount"), amount_value=amount_value,
+                currency=currency, valuation_raw=item.get("valuation"),
+                investors=_nn(item.get("investors"), []),
+                announced_date=announced,
+                content_en=_nn(item.get("content"), ""),
+                evidence=item.get("evidence"),
+                source_url=item.get("sourceUrl"),
+                source_name=_source_author(item).get("name"),
+                status="ai_extracted",
+            ))
+            saved += 1
+
+    if "ma" in deal_types:
+        ma = investment_data.get("ma", {})
+        for item in (ma.get("en", []) if isinstance(ma, dict) else []):
+            if not isinstance(item, dict):
+                continue
+            company = normalize_company(item.get("target") or item.get("acquirer"))
+            if not company:
+                continue
+            announced = parse_announced_date(item.get("timestamp"))
+            if duplicate_elsewhere("ma", company, announced):
+                continue
+            amount_value, currency = parse_amount(item.get("dealValue"))
+            db.add(Deal(
+                week_id=week_id, deal_type="ma", company=company,
+                acquirer=normalize_company(item.get("acquirer")),
+                ma_type=item.get("dealType"), industry=item.get("industry"),
+                amount_raw=item.get("dealValue"), amount_value=amount_value,
+                currency=currency,
+                announced_date=announced,
+                content_en=_nn(item.get("content"), ""),
+                evidence=item.get("evidence"),
+                source_url=item.get("sourceUrl"),
+                source_name=_source_author(item).get("name"),
+                status="ai_extracted",
+            ))
+            saved += 1
+
+    logger.info(f"Deals layer: saved {saved} normalized deal(s) for {week_id}")
+
+
 def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos: list) -> None:
     """
     Stage 4: Save processed data to database.
@@ -1458,6 +1548,9 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
             db.add(post)
         if skipped_inv:
             logger.warning(f"Stage4 investment.{category}: skipped {skipped_inv} record(s) missing key field")
+
+    # Normalized deals layer (accumulates across periods)
+    _save_deals(db, week_id, investment_data)
 
     # Save tips
     skipped_tips = 0
@@ -1776,6 +1869,9 @@ def stage4_save_ma_to_database(db: Session, week_id: str, investment_data: dict)
             metrics=de_p.get("metrics", {}),
         )
         db.add(post)
+
+    # Normalized deals layer (ma rows for this period are replaced)
+    _save_deals(db, week_id, investment_data, deal_types=("ma",))
 
     try:
         db.commit()

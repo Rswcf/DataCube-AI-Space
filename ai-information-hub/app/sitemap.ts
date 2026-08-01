@@ -283,8 +283,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.4,
   }))
 
+  // The Funding Tracker is a primary compounding asset page — high priority,
+  // refreshed daily by the collection pipeline.
+  const fundingEntry = {
+    url: `${baseUrl}/funding`,
+    lastModified: new Date(),
+    changeFrequency: 'daily' as const,
+    priority: 0.9,
+  }
+
   return [
     rootEntry,
+    fundingEntry,
     {
       url: `${baseUrl}/impressum`,
       lastModified: new Date('2026-02-18T00:00:00Z'),

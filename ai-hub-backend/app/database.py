@@ -24,8 +24,15 @@ def get_engine():
     return create_engine(
         settings.database_url,
         pool_pre_ping=True,
-        pool_size=5,
-        max_overflow=10,
+        # 2026-08-01 incident: a frontend static-generation build storm
+        # (13 workers × ~200 API calls × retries) exhausted the 5+10 pool and
+        # wedged every request in pool.connect(). Bigger pool + short timeout
+        # so overloads fail fast (503-ish) instead of hanging clients for 60s+.
+        # The main fix is on the frontend (prerender set limited to recent
+        # periods), this is defense in depth.
+        pool_size=10,
+        max_overflow=20,
+        pool_timeout=10,
     )
 
 

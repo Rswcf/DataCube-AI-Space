@@ -372,11 +372,17 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
 }
 
 export async function generateStaticParams() {
+  // Prerender only the most recent periods; older ones render on-demand with
+  // ISR (revalidate above). Prerendering every period × 8 languages fired
+  // hundreds of concurrent API calls per build and exhausted the backend DB
+  // connection pool (2026-08-01 incident).
   try {
     const res = await fetch(`${API_BASE}/weeks`, { next: { revalidate: 3600 } })
     if (res.ok) {
       const data = await res.json()
-      return (data.weeks || []).map((w: { id: string }) => ({ weekId: w.id }))
+      return (data.weeks || [])
+        .slice(0, 6)
+        .map((w: { id: string }) => ({ weekId: w.id }))
     }
   } catch {}
   return []

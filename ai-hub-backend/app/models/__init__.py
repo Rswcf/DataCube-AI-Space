@@ -12,10 +12,12 @@ from app.models.raw import RawArticle, RawVideo
 from app.models.developer import ApiKey
 from app.models.job import JobListing
 from app.models.subscription import Subscription
+from app.models.deal import Deal
 from app.models.collection_run import CollectionRun
 from app.models.newsletter_send import NewsletterSend
 
 __all__ = [
+    "Deal",
     "Week",
     "TechPost",
     "Video",
