@@ -415,65 +415,60 @@ def load_sources() -> dict:
             {"url": "https://blog.google/technology/ai/rss/", "name": "Google AI Blog"},
             {"url": "https://deepmind.google/blog/rss.xml", "name": "Google DeepMind"},
             {"url": "https://techcrunch.com/category/artificial-intelligence/feed/", "name": "TechCrunch AI"},
-            {"url": "https://venturebeat.com/category/ai/feed/", "name": "VentureBeat AI"},
+            {"url": "https://venturebeat.com/feed", "name": "VentureBeat"},
             {"url": "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml", "name": "The Verge AI"},
             {"url": "https://arstechnica.com/ai/feed/", "name": "Ars Technica AI"},
+            # 2026-08-01 research-team additions (all verified with our bot UA):
+            # Anthropic has no official RSS; community mirror updates hourly.
+            {"url": "https://raw.githubusercontent.com/Olshansk/rss-feeds/main/feeds/feed_anthropic_news.xml", "name": "Anthropic News"},
+            {"url": "https://www.theregister.com/software/ai_ml/headlines.atom", "name": "The Register AI"},
+            {"url": "https://spectrum.ieee.org/feeds/topic/artificial-intelligence.rss", "name": "IEEE Spectrum AI"},
+            # ZH ecosystem (50% of visitors are from China; ZH co-primary lang)
+            {"url": "https://www.qbitai.com/feed", "name": "QbitAI 量子位", "lang": "zh"},
+            {"url": "https://www.chinatalk.media/feed", "name": "ChinaTalk"},
         ],
         "investment": [
-            {"url": "https://techcrunch.com/tag/funding/feed/", "name": "TechCrunch Funding"},
+            # 2026-08-01 refresh: dead tag feed replaced by the live category
+            # feed; NVCA/PEHub dropped (zero contribution over 6 days);
+            # VentureBeat moved to tech (main feed, classifier routes).
+            {"url": "https://techcrunch.com/category/fundraising/feed/", "name": "TechCrunch Fundraising"},
+            {"url": "https://techfundingnews.com/category/ai/feed/", "name": "Tech Funding News AI"},
             {"url": "https://news.crunchbase.com/feed/", "name": "Crunchbase News"},
             {"url": "https://www.techmeme.com/feed.xml", "name": "Techmeme"},
-            # New investment sources
             {"url": "https://sifted.eu/feed", "name": "Sifted"},
-            {"url": "https://www.pehub.com/feed/", "name": "PEHub"},
-            {"url": "https://nvca.org/feed/", "name": "NVCA"},
-            {"url": "https://venturebeat.com/feed/", "name": "VentureBeat"},
-            # Chinese investment source
             {"url": "https://36kr.com/feed", "name": "36Kr", "lang": "zh"},
-            # Phase 2: Additional sources
             {"url": "https://tech.eu/feed", "name": "Tech.eu"},
             {"url": "https://technode.com/feed/", "name": "TechNode"},
             {"url": "https://pandaily.com/feed/", "name": "Pandaily"},
+            {"url": "https://news.google.com/rss/search?q=AI+startup+(%22raises%22+OR+%22Series+A%22+OR+%22funding+round%22)+when:1d&hl=en-US&gl=US&ceid=US:en", "name": "Google News AI Funding"},
         ],
         "ma": [
-            # Mergers & Acquisitions specific sources
+            # 2026-08-01 refresh: SEC EDGAR 8-K dropped (raw filings were ~25%
+            # of pipeline volume with near-zero AI relevance; FT/Techmeme/
+            # Google News catch material AI deals). PR Newswire scoped to its
+            # M&A-only category feed. Yahoo topstories dropped (generic).
             {"url": "https://techcrunch.com/tag/mergers-and-acquisitions/feed/", "name": "TechCrunch M&A"},
-            {"url": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcurrent&type=8-K&output=atom", "name": "SEC EDGAR 8-K"},
             {"url": "https://www.ft.com/mergers-acquisitions?format=rss", "name": "FT M&A"},
-            {"url": "https://finance.yahoo.com/rss/topstories", "name": "Yahoo Finance"},
             {"url": "https://www.globenewswire.com/RssFeed/subjectcode/15-Mergers%20and%20Acquisitions/feedTitle/GlobeNewswire%20-%20Mergers%20and%20Acquisitions", "name": "GlobeNewswire M&A"},
-            {"url": "https://www.prnewswire.com/rss/news-releases-list.rss", "name": "PR Newswire"},
+            {"url": "https://www.prnewswire.com/rss/financial-services-latest-news/acquisitions-mergers-and-takeovers-list.rss", "name": "PR Newswire M&A"},
             {"url": "https://news.google.com/rss/search?q=mergers+acquisitions+AI&hl=en-US", "name": "Google News M&A"},
         ],
         "tips": [
-            # Blogs (business-oriented)
+            # 2026-08-01 refresh: Reddit now rate-limits unauthenticated .rss
+            # to ~1 req/min per IP — the fetcher serializes Reddit requests
+            # (see rss_fetcher). Subreddits cut 12 -> 4 (highest tip density);
+            # four quality practical-AI publications added as the stable base.
             {"url": "https://simonwillison.net/atom/everything/", "name": "Simon Willison"},
             {"url": "https://www.oneusefulthing.org/feed", "name": "One Useful Thing (Ethan Mollick)"},
-
-            # Reddit - LLM & Chat Tools
+            {"url": "https://www.theneuron.ai/feed", "name": "The Neuron"},
+            {"url": "https://natesnewsletter.substack.com/feed", "name": "Nate's Newsletter"},
+            {"url": "https://www.whytryai.com/feed", "name": "Why Try AI"},
+            {"url": "https://www.bensbites.com/feed", "name": "Ben's Bites"},
             {"url": "https://www.reddit.com/r/ChatGPT/top/.rss?t=day", "name": "Reddit r/ChatGPT"},
-            {"url": "https://www.reddit.com/r/ClaudeAI/top/.rss?t=day", "name": "Reddit r/ClaudeAI"},
-            {"url": "https://www.reddit.com/r/OpenAI/top/.rss?t=day", "name": "Reddit r/OpenAI"},
-            {"url": "https://www.reddit.com/r/PromptEngineering/top/.rss?t=day", "name": "Reddit r/PromptEngineering"},
-
-            # Reddit - Image Generation (marketing use)
-            {"url": "https://www.reddit.com/r/midjourney/top/.rss?t=day", "name": "Reddit r/Midjourney"},
-
-            # Reddit - AI Search & Research Tools
-            {"url": "https://www.reddit.com/r/perplexity_ai/top/.rss?t=day", "name": "Reddit r/perplexity_ai"},
-            {"url": "https://www.reddit.com/r/NotebookLM/top/.rss?t=day", "name": "Reddit r/NotebookLM"},
-
-            # Reddit - General AI Discussion
-            {"url": "https://www.reddit.com/r/artificial/top/.rss?t=day", "name": "Reddit r/artificial"},
-            {"url": "https://www.reddit.com/r/singularity/top/.rss?t=day", "name": "Reddit r/singularity"},
-
-            # Reddit - Video/Audio Generation (content creation)
-            {"url": "https://www.reddit.com/r/aivideo/top/.rss?t=day", "name": "Reddit r/aivideo"},
-            {"url": "https://www.reddit.com/r/ElevenLabs/top/.rss?t=day", "name": "Reddit r/ElevenLabs"},
-
-            # Reddit - Pro Users
             {"url": "https://www.reddit.com/r/ChatGPTPro/top/.rss?t=day", "name": "Reddit r/ChatGPTPro"},
-        ],
+            {"url": "https://www.reddit.com/r/ClaudeAI/top/.rss?t=day", "name": "Reddit r/ClaudeAI"},
+            {"url": "https://www.reddit.com/r/PromptEngineering/top/.rss?t=day", "name": "Reddit r/PromptEngineering"},
+        ]
     }
 
     try:

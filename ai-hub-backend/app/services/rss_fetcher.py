@@ -3,6 +3,7 @@ RSS feed fetching service.
 """
 
 import feedparser
+import time
 from datetime import datetime, timedelta
 from typing import Optional
 import logging
@@ -12,6 +13,47 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from app.config import get_settings
 
 logger = logging.getLogger(__name__)
+
+# Reddit limits unauthenticated .rss to roughly one request per minute per IP
+# (verified 2026-08-01: first request 200, the following burst 429s, recovery
+# after ~65s). Bursty fetching therefore guarantees 429s — Reddit feeds are
+# pulled on a dedicated serial lane with spacing plus one retry pass.
+REDDIT_SPACING_SECONDS = 75
+REDDIT_RETRY_DELAY_SECONDS = 120
+
+
+def _is_reddit(url: str) -> bool:
+    return "reddit.com" in url
+
+
+def _fetch_reddit_serial(
+    reddit_tasks: list[tuple[str, str, str]], timeout: int | float
+) -> list[tuple[str, str, str, list[dict]]]:
+    """Fetch Reddit feeds one by one with spacing, retrying failures once."""
+    results: list[tuple[str, str, str, list[dict]]] = []
+    failed: list[tuple[str, str, str]] = []
+
+    for i, (section, name, url) in enumerate(reddit_tasks):
+        if i > 0:
+            time.sleep(REDDIT_SPACING_SECONDS)
+        articles = fetch_feed_with_timeout(url, 7, timeout)
+        if articles:
+            results.append((section, name, url, articles))
+        else:
+            failed.append((section, name, url))
+
+    if failed:
+        logger.info(
+            f"Reddit retry pass: {len(failed)} feed(s) after {REDDIT_RETRY_DELAY_SECONDS}s cooldown"
+        )
+        time.sleep(REDDIT_RETRY_DELAY_SECONDS)
+        for i, (section, name, url) in enumerate(failed):
+            if i > 0:
+                time.sleep(REDDIT_SPACING_SECONDS)
+            articles = fetch_feed_with_timeout(url, 7, timeout)
+            results.append((section, name, url, articles))
+
+    return results
 
 
 def fetch_feed(url: str, days: int = 7) -> list[dict]:
@@ -140,8 +182,36 @@ def fetch_rss_feeds_parallel(
     seen_urls: set[str] = set()
     all_articles: list[dict] = []
 
-    logger.info(f"Parallel RSS fetch: {len(tasks)} sources, workers={settings.rss_max_workers}")
+    def collect(section: str, name: str, articles: list[dict]) -> None:
+        added = 0
+        for article in articles or []:
+            link = article.get("link")
+            if link and link not in seen_urls:
+                seen_urls.add(link)
+                article["source"] = name
+                article["original_section"] = section
+                all_articles.append(article)
+                added += 1
+        logger.info(f"[{section}] {name}: {len(articles or [])} fetched, {added} new")
+
+    reddit_tasks = [t for t in tasks if _is_reddit(t[2])]
+    other_tasks = [t for t in tasks if not _is_reddit(t[2])]
+
+    logger.info(
+        f"Parallel RSS fetch: {len(other_tasks)} sources (workers={settings.rss_max_workers}) "
+        f"+ {len(reddit_tasks)} Reddit feeds on the serial lane"
+    )
     with ThreadPoolExecutor(max_workers=settings.rss_max_workers) as executor:
+        # Reddit runs serially in ONE worker slot while the rest fan out —
+        # total stage-1 time is dominated by the Reddit lane (~75s per feed).
+        reddit_future = (
+            executor.submit(
+                _fetch_reddit_serial, reddit_tasks, settings.rss_request_timeout_seconds
+            )
+            if reddit_tasks
+            else None
+        )
+
         future_map = {
             executor.submit(
                 fetch_feed_with_timeout,
@@ -149,7 +219,7 @@ def fetch_rss_feeds_parallel(
                 7,
                 settings.rss_request_timeout_seconds,
             ): (section, name, url)
-            for (section, name, url) in tasks
+            for (section, name, url) in other_tasks
         }
 
         for future in as_completed(future_map):
@@ -159,16 +229,13 @@ def fetch_rss_feeds_parallel(
             except Exception as e:
                 logger.error(f"[{section}] Error fetching {name}: {e}")
                 continue
+            collect(section, name, articles)
 
-            added = 0
-            for article in articles or []:
-                link = article.get("link")
-                if link and link not in seen_urls:
-                    seen_urls.add(link)
-                    article["source"] = name
-                    article["original_section"] = section
-                    all_articles.append(article)
-                    added += 1
-            logger.info(f"[{section}] {name}: {len(articles or [])} fetched, {added} new")
+        if reddit_future is not None:
+            try:
+                for section, name, url, articles in reddit_future.result():
+                    collect(section, name, articles)
+            except Exception as e:
+                logger.error(f"Reddit serial lane failed: {e}")
 
     return all_articles

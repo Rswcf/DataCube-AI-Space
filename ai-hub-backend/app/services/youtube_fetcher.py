@@ -54,6 +54,60 @@ def format_view_count(count: int) -> str:
         return str(count)
 
 
+# Channel allowlist (2026-08-01 research-team refresh). Allowlist-primary
+# fetching replaced the 20-generic-query search approach: per-channel
+# playlistItems cost ~1 quota unit vs 100 per search call (~95% quota cut),
+# and it stops off-topic channels that merely keyword-match "AI" from
+# leaking into the feed. Handles are resolved to upload playlists at
+# runtime via channels.list (cached per process).
+CHANNEL_ALLOWLIST = [
+    "aiexplained-official",      # AI Explained — benchmark-driven news analysis
+    "mreflow",                   # Matt Wolfe — weekly AI news/tools roundups
+    "AIDailyBrief",              # The AI Daily Brief — daily ~20min news show
+    "Fireship",                  # Fireship — dev-oriented explainers
+    "TwoMinutePapers",           # Two Minute Papers — research summaries
+    "bycloudAI",                 # bycloud — technical research breakdowns
+    "ColeMedin",                 # Cole Medin — production AI-agent tutorials
+    "indydevdan",                # IndyDevDan — agentic coding workflows
+    "WesRoth",                   # Wes Roth — near-daily news (hypey titles; LLM ranks)
+    "matthew_berman",            # Matthew Berman — model testing/news
+    "samwitteveenai",            # Sam Witteveen — hands-on LLM/agent tutorials
+    "futurepedia_io",            # Futurepedia — beginner tool tutorials
+    "MachineLearningStreetTalk", # MLST — technical interviews
+    "3blue1brown",               # 3Blue1Brown — visual math/AI explainers
+    "AndrejKarpathy",            # Karpathy — rare but landmark uploads
+]
+
+# Small discovery net alongside the allowlist — catches breakout videos from
+# channels we do not follow yet. Two queries = 200 quota units/day.
+DISCOVERY_QUERIES = [
+    "AI news today",
+    "AI breakthrough explained",
+]
+
+_UPLOADS_PLAYLIST_CACHE: dict[str, str] = {}
+
+
+def _uploads_playlist_id(youtube, handle: str) -> str | None:
+    """Resolve a channel handle to its uploads playlist ID (cached)."""
+    if handle in _UPLOADS_PLAYLIST_CACHE:
+        return _UPLOADS_PLAYLIST_CACHE[handle]
+    try:
+        resp = youtube.channels().list(
+            forHandle=handle, part="contentDetails"
+        ).execute()
+        items = resp.get("items", [])
+        if not items:
+            logger.warning(f"YouTube channel not found for handle @{handle}")
+            return None
+        playlist_id = items[0]["contentDetails"]["relatedPlaylists"]["uploads"]
+        _UPLOADS_PLAYLIST_CACHE[handle] = playlist_id
+        return playlist_id
+    except Exception as e:
+        logger.warning(f"Failed to resolve @{handle}: {e}")
+        return None
+
+
 def fetch_youtube_videos(
     queries: list[str] = None,
     max_results: int = 10,
@@ -79,41 +133,7 @@ def fetch_youtube_videos(
         return []
 
     if queries is None:
-        # General-audience queries (2026-08: generalized from the old
-        # consultant/analytics-team set as part of the public repositioning)
-        queries = [
-            # AI News (core)
-            "AI news this week",
-            "AI news today",
-
-            # Major model / lab coverage
-            "GPT-5 explained",
-            "Claude AI tutorial",
-            "Gemini tutorial",
-            "open source LLM",
-
-            # Tools & tutorials (high search volume)
-            "ChatGPT tutorial",
-            "best AI tools",
-            "AI agents tutorial",
-            "prompt engineering guide",
-            "NotebookLM tutorial",
-            "Perplexity AI tutorial",
-
-            # Coding & builders (large enthusiast audience)
-            "AI coding assistant",
-            "build with AI tutorial",
-
-            # Creative AI
-            "AI image generation",
-            "AI video generation",
-            "Midjourney tips",
-
-            # Explainers & analysis
-            "how LLMs work",
-            "AI research explained",
-            "AI safety explained",
-        ]
+        queries = DISCOVERY_QUERIES
 
     try:
         youtube = build("youtube", "v3", developerKey=settings.youtube_api_key)
@@ -125,38 +145,22 @@ def fetch_youtube_videos(
     all_videos = []
     seen_ids = set()
 
-    for query in queries:
-        logger.info(f"Searching YouTube for: {query}")
-
-        try:
-            search_response = youtube.search().list(
-                q=query,
-                part="id,snippet",
-                type="video",
-                order="viewCount",
-                publishedAfter=published_after,
-                maxResults=max_results,
-                relevanceLanguage="en",
-            ).execute()
-
-            video_ids = [
-                item["id"]["videoId"]
-                for item in search_response.get("items", [])
-                if item["id"]["videoId"] not in seen_ids
-            ]
-
-            if not video_ids:
+    def process_video_ids(video_ids: list[str]) -> None:
+        """Fetch details for IDs and append those passing quality filters."""
+        fresh = [v for v in video_ids if v not in seen_ids]
+        for i in range(0, len(fresh), 50):
+            chunk = fresh[i:i + 50]
+            try:
+                videos_response = youtube.videos().list(
+                    id=",".join(chunk),
+                    part="snippet,contentDetails,statistics",
+                ).execute()
+            except Exception as e:
+                logger.error(f"videos.list failed: {e}")
                 continue
-
-            # Get video details (duration, view count, etc.)
-            videos_response = youtube.videos().list(
-                id=",".join(video_ids),
-                part="snippet,contentDetails,statistics",
-            ).execute()
 
             for video in videos_response.get("items", []):
                 video_id = video["id"]
-
                 if video_id in seen_ids:
                     continue
 
@@ -165,15 +169,12 @@ def fetch_youtube_videos(
                 statistics = video.get("statistics", {})
 
                 view_count = int(statistics.get("viewCount", 0))
-
-                # Filter by view count
                 if view_count < min_view_count:
                     continue
 
                 duration_seconds, duration_formatted = parse_duration(
                     content_details.get("duration", "PT0S")
                 )
-
                 # Skip very short videos (< 1 min) or very long ones (> 1 hour)
                 if duration_seconds < 60 or duration_seconds > 3600:
                     continue
@@ -195,6 +196,49 @@ def fetch_youtube_videos(
                     "tags": snippet.get("tags", []),
                 })
 
+    # --- Allowlist phase: latest uploads from curated channels (~2 quota
+    # units per channel vs 100 per search query) ---
+    allowlist_ids: list[str] = []
+    for handle in CHANNEL_ALLOWLIST:
+        playlist_id = _uploads_playlist_id(youtube, handle)
+        if not playlist_id:
+            continue
+        try:
+            resp = youtube.playlistItems().list(
+                playlistId=playlist_id, part="contentDetails", maxResults=5
+            ).execute()
+            for item in resp.get("items", []):
+                details = item.get("contentDetails", {})
+                vid = details.get("videoId")
+                published = details.get("videoPublishedAt", "")
+                if vid and published and published >= published_after:
+                    allowlist_ids.append(vid)
+        except HttpError as e:
+            logger.warning(f"playlistItems failed for @{handle}: {e}")
+        except Exception as e:
+            logger.warning(f"Allowlist fetch error for @{handle}: {e}")
+    logger.info(f"Allowlist channels yielded {len(allowlist_ids)} fresh videos")
+    process_video_ids(allowlist_ids)
+
+    # --- Discovery phase: small search net for breakout videos ---
+    for query in queries:
+        logger.info(f"Searching YouTube for: {query}")
+        try:
+            search_response = youtube.search().list(
+                q=query,
+                part="id,snippet",
+                type="video",
+                order="viewCount",
+                publishedAfter=published_after,
+                maxResults=max_results,
+                relevanceLanguage="en",
+            ).execute()
+            video_ids = [
+                item["id"]["videoId"]
+                for item in search_response.get("items", [])
+                if item["id"]["videoId"] not in seen_ids
+            ]
+            process_video_ids(video_ids)
         except HttpError as e:
             logger.error(f"YouTube API error for query '{query}': {e}")
         except Exception as e:
