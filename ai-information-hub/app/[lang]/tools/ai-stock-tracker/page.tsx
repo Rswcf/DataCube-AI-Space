@@ -660,6 +660,12 @@ export default async function AIStockTrackerToolPage({ params }: Props) {
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold font-display leading-tight">
             {t(H1, lang)}
           </h1>
+        <p className="mt-3 border border-invest-accent/50 bg-invest-accent/5 p-3 font-sans text-xs leading-relaxed text-muted-foreground">
+          <strong className="text-foreground">Status (2026-08):</strong>{' '}
+          live market-data display is temporarily paused pending a market-data
+          licensing review. Deal and funding data remains available on the{' '}
+          <a href="/funding" className="font-bold text-primary hover:underline">AI Funding Tracker</a>.
+        </p>
 
           <p className="mt-6 max-w-3xl mx-auto text-lg text-muted-foreground leading-relaxed">
             {t(SUBTITLE, lang)}

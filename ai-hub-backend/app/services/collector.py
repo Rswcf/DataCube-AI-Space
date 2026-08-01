@@ -442,18 +442,16 @@ def load_sources() -> dict:
             {"url": "https://tech.eu/feed", "name": "Tech.eu"},
             {"url": "https://technode.com/feed/", "name": "TechNode"},
             {"url": "https://pandaily.com/feed/", "name": "Pandaily"},
-            {"url": "https://news.google.com/rss/search?q=AI+startup+(%22raises%22+OR+%22Series+A%22+OR+%22funding+round%22)+when:1d&hl=en-US&gl=US&ceid=US:en", "name": "Google News AI Funding"},
         ],
         "ma": [
-            # 2026-08-01 refresh: SEC EDGAR 8-K dropped (raw filings were ~25%
-            # of pipeline volume with near-zero AI relevance; FT/Techmeme/
-            # Google News catch material AI deals). PR Newswire scoped to its
-            # M&A-only category feed. Yahoo topstories dropped (generic).
+            # 2026-08-01 refresh: SEC EDGAR 8-K dropped (noise). Same-day
+            # data-rights review removed FT (RSS terms bar commercial reuse and
+            # database creation) and Google News RSS (robots.txt disallows /rss;
+            # no rights flow-through) — press releases + tech press cover M&A.
+            # See .ai-collab/context/data-rights-register-2026-08.md.
             {"url": "https://techcrunch.com/tag/mergers-and-acquisitions/feed/", "name": "TechCrunch M&A"},
-            {"url": "https://www.ft.com/mergers-acquisitions?format=rss", "name": "FT M&A"},
             {"url": "https://www.globenewswire.com/RssFeed/subjectcode/15-Mergers%20and%20Acquisitions/feedTitle/GlobeNewswire%20-%20Mergers%20and%20Acquisitions", "name": "GlobeNewswire M&A"},
             {"url": "https://www.prnewswire.com/rss/financial-services-latest-news/acquisitions-mergers-and-takeovers-list.rss", "name": "PR Newswire M&A"},
-            {"url": "https://news.google.com/rss/search?q=mergers+acquisitions+AI&hl=en-US", "name": "Google News M&A"},
         ],
         "tips": [
             # 2026-08-01 refresh: Reddit now rate-limits unauthenticated .rss

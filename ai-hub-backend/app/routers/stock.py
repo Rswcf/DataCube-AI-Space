@@ -19,6 +19,25 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/stock", tags=["stock"])
 
+# 2026-08-01 COMPLIANCE KILL SWITCH (data-rights review, see
+# .ai-collab/context/data-rights-register-2026-08.md): Polygon/Massive
+# individual-tier Market Data Terms license data "exclusively for your
+# personal, non-business, and non-commercial purposes" and prohibit public
+# redistribution/display. Serving live market data on a public site breaches
+# those terms — all stock endpoints are disabled until a redistribution-
+# licensed tier or alternative source is in place.
+STOCK_DATA_DISABLED = True
+_DISABLED_DETAIL = (
+    "Stock data is temporarily disabled pending market-data licensing review "
+    "(2026-08-01). See /source-methodology."
+)
+
+
+def _ensure_enabled():
+    if STOCK_DATA_DISABLED:
+        raise HTTPException(status_code=410, detail=_DISABLED_DETAIL)
+
+
 # Polygon.io API base URL
 POLYGON_BASE_URL = "https://api.polygon.io"
 
@@ -105,6 +124,7 @@ async def get_stock_data(ticker: str):
     Returns:
         StockData with price, change, marketCap, and company name
     """
+    _ensure_enabled()
     settings = get_settings()
 
     if not settings.polygon_api_key:
@@ -181,6 +201,7 @@ async def get_batch_stock_data(
     Returns:
         Dictionary mapping tickers to their stock data
     """
+    _ensure_enabled()
     settings = get_settings()
 
     if not settings.polygon_api_key:
@@ -285,6 +306,7 @@ async def get_formatted_stock_data(
     Returns:
         Formatted stock data with display-ready strings
     """
+    _ensure_enabled()
     data = await get_stock_data(ticker)
 
     return {
@@ -315,6 +337,7 @@ async def get_formatted_batch_stock_data(
     Returns:
         Dictionary mapping tickers to formatted stock data
     """
+    _ensure_enabled()
     batch_data = await get_batch_stock_data(tickers)
 
     results = {}
