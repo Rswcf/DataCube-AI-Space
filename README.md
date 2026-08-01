@@ -45,7 +45,7 @@ https://github.com/user-attachments/assets/9dddaaed-e473-4350-97de-0346cacb6660
 |---|---------|-------------|
 | 📡 | **Tech Feed** | AI/ML breakthroughs with embedded YouTube videos and impact ratings |
 | 💰 | **Investment Tracker** | Funding rounds, M&A deals, evidence-linked AI Funding Tracker with free CSV export |
-| 💡 | **Practical Tips** | Curated from 14 Reddit communities and expert blogs |
+| 💡 | **Practical Tips** | Curated from hand-picked Reddit communities and expert blogs |
 | 🌐 | **8 Languages** | DE, EN, ZH, FR, ES, PT, JA, KO — free-model translation pipeline |
 | 📅 | **Daily + Weekly** | Automated daily collection with weekly rollup views |
 | 🤖 | **AI Chat** | Ask questions about the current week's AI news |
@@ -68,7 +68,7 @@ Frontend (Vercel)                    Backend (Railway)
 │  Shadcn/ui          │             │  1. Fetch (RSS, HN, YouTube)  │
 │                     │             │  2. Classify (LLM)            │
 │  Pages:             │             │  3. Process (LLM, parallel)   │
-│  • Tech Feed        │             │  3.5 Translate (6 languages)  │
+│  • Tech Feed        │             │  3.5 Translate (7 languages)  │
 │  • Investment Feed  │             │  4. Save to PostgreSQL        │
 │  • Tips Feed        │             │                              │
 │  • AI Chat          │             │  Data Sources:               │

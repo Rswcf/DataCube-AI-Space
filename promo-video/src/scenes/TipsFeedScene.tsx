@@ -187,7 +187,7 @@ export const TipsFeedScene: React.FC = () => {
           marginTop: 32,
         }}
       >
-        Curated from 14 Reddit communities + expert blogs
+        Curated from hand-picked Reddit communities + expert blogs
       </div>
     </AbsoluteFill>
   );
