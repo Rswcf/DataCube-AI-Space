@@ -121,9 +121,9 @@ python -m scripts.weekly_collect --week 2026-kw06  # Specific week
 |-------|-----------|
 | **Frontend** | Next.js 16, React 19, Tailwind CSS 4, Shadcn/ui, TypeScript |
 | **Backend** | FastAPI, SQLAlchemy, Alembic, PostgreSQL |
-| **LLM Classification** | GLM-4.5-Air (OpenRouter, free tier) |
-| **LLM Processing** | DeepSeek V4 Flash (OpenRouter, primary; V3.2 fallback) |
-| **Translation** | Free model chain + paid tail (OpenRouter, free-first) |
+| **LLM Classification** | deepseek-v4-flash-0731 → qwen3.7-flash → free fallbacks (OpenRouter, paid-first) |
+| **LLM Processing** | deepseek-v4-flash-0731 → qwen3.7-flash → free fallbacks (OpenRouter, paid-first) |
+| **Translation** | deepseek-v4-flash-0731 → qwen3.7-flash → free fallbacks (OpenRouter, paid-first) |
 | **Chat & Reports** | openrouter/free (OpenRouter, smart router) |
 | **Newsletter** | Resend (sending) + Beehiiv (subscribers) |
 | **Stock Data** | Disabled (HTTP 410) pending market-data licensing — see docs/data-rights.md |
