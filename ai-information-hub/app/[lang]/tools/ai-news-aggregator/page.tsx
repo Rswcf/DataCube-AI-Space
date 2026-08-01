@@ -115,7 +115,7 @@ const SUBTITLE: L = {
   fr: "DataCube AI s\u00e9lectionne chaque jour les actualit\u00e9s IA les plus importantes de 35+ sources \u2014 perc\u00e9es technologiques, signaux d'investissement, conseils pratiques et vid\u00e9os YouTube. Enti\u00e8rement gratuit, en 8 langues.",
   es: 'DataCube AI selecciona diariamente las noticias de IA m\u00e1s importantes de 35+ fuentes \u2014 avances tecnol\u00f3gicos, se\u00f1ales de inversi\u00f3n, consejos pr\u00e1cticos y videos de YouTube. Completamente gratuito, en 8 idiomas.',
   pt: 'DataCube AI seleciona diariamente as not\u00edcias de IA mais importantes de 35+ fontes \u2014 avan\u00e7os tecnol\u00f3gicos, sinais de investimento, dicas pr\u00e1ticas e v\u00eddeos do YouTube. Totalmente gratuito, em 8 idiomas.',
-  ja: 'DataCube AI \u306f 22 \u4ee5\u4e0a\u306e\u30bd\u30fc\u30b9\u304b\u3089\u6bce\u65e5\u6700\u3082\u91cd\u8981\u306a AI \u30cb\u30e5\u30fc\u30b9\u3092\u53b3\u9078 \u2014 \u6280\u8853\u7684\u30d6\u30ec\u30fc\u30af\u30b9\u30eb\u30fc\u3001\u6295\u8cc7\u30b7\u30b0\u30ca\u30eb\u3001\u5b9f\u8df5\u30d2\u30f3\u30c8\u3001YouTube \u52d5\u753b\u3002\u5b8c\u5168\u7121\u6599\u30018 \u8a00\u8a9e\u5bfe\u5fdc\u3002',
+  ja: 'DataCube AI \u306f 35 \u4ee5\u4e0a\u306e\u30bd\u30fc\u30b9\u304b\u3089\u6bce\u65e5\u6700\u3082\u91cd\u8981\u306a AI \u30cb\u30e5\u30fc\u30b9\u3092\u53b3\u9078 \u2014 \u6280\u8853\u7684\u30d6\u30ec\u30fc\u30af\u30b9\u30eb\u30fc\u3001\u6295\u8cc7\u30b7\u30b0\u30ca\u30eb\u3001\u5b9f\u8df5\u30d2\u30f3\u30c8\u3001YouTube \u52d5\u753b\u3002\u5b8c\u5168\u7121\u6599\u30018 \u8a00\u8a9e\u5bfe\u5fdc\u3002',
   ko: 'DataCube AI\ub294 35\uac1c \uc774\uc0c1\uc758 \uc18c\uc2a4\uc5d0\uc11c \ub9e4\uc77c \uac00\uc7a5 \uc911\uc694\ud55c AI \ub274\uc2a4\ub97c \uc120\ubcc4\ud569\ub2c8\ub2e4 \u2014 \uae30\uc220 \ub3cc\ud30c\uad6c, \ud22c\uc790 \uc2e0\ud638, \uc2e4\uc6a9 \ud301, YouTube \ub3d9\uc601\uc0c1. \uc644\uc804 \ubb34\ub8cc, 8\uac1c \uc5b8\uc5b4 \uc9c0\uc6d0.',
 }
 
@@ -302,8 +302,8 @@ const STEP_DESCRIPTIONS: L[] = [
     fr: 'Nous collectons quotidiennement les donn\u00e9es de 30+ flux RSS, Hacker News et YouTube.',
     es: 'Recopilamos datos diariamente de 30+ feeds RSS, Hacker News y YouTube.',
     pt: 'Coletamos dados diariamente de 30+ feeds RSS, Hacker News e YouTube.',
-    ja: '35\u4ee5\u4e0a\u306eRSS\u30d5\u30a3\u30fc\u30c9\u3001Hacker News\u3001YouTube\u304b\u3089\u6bce\u65e5\u30c7\u30fc\u30bf\u3092\u53d6\u5f97\u3002',
-    ko: '35\uac1c \uc774\uc0c1\uc758 RSS \ud53c\ub4dc, Hacker News, YouTube\uc5d0\uc11c \ub9e4\uc77c \ub370\uc774\ud130\ub97c \uc218\uc9d1\ud569\ub2c8\ub2e4.',
+    ja: '30\u4ee5\u4e0a\u306eRSS\u30d5\u30a3\u30fc\u30c9\u3001Hacker News\u3001YouTube\u304b\u3089\u6bce\u65e5\u30c7\u30fc\u30bf\u3092\u53d6\u5f97\u3002',
+    ko: '30\uac1c \uc774\uc0c1\uc758 RSS \ud53c\ub4dc, Hacker News, YouTube\uc5d0\uc11c \ub9e4\uc77c \ub370\uc774\ud130\ub97c \uc218\uc9d1\ud569\ub2c8\ub2e4.',
   },
   {
     de: 'KI-Modelle kategorisieren jeden Artikel nach Thema und Relevanz.',

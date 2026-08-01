@@ -220,13 +220,13 @@ Analyze the tech news in detail. Group related developments, explain their signi
 ## Investment & Market Activity
 
 ### Primary Market (Funding Rounds)
-Summarize funding rounds, noting amounts, stages, and what the companies do.
+Present the funding rounds as a GitHub-Flavored Markdown table (columns: Company | Round | Amount | Investors), then briefly analyze what the companies do.
 
-### Secondary Market (Stock Movements)
-Analyze notable stock price movements and what they signal about market sentiment.
+### Secondary Market (Market News)
+Summarize notable as-reported market news and what it signals about sentiment.
 
 ### Mergers & Acquisitions
-Cover M&A activity, discussing strategic rationale and industry implications.
+Present M&A activity as a GitHub-Flavored Markdown table (columns: Acquirer | Target | Deal), then discuss strategic rationale and industry implications.
 
 ## Practical AI Tips
 Curate the most valuable tips, adding context about when and why each tip is useful. Group by difficulty level if applicable.
