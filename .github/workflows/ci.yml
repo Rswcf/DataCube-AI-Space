@@ -156,4 +156,4 @@ jobs:
       - name: Run migrations on a fresh database
         run: alembic upgrade head
       - name: Deals-layer integration tests
-        run: pytest tests/test_deals_integration.py -v
+        run: python -m pytest tests/test_deals_integration.py -v
