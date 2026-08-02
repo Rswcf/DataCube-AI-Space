@@ -5,41 +5,41 @@ export const revalidate = 86400
 export const metadata: Metadata = {
   title: 'Premium',
   description:
-    'Unlock the full power of Data Cube AI with Premium: unlimited AI chat, full archive access, custom keyword alerts, data export, and ad-free reading across 8 languages.',
+    'Data Cube AI Premium is in development. Everything on the site is free today — see the planned Premium features: higher AI chat limits, keyword alerts, data export, and priority support.',
 }
 
 /* -------------------------------------------------------------------
    Feature comparison data
    ------------------------------------------------------------------- */
 
+// Honest current state: today EVERYTHING on the site is free. The premium
+// column describes PLANNED features (subscription is not purchasable yet —
+// the CTA below is disabled) — do not present them as live entitlements.
 const FEATURES: { label: string; free: string; premium: string }[] = [
-  { label: 'Daily AI news feed', free: 'Last 7 days', premium: 'Full archive access' },
-  { label: 'Content languages', free: 'All 8 languages', premium: 'All 8 + custom filters' },
-  { label: 'AI chat assistant', free: '5 queries/day', premium: 'Unlimited queries' },
-  { label: 'Weekly email digest', free: 'Yes', premium: 'Daily digest + breaking news alerts' },
-  { label: 'API access', free: '100 calls/day', premium: '5,000 calls/day' },
-  { label: 'Custom keyword alerts', free: 'No', premium: 'Yes' },
-  { label: 'Ad-free experience', free: 'No', premium: 'Yes' },
-  { label: 'Data export (CSV/JSON)', free: 'No', premium: 'Yes' },
-  { label: 'Priority support', free: 'No', premium: 'Yes' },
+  { label: 'Daily AI news feed + full archive', free: 'Yes', premium: 'Yes' },
+  { label: 'Content languages', free: 'All 8 languages', premium: 'All 8 + custom filters (planned)' },
+  { label: 'AI chat assistant', free: '20 queries / 10 min (fair use)', premium: 'Higher limits (planned)' },
+  { label: 'Email digest', free: 'Daily newsletter (8 languages)', premium: 'Breaking-news alerts (planned)' },
+  { label: 'API access', free: 'Free, no key required', premium: 'Guaranteed limits + SLA (planned)' },
+  { label: 'Custom keyword alerts', free: 'No', premium: 'Planned' },
+  { label: 'Data export (CSV/JSON)', free: 'Funding Tracker CSV', premium: 'All sections (planned)' },
+  { label: 'Priority support', free: 'No', premium: 'Planned' },
 ]
 
 const PREMIUM_FEATURES = [
-  'Full archive access',
-  'Unlimited AI chat queries',
-  'Daily digest + breaking news alerts',
-  '5,000 API calls/day',
+  'Higher AI chat limits',
+  'Breaking-news alerts',
   'Custom keyword alerts',
-  'Ad-free experience',
-  'Data export (CSV/JSON)',
+  'Data export for all sections (CSV/JSON)',
+  'Guaranteed API limits + SLA',
   'Priority support',
-  'All 8 languages + custom filters',
+  'Custom language/topic filters',
 ]
 
 const FAQ: { q: string; a: string }[] = [
   {
     q: 'Can I cancel anytime?',
-    a: 'Yes. You can cancel your subscription from your account settings at any time. You will retain access until the end of your current billing period.',
+    a: 'Yes — when Premium launches, cancellation will be self-service at any time, with access retained until the end of the billing period.',
   },
   {
     q: 'What payment methods are accepted?',
@@ -47,11 +47,11 @@ const FAQ: { q: string; a: string }[] = [
   },
   {
     q: 'Is there a free trial?',
-    a: 'Yes. Every Premium subscription starts with a 7-day free trial. You will not be charged until the trial period ends.',
+    a: 'Premium has not launched yet — everything on Data Cube AI is free today. When Premium launches, subscriptions are planned to start with a 7-day free trial.',
   },
   {
     q: 'What happens to my data if I cancel?',
-    a: 'Your bookmarks, saved searches, and settings are preserved. You can reactivate your subscription at any time to regain Premium access.',
+    a: 'The site does not require an account today. When Premium launches with saved preferences, they will be preserved on cancellation and you can reactivate at any time.',
   },
 ]
 
@@ -139,12 +139,13 @@ export default function PremiumPage() {
       {/* ---- Hero ---- */}
       <header className="mb-16 text-center">
         <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
-          Unlock the Full Power of Data Cube AI
+          Data Cube AI Premium — In Development
         </h1>
         <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
-          Get unlimited AI chat, full archive access, custom keyword alerts, data export,
-          and an ad-free reading experience across all 8 languages. Stay ahead with
-          daily digests and breaking news alerts delivered straight to your inbox.
+          Everything on Data Cube AI is free today — the daily briefing, full archive,
+          AI chat and reports, the Funding Tracker with CSV export, and the public API.
+          Premium is in development and will add higher AI chat limits, keyword alerts,
+          full data export, and priority support. Here is what is planned:
         </p>
       </header>
 
@@ -162,7 +163,7 @@ export default function PremiumPage() {
                   Free
                 </th>
                 <th className="border border-gray-200 px-4 py-3 text-center font-semibold w-52 bg-amber-50">
-                  Premium (EUR 7/mo)
+                  Premium — planned (EUR 7/mo)
                 </th>
               </tr>
             </thead>
@@ -215,7 +216,8 @@ export default function PremiumPage() {
             Coming Soon
           </button>
           <p className="mt-3 text-xs text-gray-500">
-            7-day free trial included. Cancel anytime.
+            Premium is in development — everything on the site is free today.
+            Planned launch terms: 7-day free trial, cancel anytime.
           </p>
         </div>
       </section>

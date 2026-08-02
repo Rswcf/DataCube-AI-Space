@@ -6,7 +6,7 @@
 ## Content Sections
 
 ### Technology Feed
-Daily curated AI technology news (10-25 posts per day). Each post includes
+Daily curated AI technology news (up to 10 posts per day; weekly digests carry more). Each post includes
 impact level, category, source attribution, and multilingual content (8 languages).
 
 ### Investment Feed
@@ -16,10 +16,10 @@ impact level, category, source attribution, and multilingual content (8 language
 
 ### Tips Feed
 Practical AI tips from Reddit communities and expert blogs.
-5-15 tips per language per day.
+Up to 5 tips per day (15 in weekly digests).
 
 ### Video Feed
-2-5 curated YouTube videos about AI developments per day.
+Up to 2 curated YouTube videos about AI developments per day (5 in weekly digests).
 
 ## Free AI Tools
 DataCube AI offers free, multilingual AI-powered tools:
