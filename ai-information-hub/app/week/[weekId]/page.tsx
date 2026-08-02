@@ -243,14 +243,14 @@ const h3PrimaryMarket: L = {
 }
 
 const h3SecondaryMarket: L = {
-  de: 'Sekundärmarkt – Aktienbewegungen',
-  en: 'Secondary Market – Stock Movements',
-  zh: '二级市场 – 股票动态',
-  fr: 'Marché secondaire – Mouvements boursiers',
-  es: 'Mercado secundario – Movimientos bursátiles',
-  pt: 'Mercado secundário – Movimentos de ações',
-  ja: 'セカンダリーマーケット – 株価動向',
-  ko: '2차 시장 – 주가 동향',
+  de: 'Sekundärmarkt – Markt-Updates',
+  en: 'Secondary Market – Market Updates',
+  zh: '二级市场 – 市场动态',
+  fr: 'Marché secondaire – Actualités de marché',
+  es: 'Mercado secundario – Actualizaciones de mercado',
+  pt: 'Mercado secundário – Atualizações de mercado',
+  ja: 'セカンダリーマーケット – 市場動向',
+  ko: '세컨더리 마켓 – 시장 동향',
 }
 
 const h3MA: L = {
