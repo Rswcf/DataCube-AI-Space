@@ -173,7 +173,7 @@ export function TechFeed({ weekId, searchQuery }: TechFeedProps) {
           </div>
           <p className="text-muted-foreground font-medium">{t("noDataForThisPeriod")}</p>
           <p className="mt-1 text-sm text-muted-foreground/60">
-            {language === "de" ? "Daten werden täglich um 23:00 Uhr gesammelt" : "Data is collected daily at 11:00 PM CET"}
+            {language === "de" ? "Daten werden täglich am späten Abend (Berliner Zeit) gesammelt" : "Data is collected daily in the late evening (Berlin time)"}
           </p>
         </div>
       )}
