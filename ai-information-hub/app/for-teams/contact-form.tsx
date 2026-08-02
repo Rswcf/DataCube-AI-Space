@@ -26,11 +26,12 @@ export function ContactForm() {
     return (
       <div className="border border-green-200 bg-green-50 rounded-lg p-6 text-center">
         <p className="text-green-800 font-semibold text-lg mb-2">
-          Almost done — your email draft is ready.
+          One more step — send the email.
         </p>
         <p className="text-green-700 text-sm">
-          We opened a prefilled draft in your mail client — hit send there to
-          complete the inquiry. If no draft opened, please email{' '}
+          We asked your mail client to open a prefilled draft. If it opened,
+          hit send there to complete the inquiry. If nothing opened, please
+          email{' '}
           <a href="mailto:enterprise@datacubeai.space" className="underline">
             enterprise@datacubeai.space
           </a>{' '}

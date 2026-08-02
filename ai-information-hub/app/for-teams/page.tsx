@@ -48,6 +48,8 @@ const useCases = [
   },
 ]
 
+// These are PLANNED offerings (roadmap Phase 4) — none are live products
+// today. The page must present them as pilot engagements, not inventory.
 const products = [
   {
     name: 'Enterprise Dashboard',
@@ -134,7 +136,12 @@ export default function ForTeamsPage() {
 
       {/* Product Offerings */}
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold mb-6">Product Offerings</h2>
+        <h2 className="text-2xl font-semibold mb-6">Planned Offerings (Pilot Program)</h2>
+        <p className="text-sm text-gray-600 mb-4">
+          These offerings are in development and available as pilot
+          engagements — get in touch below to shape them with us. Prices are
+          planned pilot pricing, not a live price list.
+        </p>
         <div className="overflow-x-auto">
           <table className="w-full border-collapse text-sm">
             <thead>
@@ -146,7 +153,7 @@ export default function ForTeamsPage() {
                   Description
                 </th>
                 <th className="border border-gray-200 px-4 py-3 text-left font-semibold whitespace-nowrap">
-                  Starting Price
+                  Planned Price
                 </th>
               </tr>
             </thead>
@@ -166,7 +173,7 @@ export default function ForTeamsPage() {
           </table>
         </div>
         <p className="text-xs text-gray-500 mt-2">
-          All prices exclude VAT. Volume discounts available for annual contracts.
+          Planned prices exclude VAT; final pilot terms are agreed individually.
         </p>
       </section>
 
