@@ -159,14 +159,14 @@ const H2_ENDPOINTS: L = {
 }
 
 const ENDPOINTS_LEAD: L = {
-  de: 'Unsere REST API gibt Ihnen programmatischen Zugriff auf kuratierte KI-Nachrichten-Daten. Alle Endpunkte liefern JSON-Antworten mit Daten in bis zu 8 Sprachen. Period-IDs verwenden das Format YYYY-MM-DD (t\u00e4glich) oder YYYY-kwWW (w\u00f6chentlich).',
-  en: 'Our REST API gives you programmatic access to curated AI news data. All endpoints return JSON responses with data in up to 8 languages. Period IDs use the format YYYY-MM-DD (daily) or YYYY-kwWW (weekly).',
-  zh: '\u6211\u4eec\u7684 REST API \u4e3a\u60a8\u63d0\u4f9b\u5bf9\u7cbe\u9009 AI \u65b0\u95fb\u6570\u636e\u7684\u7a0b\u5e8f\u5316\u8bbf\u95ee\u3002\u6240\u6709\u7aef\u70b9\u8fd4\u56de JSON \u54cd\u5e94\uff0c\u6570\u636e\u652f\u6301\u6700\u591a 8 \u79cd\u8bed\u8a00\u3002Period ID \u4f7f\u7528 YYYY-MM-DD\uff08\u6bcf\u65e5\uff09\u6216 YYYY-kwWW\uff08\u6bcf\u5468\uff09\u683c\u5f0f\u3002',
-  fr: "Notre API REST vous donne un acc\u00e8s programmatique aux donn\u00e9es d'actualit\u00e9s IA. Tous les endpoints renvoient des r\u00e9ponses JSON avec des donn\u00e9es en 8 langues. Les IDs de p\u00e9riode utilisent le format YYYY-MM-DD (quotidien) ou YYYY-kwWW (hebdomadaire).",
-  es: 'Nuestra API REST le da acceso program\u00e1tico a datos de noticias IA curados. Todos los endpoints devuelven respuestas JSON con datos en hasta 8 idiomas. Los IDs de per\u00edodo usan el formato YYYY-MM-DD (diario) o YYYY-kwWW (semanal).',
-  pt: 'Nossa API REST oferece acesso program\u00e1tico a dados de not\u00edcias IA curados. Todos os endpoints retornam respostas JSON com dados em at\u00e9 8 idiomas. Os IDs de per\u00edodo usam o formato YYYY-MM-DD (di\u00e1rio) ou YYYY-kwWW (semanal).',
-  ja: '\u5f53\u793eREST API\u306f\u3001\u7cbe\u9078\u3055\u308c\u305fAI\u30cb\u30e5\u30fc\u30b9\u30c7\u30fc\u30bf\u3078\u306e\u30d7\u30ed\u30b0\u30e9\u30e0\u306b\u3088\u308b\u30a2\u30af\u30bb\u30b9\u3092\u63d0\u4f9b\u3057\u307e\u3059\u3002\u5168\u30a8\u30f3\u30c9\u30dd\u30a4\u30f3\u30c8\u306f\u6700\u59278\u8a00\u8a9e\u306eJSON\u5fdc\u7b54\u3092\u8fd4\u3057\u307e\u3059\u3002\u671f\u9593ID\u306fYYYY-MM-DD\uff08\u65e5\u6b21\uff09\u307e\u305f\u306fYYYY-kwWW\uff08\u9031\u6b21\uff09\u5f62\u5f0f\u3002',
-  ko: '\uc6b0\ub9ac\uc758 REST API\ub294 \ud050\ub808\uc774\uc158\ub41c AI \ub274\uc2a4 \ub370\uc774\ud130\uc5d0 \ud504\ub85c\uadf8\ub798\ub9c8\ud2f1 \uc561\uc138\uc2a4\ub97c \uc81c\uacf5\ud569\ub2c8\ub2e4. \ubaa8\ub4e0 \uc5d4\ub4dc\ud3ec\uc778\ud2b8\ub294 \ucd5c\ub300 8\uac1c \uc5b8\uc5b4\uc758 JSON \uc751\ub2f5\uc744 \ubc18\ud658\ud569\ub2c8\ub2e4. Period ID\ub294 YYYY-MM-DD(\uc77c\uc77c) \ub610\ub294 YYYY-kwWW(\uc8fc\uac04) \ud615\uc2dd\uc744 \uc0ac\uc6a9\ud569\ub2c8\ub2e4.',
+  de: 'Unsere REST API gibt Ihnen programmatischen Zugriff auf kuratierte KI-Nachrichten-Daten. Die Inhalts-Endpunkte liefern JSON mit allen verf\u00fcgbaren \u00dcbersetzungen (bis zu 8 Sprachen); /weeks liefert die Periodenliste. Period-IDs verwenden das Format YYYY-MM-DD (t\u00e4glich) oder YYYY-kwWW (w\u00f6chentlich).',
+  en: 'Our REST API gives you programmatic access to curated AI news data. Content endpoints return JSON with all available translations (up to 8 languages); /weeks returns the period list. Period IDs use the format YYYY-MM-DD (daily) or YYYY-kwWW (weekly).',
+  zh: '\u6211\u4eec\u7684 REST API \u63d0\u4f9b\u5bf9\u7cbe\u9009 AI \u65b0\u95fb\u6570\u636e\u7684\u7a0b\u5e8f\u5316\u8bbf\u95ee\u3002\u5185\u5bb9\u7aef\u70b9\u8fd4\u56de\u5305\u542b\u6240\u6709\u5df2\u751f\u6210\u7ffb\u8bd1(\u6700\u591a 8 \u79cd\u8bed\u8a00)\u7684 JSON;/weeks \u8fd4\u56de\u65f6\u6bb5\u5217\u8868\u3002Period ID \u683c\u5f0f\u4e3a YYYY-MM-DD(\u6bcf\u65e5)\u6216 YYYY-kwWW(\u6bcf\u5468)\u3002',
+  fr: 'Notre API REST vous donne un acc\u00e8s programmatique aux donn\u00e9es d\'actualit\u00e9s IA. Les endpoints de contenu renvoient du JSON avec toutes les traductions disponibles (jusqu\'\u00e0 8 langues) ; /weeks renvoie la liste des p\u00e9riodes. Les Period IDs utilisent le format YYYY-MM-DD (quotidien) ou YYYY-kwWW (hebdomadaire).',
+  es: 'Nuestra API REST le da acceso program\u00e1tico a datos curados de noticias de IA. Los endpoints de contenido devuelven JSON con todas las traducciones disponibles (hasta 8 idiomas); /weeks devuelve la lista de per\u00edodos. Los Period IDs usan el formato YYYY-MM-DD (diario) o YYYY-kwWW (semanal).',
+  pt: 'Nossa API REST d\u00e1 acesso program\u00e1tico a dados curados de not\u00edcias de IA. Os endpoints de conte\u00fado retornam JSON com todas as tradu\u00e7\u00f5es dispon\u00edveis (at\u00e9 8 idiomas); /weeks retorna a lista de per\u00edodos. Period IDs usam o formato YYYY-MM-DD (di\u00e1rio) ou YYYY-kwWW (semanal).',
+  ja: 'REST API\u3067\u30ad\u30e5\u30ec\u30fc\u30b7\u30e7\u30f3\u6e08\u307fAI\u30cb\u30e5\u30fc\u30b9\u30c7\u30fc\u30bf\u306b\u30d7\u30ed\u30b0\u30e9\u30e0\u304b\u3089\u30a2\u30af\u30bb\u30b9\u3067\u304d\u307e\u3059\u3002\u30b3\u30f3\u30c6\u30f3\u30c4\u7cfb\u30a8\u30f3\u30c9\u30dd\u30a4\u30f3\u30c8\u306f\u751f\u6210\u6e08\u307f\u306e\u3059\u3079\u3066\u306e\u7ffb\u8a33(\u6700\u59278\u8a00\u8a9e)\u3092\u542b\u3080JSON\u3092\u8fd4\u3057\u3001/weeks\u306f\u671f\u9593\u30ea\u30b9\u30c8\u3092\u8fd4\u3057\u307e\u3059\u3002Period ID\u306fYYYY-MM-DD(\u65e5\u6b21)\u307e\u305f\u306fYYYY-kwWW(\u9031\u6b21)\u5f62\u5f0f\u3002',
+  ko: 'REST API\ub85c \ud050\ub808\uc774\uc158\ub41c AI \ub274\uc2a4 \ub370\uc774\ud130\uc5d0 \ud504\ub85c\uadf8\ub798\ubc0d \ubc29\uc2dd\uc73c\ub85c \uc561\uc138\uc2a4\ud560 \uc218 \uc788\uc2b5\ub2c8\ub2e4. \ucf58\ud150\uce20 \uc5d4\ub4dc\ud3ec\uc778\ud2b8\ub294 \uc0dd\uc131\ub41c \ubaa8\ub4e0 \ubc88\uc5ed(\ucd5c\ub300 8\uac1c \uc5b8\uc5b4)\uc744 \ud3ec\ud568\ud55c JSON\uc744 \ubc18\ud658\ud558\uace0, /weeks\ub294 \uae30\uac04 \ubaa9\ub85d\uc744 \ubc18\ud658\ud569\ub2c8\ub2e4. Period ID \ud615\uc2dd\uc740 YYYY-MM-DD(\uc77c\uac04) \ub610\ub294 YYYY-kwWW(\uc8fc\uac04)\uc785\ub2c8\ub2e4.',
 }
 
 const ENDPOINTS = [
@@ -257,14 +257,14 @@ const FEATURE_DESCRIPTIONS: Record<string, L> = {
     ko: '\ubb34\ub8cc \ud50c\ub79c\uc740 API \ud0a4\ub098 \ub4f1\ub85d\uc774 \ud544\uc694 \uc5c6\uc2b5\ub2c8\ub2e4. \uc5d4\ub4dc\ud3ec\uc778\ud2b8\ub97c \ud638\ucd9c\ud558\uba74 \ub370\uc774\ud130\ub97c \ubc1b\uc744 \uc218 \uc788\uc2b5\ub2c8\ub2e4.',
   },
   languages: {
-    de: 'Jede Antwort enth\u00e4lt Daten in Deutsch, Englisch, Chinesisch, Franz\u00f6sisch, Spanisch, Portugiesisch, Japanisch und Koreanisch.',
-    en: 'Every response includes data in German, English, Chinese, French, Spanish, Portuguese, Japanese, and Korean.',
-    zh: '\u6bcf\u4e2a\u54cd\u5e94\u5305\u542b\u5fb7\u8bed\u3001\u82f1\u8bed\u3001\u4e2d\u6587\u3001\u6cd5\u8bed\u3001\u897f\u73ed\u7259\u8bed\u3001\u8461\u8404\u7259\u8bed\u3001\u65e5\u8bed\u548c\u97e9\u8bed\u7684\u6570\u636e\u3002',
-    fr: 'Chaque r\u00e9ponse inclut des donn\u00e9es en allemand, anglais, chinois, fran\u00e7ais, espagnol, portugais, japonais et cor\u00e9en.',
-    es: 'Cada respuesta incluye datos en alem\u00e1n, ingl\u00e9s, chino, franc\u00e9s, espa\u00f1ol, portugu\u00e9s, japon\u00e9s y coreano.',
-    pt: 'Cada resposta inclui dados em alem\u00e3o, ingl\u00eas, chin\u00eas, franc\u00eas, espanhol, portugu\u00eas, japon\u00eas e coreano.',
-    ja: '\u5404\u30ec\u30b9\u30dd\u30f3\u30b9\u306b\u306f\u30c9\u30a4\u30c4\u8a9e\u3001\u82f1\u8a9e\u3001\u4e2d\u56fd\u8a9e\u3001\u30d5\u30e9\u30f3\u30b9\u8a9e\u3001\u30b9\u30da\u30a4\u30f3\u8a9e\u3001\u30dd\u30eb\u30c8\u30ac\u30eb\u8a9e\u3001\u65e5\u672c\u8a9e\u3001\u97d3\u56fd\u8a9e\u306e\u30c7\u30fc\u30bf\u304c\u542b\u307e\u308c\u307e\u3059\u3002',
-    ko: '\uac01 \uc751\ub2f5\uc5d0\ub294 \ub3c5\uc77c\uc5b4, \uc601\uc5b4, \uc911\uad6d\uc5b4, \ud504\ub791\uc2a4\uc5b4, \uc2a4\ud398\uc778\uc5b4, \ud3ec\ub974\ud22c\uac08\uc5b4, \uc77c\ubcf8\uc5b4, \ud55c\uad6d\uc5b4 \ub370\uc774\ud130\uac00 \ud3ec\ud568\ub429\ub2c8\ub2e4.',
+    de: 'Die Inhalts-Endpunkte liefern alle verf\u00fcgbaren \u00dcbersetzungen \u2014 bis zu 8 Sprachen: Deutsch, Englisch, Chinesisch, Franz\u00f6sisch, Spanisch, Portugiesisch, Japanisch und Koreanisch.',
+    en: 'Content endpoints include all available translations \u2014 up to 8 languages: German, English, Chinese, French, Spanish, Portuguese, Japanese, and Korean.',
+    zh: '\u5185\u5bb9\u7aef\u70b9\u5305\u542b\u6240\u6709\u5df2\u751f\u6210\u7684\u7ffb\u8bd1 \u2014 \u6700\u591a 8 \u79cd\u8bed\u8a00:\u5fb7\u8bed\u3001\u82f1\u8bed\u3001\u4e2d\u6587\u3001\u6cd5\u8bed\u3001\u897f\u73ed\u7259\u8bed\u3001\u8461\u8404\u7259\u8bed\u3001\u65e5\u8bed\u548c\u97e9\u8bed\u3002',
+    fr: 'Les endpoints de contenu incluent toutes les traductions disponibles \u2014 jusqu\'\u00e0 8 langues : allemand, anglais, chinois, fran\u00e7ais, espagnol, portugais, japonais et cor\u00e9en.',
+    es: 'Los endpoints de contenido incluyen todas las traducciones disponibles \u2014 hasta 8 idiomas: alem\u00e1n, ingl\u00e9s, chino, franc\u00e9s, espa\u00f1ol, portugu\u00e9s, japon\u00e9s y coreano.',
+    pt: 'Os endpoints de conte\u00fado incluem todas as tradu\u00e7\u00f5es dispon\u00edveis \u2014 at\u00e9 8 idiomas: alem\u00e3o, ingl\u00eas, chin\u00eas, franc\u00eas, espanhol, portugu\u00eas, japon\u00eas e coreano.',
+    ja: '\u30b3\u30f3\u30c6\u30f3\u30c4\u7cfb\u30a8\u30f3\u30c9\u30dd\u30a4\u30f3\u30c8\u306f\u751f\u6210\u6e08\u307f\u306e\u3059\u3079\u3066\u306e\u7ffb\u8a33\u3092\u542b\u307f\u307e\u3059 \u2014 \u6700\u59278\u8a00\u8a9e:\u30c9\u30a4\u30c4\u8a9e\u3001\u82f1\u8a9e\u3001\u4e2d\u56fd\u8a9e\u3001\u30d5\u30e9\u30f3\u30b9\u8a9e\u3001\u30b9\u30da\u30a4\u30f3\u8a9e\u3001\u30dd\u30eb\u30c8\u30ac\u30eb\u8a9e\u3001\u65e5\u672c\u8a9e\u3001\u97d3\u56fd\u8a9e\u3002',
+    ko: '\ucf58\ud150\uce20 \uc5d4\ub4dc\ud3ec\uc778\ud2b8\ub294 \uc0dd\uc131\ub41c \ubaa8\ub4e0 \ubc88\uc5ed\uc744 \ud3ec\ud568\ud569\ub2c8\ub2e4 \u2014 \ucd5c\ub300 8\uac1c \uc5b8\uc5b4: \ub3c5\uc77c\uc5b4, \uc601\uc5b4, \uc911\uad6d\uc5b4, \ud504\ub791\uc2a4\uc5b4, \uc2a4\ud398\uc778\uc5b4, \ud3ec\ub974\ud22c\uac08\uc5b4, \uc77c\ubcf8\uc5b4, \ud55c\uad6d\uc5b4.',
   },
   sources: {
     de: 'Kuratierte Inhalte von TechCrunch, MIT Technology Review, Ars Technica, Hacker News, Reddit und YouTube.',
@@ -377,14 +377,14 @@ const FAQ_ITEMS: Array<{ q: L; a: L }> = [
       ko: '\uc778\uc99d\uc774 \ud544\uc694\ud55c\uac00\uc694?',
     },
     a: {
-      de: 'Der kostenlose Zugang erfordert keine Authentifizierung \u2014 rufen Sie einfach die Endpunkte auf. Die Developer-Stufe verwendet API-Schl\u00fcssel, die Sie \u00fcber unser Entwicklerportal erhalten k\u00f6nnen.',
-      en: 'Free tier requires no authentication \u2014 just call the endpoints. The Developer tier uses API keys, which you can obtain through our developer portal.',
-      zh: '\u514d\u8d39\u5c42\u65e0\u9700\u8ba4\u8bc1 \u2014 \u76f4\u63a5\u8c03\u7528\u7aef\u70b9\u5373\u53ef\u3002Developer \u5c42\u4f7f\u7528 API \u5bc6\u94a5\uff0c\u53ef\u901a\u8fc7\u6211\u4eec\u7684\u5f00\u53d1\u8005\u95e8\u6237\u83b7\u53d6\u3002',
-      fr: "Le niveau gratuit ne n\u00e9cessite aucune authentification \u2014 appelez simplement les endpoints. Le niveau Developer utilise des cl\u00e9s API que vous pouvez obtenir via notre portail d\u00e9veloppeur.",
-      es: 'El nivel gratuito no requiere autenticaci\u00f3n \u2014 simplemente llame a los endpoints. El nivel Developer usa claves API que puede obtener a trav\u00e9s de nuestro portal de desarrolladores.',
-      pt: 'O n\u00edvel gratuito n\u00e3o requer autentica\u00e7\u00e3o \u2014 simplesmente chame os endpoints. O n\u00edvel Developer usa chaves API que voc\u00ea pode obter atrav\u00e9s do nosso portal de desenvolvedores.',
-      ja: '\u7121\u6599\u30d7\u30e9\u30f3\u306f\u8a8d\u8a3c\u4e0d\u8981 \u2014 \u30a8\u30f3\u30c9\u30dd\u30a4\u30f3\u30c8\u3092\u547c\u3073\u51fa\u3059\u3060\u3051\u3002Developer\u30d7\u30e9\u30f3\u306f\u958b\u767a\u8005\u30dd\u30fc\u30bf\u30eb\u3067\u53d6\u5f97\u3067\u304d\u308bAPI\u30ad\u30fc\u3092\u4f7f\u7528\u3002',
-      ko: '\ubb34\ub8cc \ud50c\ub79c\uc740 \uc778\uc99d\uc774 \ud544\uc694 \uc5c6\uc2b5\ub2c8\ub2e4 \u2014 \uc5d4\ub4dc\ud3ec\uc778\ud2b8\ub97c \ud638\ucd9c\ud558\uae30\ub9cc \ud558\uba74 \ub429\ub2c8\ub2e4. Developer \ud50c\ub79c\uc740 \uac1c\ubc1c\uc790 \ud3ec\ud138\uc744 \ud1b5\ud574 \ubc1b\uc744 \uc218 \uc788\ub294 API \ud0a4\ub97c \uc0ac\uc6a9\ud569\ub2c8\ub2e4.',
+      de: 'Nein \u2014 die \u00f6ffentlichen Endpunkte erfordern keine Authentifizierung und keinen API-Schl\u00fcssel. Rufen Sie die Endpunkte einfach direkt auf.',
+      en: 'No \u2014 the public endpoints require no authentication and no API key. Just call the endpoints directly.',
+      zh: '\u4e0d\u9700\u8981 \u2014 \u516c\u5f00\u7aef\u70b9\u65e0\u9700\u8ba4\u8bc1\u3001\u65e0\u9700 API \u5bc6\u94a5,\u76f4\u63a5\u8c03\u7528\u5373\u53ef\u3002',
+      fr: 'Non \u2014 les endpoints publics ne n\u00e9cessitent ni authentification ni cl\u00e9 API. Appelez-les simplement directement.',
+      es: 'No \u2014 los endpoints p\u00fablicos no requieren autenticaci\u00f3n ni clave API. Simplemente ll\u00e1melos directamente.',
+      pt: 'N\u00e3o \u2014 os endpoints p\u00fablicos n\u00e3o exigem autentica\u00e7\u00e3o nem chave API. Basta cham\u00e1-los diretamente.',
+      ja: '\u3044\u3044\u3048 \u2014 \u516c\u958b\u30a8\u30f3\u30c9\u30dd\u30a4\u30f3\u30c8\u306b\u8a8d\u8a3c\u3082API\u30ad\u30fc\u3082\u4e0d\u8981\u3067\u3059\u3002\u305d\u306e\u307e\u307e\u76f4\u63a5\u547c\u3073\u51fa\u3057\u3066\u304f\u3060\u3055\u3044\u3002',
+      ko: '\uc544\ub2c8\uc694 \u2014 \uacf5\uac1c \uc5d4\ub4dc\ud3ec\uc778\ud2b8\ub294 \uc778\uc99d\ub3c4 API \ud0a4\ub3c4 \ud544\uc694 \uc5c6\uc2b5\ub2c8\ub2e4. \ubc14\ub85c \ud638\ucd9c\ud558\uba74 \ub429\ub2c8\ub2e4.',
     },
   },
   {
@@ -399,14 +399,14 @@ const FAQ_ITEMS: Array<{ q: L; a: L }> = [
       ko: '\uc5b4\ub5a4 \ub370\uc774\ud130 \ud615\uc2dd\uc774 \uc9c0\uc6d0\ub418\ub098\uc694?',
     },
     a: {
-      de: 'Alle Endpunkte liefern JSON-Antworten. Jede Antwort enth\u00e4lt Daten in bis zu 8 Sprachen (DE, EN, ZH, FR, ES, PT, JA, KO), die als Schl\u00fcssel im JSON-Objekt organisiert sind.',
-      en: 'All endpoints return JSON responses. Each response contains data in up to 8 languages (DE, EN, ZH, FR, ES, PT, JA, KO), organized as keys in the JSON object.',
-      zh: '\u6240\u6709\u7aef\u70b9\u8fd4\u56de JSON \u54cd\u5e94\u3002\u6bcf\u4e2a\u54cd\u5e94\u5305\u542b\u6700\u591a 8 \u79cd\u8bed\u8a00\uff08DE, EN, ZH, FR, ES, PT, JA, KO\uff09\u7684\u6570\u636e\uff0c\u4ee5 JSON \u5bf9\u8c61\u7684\u952e\u7ec4\u7ec7\u3002',
-      fr: "Tous les endpoints renvoient des r\u00e9ponses JSON. Chaque r\u00e9ponse contient des donn\u00e9es dans jusqu'\u00e0 8 langues (DE, EN, ZH, FR, ES, PT, JA, KO), organis\u00e9es comme cl\u00e9s dans l'objet JSON.",
-      es: 'Todos los endpoints devuelven respuestas JSON. Cada respuesta contiene datos en hasta 8 idiomas (DE, EN, ZH, FR, ES, PT, JA, KO), organizados como claves en el objeto JSON.',
-      pt: 'Todos os endpoints retornam respostas JSON. Cada resposta cont\u00e9m dados em at\u00e9 8 idiomas (DE, EN, ZH, FR, ES, PT, JA, KO), organizados como chaves no objeto JSON.',
-      ja: '\u5168\u30a8\u30f3\u30c9\u30dd\u30a4\u30f3\u30c8\u306fJSON\u30ec\u30b9\u30dd\u30f3\u30b9\u3092\u8fd4\u3057\u307e\u3059\u3002\u5404\u30ec\u30b9\u30dd\u30f3\u30b9\u306b\u306f\u6700\u59278\u8a00\u8a9e\uff08DE, EN, ZH, FR, ES, PT, JA, KO\uff09\u306e\u30c7\u30fc\u30bf\u304c\u542b\u307e\u308c\u3001JSON\u30aa\u30d6\u30b8\u30a7\u30af\u30c8\u306e\u30ad\u30fc\u3068\u3057\u3066\u7d44\u7e54\u5316\u3002',
-      ko: '\ubaa8\ub4e0 \uc5d4\ub4dc\ud3ec\uc778\ud2b8\ub294 JSON \uc751\ub2f5\uc744 \ubc18\ud658\ud569\ub2c8\ub2e4. \uac01 \uc751\ub2f5\uc5d0\ub294 \ucd5c\ub300 8\uac1c \uc5b8\uc5b4(DE, EN, ZH, FR, ES, PT, JA, KO)\uc758 \ub370\uc774\ud130\uac00 JSON \uac1d\uccb4\uc758 \ud0a4\ub85c \uad6c\uc131\ub418\uc5b4 \uc788\uc2b5\ub2c8\ub2e4.',
+      de: 'Alle Endpunkte liefern JSON. Die Inhalts-Endpunkte (tech/investment/tips/trends) organisieren die Daten nach Sprachschl\u00fcsseln mit bis zu 8 Sprachen (DE, EN, ZH, FR, ES, PT, JA, KO); /weeks liefert einfache Periodenobjekte.',
+      en: 'All endpoints return JSON. The content endpoints (tech/investment/tips/trends) organize data under language keys with up to 8 languages (DE, EN, ZH, FR, ES, PT, JA, KO); /weeks returns plain period objects.',
+      zh: '\u6240\u6709\u7aef\u70b9\u8fd4\u56de JSON\u3002\u5185\u5bb9\u7aef\u70b9(tech/investment/tips/trends)\u6309\u8bed\u8a00\u952e\u7ec4\u7ec7\u6570\u636e,\u6700\u591a 8 \u79cd\u8bed\u8a00(DE\u3001EN\u3001ZH\u3001FR\u3001ES\u3001PT\u3001JA\u3001KO);/weeks \u8fd4\u56de\u666e\u901a\u65f6\u6bb5\u5bf9\u8c61\u3002',
+      fr: 'Tous les endpoints renvoient du JSON. Les endpoints de contenu (tech/investment/tips/trends) organisent les donn\u00e9es par cl\u00e9s de langue avec jusqu\'\u00e0 8 langues (DE, EN, ZH, FR, ES, PT, JA, KO) ; /weeks renvoie de simples objets de p\u00e9riode.',
+      es: 'Todos los endpoints devuelven JSON. Los endpoints de contenido (tech/investment/tips/trends) organizan los datos por claves de idioma con hasta 8 idiomas (DE, EN, ZH, FR, ES, PT, JA, KO); /weeks devuelve objetos de per\u00edodo simples.',
+      pt: 'Todos os endpoints retornam JSON. Os endpoints de conte\u00fado (tech/investment/tips/trends) organizam os dados por chaves de idioma com at\u00e9 8 idiomas (DE, EN, ZH, FR, ES, PT, JA, KO); /weeks retorna objetos de per\u00edodo simples.',
+      ja: '\u3059\u3079\u3066\u306e\u30a8\u30f3\u30c9\u30dd\u30a4\u30f3\u30c8\u306fJSON\u3092\u8fd4\u3057\u307e\u3059\u3002\u30b3\u30f3\u30c6\u30f3\u30c4\u7cfb\u30a8\u30f3\u30c9\u30dd\u30a4\u30f3\u30c8(tech/investment/tips/trends)\u306f\u8a00\u8a9e\u30ad\u30fc\u3054\u3068\u306b\u6700\u59278\u8a00\u8a9e(DE\u3001EN\u3001ZH\u3001FR\u3001ES\u3001PT\u3001JA\u3001KO)\u3067\u30c7\u30fc\u30bf\u3092\u6574\u7406\u3057\u3001/weeks\u306f\u901a\u5e38\u306e\u671f\u9593\u30aa\u30d6\u30b8\u30a7\u30af\u30c8\u3092\u8fd4\u3057\u307e\u3059\u3002',
+      ko: '\ubaa8\ub4e0 \uc5d4\ub4dc\ud3ec\uc778\ud2b8\ub294 JSON\uc744 \ubc18\ud658\ud569\ub2c8\ub2e4. \ucf58\ud150\uce20 \uc5d4\ub4dc\ud3ec\uc778\ud2b8(tech/investment/tips/trends)\ub294 \uc5b8\uc5b4 \ud0a4\ub85c \ucd5c\ub300 8\uac1c \uc5b8\uc5b4(DE, EN, ZH, FR, ES, PT, JA, KO)\uc758 \ub370\uc774\ud130\ub97c \uad6c\uc131\ud558\uba70, /weeks\ub294 \uc77c\ubc18 \uae30\uac04 \uac1d\uccb4\ub97c \ubc18\ud658\ud569\ub2c8\ub2e4.',
     },
   },
   {
@@ -715,13 +715,13 @@ console.log(data.en[0].content);`}</code>
                 Python
               </h3>
               <pre className="bg-zinc-900 text-zinc-100 rounded-lg p-4 overflow-x-auto text-sm">
-                <code className="font-mono">{`import requests
+                <code className="font-mono">{`import json, urllib.request
 
-# Fetch today's AI tech news
-response = requests.get(
+# Fetch today's AI tech news (standard library only)
+with urllib.request.urlopen(
     '${API_BASE_URL}/api/tech/2026-02-26'
-)
-data = response.json()
+) as response:
+    data = json.load(response)
 
 # data['en'] = List of English tech articles
 # data['de'] = List of German tech articles
