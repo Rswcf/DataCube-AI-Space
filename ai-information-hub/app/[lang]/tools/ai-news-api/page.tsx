@@ -695,7 +695,7 @@ export default async function AINewsAPIToolPage({ params }: Props) {
                 JavaScript
               </h3>
               <pre className="bg-zinc-900 text-zinc-100 rounded-lg p-4 overflow-x-auto text-sm">
-                <code className="font-mono">{`// Fetch today's AI tech news
+                <code className="font-mono">{`// Fetch AI tech news for a specific day
 const response = await fetch(
   '${API_BASE_URL}/api/tech/2026-02-26'
 );
@@ -717,7 +717,7 @@ console.log(data.en[0].content);`}</code>
               <pre className="bg-zinc-900 text-zinc-100 rounded-lg p-4 overflow-x-auto text-sm">
                 <code className="font-mono">{`import json, urllib.request
 
-# Fetch today's AI tech news (standard library only)
+# Fetch AI tech news for a specific day (standard library only)
 with urllib.request.urlopen(
     '${API_BASE_URL}/api/tech/2026-02-26'
 ) as response:
