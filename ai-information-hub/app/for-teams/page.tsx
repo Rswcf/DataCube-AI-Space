@@ -78,7 +78,7 @@ const benefits = [
   'REST API with full Swagger documentation',
   'Custom filtering by topic, company, and technology',
   'Dedicated account support and SLA options',
-  'GDPR-compliant data processing',
+  'Privacy-first: no account required, no tracking ads',
   'No long-term commitment required',
 ]
 
