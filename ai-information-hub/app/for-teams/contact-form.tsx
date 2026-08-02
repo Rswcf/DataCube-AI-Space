@@ -9,8 +9,16 @@ export function ContactForm() {
   const [company, setCompany] = useState('')
   const [message, setMessage] = useState('')
 
+  // There is no server-side inbox for this form — delivery happens via the
+  // visitor's own mail client (mailto: draft, prefilled from the fields).
+  // Never show a "we received it" state that nothing backs up.
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    const subject = encodeURIComponent(`Team inquiry — ${company || name}`)
+    const body = encodeURIComponent(
+      `Name: ${name}\nWork email: ${email}\nCompany: ${company}\n\n${message}`
+    )
+    window.location.href = `mailto:enterprise@datacubeai.space?subject=${subject}&body=${body}`
     setSubmitted(true)
   }
 
@@ -18,10 +26,15 @@ export function ContactForm() {
     return (
       <div className="border border-green-200 bg-green-50 rounded-lg p-6 text-center">
         <p className="text-green-800 font-semibold text-lg mb-2">
-          Thank you for your interest.
+          Almost done — your email draft is ready.
         </p>
         <p className="text-green-700 text-sm">
-          We will review your message and get back to you within one business day.
+          We opened a prefilled draft in your mail client — hit send there to
+          complete the inquiry. If no draft opened, please email{' '}
+          <a href="mailto:enterprise@datacubeai.space" className="underline">
+            enterprise@datacubeai.space
+          </a>{' '}
+          directly.
         </p>
       </div>
     )
@@ -102,7 +115,7 @@ export function ContactForm() {
           type="submit"
           className="bg-blue-600 text-white px-6 py-2 rounded text-sm font-medium hover:bg-blue-700 focus-visible:ring-2 focus-visible:ring-primary focus:outline-none transition-colors"
         >
-          Send Inquiry
+          Compose Email Inquiry
         </button>
         <span className="text-xs text-gray-500">
           Or email us directly at{' '}

@@ -189,7 +189,7 @@ export default function ForTeamsPage() {
       <section className="mb-12">
         <h2 className="text-2xl font-semibold mb-4">Get in Touch</h2>
         <p className="text-sm text-gray-600 mb-6">
-          Tell us about your team and requirements. We will get back to you within one business day.
+          Tell us about your team and requirements — the form opens a prefilled email to us. We will get back to you as soon as possible.
         </p>
         <ContactForm />
       </section>
