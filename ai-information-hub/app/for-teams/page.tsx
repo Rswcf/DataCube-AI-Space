@@ -6,12 +6,12 @@ export const revalidate = 86400
 export const metadata: Metadata = {
   title: 'For Teams & Enterprise',
   description:
-    'Enterprise AI intelligence for teams: custom feeds, dashboards, APIs, and reports from 35+ sources in 8 languages.',
+    'AI intelligence for teams: daily briefings, a free API, and evidence-linked deal data from 35+ sources in 8 languages — plus custom feeds, dashboards, and white-label options as pilot engagements.',
   alternates: { canonical: 'https://www.datacubeai.space/for-teams' },
   openGraph: {
     title: 'For Teams & Enterprise',
     description:
-      'Enterprise AI intelligence for teams: custom feeds, dashboards, APIs, and reports from 35+ sources.',
+      'AI intelligence for teams: daily briefings, free API, evidence-linked deal data — custom feeds, dashboards, and white-label options as pilot engagements.',
     url: 'https://www.datacubeai.space/for-teams',
     images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: 'Data Cube AI' }],
   },
@@ -42,7 +42,7 @@ const useCases = [
   {
     title: 'Consulting Firms',
     description:
-      'White-label AI news feed for client deliverables. Embed curated, multilingual AI intelligence directly into your reports, newsletters, and intranet portals.',
+      'White-label AI news feed for client deliverables (pilot program). Work with us to embed curated, multilingual AI intelligence into your reports, newsletters, and intranet portals.',
     icon: 'C',
     accent: 'bg-purple-100 text-purple-700',
   },
