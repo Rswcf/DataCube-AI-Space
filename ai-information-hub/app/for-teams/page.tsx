@@ -6,12 +6,12 @@ export const revalidate = 86400
 export const metadata: Metadata = {
   title: 'For Teams & Enterprise',
   description:
-    'AI intelligence for teams: daily briefings, a free API, and evidence-linked deal data from 35+ sources in 8 languages — plus custom feeds, dashboards, and white-label options as pilot engagements.',
+    'AI intelligence for teams: daily briefings in 8 languages from 35+ sources, a free API, and an evidence-linked AI deal tracker (EN/ZH sources) — plus custom feeds, dashboards, and white-label options as pilot engagements.',
   alternates: { canonical: 'https://www.datacubeai.space/for-teams' },
   openGraph: {
     title: 'For Teams & Enterprise',
     description:
-      'AI intelligence for teams: daily briefings, free API, evidence-linked deal data — custom feeds, dashboards, and white-label options as pilot engagements.',
+      'AI intelligence for teams: daily briefings in 8 languages, free API, evidence-linked AI deal tracker — custom feeds, dashboards, and white-label options as pilot engagements.',
     url: 'https://www.datacubeai.space/for-teams',
     images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: 'Data Cube AI' }],
   },
@@ -78,10 +78,10 @@ const benefits = [
   '8-language support (DACH + global coverage)',
   'AI Funding & M&A deal tracker with free CSV export',
   'REST API with full Swagger documentation',
-  'Custom filtering by topic, company, and technology',
-  'Dedicated account support and SLA options',
   'Privacy-first: no account required, no tracking ads',
-  'No long-term commitment required',
+  'Custom filtering by topic, company, and technology (pilot)',
+  'Dedicated account support and SLA options (pilot)',
+  'No long-term commitment for pilot engagements',
 ]
 
 export default function ForTeamsPage() {
