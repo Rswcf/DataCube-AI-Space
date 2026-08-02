@@ -43,7 +43,7 @@ const FAQ: { q: string; a: string }[] = [
   },
   {
     q: 'What payment methods are accepted?',
-    a: 'All major credit and debit cards are accepted via Stripe. We support Visa, Mastercard, American Express, and more.',
+    a: 'When Premium launches, payments will be processed by Stripe, supporting all major credit and debit cards (Visa, Mastercard, American Express, and more).',
   },
   {
     q: 'Is there a free trial?',
@@ -56,7 +56,7 @@ const FAQ: { q: string; a: string }[] = [
 ]
 
 const TRUST_BADGES = [
-  'GDPR Compliant',
+  'No Account Required',
   'No Tracking Ads',
   '8 Languages',
   '40+ Sources',
