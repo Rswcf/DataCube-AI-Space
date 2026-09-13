@@ -80,8 +80,14 @@ jobs:
       - name: Lint (ruff)
         run: ruff check app/ scripts/ tests/
 
-      - name: Unit tests (deals normalization contracts)
-        run: python tests/test_deal_utils.py
+      - name: Unit tests (pytest, no database)
+        run: |
+          pip install pytest
+          python -m pytest -m "not integration" -q
+        env:
+          DATABASE_URL: sqlite:///./test.db
+          OPENROUTER_API_KEY: test-key-for-ci
+          ADMIN_API_KEY: test-key-for-ci
 
       - name: Syntax check (all Python files)
         run: |
@@ -155,5 +161,5 @@ jobs:
           pip install pytest httpx
       - name: Run migrations on a fresh database
         run: alembic upgrade head
-      - name: Deals-layer integration tests
-        run: python -m pytest tests/test_deals_integration.py -v
+      - name: Integration tests (PostgreSQL)
+        run: python -m pytest -m integration -v
