@@ -23,7 +23,7 @@ Verified on production data for 2026-09-12 (row 2 video shows the Anthropic repo
 3. **Translation status.** `ok | missing | stale | untranslated`: missing = no entry, no marker or no text; stale = marker ≠ hash of the row's current English; untranslated = localized text identical to English. Legacy rows without a marker count as missing.
 4. **Stage 3.5 completeness.** After the parallel pass, every (item, language) pair without a usable translation is retried once in batches of 3; the remaining count is recorded as `counts.translation_gaps` on the collection run (status strings unchanged).
 5. **Backfill service.** `app/services/translation_backfill.py` plans per period which rows/languages need work (or everything with `force`), translates in worker threads (DB access stays on the calling thread), stamps `_src` from the row's English, merges into existing translations and writes German into `*_de`. Admin endpoint `POST /api/admin/backfill-translations` gains `since`, `force`, `dry_run`, `cheap`; `cheap` uses `LLMProcessor.CHEAP_TRANSLATOR_MODELS` (`qwen/qwen3.7-flash` then free fallbacks). `patch-translation` stamps `_src`. The CLI script wraps the same service.
-6. **Send gate.** Before taking a language's send lock, the newsletter counts non-ok translations across tech (incl. video rows), funding, M&A and tips; a language with any is held (not sent, no lock). The result gains `held_languages`; the admin endpoint returns HTTP 502 when any language is held so the workflow turns red.
+6. **Send gate.** Before taking a language's send lock, the newsletter counts translation statuses across tech (incl. video rows), funding, M&A and tips. A language is held (not sent, no lock) when any row is `stale` or at least half of its rows are not ready; otherwise it is sent with English fallback for the few rows that are not ready and the counts are reported under `translation_warnings`. The result gains `held_languages`; the admin endpoint returns HTTP 502 when any language is held so the workflow turns red.
 7. **M&A-only save.** Build the DE side from EN via `_mirror_de_from_translations` and pair with `_pair_de_en`, using the same field defaults as the main save.
 8. **Test safety.** `tests/conftest.py` refuses non-local databases; `integration` marker; CI runs all unit tests with pytest and all integration tests against the Postgres service.
 
@@ -33,7 +33,7 @@ Verified on production data for 2026-09-12 (row 2 video shows the Anthropic repo
 - Same for process-only order (translate → save).
 - Stage 3.5 retry test: a language failing on the first pass is filled on retry; an unfixable language is counted.
 - Backfill test: misaligned legacy rows are repaired (German columns + JSONB), dry-run changes nothing, a second non-force run is a no-op, `cheap` passes the cheap model chain.
-- Newsletter tests: ready translations send; a legacy/misaligned language is held; admin returns 502 when held.
+- Newsletter tests: ready translations send; a fully legacy/misaligned language is held; a language with a minority of unready rows sends with warnings; admin returns 502 when held.
 - M&A-only save test keeps the EN-native row.
 - Full unit + integration suites and `ruff check app/ scripts/ tests/` pass locally and in CI.
 

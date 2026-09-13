@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Stop non-English content from carrying another story's translation, detect and repair misaligned/missing translations, and never send a newsletter language whose translations are not ready.
+**Goal:** Stop non-English content from carrying another story's translation, detect and repair misaligned/missing translations, and never send a newsletter language that carries another story's text or is mostly untranslated.
 
-**Architecture:** A stdlib-only integrity module stamps every translation with a hash of its English source (`_src`). The collector matches saved rows to their English items by identity instead of position, retries translation gaps once, and a backfill service repairs rows using that status. The newsletter holds any language whose rows are not `ok`.
+**Architecture:** A stdlib-only integrity module stamps every translation with a hash of its English source (`_src`). The collector matches saved rows to their English items by identity instead of position, retries translation gaps once, and a backfill service repairs rows using that status. The newsletter holds a language when any row is stale or at least half of its rows are not ready; otherwise it sends with English fallback and reports warnings.
 
 **Tech Stack:** Python 3.11 (CI) / 3.12 (local venv), FastAPI, SQLAlchemy 2, PostgreSQL 16, pytest.
 
@@ -235,7 +235,7 @@ git commit -m "test: refuse non-local test databases and run all backend tests i
 - Create: `ai-hub-backend/tests/test_translation_integrity.py`
 
 **Interfaces:**
-- Produces (module `app.services.translation_integrity`): `SRC_KEY = "_src"`; `SOURCE_FIELDS: dict[str, list[str]]`; `normalize_text(value) -> str`; `identity_key(values: list) -> tuple`; `source_hash(values: list) -> str`; `item_source_hash(item: dict, kind: str) -> str`; `record_source_hash(record, kind: str) -> str`; `entry_is_usable(item: dict, entry, kind: str) -> bool`; `translation_status(record, kind: str, lang: str) -> str`; `send_gate_counts(sections: dict, lang: str) -> dict`.
+- Produces (module `app.services.translation_integrity`): `SRC_KEY = "_src"`; `SOURCE_FIELDS: dict[str, list[str]]`; `normalize_text(value) -> str`; `identity_key(values: list) -> tuple`; `source_hash(values: list) -> str`; `item_source_hash(item: dict, kind: str) -> str`; `record_source_hash(record, kind: str) -> str`; `entry_is_usable(item: dict, entry, kind: str) -> bool`; `translation_status(record, kind: str, lang: str) -> str`; `send_gate_counts(sections: dict, lang: str) -> dict` (keys `total`, `missing`, `stale`, `untranslated`); `gate_holds_language(counts: dict) -> bool`.
 
 - [ ] **Step 1: Write the failing test** — create `ai-hub-backend/tests/test_translation_integrity.py`:
 
@@ -323,11 +323,19 @@ def test_send_gate_counts():
     good = _stamped(_tech_row(), zh={"content": "OpenAI 发布了模型。"})
     legacy = _tech_row(translations={"zh": {"content": "旧译文"}})
     assert ti.send_gate_counts({"tech": [good, legacy]}, "zh") == {
-        "missing": 1, "stale": 0, "untranslated": 0,
+        "total": 2, "missing": 1, "stale": 0, "untranslated": 0,
     }
     assert ti.send_gate_counts({"tech": [legacy]}, "en") == {
-        "missing": 0, "stale": 0, "untranslated": 0,
+        "total": 0, "missing": 0, "stale": 0, "untranslated": 0,
     }
+
+
+def test_gate_holds_language():
+    assert ti.gate_holds_language({"total": 10, "missing": 0, "stale": 1, "untranslated": 0})
+    assert ti.gate_holds_language({"total": 4, "missing": 1, "stale": 0, "untranslated": 1})
+    assert ti.gate_holds_language({"total": 1, "missing": 1, "stale": 0, "untranslated": 0})
+    assert not ti.gate_holds_language({"total": 10, "missing": 1, "stale": 0, "untranslated": 1})
+    assert not ti.gate_holds_language({"total": 0, "missing": 0, "stale": 0, "untranslated": 0})
 ```
 
 - [ ] **Step 2: Run it to verify it fails**
@@ -446,28 +454,37 @@ def translation_status(record, kind: str, lang: str) -> str:
 
 
 def send_gate_counts(sections: dict, lang: str) -> dict:
-    """Count rows whose translation is not usable for one language.
+    """Count one language's rows by translation readiness.
 
     ``sections`` maps a section kind to its rows, e.g.
     ``{"tech": [...], "primary_market": [...], "ma": [...], "tip": [...]}``.
-    Returns ``{"missing": n, "stale": n, "untranslated": n}``; all zeros means
-    the language may be sent.
+    Returns ``{"total": n, "missing": n, "stale": n, "untranslated": n}``.
+    English is always ready (all zeros).
     """
-    counts = {"missing": 0, "stale": 0, "untranslated": 0}
+    counts = {"total": 0, "missing": 0, "stale": 0, "untranslated": 0}
     if lang == "en":
         return counts
     for kind, rows in sections.items():
         for row in rows:
+            counts["total"] += 1
             status = translation_status(row, kind, lang)
             if status != "ok":
                 counts[status] += 1
     return counts
+
+
+def gate_holds_language(counts: dict) -> bool:
+    """Hold a language when any row is stale (another text's translation) or
+    at least half of its rows are not ready; otherwise it is sent with English
+    fallback for the few rows that are not ready."""
+    not_ready = counts["missing"] + counts["untranslated"]
+    return counts["stale"] > 0 or (not_ready > 0 and not_ready * 2 >= counts["total"])
 ```
 
 - [ ] **Step 4: Run the tests to verify they pass**
 
 Run: `cd <repo-root>/ai-hub-backend && DATABASE_URL=sqlite:///./test.db venv312/bin/python -m pytest tests/test_translation_integrity.py -q`
-Expected: `10 passed`.
+Expected: `11 passed`.
 
 Run the unit suite command and the lint command from Global Constraints. Expected: all pass.
 
@@ -1774,8 +1791,8 @@ git commit -m "fix: translation backfill repairs misaligned rows and German colu
 - Create: `ai-hub-backend/tests/test_newsletter_translation_gate.py`
 
 **Interfaces:**
-- Consumes (Task 2): `send_gate_counts(sections, lang)`, `SRC_KEY`, `record_source_hash`.
-- Produces: `send_newsletter(...)` result gains `"held_languages": {lang: {"missing": n, "stale": n, "untranslated": n}}` and status `"held"`; `POST /api/admin/newsletter?wait=true` returns 502 when `held_languages` is non-empty.
+- Consumes (Task 2): `send_gate_counts(sections, lang)`, `gate_holds_language(counts)`, `SRC_KEY`, `record_source_hash`.
+- Produces: `send_newsletter(...)` result gains `"held_languages"` and `"translation_warnings"` (both `{lang: {"total": n, "missing": n, "stale": n, "untranslated": n}}`) and status `"held"`; `POST /api/admin/newsletter?wait=true` returns 502 when `held_languages` is non-empty.
 
 - [ ] **Step 1: Write the failing test** — create `ai-hub-backend/tests/test_newsletter_translation_gate.py`:
 
@@ -1847,11 +1864,26 @@ def test_misaligned_language_is_held(monkeypatch):
 
     result = sender.send_newsletter(None, "2026-09-12")
 
-    assert result["held_languages"] == {"zh": {"missing": 1, "stale": 0, "untranslated": 0}}
+    assert result["held_languages"] == {"zh": {"total": 1, "missing": 1, "stale": 0, "untranslated": 0}}
     assert ("zh@example.com",) not in sent
     assert ("en@example.com",) in sent
     assert ("de@example.com",) in sent
     assert result["status"] == "partial"
+
+
+def test_few_unready_rows_send_with_english_fallback(monkeypatch):
+    legacy = _ready_row()
+    legacy.translations["zh"] = {"content": "旧译文。"}  # legacy entry, no marker
+    sent = _patch_sender(monkeypatch, [_ready_row(), _ready_row(), legacy])
+
+    result = sender.send_newsletter(None, "2026-09-12")
+
+    assert result["held_languages"] == {}
+    assert result["translation_warnings"] == {
+        "zh": {"total": 3, "missing": 1, "stale": 0, "untranslated": 0},
+    }
+    assert ("zh@example.com",) in sent
+    assert result["status"] == "sent"
 
 
 def test_admin_returns_502_when_a_language_is_held(monkeypatch):
@@ -1873,7 +1905,7 @@ def test_admin_returns_502_when_a_language_is_held(monkeypatch):
 - [ ] **Step 2: Run it to verify it fails**
 
 Run: `cd <repo-root>/ai-hub-backend && DATABASE_URL=sqlite:///./test.db venv312/bin/python -m pytest tests/test_newsletter_translation_gate.py -q`
-Expected: `3 failed` (`KeyError: 'held_languages'` and `assert 200 == 502`).
+Expected: `4 failed` (`KeyError: 'held_languages'` / `KeyError: 'translation_warnings'` and `assert 200 == 502`).
 
 - [ ] **Step 3: Implement**
 
@@ -1887,7 +1919,7 @@ Replace with:
 
 ```python
 from app.services.i18n_utils import get_field, SUPPORTED_LANGUAGES
-from app.services.translation_integrity import send_gate_counts
+from app.services.translation_integrity import gate_holds_language, send_gate_counts
 ```
 
 Edit 6b — find:
@@ -1914,7 +1946,8 @@ Replace with:
 
 ```python
             "skipped_already_sent": int,
-            "held_languages": {lang: {"missing": int, "stale": int, "untranslated": int}},
+            "held_languages": {lang: {"total": int, "missing": int, "stale": int, "untranslated": int}},
+            "translation_warnings": {lang: {"total": int, "missing": int, "stale": int, "untranslated": int}},
         }
     """
 ```
@@ -1933,6 +1966,7 @@ Replace with:
             "lang_breakdown": {},
             "skipped_already_sent": 0,
             "held_languages": {},
+            "translation_warnings": {},
         }
 ```
 
@@ -1949,8 +1983,9 @@ Replace with:
     lang_counts = {lang: len(addrs) for lang, addrs in by_lang.items() if addrs}
     logger.info(f"Language split: {lang_counts}")
 
-    # Translation gate: never send a language whose items are missing,
-    # stale (another story's translation) or still English. EN always passes.
+    # Translation gate: never send a language carrying another story's text
+    # (stale) or that is mostly untranslated; a few unready rows fall back to
+    # English and are reported. EN always passes.
     gate_sections = {
         "tech": list(data["tech"]) + list(data.get("videos", [])),
         "primary_market": list(data["funding"]),
@@ -1958,6 +1993,7 @@ Replace with:
         "tip": list(data["tips"]),
     }
     held_languages: dict[str, dict[str, int]] = {}
+    translation_warnings: dict[str, dict[str, int]] = {}
 ```
 
 Then find:
@@ -1976,13 +2012,19 @@ Replace with:
             continue
 
         gate = send_gate_counts(gate_sections, lang)
-        if any(gate.values()):
+        if gate_holds_language(gate):
             held_languages[lang] = gate
             logger.error(
                 f"Holding {lang.upper()} newsletter for {period_id}: "
                 f"translations not ready ({gate})"
             )
             continue
+        if gate["missing"] or gate["untranslated"]:
+            translation_warnings[lang] = gate
+            logger.warning(
+                f"{lang.upper()} newsletter for {period_id}: sending with English "
+                f"fallback for rows not ready ({gate})"
+            )
 
         if not _acquire_send_lock(db, period_id, lang):
 ```
@@ -2021,6 +2063,7 @@ Replace with:
         "lang_breakdown": lang_breakdown,
         "skipped_already_sent": skipped_already_sent,
         "held_languages": held_languages,
+        "translation_warnings": translation_warnings,
     }
 ```
 
@@ -2063,7 +2106,7 @@ Replace with:
 - [ ] **Step 4: Run the tests to verify they pass**
 
 Run: `cd <repo-root>/ai-hub-backend && DATABASE_URL=sqlite:///./test.db venv312/bin/python -m pytest tests/test_newsletter_translation_gate.py -q`
-Expected: `3 passed`.
+Expected: `4 passed`.
 
 Run the unit suite command, the integration suite command and the lint command from Global Constraints. Expected: all pass.
 
