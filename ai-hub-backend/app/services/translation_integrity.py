@@ -17,7 +17,9 @@ SRC_KEY = "_src"
 # English fields whose text identifies a row and is hashed into ``_src``, per
 # section kind. Each is saved verbatim from the English item (``_nn(v, "")``),
 # so the hash computed from the item at translation time equals the hash
-# computed later from the saved row.
+# computed later from the saved row. Status checks (``entry_is_usable``,
+# ``translation_status``) look only at the first non-empty source field — a
+# deliberate simplification (tips: ``content``; videos: ``title``).
 SOURCE_FIELDS: dict[str, list[str]] = {
     "tech": ["content"],
     "video": ["title", "summary"],
@@ -72,6 +74,27 @@ def entry_is_usable(item: dict, entry, kind: str) -> bool:
         localized = normalize_text(entry.get(field))
         return bool(localized) and localized != english
     return True
+
+
+def is_blank(value) -> bool:
+    """None, an empty or whitespace-only string, or an empty list."""
+    if value is None:
+        return True
+    if isinstance(value, str):
+        return not value.strip()
+    if isinstance(value, list):
+        return len(value) == 0
+    return False
+
+
+def entry_is_complete(item: dict, entry, kind: str) -> bool:
+    """True when ``entry`` translates the primary source text (see
+    ``entry_is_usable``) and has a non-blank value for every field that is
+    non-blank in the English ``item``. Incomplete entries must never be
+    written over existing translations: they would drop translated fields."""
+    if not entry_is_usable(item, entry, kind):
+        return False
+    return all(not is_blank(entry.get(field)) for field, value in item.items() if not is_blank(value))
 
 
 def translation_status(record, kind: str, lang: str) -> str:

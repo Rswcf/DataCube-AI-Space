@@ -9,7 +9,7 @@ Usage:
     python -m scripts.backfill_translations                          # all periods
     python -m scripts.backfill_translations --period 2026-09-12      # one period
     python -m scripts.backfill_translations --since 2026-08-01       # daily periods from a date
-    python -m scripts.backfill_translations --since 2026-08-01 --force --cheap
+    python -m scripts.backfill_translations --since 2026-08-01 --cheap       # repair with the cheap chain
     python -m scripts.backfill_translations --since 2026-08-01 --dry-run
 """
 
@@ -32,7 +32,10 @@ def main():
     parser = argparse.ArgumentParser(description="Repair translations for existing content")
     parser.add_argument("--period", default=None, help="Single period id, e.g. 2026-09-12")
     parser.add_argument("--since", default=None, help="All daily periods on/after YYYY-MM-DD")
-    parser.add_argument("--force", action="store_true", help="Re-translate everything selected")
+    parser.add_argument(
+        "--force", action="store_true",
+        help="Also re-translate rows that are already ok (not needed for repairs)",
+    )
     parser.add_argument("--cheap", action="store_true", help="Use the cheapest translator chain")
     parser.add_argument("--dry-run", action="store_true", help="Only print what would be translated")
     args = parser.parse_args()

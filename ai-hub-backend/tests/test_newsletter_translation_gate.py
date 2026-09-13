@@ -101,3 +101,23 @@ def test_admin_returns_502_when_a_language_is_held(monkeypatch):
 
     assert response.status_code == 502
     assert response.json()["detail"]["held_languages"]["de"]["missing"] == 2
+
+
+def test_held_language_after_earlier_cron_reports_held_and_takes_no_lock(monkeypatch):
+    row = _ready_row()
+    row.translations["zh"] = {"content": "Sam Altman 确认不上市。"}  # legacy entry, no marker
+    sent = _patch_sender(monkeypatch, [row])
+    lock_calls = []
+
+    def already_sent(db, period_id, lang):
+        lock_calls.append(lang)
+        return False  # EN and DE went out in the earlier cron slot
+
+    monkeypatch.setattr(sender, "_acquire_send_lock", already_sent)
+
+    result = sender.send_newsletter(None, "2026-09-12")
+
+    assert result["status"] == "held"
+    assert "zh" in result["held_languages"]
+    assert "zh" not in lock_calls
+    assert sent == []

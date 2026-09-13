@@ -27,10 +27,29 @@ class FakeTranslator:
 
     def translate_batch(self, items, target_lang, fields, batch_size=10, models=None):
         FakeTranslator.models_seen.append(models)
-        return [
-            {field: f"[{target_lang}] {item[field]}" for field in fields if isinstance(item.get(field), str)}
-            for item in items
-        ]
+        out = []
+        for item in items:
+            entry = {}
+            for field in fields:
+                value = item.get(field)
+                if isinstance(value, str):
+                    entry[field] = f"[{target_lang}] {value}"
+                elif isinstance(value, list):
+                    entry[field] = [f"[{target_lang}] {v}" for v in value]
+            out.append(entry)
+        return out
+
+
+class PartialTranslator(FakeTranslator):
+    """First row loses a field, second row gets an empty translation."""
+
+    def translate_batch(self, items, target_lang, fields, batch_size=10, models=None):
+        out = super().translate_batch(items, target_lang, fields, batch_size, models)
+        if out:
+            out[0].pop("category", None)
+        if len(out) > 1:
+            out[1]["content"] = ""
+        return out
 
 
 @pytest.fixture()
@@ -95,6 +114,18 @@ def test_backfill_repairs_rows_and_german_columns(db):
     assert FakeTranslator.models_seen
     assert all(models == ["cheap/test-model"] for models in FakeTranslator.models_seen)
     assert backfill.backfill_periods(db, [WEEK_ID]) == {}
+
+
+def test_incomplete_translations_are_not_applied(db, monkeypatch):
+    monkeypatch.setattr(backfill, "LLMProcessor", PartialTranslator)
+
+    report = backfill.backfill_periods(db, [WEEK_ID], force=True)
+
+    assert report == {WEEK_ID: 0}
+    rows = _rows(db)
+    assert rows[0].content_de == "Deutsche Geschichte 1."
+    assert rows[0].translations["zh"]["content"] == "中文故事 1。"
+    assert rows[1].content_de == "Deutsche Geschichte 0."
 
 
 def test_resolve_periods_since_selects_daily_periods(db):

@@ -94,3 +94,14 @@ def test_gate_holds_language():
     assert ti.gate_holds_language({"total": 1, "missing": 1, "stale": 0, "untranslated": 0})
     assert not ti.gate_holds_language({"total": 10, "missing": 1, "stale": 0, "untranslated": 1})
     assert not ti.gate_holds_language({"total": 0, "missing": 0, "stale": 0, "untranslated": 0})
+
+
+def test_entry_is_complete():
+    item = {"content": "Acme raised $20M.", "category": "Funding", "tags": ["AI"], "amount": None}
+    good = {"content": "Acme hat 20 Mio. $ eingesammelt.", "category": "Finanzierung", "tags": ["KI"]}
+    assert ti.entry_is_complete(item, good, "tech")
+    assert not ti.entry_is_complete(item, {**good, "category": ""}, "tech")
+    assert not ti.entry_is_complete(item, {"content": good["content"], "tags": ["KI"]}, "tech")
+    assert not ti.entry_is_complete(item, {**good, "tags": []}, "tech")
+    assert not ti.entry_is_complete(item, {**good, "content": item["content"]}, "tech")
+    assert not ti.entry_is_complete(item, None, "tech")

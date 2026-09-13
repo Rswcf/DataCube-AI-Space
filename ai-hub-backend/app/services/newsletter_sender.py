@@ -1516,12 +1516,14 @@ def send_newsletter(db: Session, period_id: str | None = None) -> dict:
     # this via the HTTP layer to decide red/green.
     if total_sent == 0 and total_failed > 0:
         status = "all_failed"
+    elif total_sent == 0 and held_languages:
+        status = "held"  # nothing went out and at least one language is held
     elif total_sent == 0 and skipped_already_sent > 0:
         status = "skipped"  # all cohorts were already sent
     elif total_failed > 0:
         status = "partial"
     elif held_languages:
-        status = "held" if total_sent == 0 else "partial"
+        status = "partial"
     elif total_sent > 0:
         status = "sent"
     else:

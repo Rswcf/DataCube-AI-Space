@@ -456,7 +456,9 @@ def trigger_backfill_translations(
     after `since` (YYYY-MM-DD), or all periods.
 
     A row/language is repaired when its translation is missing, stale or
-    identical to English; `force=true` re-translates everything selected.
+    identical to English; `force=true` re-translates everything selected,
+    including rows that are already correct — not needed for repairs.
+    Incomplete translator output is never written.
     `dry_run=true` returns per-period row counts and changes nothing.
     `cheap=true` uses the cheapest translator model chain. Writes both the
     German `_de` columns and the JSONB translations.

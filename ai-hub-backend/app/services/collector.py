@@ -25,7 +25,7 @@ from app.services.hn_fetcher import fetch_hn_stories
 from app.services.youtube_fetcher import fetch_youtube_videos, fetch_video_transcript
 from app.services.llm_processor import LLMProcessor
 from app.services.translation_integrity import (
-    SRC_KEY, entry_is_usable, identity_key, item_source_hash, source_hash,
+    SRC_KEY, entry_is_usable, identity_key, is_blank, item_source_hash, source_hash,
 )
 
 logger = logging.getLogger(__name__)
@@ -1191,7 +1191,7 @@ def _apply_translations_to_record(record, trans) -> None:
             if db_name.startswith("_"):
                 continue
             attr = f"{db_name}_de"
-            if value is not None and hasattr(record, attr):
+            if not is_blank(value) and hasattr(record, attr):
                 setattr(record, attr, value)
     record.translations = _jsonb_view(trans)
 
@@ -1244,7 +1244,7 @@ def _backfill_translations_to_db(db: Session, week_id: str, results: dict):
         logger.info(f"Translations {label}: applied to {applied}/{len(records)} row(s)")
 
     def by_week(model_cls):
-        return db.query(model_cls).filter(model_cls.week_id == week_id)
+        return db.query(model_cls).filter(model_cls.week_id == week_id).order_by(model_cls.id)
 
     def content_of_record(record):
         return identity_key([record.content_en])

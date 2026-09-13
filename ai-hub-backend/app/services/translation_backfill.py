@@ -18,7 +18,9 @@ from app.models import (
 from app.services.collector import _apply_translations_to_record
 from app.services.i18n_utils import TRANSLATION_LANGUAGES
 from app.services.llm_processor import LLMProcessor
-from app.services.translation_integrity import SRC_KEY, record_source_hash, translation_status
+from app.services.translation_integrity import (
+    SRC_KEY, entry_is_complete, record_source_hash, translation_status,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -104,11 +106,15 @@ def translate_groups(groups: dict, models: list[str] | None = None, workers: int
         items = [_english_item(row, list(fields)) for row in rows]
         output = LLMProcessor().translate_batch(items, lang, list(fields), models=models)
         with lock:
-            for row, entry in zip(rows, output):
-                if entry:
-                    stamped = dict(entry)
-                    stamped[SRC_KEY] = record_source_hash(row, kind)
-                    translated.setdefault((kind, row.id), {})[lang] = stamped
+            for row, item, entry in zip(rows, items, output):
+                # Never write partial output over existing translations: an
+                # incomplete entry would drop translated fields. The row stays
+                # not ok and a later run retries it.
+                if not entry_is_complete(item, entry, kind):
+                    continue
+                stamped = dict(entry)
+                stamped[SRC_KEY] = record_source_hash(row, kind)
+                translated.setdefault((kind, row.id), {})[lang] = stamped
 
     with ThreadPoolExecutor(max_workers=workers) as pool:
         futures = {pool.submit(work, key, rows): key for key, rows in groups.items()}
