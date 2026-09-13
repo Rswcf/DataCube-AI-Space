@@ -25,7 +25,7 @@ from app.services.hn_fetcher import fetch_hn_stories
 from app.services.youtube_fetcher import fetch_youtube_videos, fetch_video_transcript
 from app.services.llm_processor import LLMProcessor
 from app.services.translation_integrity import (
-    SRC_KEY, identity_key, item_source_hash, source_hash,
+    SRC_KEY, entry_is_usable, identity_key, item_source_hash, source_hash,
 )
 
 logger = logging.getLogger(__name__)
@@ -1055,6 +1055,22 @@ def _build_translation_tasks(results: dict) -> list:
     return tasks
 
 
+def _translation_gaps(translation_tasks: list) -> dict:
+    """(section index, language) -> indexes of EN items without a usable translation."""
+    from app.services.i18n_utils import TRANSLATION_LANGUAGES
+
+    gaps: dict = {}
+    for section_idx, (section_name, items, _fields, _name_map) in enumerate(translation_tasks):
+        for item_idx, item in enumerate(items):
+            if not isinstance(item, dict):
+                continue
+            translations = item.get("_translations") or {}
+            for lang in TRANSLATION_LANGUAGES:
+                if not entry_is_usable(item, translations.get(lang), section_name):
+                    gaps.setdefault((section_idx, lang), []).append(item_idx)
+    return gaps
+
+
 def _store_translations(section_name: str, items: list, translated: list,
                         target_lang: str, name_map: dict) -> None:
     """Attach one language's translations to EN items, stamped with `_src`."""
@@ -1126,6 +1142,30 @@ def stage3_5_translate_content(results: dict) -> dict:
                 logger.info(f"Translation done: {task_name}")
             except Exception as e:
                 logger.warning(f"Translation failed (skipping): {task_name}: {e}")
+
+    # Retry every (item, language) pair that is still missing or came back
+    # identical to English, once, in small batches.
+    gaps = _translation_gaps(translation_tasks)
+    if gaps:
+        logger.warning(
+            f"Stage 3.5: retrying {sum(len(ix) for ix in gaps.values())} "
+            f"untranslated item/language pair(s)"
+        )
+        retry_processor = LLMProcessor()
+        for (section_idx, lang), item_indexes in gaps.items():
+            section_name, items, fields, name_map = translation_tasks[section_idx]
+            subset = [items[i] for i in item_indexes]
+            try:
+                translated = retry_processor.translate_batch(subset, lang, fields, batch_size=3)
+            except Exception as e:
+                logger.warning(f"Stage 3.5 retry failed for {section_name}→{lang}: {e}")
+                continue
+            _store_translations(section_name, subset, translated, lang, name_map)
+
+    remaining = sum(len(ix) for ix in _translation_gaps(translation_tasks).values())
+    results["_translation_gaps"] = remaining
+    if remaining:
+        logger.warning(f"Stage 3.5: {remaining} item/language pair(s) still untranslated")
 
     # EN is the only natively generated language — mirror the German
     # translations into full DE item arrays for the stage-4 save sites.
@@ -1918,6 +1958,7 @@ def run_collection(db: Session, week_id: Optional[str] = None):
         try:
             stage3_5_translate_content(results)
             _backfill_translations_to_db(db, week_id, results)
+            counts["translation_gaps"] = results.get("_translation_gaps", 0)
             logger.info(f"Translations saved for {week_id}")
         except Exception as e:
             logger.warning(f"Translation stage failed (non-fatal): {e}")
