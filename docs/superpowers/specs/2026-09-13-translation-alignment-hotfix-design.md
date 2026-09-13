@@ -40,12 +40,13 @@ Verified on production data for 2026-09-12 (row 2 video shows the Anthropic repo
 ## Rollout and data repair (after founder deploy approval)
 
 1. PR with green CI → merge → `railway up` (no migrations).
-2. `POST /api/admin/backfill-translations?since=2026-08-01&dry_run=true` (read-only) to size the repair.
-3. Repair the latest period first (`period_id=<latest>&cheap=true`; no `force` — legacy rows have no `_src`, so they are selected anyway), verify alignment on the public API.
-4. Repair everything else (`since=2026-08-01&cheap=true`, non-force = only rows not yet ok); re-run dry-run until it returns no periods.
-5. Next morning: newsletter run has no held languages; next collection reports `translation_gaps` 0.
+2. Confirm the new backend is live: `/openapi.json` lists `since`, `force`, `dry_run`, `cheap` on the backfill endpoint. The old endpoint ignores unknown parameters and would run the old positional backfill over every period.
+3. `POST /api/admin/backfill-translations?since=2026-08-01&dry_run=true` (read-only) to size the repair.
+4. Repair the latest period first (`period_id=<latest>&cheap=true`; no `force` — legacy rows have no `_src`, so they are selected anyway), verify alignment on the public API.
+5. Repair everything else (`since=2026-08-01&cheap=true`, non-force = only rows not yet ok); re-run dry-run until it returns no periods.
+6. Next morning: newsletter run has no held languages; next collection reports `translation_gaps` 0.
 
-Legacy rows have no `_src`, so until step 3–4 completes the gate holds non-English newsletters for unrepaired periods — intended: no known-wrong sends.
+Legacy rows have no `_src`, so until steps 4–5 complete the gate holds non-English newsletters for unrepaired periods — intended: no known-wrong sends.
 
 ## Out of scope
 
