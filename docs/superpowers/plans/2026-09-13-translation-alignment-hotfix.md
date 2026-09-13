@@ -39,7 +39,7 @@ cd <repo-root>/ai-hub-backend && DATABASE_URL=postgresql://postgres:test@localho
 1. Push branch `fix/translation-alignment`, open a PR, wait for green CI.
 2. Ask the founder for deploy approval. Then merge and run `railway up -d -s api` from `ai-hub-backend/` (no migrations in this change).
 3. Size the repair (read-only): `railway run -s api -- sh -c 'curl -sS -X POST "https://api-production-3ee5.up.railway.app/api/admin/backfill-translations?since=2026-08-01&dry_run=true" -H "X-API-Key: $ADMIN_API_KEY"'`.
-4. Repair the latest day first: `...?period_id=<latest day>&force=true&cheap=true`; verify on `GET /api/tech/<latest day>` that every non-EN item translates its own EN item.
+4. Repair the latest day first: `...?period_id=<latest day>&cheap=true` (no `force`: legacy rows have no `_src`, so they are selected anyway; `force` only re-translates rows that are already correct); verify on `GET /api/tech/<latest day>` that every non-EN item translates its own EN item and that `category`/`tags` are present.
 5. Repair the rest: `...?since=2026-08-01&cheap=true`; repeat the dry run until `periods` is empty.
 6. Next morning: newsletter result has empty `held_languages`; the next collection run reports `counts.translation_gaps` = 0.
 
