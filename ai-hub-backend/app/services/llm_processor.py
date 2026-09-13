@@ -101,6 +101,15 @@ class LLMProcessor:
         "google/gemma-4-31b-it:free",
     ]
 
+    # Cheapest paid model first, then the free fallbacks. Used for bulk
+    # translation repairs (admin backfill with cheap=true).
+    CHEAP_TRANSLATOR_MODELS = [
+        "qwen/qwen3.7-flash",
+        "nvidia/nemotron-3-super-120b-a12b:free",
+        "nvidia/nemotron-3-nano-30b-a3b:free",
+        "google/gemma-4-31b-it:free",
+    ]
+
     PROCESSOR_MODELS = [
         "deepseek/deepseek-v4-flash-0731",
         "qwen/qwen3.7-flash",
@@ -290,6 +299,7 @@ class LLMProcessor:
         target_lang: str,
         fields: list[str],
         lang_name: str,
+        models: "list[str] | None" = None,
     ) -> "list[dict] | None":
         """Attempt to translate a single batch. Returns list of translated dicts or None on failure.
 
@@ -318,7 +328,7 @@ Output the translated JSON array with the same structure. Output ONLY the JSON a
         try:
             response = self._call_with_fallback(
                 prompt, temperature=0.2, timeout=120.0, expect_json=True,
-                models=self.TRANSLATOR_MODELS, chain_name="translator",
+                models=models or self.TRANSLATOR_MODELS, chain_name="translator",
             )
             translated = parse_llm_json(response, fallback=None)
 
@@ -348,6 +358,7 @@ Output the translated JSON array with the same structure. Output ONLY the JSON a
         target_lang: str,
         fields: list[str],
         batch_size: int = 10,
+        models: "list[str] | None" = None,
     ) -> list[dict]:
         """Translate specific fields of items from English to target language.
 
@@ -359,6 +370,7 @@ Output the translated JSON array with the same structure. Output ONLY the JSON a
             target_lang: Target language code (zh, fr, es, pt, ja, ko).
             fields: List of field names to translate in each item.
             batch_size: Number of items per LLM call.
+            models: Optional translator model chain (defaults to TRANSLATOR_MODELS).
 
         Returns:
             List of dicts containing only the translated fields for each item.
@@ -371,7 +383,7 @@ Output the translated JSON array with the same structure. Output ONLY the JSON a
 
         for start in range(0, len(items), batch_size):
             batch = items[start:start + batch_size]
-            translated = self._try_translate_batch(batch, target_lang, fields, lang_name)
+            translated = self._try_translate_batch(batch, target_lang, fields, lang_name, models)
 
             # If full batch failed and it's larger than mini_batch_size, retry with smaller chunks
             if translated is None and len(batch) > mini_batch_size:
@@ -382,7 +394,7 @@ Output the translated JSON array with the same structure. Output ONLY the JSON a
                 for mini_start in range(0, len(batch), mini_batch_size):
                     mini_batch = batch[mini_start:mini_start + mini_batch_size]
                     mini_result = self._try_translate_batch(
-                        mini_batch, target_lang, fields, lang_name,
+                        mini_batch, target_lang, fields, lang_name, models,
                     )
                     if mini_result:
                         translated.extend(mini_result)

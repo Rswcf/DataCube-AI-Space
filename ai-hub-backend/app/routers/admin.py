@@ -427,177 +427,64 @@ async def trigger_newsletter(
                     **result,
                 },
             )
+        if result.get("held_languages"):
+            raise HTTPException(
+                status_code=502,
+                detail={
+                    "message": "Newsletter held for languages whose translations are not ready",
+                    **result,
+                },
+            )
         return result
 
     background_tasks.add_task(_send_newsletter_with_new_session, period_id)
     return {"status": "started", "period_id": period_id or "yesterday"}
 
 
-def _run_backfill_translations_with_new_session(
-    period_id: str | None = None,
-):
-    """Background task wrapper for translation backfill."""
-    from app.models import (
-        Week, TechPost, PrimaryMarketPost, SecondaryMarketPost,
-        MAPost, TipPost, Video, Trend,
-    )
-    from app.services.i18n_utils import TRANSLATION_LANGUAGES
-    from app.services.llm_processor import LLMProcessor
-
-    CONFIGS = {
-        "tech": (TechPost, ["content", "category", "tags"], {}),
-        "video": (Video, ["title", "summary"], {}),
-        "tip": (TipPost, ["content", "tip", "category", "difficulty"], {}),
-        "primary_market": (PrimaryMarketPost, ["content", "amount", "valuation"], {}),
-        "secondary_market": (SecondaryMarketPost, ["content"], {}),
-        "ma": (MAPost, ["content", "deal_value", "deal_type"], {}),
-        "trend": (Trend, ["category", "title"], {}),
-    }
-
-    from concurrent.futures import ThreadPoolExecutor, as_completed
-    import threading
-
-    db = get_session_local()()
-    try:
-        # Resolve periods
-        if period_id:
-            week_ids = [period_id]
-        else:
-            weeks = db.query(Week).order_by(Week.id).all()
-            week_ids = [w.id for w in weeks]
-
-        logger.info(f"Backfill translations: {len(week_ids)} period(s)")
-        grand_total = 0
-
-        for wid in week_ids:
-            logger.info(f"Backfilling {wid}")
-
-            # Collect all sections that need translation for this period
-            section_data = []  # (section_name, records, en_items, fields, name_map, missing_langs)
-            for section_name, (model_cls, fields, name_map) in CONFIGS.items():
-                records = db.query(model_cls).filter(model_cls.week_id == wid).all()
-
-                # Find records missing ANY language (not just records with no translations)
-                to_translate = []
-                missing_langs_per_record = []
-                for r in records:
-                    existing = r.translations or {}
-                    missing = [lang for lang in TRANSLATION_LANGUAGES if lang not in existing]
-                    if missing:
-                        to_translate.append(r)
-                        missing_langs_per_record.append(missing)
-
-                if not to_translate:
-                    continue
-
-                # Figure out which languages need work across all records in this section
-                all_missing = set()
-                for ml in missing_langs_per_record:
-                    all_missing.update(ml)
-
-                en_items = []
-                for record in to_translate:
-                    d = {"_translations": dict(record.translations or {})}
-                    for f in fields:
-                        val = getattr(record, f"{f}_en", None)
-                        if val is not None:
-                            d[f] = val
-                    en_items.append(d)
-
-                section_data.append((section_name, to_translate, en_items, fields, name_map, sorted(all_missing)))
-                logger.info(f"  {section_name}: {len(to_translate)} records, missing langs: {sorted(all_missing)}")
-
-            if not section_data:
-                logger.info(f"  {wid}: nothing to translate")
-                continue
-
-            # Build work units: only for missing languages per section
-            lock = threading.Lock()
-            work_units = [
-                (si, lang)
-                for si in range(len(section_data))
-                for lang in section_data[si][5]  # missing_langs
-            ]
-
-            def do_translate(section_idx: int, target_lang: str):
-                section_name, _, en_items, fields, name_map, _ = section_data[section_idx]
-                proc = LLMProcessor()
-                translated = proc.translate_batch(en_items, target_lang, fields)
-                with lock:
-                    for i, en_item in enumerate(en_items):
-                        if i < len(translated) and translated[i]:
-                            mapped = {}
-                            for k, v in translated[i].items():
-                                db_name = name_map.get(k, k)
-                                mapped[db_name] = v
-                            en_item["_translations"][target_lang] = mapped
-
-            # 3 parallel workers (same as stage3_5)
-            with ThreadPoolExecutor(max_workers=3) as executor:
-                futures = {}
-                for si, lang in work_units:
-                    future = executor.submit(do_translate, si, lang)
-                    futures[future] = f"{section_data[si][0]}→{lang}"
-
-                for future in as_completed(futures):
-                    task_name = futures[future]
-                    try:
-                        future.result()
-                        logger.info(f"    {task_name}: done")
-                    except Exception as e:
-                        logger.warning(f"    {task_name}: failed ({e})")
-
-            # Write back to DB
-            period_total = 0
-            for section_name, records, en_items, _, _, _ in section_data:
-                for i, record in enumerate(records):
-                    t = en_items[i].get("_translations")
-                    if t:
-                        record.translations = t
-                        period_total += 1
-
-            if period_total > 0:
-                db.commit()
-            grand_total += period_total
-            logger.info(f"  {wid}: {period_total} records updated")
-
-        logger.info(f"Backfill complete: {grand_total} total records across {len(week_ids)} periods")
-    except Exception as e:
-        logger.error(f"Backfill failed: {e}")
-        db.rollback()
-        raise
-    finally:
-        db.close()
-
-
 @router.post("/backfill-translations")
-async def trigger_backfill_translations(
+def trigger_backfill_translations(
     period_id: str | None = None,
+    since: str | None = None,
+    force: bool = False,
+    dry_run: bool = False,
+    cheap: bool = False,
+    db: Session = Depends(get_db),
     _: bool = Depends(verify_api_key),
 ):
     """
-    Backfill translations for existing content that only has DE/EN.
+    Repair translations for one period (`period_id`), every daily period on or
+    after `since` (YYYY-MM-DD), or all periods.
 
-    Translates EN content to ZH, FR, ES, PT, JA, KO using free model chain.
-    If period_id is specified, only backfill that period. Otherwise all periods.
-
-    Runs in a daemon thread so the event loop stays responsive.
+    A row/language is repaired when its translation is missing, stale or
+    identical to English; `force=true` re-translates everything selected,
+    including rows that are already correct — not needed for repairs.
+    Incomplete translator output is never written.
+    `dry_run=true` returns per-period row counts and changes nothing.
+    `cheap=true` uses the cheapest translator model chain. Writes both the
+    German `_de` columns and the JSONB translations.
 
     Requires X-API-Key header.
     """
     import threading
 
+    from app.services.translation_backfill import (
+        backfill_with_new_session, resolve_periods, summarize_periods,
+    )
+
+    period_ids = resolve_periods(db, period_id, since)
+    if dry_run:
+        return {
+            "status": "dry_run",
+            "force": force,
+            "periods": summarize_periods(db, period_ids, force),
+        }
     thread = threading.Thread(
-        target=_run_backfill_translations_with_new_session,
-        args=(period_id,),
+        target=backfill_with_new_session,
+        args=(period_ids, force, cheap),
         daemon=True,
     )
     thread.start()
-    return {
-        "status": "started",
-        "period_id": period_id or "all",
-        "message": "Translation backfill started in background thread",
-    }
+    return {"status": "started", "periods": len(period_ids), "force": force, "cheap": cheap}
 
 
 @router.post("/patch-translation")
@@ -633,9 +520,14 @@ async def patch_translation(
     if not record:
         raise HTTPException(status_code=404, detail=f"Record {record_id} not found")
 
-    existing = dict(record.translations or {})
-    existing[lang] = translations_data
-    record.translations = existing
+    from app.services.collector import _apply_translations_to_record
+    from app.services.translation_integrity import SRC_KEY, record_source_hash
+
+    entry = dict(translations_data)
+    entry[SRC_KEY] = record_source_hash(record, table)
+    merged = dict(record.translations or {})
+    merged[lang] = entry
+    _apply_translations_to_record(record, merged)
     db.commit()
 
     return {"status": "patched", "table": table, "id": record_id, "lang": lang}

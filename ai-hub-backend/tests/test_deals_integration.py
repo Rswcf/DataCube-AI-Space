@@ -28,6 +28,8 @@ from app.models import Deal, RawArticle, Week
 from app.services.collector import _save_deals, delete_period
 import app.routers.deals as deals_router
 
+pytestmark = pytest.mark.integration
+
 WEEK_ID = "2026-08-01"
 SOURCE_URL = "https://example.com/acme-round"
 
