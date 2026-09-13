@@ -51,6 +51,10 @@ Stage 3.5: Translate EN → 7 languages incl. DE (paid-first chain)
     • DE, ZH, FR, ES, PT, JA, KO
     • Resilient: JSON validation retries across the model chain
     • Smaller batch fallback (size=3) on parse failure
+    • Every entry carries `_src` (hash of its English source); empty or
+      untranslated pairs are retried once, the rest counted as
+      `counts.translation_gaps`
+    • Written back to saved rows by identity, never by position
     ↓
 Stage 4: Save to PostgreSQL (translations in JSONB column)
     • `_nn(value, default)` helper coalesces LLM `null` → default
@@ -77,8 +81,9 @@ Stage 4: Save to PostgreSQL (translations in JSONB column)
 | 2. Classify | LLM classifies articles into tech/investment (tips sources skip) | `collector.stage2_classify_articles`, `llm_processor.CLASSIFIER_MODELS` |
 | 3. Process | Parallel LLM processing, EN-native (global-audience voice); also trends + AI editorial brief ("Why Today Matters") | `collector.stage3_parallel_processing`, `llm_processor.process_*`, `generate_trends`, `generate_editorial` |
 | 4a. Save base | Validate (EN counts; refuses to clear existing data on empty output), mirror EN→DE arrays as fallback, save with honest source attribution | `collector.stage4_save_to_database`, `_mirror_de_from_translations`, `_source_author` |
-| 3.5 Translate | EN → 7 languages (DE + ZH/FR/ES/PT/JA/KO) via paid-first chain; non-blocking after base save | `collector.stage3_5_translate_content`, `llm_processor.TRANSLATOR_MODELS`, `translate_batch` |
-| Backfill | Write German into native `_de` columns, other 6 languages into `translations` JSONB | `collector._backfill_translations_to_db`, `_apply_translations_to_record` |
+| 3.5 Translate | EN → 7 languages (DE + ZH/FR/ES/PT/JA/KO) via paid-first chain; non-blocking after base save. Every entry is stamped with `_src` (hash of its English source text); item/language pairs that come back empty or identical to English are retried once in batches of 3 and the remainder is reported as `counts.translation_gaps` | `collector.stage3_5_translate_content`, `llm_processor.TRANSLATOR_MODELS`, `translate_batch`, `translation_integrity` |
+| Backfill | Match saved rows to the EN items they came from by identity (English text; video rows by `video_id`), never by position; write German into native `_de` columns and the other 6 languages into `translations` JSONB (German keeps only its `_src` marker there) | `collector._backfill_translations_to_db`, `_match_by_identity`, `_apply_translations_to_record` |
+| Repair | Re-translate rows whose translation is `missing`, `stale` or `untranslated`; writes only complete entries and never blanks a German column. Admin `POST /api/admin/backfill-translations` (`period_id` or `since`, `dry_run`, `cheap`, `force`) or `python -m scripts.backfill_translations` | `translation_backfill.backfill_periods`, `translation_integrity.translation_status` |
 
 Full-collection order is 1 → 2 → 3 → 4a → 3.5 → backfill (base content is
 visible even if translation fails). The process-only admin path runs 3.5
@@ -172,6 +177,25 @@ uvicorn app.main:app --reload
 
 6. Access API docs at http://localhost:8000/docs
 
+### Tests
+
+Tests must never reach the production database: `tests/conftest.py` refuses
+any non-local `DATABASE_URL`, and integration tests delete rows. Always set a
+local URL in the same command.
+
+```bash
+# Unit tests (no database)
+DATABASE_URL=sqlite:///./test.db python -m pytest -m "not integration" -q
+
+# Integration tests (local PostgreSQL, migrated to head)
+docker run -d --name aihub-test-pg -e POSTGRES_PASSWORD=test -e POSTGRES_DB=aihub_test -p 5433:5432 postgres:16
+DATABASE_URL=postgresql://postgres:test@localhost:5433/aihub_test alembic upgrade head
+DATABASE_URL=postgresql://postgres:test@localhost:5433/aihub_test python -m pytest -m integration -q
+```
+
+CI runs both suites (`.github/workflows/ci.yml`, PostgreSQL 16 service for
+the integration job).
+
 ### Database Migrations
 
 Using Alembic for schema migrations:
@@ -218,7 +242,8 @@ Chain: 0006 -> 0007 -> 0008 -> 0009 -> 0011 -> 0012
 | `/api/admin/collect/fetch` | POST | Stage 1 only |
 | `/api/admin/collect/process` | POST | Stages 2-4 only |
 | `/api/admin/collect/ma` | POST | M&A-only reprocessing |
-| `/api/admin/newsletter` | POST | Send newsletter (per-subscriber language) |
+| `/api/admin/newsletter` | POST | Send newsletter (per-subscriber language); languages whose translations are stale or mostly not ready are held (status `held`, HTTP 502) |
+| `/api/admin/backfill-translations` | POST | Repair missing/stale/untranslated translations: `period_id` or `since` (daily periods), `dry_run` (counts only), `cheap` (cheapest translator chain), `force` (also re-translate rows that are already ok) |
 | `/api/admin/migrate` | POST | Migrate JSON data |
 | `/api/developer/register` | POST | Register for API key (returns `dcai_xxx`) |
 | `/api/developer/usage` | GET | API key usage stats (requires `X-API-Key`) |
@@ -433,11 +458,15 @@ ai-hub-backend/
 │       ├── llm_processor.py # LLM processing + resilient translation (JSON validation + small-batch retry)
 │       ├── i18n_utils.py    # Language constants, get_field() helper
 │       ├── newsletter_sender.py # Resend + Beehiiv newsletter — idempotent via newsletter_sends lock (ON CONFLICT DO NOTHING + SELECT FOR UPDATE, 6h stale reclaim); (sent, failed) tuple lets partial success avoid duplicate delivery; Berlin-tz default period (no late-UTC cron "yesterday" bug)
+│       ├── translation_integrity.py # `_src` source hash, translation status, newsletter send gate
+│       ├── translation_backfill.py  # Translation repair per period (admin endpoint + CLI)
 │       └── migrator.py      # JSON migration
 ├── alembic/                 # DB migrations
 ├── scripts/                 # CLI scripts
 │   ├── daily_collect.py     # Daily cron script (Railway)
-│   └── weekly_collect.py    # Weekly collection script
+│   ├── weekly_collect.py    # Weekly collection script
+│   └── backfill_translations.py  # Translation repair CLI (same service as the admin endpoint)
+├── tests/                   # pytest; conftest refuses non-local databases (see "Tests")
 ├── Dockerfile
 ├── railway.toml
 └── requirements.txt

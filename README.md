@@ -157,8 +157,9 @@ Daily collections produce reduced counts (10 tech, 5 investment, 5 tips, 2 video
 | `/api/stock/{ticker}` | GET | Disabled — 410 (licensing) |
 | `/api/stock/batch/?tickers=AAPL,NVDA` | GET | Disabled — 410 (licensing) |
 | `/api/admin/collect` | POST | Trigger full data collection |
-| `/api/admin/newsletter` | POST | Send newsletter (per-subscriber language) |
+| `/api/admin/newsletter` | POST | Send newsletter (per-subscriber language; languages whose translations are not ready are held) |
 | `/api/admin/newsletter/diagnose` | POST | Diagnostic: test Beehiiv, Resend, content |
+| `/api/admin/backfill-translations` | POST | Repair translations that are missing, stale or untranslated (`period_id` or `since`, `dry_run`, `cheap`) |
 | `/api/developer/register` | POST | Register for developer API key |
 | `/api/jobs` | GET | AI job listings (DACH region) |
 | `/api/stripe/create-checkout` | POST | Create Stripe checkout session |
