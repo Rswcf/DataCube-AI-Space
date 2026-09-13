@@ -32,6 +32,7 @@ from app.models.week import Week
 from app.models.newsletter_send import NewsletterSend
 from app.services.period_utils import current_day_id
 from app.services.i18n_utils import get_field, SUPPORTED_LANGUAGES
+from app.services.translation_integrity import gate_holds_language, send_gate_counts
 
 logger = logging.getLogger(__name__)
 
@@ -1311,11 +1312,13 @@ def send_newsletter(db: Session, period_id: str | None = None) -> dict:
     Returns:
         {
             "period_id": str,
-            "status": "sent" | "no_subscribers" | "no_content" | "skipped" | "no_period",
+            "status": "sent" | "partial" | "held" | "no_subscribers" | "no_content" | "skipped" | "no_period",
             "total_sent": int,
             "total_failed": int,
             "lang_breakdown": {lang: {"sent": int, "failed": int, "attempted": int}},
             "skipped_already_sent": int,
+            "held_languages": {lang: {"total": int, "missing": int, "stale": int, "untranslated": int}},
+            "translation_warnings": {lang: {"total": int, "missing": int, "stale": int, "untranslated": int}},
         }
     """
     settings = get_settings()
@@ -1342,6 +1345,8 @@ def send_newsletter(db: Session, period_id: str | None = None) -> dict:
             "total_failed": 0,
             "lang_breakdown": {},
             "skipped_already_sent": 0,
+            "held_languages": {},
+            "translation_warnings": {},
         }
 
     if not period_id:
@@ -1391,6 +1396,18 @@ def send_newsletter(db: Session, period_id: str | None = None) -> dict:
     lang_counts = {lang: len(addrs) for lang, addrs in by_lang.items() if addrs}
     logger.info(f"Language split: {lang_counts}")
 
+    # Translation gate: never send a language carrying another story's text
+    # (stale) or that is mostly untranslated; a few unready rows fall back to
+    # English and are reported. EN always passes.
+    gate_sections = {
+        "tech": list(data["tech"]) + list(data.get("videos", [])),
+        "primary_market": list(data["funding"]),
+        "ma": list(data.get("ma", [])),
+        "tip": list(data["tips"]),
+    }
+    held_languages: dict[str, dict[str, int]] = {}
+    translation_warnings: dict[str, dict[str, int]] = {}
+
     # Build and send per language (only to subscribers who chose that language).
     # Each (period_id, lang) slot is guarded by the NewsletterSend lock to
     # prevent duplicates on manual re-runs, dual cron fires, or workflow retries.
@@ -1401,6 +1418,21 @@ def send_newsletter(db: Session, period_id: str | None = None) -> dict:
     for lang, addrs in by_lang.items():
         if not addrs:
             continue
+
+        gate = send_gate_counts(gate_sections, lang)
+        if gate_holds_language(gate):
+            held_languages[lang] = gate
+            logger.error(
+                f"Holding {lang.upper()} newsletter for {period_id}: "
+                f"translations not ready ({gate})"
+            )
+            continue
+        if gate["missing"] or gate["untranslated"]:
+            translation_warnings[lang] = gate
+            logger.warning(
+                f"{lang.upper()} newsletter for {period_id}: sending with English "
+                f"fallback for rows not ready ({gate})"
+            )
 
         if not _acquire_send_lock(db, period_id, lang):
             logger.info(
@@ -1488,6 +1520,8 @@ def send_newsletter(db: Session, period_id: str | None = None) -> dict:
         status = "skipped"  # all cohorts were already sent
     elif total_failed > 0:
         status = "partial"
+    elif held_languages:
+        status = "held" if total_sent == 0 else "partial"
     elif total_sent > 0:
         status = "sent"
     else:
@@ -1500,4 +1534,6 @@ def send_newsletter(db: Session, period_id: str | None = None) -> dict:
         "total_failed": total_failed,
         "lang_breakdown": lang_breakdown,
         "skipped_already_sent": skipped_already_sent,
+        "held_languages": held_languages,
+        "translation_warnings": translation_warnings,
     }

@@ -427,6 +427,14 @@ async def trigger_newsletter(
                     **result,
                 },
             )
+        if result.get("held_languages"):
+            raise HTTPException(
+                status_code=502,
+                detail={
+                    "message": "Newsletter held for languages whose translations are not ready",
+                    **result,
+                },
+            )
         return result
 
     background_tasks.add_task(_send_newsletter_with_new_session, period_id)
