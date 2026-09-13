@@ -1999,26 +1999,36 @@ def stage4_save_ma_to_database(db: Session, week_id: str, investment_data: dict)
     # Clear existing M&A posts for the week
     db.query(MAPost).filter(MAPost.week_id == week_id).delete()
 
+    # EN is the only natively generated language: build the DE side from EN
+    # (plus German translations when present) before pairing.
+    if isinstance(investment_data, dict):
+        _mirror_de_from_translations({"investment": investment_data})
     ma_data = investment_data.get("ma", {}) if isinstance(investment_data, dict) else {}
     de_posts = ma_data.get("de", []) if isinstance(ma_data, dict) else []
     en_posts = ma_data.get("en", []) if isinstance(ma_data, dict) else []
 
-    for de_p, en_p in zip(de_posts, en_posts):
+    for de_p, en_p in _pair_de_en(de_posts, en_posts, "investment.ma"):
+        if not (
+            de_p.get("acquirer") or en_p.get("acquirer")
+            or de_p.get("target") or en_p.get("target")
+        ):
+            continue
         post = MAPost(
             week_id=week_id,
-            content_de=de_p.get("content", ""),
-            content_en=en_p.get("content", ""),
-            acquirer=de_p.get("acquirer", ""),
-            target=de_p.get("target", ""),
+            content_de=_nn(de_p.get("content"), ""),
+            content_en=_nn(en_p.get("content"), ""),
+            acquirer=_nn(de_p.get("acquirer") or en_p.get("acquirer"), ""),
+            target=_nn(de_p.get("target") or en_p.get("target"), ""),
             deal_value_de=de_p.get("dealValue"),
             deal_value_en=en_p.get("dealValue"),
-            deal_type_de=de_p.get("dealType", ""),
-            deal_type_en=en_p.get("dealType", ""),
+            deal_type_de=_nn(de_p.get("dealType"), ""),
+            deal_type_en=_nn(en_p.get("dealType"), ""),
             industry=de_p.get("industry") or en_p.get("industry"),
             author=_source_author(en_p),
-            timestamp=de_p.get("timestamp", ""),
+            timestamp=_nn(de_p.get("timestamp"), ""),
             source_url=de_p.get("sourceUrl"),
-            metrics=de_p.get("metrics", {}),
+            metrics=_nn(de_p.get("metrics"), {}),
+            translations=_jsonb_translations(en_p),
         )
         db.add(post)
 
