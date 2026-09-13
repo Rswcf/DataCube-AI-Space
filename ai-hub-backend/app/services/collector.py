@@ -24,6 +24,9 @@ from app.services.rss_fetcher import fetch_rss_feeds_parallel
 from app.services.hn_fetcher import fetch_hn_stories
 from app.services.youtube_fetcher import fetch_youtube_videos, fetch_video_transcript
 from app.services.llm_processor import LLMProcessor
+from app.services.translation_integrity import (
+    SRC_KEY, identity_key, item_source_hash, source_hash,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -67,17 +70,42 @@ def _source_author(item: dict) -> dict:
 _TRANSLATION_REVERSE_MAPS = {"ma": {"deal_value": "dealValue", "deal_type": "dealType"}}
 
 
-def _jsonb_translations(item: dict):
-    """Translations destined for the JSONB column: everything except 'de'.
+def _jsonb_view(translations):
+    """Translations as stored in the JSONB column.
 
-    German lives in the native `_de` columns (mirrored/backfilled), so
-    storing it in JSONB as well would be duplication `get_field` never reads.
+    German text lives in the native `_de` columns, so under "de" only its
+    integrity marker (``{"_src": ...}``) is stored; every other language is
+    stored whole. ``get_field`` never reads JSONB for German.
     """
-    translations = item.get("_translations")
     if not isinstance(translations, dict):
         return None
-    filtered = {k: v for k, v in translations.items() if k != "de"}
-    return filtered or None
+    stored = {}
+    for lang, fields in translations.items():
+        if lang == "de":
+            if isinstance(fields, dict) and fields.get(SRC_KEY):
+                stored["de"] = {SRC_KEY: fields[SRC_KEY]}
+        else:
+            stored[lang] = fields
+    return stored or None
+
+
+def _jsonb_translations(item: dict):
+    """JSONB value for a row saved from an EN item (see `_jsonb_view`)."""
+    return _jsonb_view(item.get("_translations"))
+
+
+def _video_translations_for_tech_row(item: dict, translations: dict) -> dict:
+    """Map a video's translations (title/summary) onto its tech-feed row (content).
+
+    The tech-feed row stores the video summary as `content`, so its integrity
+    marker is the hash of the English summary (kind "tech" hashes `content`).
+    """
+    src = source_hash([item.get("summary")])
+    mapped = {}
+    for lang, fields in (translations or {}).items():
+        if isinstance(fields, dict):
+            mapped[lang] = {"content": fields.get("summary"), SRC_KEY: src}
+    return mapped
 
 
 def _mirror_de_from_translations(results: dict) -> None:
@@ -110,6 +138,8 @@ def _mirror_de_from_translations(results: dict) -> None:
             de_fields = translations.get("de") if isinstance(translations, dict) else None
             if de_fields:
                 for db_name, value in de_fields.items():
+                    if db_name.startswith("_"):
+                        continue
                     de_item[reverse.get(db_name, db_name)] = value
             de_items.append(de_item)
         return de_items
@@ -1025,6 +1055,16 @@ def _build_translation_tasks(results: dict) -> list:
     return tasks
 
 
+def _store_translations(section_name: str, items: list, translated: list,
+                        target_lang: str, name_map: dict) -> None:
+    """Attach one language's translations to EN items, stamped with `_src`."""
+    for i, item in enumerate(items):
+        if i < len(translated) and translated[i] and isinstance(item, dict):
+            mapped = {name_map.get(k, k): v for k, v in translated[i].items()}
+            mapped[SRC_KEY] = item_source_hash(item, section_name)
+            item.setdefault("_translations", {})[target_lang] = mapped
+
+
 def stage3_5_translate_content(results: dict) -> dict:
     """
     Stage 3.5: Translate EN content to 6 additional languages using free models.
@@ -1064,14 +1104,7 @@ def stage3_5_translate_content(results: dict) -> dict:
         section_name, items, fields, name_map = translation_tasks[section_idx]
         thread_processor = LLMProcessor()
         translated = thread_processor.translate_batch(items, target_lang, fields)
-
-        for i, item in enumerate(items):
-            if i < len(translated) and translated[i] and isinstance(item, dict):
-                mapped = {}
-                for k, v in translated[i].items():
-                    db_name = name_map.get(k, k)
-                    mapped[db_name] = v
-                item["_translations"][target_lang] = mapped
+        _store_translations(section_name, items, translated, target_lang, name_map)
 
     # Run translations in parallel (3 workers to respect free model rate limits)
     work_units = [
@@ -1105,92 +1138,118 @@ def stage3_5_translate_content(results: dict) -> dict:
 def _apply_translations_to_record(record, trans) -> None:
     """Write Stage 3.5 output onto an already-saved record.
 
-    German goes into the native `_de` columns (overwriting the EN fallback
-    that the stage-4 mirror saved); the other six languages go into the
-    JSONB `translations` column. Stage 3.5 emits DB field names, so the
-    `_de` attribute lookup is direct.
+    German text goes into the native `_de` columns (overwriting the EN
+    fallback that the stage-4 mirror saved); the JSONB column stores the other
+    languages plus the German integrity marker (see `_jsonb_view`). Stage 3.5
+    emits DB field names, so the `_de` attribute lookup is direct.
     """
     if not isinstance(trans, dict):
         return
     de_fields = trans.get("de")
     if isinstance(de_fields, dict):
         for db_name, value in de_fields.items():
+            if db_name.startswith("_"):
+                continue
             attr = f"{db_name}_de"
             if value is not None and hasattr(record, attr):
                 setattr(record, attr, value)
-    filtered = {k: v for k, v in trans.items() if k != "de"}
-    record.translations = filtered or None
+    record.translations = _jsonb_view(trans)
+
+
+def _match_by_identity(records: list, en_items: list, record_key, item_key) -> list:
+    """Pair saved rows with the EN items they were created from.
+
+    Rows are matched on the English text they were saved with, never by
+    position: positional pairing shifted translations onto the wrong rows
+    whenever video rows were interleaved into the tech feed or a row was
+    dropped at save time. Duplicate keys pair in order.
+    Returns [(record, item), ...].
+    """
+    buckets: dict = {}
+    for item in en_items:
+        if isinstance(item, dict):
+            buckets.setdefault(item_key(item), []).append(item)
+    pairs = []
+    for record in records:
+        queue = buckets.get(record_key(record))
+        if queue:
+            pairs.append((record, queue.pop(0)))
+    return pairs
 
 
 def _backfill_translations_to_db(db: Session, week_id: str, results: dict):
     """
     Update already-saved records with translations from Stage 3.5.
 
-    Stage 3.5 mutates results in place, adding _translations dicts
-    to each EN item. This function reads those and writes them to DB.
+    Stage 3.5 mutates results in place, adding _translations dicts to each EN
+    item. Each saved row is matched to its EN item by identity (see
+    `_match_by_identity`) and the translations are written onto it.
     """
-    def _update_translations(model_cls, items_key, results_data):
-        en_items = results_data.get(items_key, {}).get("en", [])
+    def apply(label, query, en_items, record_key, item_key, transform=None):
         if not en_items:
             return
-        records = (
-            db.query(model_cls)
-            .filter(model_cls.week_id == week_id)
-            .order_by(model_cls.id)
-            .all()
-        )
-        for i, record in enumerate(records):
-            if i < len(en_items):
-                trans = en_items[i].get("_translations")
-                if trans:
-                    _apply_translations_to_record(record, trans)
+        records = query.all()
+        pairs = _match_by_identity(records, en_items, record_key, item_key)
+        applied = 0
+        for record, item in pairs:
+            trans = item.get("_translations")
+            if not trans:
+                continue
+            _apply_translations_to_record(record, transform(item, trans) if transform else trans)
+            applied += 1
+        if len(pairs) < len(records):
+            logger.warning(
+                f"Translations {label}: {len(records) - len(pairs)} row(s) had no matching EN item"
+            )
+        logger.info(f"Translations {label}: applied to {applied}/{len(records)} row(s)")
 
-    _update_translations(TechPost, "tech", results)
-    _update_translations(Video, "videos", results)
-    _update_translations(TipPost, "tips", results)
+    def by_week(model_cls):
+        return db.query(model_cls).filter(model_cls.week_id == week_id)
 
-    # Investment sub-sections
-    inv = results.get("investment", {})
+    def content_of_record(record):
+        return identity_key([record.content_en])
+
+    def content_of_item(item):
+        return identity_key([item.get("content")])
+
+    def video_id_of_record(record):
+        return identity_key([record.video_id])
+
+    def video_id_of_item(item):
+        return identity_key([item.get("video_id")])
+
+    tech_en = (results.get("tech") or {}).get("en", [])
+    video_en = (results.get("videos") or {}).get("en", [])
+    tips_en = (results.get("tips") or {}).get("en", [])
+
+    apply("tech", by_week(TechPost).filter(TechPost.is_video == False),  # noqa: E712
+          tech_en, content_of_record, content_of_item)
+    apply("tech-video", by_week(TechPost).filter(TechPost.is_video == True),  # noqa: E712
+          video_en, video_id_of_record, video_id_of_item,
+          transform=_video_translations_for_tech_row)
+    apply("videos", by_week(Video), video_en, video_id_of_record, video_id_of_item)
+    apply("tips", by_week(TipPost), tips_en,
+          lambda record: identity_key([record.content_en, record.tip_en]),
+          lambda item: identity_key([item.get("content"), item.get("tip")]))
+
+    inv = results.get("investment") or {}
     if isinstance(inv, dict):
-        pm_en = inv.get("primaryMarket", {}).get("en", [])
-        if pm_en:
-            records = db.query(PrimaryMarketPost).filter(
-                PrimaryMarketPost.week_id == week_id
-            ).order_by(PrimaryMarketPost.id).all()
-            for i, record in enumerate(records):
-                if i < len(pm_en) and pm_en[i].get("_translations"):
-                    _apply_translations_to_record(record, pm_en[i]["_translations"])
+        for key, model_cls in (
+            ("primaryMarket", PrimaryMarketPost),
+            ("secondaryMarket", SecondaryMarketPost),
+            ("ma", MAPost),
+        ):
+            sub = inv.get(key)
+            sub_en = sub.get("en", []) if isinstance(sub, dict) else []
+            apply(f"investment.{key}", by_week(model_cls), sub_en,
+                  content_of_record, content_of_item)
 
-        sm_en = inv.get("secondaryMarket", {}).get("en", [])
-        if sm_en:
-            records = db.query(SecondaryMarketPost).filter(
-                SecondaryMarketPost.week_id == week_id
-            ).order_by(SecondaryMarketPost.id).all()
-            for i, record in enumerate(records):
-                if i < len(sm_en) and sm_en[i].get("_translations"):
-                    _apply_translations_to_record(record, sm_en[i]["_translations"])
-
-        ma_en = inv.get("ma", {}).get("en", [])
-        if ma_en:
-            records = db.query(MAPost).filter(
-                MAPost.week_id == week_id
-            ).order_by(MAPost.id).all()
-            for i, record in enumerate(records):
-                if i < len(ma_en) and ma_en[i].get("_translations"):
-                    _apply_translations_to_record(record, ma_en[i]["_translations"])
-
-    # Trends
-    trends = results.get("trends", {})
-    if isinstance(trends, dict):
-        trends_section = trends.get("trends", {})
-        trends_en = trends_section.get("en", []) if isinstance(trends_section, dict) else []
-        if trends_en:
-            records = db.query(Trend).filter(
-                Trend.week_id == week_id
-            ).order_by(Trend.id).all()
-            for i, record in enumerate(records):
-                if i < len(trends_en) and trends_en[i].get("_translations"):
-                    _apply_translations_to_record(record, trends_en[i]["_translations"])
+    trends = results.get("trends") or {}
+    trends_section = trends.get("trends", {}) if isinstance(trends, dict) else {}
+    trends_en = trends_section.get("en", []) if isinstance(trends_section, dict) else []
+    apply("trends", by_week(Trend), trends_en,
+          lambda record: identity_key([record.title_en]),
+          lambda item: identity_key([item.get("title")]))
 
     try:
         db.commit()
@@ -1423,18 +1482,17 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
             like_count=_nn(meta.get("like_count"), 0),
             transcript=raw_video.transcript if raw_video else None,
             category=de_v.get("category") or en_v.get("category"),
-            translations=en_v.get("_translations") or None,
+            translations=_jsonb_translations(en_v),
         )
         db.add(video)
 
-        # Create video post for tech feed
-        # Map video translations (summary→content) for TechPost
+        # Create video post for tech feed. In the process-only path Stage 3.5
+        # already ran, so map the video's translations (summary -> content).
         video_trans = en_v.get("_translations")
-        tech_video_trans = None
-        if video_trans:
-            tech_video_trans = {}
-            for lang, fields in video_trans.items():
-                tech_video_trans[lang] = {"content": fields.get("summary", "")}
+        tech_video_trans = (
+            _jsonb_view(_video_translations_for_tech_row(en_v, video_trans))
+            if video_trans else None
+        )
 
         video_post = TechPost(
             week_id=week_id,
