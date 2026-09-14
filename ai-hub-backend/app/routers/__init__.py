@@ -14,6 +14,7 @@ from app.routers.developer import router as developer_router
 from app.routers.jobs import router as jobs_router
 from app.routers.deals import router as deals_router
 from app.routers.newsletter import router as newsletter_router
+from app.routers.contact import router as contact_router
 
 __all__ = [
     "weeks_router",
@@ -28,4 +29,5 @@ __all__ = [
     "jobs_router",
     "deals_router",
     "newsletter_router",
+    "contact_router",
 ]
