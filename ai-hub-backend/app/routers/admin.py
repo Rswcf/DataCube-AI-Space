@@ -737,6 +737,41 @@ async def diagnose_newsletter(
     return report
 
 
+class NewsletterTestSendBody(BaseModel):
+    test_email: EmailStr
+
+
+@router.post("/newsletter/test-send")
+def newsletter_test_send(
+    body: NewsletterTestSendBody,
+    period_id: str,
+    language: str = "en",
+    db: Session = Depends(get_db),
+    _: bool = Depends(verify_api_key),
+):
+    """Send the real newsletter render for one period and language to `test_email` only.
+
+    No send lock, no subscriber list. Use it to check the template and, on the
+    received message, that the DKIM-Signature h= tag covers list-unsubscribe
+    and list-unsubscribe-post (spec AD3 acceptance).
+    """
+    from app.services.newsletter_sender import send_test_newsletter
+
+    test_email = body.test_email  # JSON body, never the query string: access logs record URLs
+    try:
+        result = send_test_newsletter(db, period_id, test_email, language)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    except Exception as exc:
+        logger.error(f"[test-send] failed for {mask_email(test_email)}: {type(exc).__name__}")
+        raise HTTPException(status_code=502, detail="test_send_failed")
+    if result["status"] == "no_content":
+        raise HTTPException(status_code=404, detail=result)
+    if result["failed"]:
+        raise HTTPException(status_code=502, detail=result)
+    return result
+
+
 @router.get("/health")
 async def health_check():
     """Health check endpoint."""

@@ -31,6 +31,7 @@ from app.models.tip import TipPost
 from app.models.week import Week
 from app.models.newsletter_send import NewsletterSend
 from app.services.period_utils import current_day_id
+from app.services.beehiiv import find_subscription_id
 from app.services.i18n_utils import get_field, SUPPORTED_LANGUAGES
 from app.services.privacy import redact_emails
 from app.services.translation_integrity import gate_holds_language, send_gate_counts
@@ -1576,4 +1577,58 @@ def send_newsletter(db: Session, period_id: str | None = None) -> dict:
         "skipped_already_sent": skipped_already_sent,
         "held_languages": held_languages,
         "translation_warnings": translation_warnings,
+    }
+
+
+# Used when the test address is not a Beehiiv subscriber: the headers are still
+# present for the DKIM h= check, and a click answers "unsubscribed" (Beehiiv 404)
+# without touching any real subscription.
+TEST_SEND_SUBSCRIPTION_ID = "test-send-preview"
+
+
+def send_test_newsletter(db: Session, period_id: str, test_email: str, lang: str = "en") -> dict:
+    """Send one real newsletter render to an explicit test address.
+
+    Same template, subject, personal footer link and List-Unsubscribe headers
+    as the daily send, but no send lock and no subscriber list. When the
+    address is a Beehiiv subscriber its real subscription id is used, so the
+    one-click link can be tried end to end (it unsubscribes that address).
+    """
+    settings = get_settings()
+    if not settings.resend_api_key:
+        raise ValueError("RESEND_API_KEY not configured")
+    if lang not in SUPPORTED_LANGUAGES:
+        raise ValueError(f"Unsupported language: {lang}")
+
+    data = _fetch_period_content(db, period_id)
+    total_items = (
+        len(data["tech"]) + len(data["funding"]) + len(data["tips"])
+        + len(data.get("ma", [])) + len(data.get("videos", []))
+    )
+    if total_items == 0:
+        return {"period_id": period_id, "language": lang, "status": "no_content", "sent": 0, "failed": 0}
+
+    subscription_id = None
+    if settings.beehiiv_api_key and settings.beehiiv_publication_id:
+        subscription_id = find_subscription_id(
+            settings.beehiiv_api_key, settings.beehiiv_publication_id, test_email
+        )
+
+    resend.api_key = settings.resend_api_key
+    messages = _recipient_messages(
+        settings.newsletter_from_email,
+        f"[TEST] {_build_subject(data, period_id, lang)}",
+        _build_email_html(data, lang),
+        [{"id": subscription_id or TEST_SEND_SUBSCRIPTION_ID, "email": test_email}],
+        settings.signing_secret,
+    )
+    sent, failed = _send_via_resend(messages)
+    return {
+        "period_id": period_id,
+        "language": lang,
+        "status": "sent" if sent else "failed",
+        "sent": sent,
+        "failed": failed,
+        "one_click_headers": "headers" in messages[0],
+        "matched_subscriber": subscription_id is not None,
     }
