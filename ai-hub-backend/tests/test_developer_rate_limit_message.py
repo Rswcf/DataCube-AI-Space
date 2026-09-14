@@ -1,6 +1,6 @@
 """The developer API 429 message links to a page that exists."""
 
-from datetime import datetime
+from datetime import datetime, timezone
 from types import SimpleNamespace
 
 import pytest
@@ -23,7 +23,7 @@ class _Query:
 def test_rate_limit_message_links_to_the_api_tool_page(monkeypatch):
     record = SimpleNamespace(
         is_active=True, tier="free", calls_today=100,
-        calls_today_date=datetime.utcnow().date(), calls_total=100,
+        calls_today_date=datetime.now(timezone.utc).date(), calls_total=100,
     )
     db = SimpleNamespace(query=lambda model: _Query(record))
     request = SimpleNamespace(headers={"X-API-Key": "dcai_test"})

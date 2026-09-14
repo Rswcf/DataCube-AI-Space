@@ -4,7 +4,7 @@ Developer API endpoints for API key management and usage tracking.
 
 import logging
 import secrets
-from datetime import datetime
+from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Header, Request
 from pydantic import BaseModel, EmailStr
@@ -211,7 +211,7 @@ def check_developer_rate_limit(request: Request, db: Session) -> Optional[ApiKey
     if not record.is_active:
         raise HTTPException(status_code=403, detail="API key is deactivated")
 
-    today = datetime.utcnow().date()
+    today = datetime.now(timezone.utc).date()
     if record.calls_today_date != today:
         record.calls_today = 0
         record.calls_today_date = today
