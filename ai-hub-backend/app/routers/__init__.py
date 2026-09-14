@@ -13,6 +13,7 @@ from app.routers.stock import router as stock_router
 from app.routers.developer import router as developer_router
 from app.routers.jobs import router as jobs_router
 from app.routers.deals import router as deals_router
+from app.routers.newsletter import router as newsletter_router
 
 __all__ = [
     "weeks_router",
@@ -26,4 +27,5 @@ __all__ = [
     "developer_router",
     "jobs_router",
     "deals_router",
+    "newsletter_router",
 ]

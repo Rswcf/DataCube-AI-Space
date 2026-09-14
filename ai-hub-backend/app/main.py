@@ -22,6 +22,7 @@ from app.routers import (
     developer_router,
     jobs_router,
     deals_router,
+    newsletter_router,
 )
 
 # Configure logging
@@ -70,6 +71,7 @@ app.include_router(stock_router, prefix="/api")
 app.include_router(developer_router, prefix="/api")
 app.include_router(jobs_router, prefix="/api")
 app.include_router(deals_router, prefix="/api")
+app.include_router(newsletter_router, prefix="/api")
 
 
 # ---------------------------------------------------------------------------
