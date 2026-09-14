@@ -28,9 +28,11 @@ class ContactRequest(BaseModel):
 
 
 def _client_ip(request: Request) -> str:
-    forwarded = request.headers.get("x-forwarded-for", "").split(",")[0].strip()
-    if forwarded:
-        return forwarded
+    # Trust the LAST X-Forwarded-For entry: Railway's ingress appends it, while
+    # earlier entries are caller-controlled (same rule as routers/deals.py).
+    hops = [hop.strip() for hop in request.headers.get("x-forwarded-for", "").split(",") if hop.strip()]
+    if hops:
+        return hops[-1]
     return request.client.host if request.client else "unknown"
 
 

@@ -81,3 +81,15 @@ def test_line_breaks_in_the_name_cannot_break_the_subject(outbox):
     TestClient(app).post("/api/contact", json={**VALID, "name": "Ada\r\nBcc: victim@example.com"})
     assert "\n" not in outbox[0]["subject"]
     assert "\r" not in outbox[0]["subject"]
+
+
+def test_per_ip_limit_ignores_a_spoofed_first_forwarded_hop(outbox):
+    client = TestClient(app)
+    statuses = [
+        client.post(
+            "/api/contact", json=VALID, headers={"X-Forwarded-For": f"198.51.100.{hop}, 203.0.113.7"}
+        ).status_code
+        for hop in range(4)
+    ]
+    assert statuses == [202, 202, 202, 429]
+    assert len(outbox) == 3
