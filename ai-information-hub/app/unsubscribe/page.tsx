@@ -24,12 +24,13 @@ export default async function UnsubscribePage({
           <UnsubscribeConfirm token={token} />
         ) : (
           <p className="text-muted-foreground">
-            Every newsletter email has a personal unsubscribe link at the bottom. Open that link
-            to unsubscribe with one click. If you cannot find it, send us a message through the{" "}
+            Newsletter emails carry a personal link at the bottom that unsubscribes you with one
+            click. If the link in your email brought you to this page instead, send us a message
+            through the{" "}
             <Link href="/contact" className="underline hover:no-underline">
               contact form
-            </Link>
-            .
+            </Link>{" "}
+            using the address you subscribed with, and we will unsubscribe you by hand.
           </p>
         )}
         <Link

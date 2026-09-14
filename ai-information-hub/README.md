@@ -44,7 +44,7 @@ vercel --prod
 - Keyword-optimized SEO: localized metadata, H1/H2/H3 headings, lead paragraphs, and breadcrumbs across all 8 languages
 - Login page supports all 8 languages with language selector row
 - One-click unsubscribe: RFC 8058 route `/api/newsletter/unsubscribe` and token confirm page `/unsubscribe`
-- Unit tests: Vitest for pure modules (`npm test`, `lib/**/*.test.ts`)
+- Unit tests: Vitest for pure modules and the one-click route handler (`npm test`, `lib/**/*.test.ts`, `app/**/*.test.ts`)
 - Non-www → www permanent redirect via vercel.json
 - Mobile optimized (overflow-x-hidden, dynamic viewport height, conditional search trends, flex-wrap investment cards, touch-action on scroll containers, mobile feature parity with Support + Newsletter in settings drawer)
 - Distinctive editorial design: Isometric cube logo, Newsreader display headlines, Geist UI labels, thin rule dividers, numbered trend rankings, section-specific accents, staggered card entrance animations, shimmer loading skeletons, tabular-nums on financial data
