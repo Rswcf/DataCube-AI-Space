@@ -18,6 +18,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+from app.db_guard import guard_script_database
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s %(levelname)s: %(message)s",
@@ -27,6 +29,7 @@ logger = logging.getLogger(__name__)
 
 
 def main():
+    guard_script_database()
     parser = argparse.ArgumentParser(description="Send daily newsletter")
     parser.add_argument(
         "--date",

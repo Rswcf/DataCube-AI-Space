@@ -18,6 +18,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from app.database import Base, get_engine, get_session_local
+from app.db_guard import guard_script_database
 from app.services.migrator import migrate_weeks_json, migrate_week_data
 
 logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
@@ -64,6 +65,7 @@ def migrate_existing_data(db, data_path: Path):
 
 
 def main():
+    guard_script_database()
     parser = argparse.ArgumentParser(description="Initialize AI Hub database")
     parser.add_argument(
         "--migrate-all",

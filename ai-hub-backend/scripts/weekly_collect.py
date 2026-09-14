@@ -19,6 +19,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from app.database import get_session_local
+from app.db_guard import guard_script_database
 from app.services.collector import run_collection
 
 logging.basicConfig(
@@ -30,6 +31,7 @@ logger = logging.getLogger(__name__)
 
 
 def main():
+    guard_script_database()
     parser = argparse.ArgumentParser(description="Data collection (weekly mode)")
     parser.add_argument(
         "--week",
