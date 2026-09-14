@@ -27,7 +27,15 @@ class Settings(BaseSettings):
     beehiiv_publication_id: str = ""
     newsletter_from_email: str = "Data Cube AI <newsletter@datacubeai.space>"
 
-    # Stripe
+    # One-click unsubscribe tokens (HMAC-SHA256, at least 32 characters). Generate with:
+    #   python -c "import secrets; print(secrets.token_urlsafe(48))"
+    signing_secret: str = ""
+    signing_secret_previous: str = ""  # keeps old links valid during a key rotation
+
+    # Contact form destination (POST /api/contact)
+    contact_inbox: str = ""
+
+    # Stripe (unused since R1; membership / SP3a reuses these)
     stripe_secret_key: str = ""
     stripe_webhook_secret: str = ""
     stripe_premium_price_id: str = ""  # Stripe Price ID for premium subscription
