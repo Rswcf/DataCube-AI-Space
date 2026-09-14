@@ -3,6 +3,7 @@
 import logging
 from urllib.parse import parse_qs, urlparse
 
+import pytest
 import requests
 import resend
 
@@ -121,3 +122,21 @@ def test_subscriber_fetch_keeps_the_subscription_id_and_logs_no_address(monkeypa
         {"id": "sub_1", "email": "reader@example.com", "language": "en"}
     ]
     assert "reader@example.com" not in caplog.text
+
+
+class _BeehiivRejection:
+    ok = False
+    status_code = 401
+    text = "Unauthorized: API key revoked by admin@example.com"
+
+
+def test_subscriber_fetch_error_keeps_the_status_but_redacts_addresses(monkeypatch):
+    monkeypatch.setattr(requests, "get", lambda *args, **kwargs: _BeehiivRejection())
+
+    with pytest.raises(RuntimeError) as raised:
+        sender._fetch_beehiiv_subscribers("bh_key", "pub_1")
+
+    message = str(raised.value)
+    assert "Beehiiv API error 401" in message
+    assert "admin@example.com" not in message
+    assert "<email>" in message

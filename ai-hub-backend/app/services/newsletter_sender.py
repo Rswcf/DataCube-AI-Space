@@ -1083,7 +1083,7 @@ def _fetch_beehiiv_subscribers(api_key: str, publication_id: str) -> list[dict]:
             # admin endpoint surfaces 5xx and the workflow turns red.
             raise RuntimeError(
                 f"Beehiiv API error {resp.status_code} on page {page}: "
-                f"{resp.text[:300]}"
+                f"{redact_emails(resp.text)[:300]}"
             )
 
         data = resp.json()
@@ -1615,6 +1615,11 @@ def send_test_newsletter(db: Session, period_id: str, test_email: str, lang: str
         )
 
     resend.api_key = settings.resend_api_key
+    if not usable_secret(settings.signing_secret):
+        logger.warning(
+            "SIGNING_SECRET is missing or shorter than 32 characters: the test send goes out "
+            "without one-click unsubscribe headers"
+        )
     messages = _recipient_messages(
         settings.newsletter_from_email,
         f"[TEST] {_build_subject(data, period_id, lang)}",

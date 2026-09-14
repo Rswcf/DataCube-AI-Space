@@ -5,7 +5,7 @@ from urllib.parse import quote
 import requests
 
 BEEHIIV_API = "https://api.beehiiv.com/v2"
-TIMEOUT_SECONDS = 15
+TIMEOUT_SECONDS = 8  # below the site route's 10 s abort (ai-information-hub/app/api/newsletter/unsubscribe/route.ts)
 
 
 class BeehiivError(RuntimeError):

@@ -1,5 +1,6 @@
 """The admin test-send mails one real render, with one-click headers, to the test address only."""
 
+import logging
 from types import SimpleNamespace
 
 from fastapi.testclient import TestClient
@@ -13,11 +14,11 @@ from app.services.unsubscribe_tokens import verify_token
 SECRET = "s" * 40
 
 
-def _patch(monkeypatch, subscription_id):
+def _patch(monkeypatch, subscription_id, signing_secret=SECRET):
     captured = {}
     monkeypatch.setattr(sender, "get_settings", lambda: SimpleNamespace(
         resend_api_key="re_test", beehiiv_api_key="bh_key", beehiiv_publication_id="pub_1",
-        newsletter_from_email="News <news@example.com>", signing_secret=SECRET,
+        newsletter_from_email="News <news@example.com>", signing_secret=signing_secret,
     ))
     monkeypatch.setattr(sender, "_fetch_period_content", lambda db, period_id: {
         "period_id": period_id, "tech": [{"content_en": "x"}], "videos": [], "funding": [], "ma": [], "tips": [],
@@ -84,3 +85,17 @@ def test_admin_test_send_requires_a_valid_test_email(monkeypatch):
     assert invalid.status_code == 422
     assert ok.status_code == 200
     assert ok.json()["one_click_headers"] is True
+
+
+def test_unusable_secret_test_send_goes_out_without_headers_and_logs_a_warning(monkeypatch, caplog):
+    captured = _patch(monkeypatch, "sub_founder", signing_secret="s" * 31)
+    caplog.set_level(logging.WARNING, logger=sender.logger.name)
+
+    result = sender.send_test_newsletter(None, "2026-09-12", "founder@example.com", "en")
+
+    assert "headers" not in captured["messages"][0]
+    assert result["one_click_headers"] is False
+    assert result["sent"] == 1
+    warnings = [r for r in caplog.records if r.levelno == logging.WARNING and "SIGNING_SECRET" in r.getMessage()]
+    assert len(warnings) == 1
+    assert "founder@example.com" not in caplog.text

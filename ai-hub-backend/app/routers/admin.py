@@ -12,6 +12,7 @@ from typing import Optional
 from app.database import get_db, get_session_local
 from app.config import get_settings
 from app.services.privacy import mask_email, redact_emails
+from app.services.unsubscribe_tokens import usable_secret
 
 logger = logging.getLogger(__name__)
 
@@ -617,7 +618,7 @@ async def diagnose_newsletter(
         "BEEHIIV_API_KEY": bool(settings.beehiiv_api_key),
         "BEEHIIV_PUBLICATION_ID": bool(settings.beehiiv_publication_id),
         "NEWSLETTER_FROM_EMAIL": settings.newsletter_from_email,
-        "SIGNING_SECRET": bool(settings.signing_secret),
+        "SIGNING_SECRET": usable_secret(settings.signing_secret),
         "CONTACT_INBOX": bool(settings.contact_inbox),
     }
     all_set = all([

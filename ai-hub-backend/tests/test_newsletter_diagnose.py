@@ -2,6 +2,7 @@
 
 from types import SimpleNamespace
 
+import pytest
 import requests
 import resend
 from fastapi.testclient import TestClient
@@ -28,11 +29,11 @@ class _BeehiivPage:
         return {"data": SUBSCRIBERS, "total_pages": 1, "total_results": 3}
 
 
-def _post(monkeypatch, url, body=None):
+def _post(monkeypatch, url, body=None, signing_secret=""):
     sent = []
     monkeypatch.setattr(admin, "get_settings", lambda: SimpleNamespace(
         resend_api_key="re_test", beehiiv_api_key="bh_test", beehiiv_publication_id="pub_test",
-        newsletter_from_email="News <news@example.com>", signing_secret="", contact_inbox="",
+        newsletter_from_email="News <news@example.com>", signing_secret=signing_secret, contact_inbox="",
     ))
     monkeypatch.setattr(requests, "get", lambda *args, **kwargs: _BeehiivPage())
     monkeypatch.setattr(resend.Emails, "send", lambda params: sent.append(params) or {"id": "email_1"})
@@ -78,3 +79,16 @@ def test_diagnose_returns_counts_without_subscriber_addresses(monkeypatch):
     assert body["env_check"]["variables"]["SIGNING_SECRET"] is False
     assert body["env_check"]["variables"]["CONTACT_INBOX"] is False
     assert [params["to"] for params in sent] == [["founder@example.com"]]
+
+
+@pytest.mark.parametrize(("secret", "usable"), [("s" * 31, False), ("s" * 32, True)])
+def test_diagnose_reports_whether_the_signing_secret_is_usable(monkeypatch, secret, usable):
+    response, _ = _post(
+        monkeypatch,
+        "/api/admin/newsletter/diagnose?period_id=2026-09-12",
+        body={"test_email": "founder@example.com"},
+        signing_secret=secret,
+    )
+
+    assert response.status_code == 200
+    assert response.json()["env_check"]["variables"]["SIGNING_SECRET"] is usable
