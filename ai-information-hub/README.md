@@ -43,10 +43,11 @@ vercel --prod
 - FAQ structured data on topic pages (localized in all 8 languages)
 - Keyword-optimized SEO: localized metadata, H1/H2/H3 headings, lead paragraphs, and breadcrumbs across all 8 languages
 - Login page supports all 8 languages with language selector row
-- Unsubscribe page (/unsubscribe) with instructions
+- One-click unsubscribe: RFC 8058 route `/api/newsletter/unsubscribe` and token confirm page `/unsubscribe`
+- Unit tests: Vitest for pure modules (`npm test`, `lib/**/*.test.ts`)
 - Non-www → www permanent redirect via vercel.json
 - Mobile optimized (overflow-x-hidden, dynamic viewport height, conditional search trends, flex-wrap investment cards, touch-action on scroll containers, mobile feature parity with Support + Newsletter in settings drawer)
 - Distinctive editorial design: Isometric cube logo, Newsreader display headlines, Geist UI labels, thin rule dividers, numbered trend rankings, section-specific accents, staggered card entrance animations, shimmer loading skeletons, tabular-nums on financial data
-- Monetization surfaces: `/for-teams`, `/premium`, Stripe checkout proxy, and backend developer API/job-board endpoints
+- Monetization surfaces: `/for-teams` (contact form → backend `POST /api/contact`), `/premium` (coming soon), and backend developer API/job-board endpoints
 - Subscription badge component for tier display
 - No authentication required

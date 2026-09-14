@@ -55,7 +55,7 @@ https://github.com/user-attachments/assets/9dddaaed-e473-4350-97de-0346cacb6660
 | ♿ | **Accessible** | WCAG-compliant: focus-visible, ARIA, reduced-motion, skip links |
 | 📝 | **Editorial Standards** | Transparent AI methodology, data sources, pipeline documentation |
 | 📱 | **Mobile-First** | Dynamic viewport, safe area insets, touch-optimized navigation |
-| 💸 | **Monetization** | Premium and team landing pages, Stripe checkout proxy, backend developer API/job board endpoints |
+| 💸 | **Monetization** | Team landing page with a working contact form, backend developer API and job board endpoints |
 
 ## Architecture
 
@@ -158,11 +158,13 @@ Daily collections produce reduced counts (10 tech, 5 investment, 5 tips, 2 video
 | `/api/stock/batch/?tickers=AAPL,NVDA` | GET | Disabled — 410 (licensing) |
 | `/api/admin/collect` | POST | Trigger full data collection |
 | `/api/admin/newsletter` | POST | Send newsletter (per-subscriber language; languages whose translations are not ready are held) |
-| `/api/admin/newsletter/diagnose` | POST | Diagnostic: test Beehiiv, Resend, content |
+| `/api/admin/newsletter/diagnose` | POST | Diagnostic: env flags, subscriber counts (no addresses), content counts, test email to the required `test_email` |
+| `/api/admin/newsletter/test-send` | POST | Real newsletter render with one-click unsubscribe headers, sent to `test_email` only |
 | `/api/admin/backfill-translations` | POST | Repair translations that are missing, stale or untranslated (`period_id` or `since`, `dry_run`, `cheap`) |
 | `/api/developer/register` | POST | Register for developer API key |
 | `/api/jobs` | GET | AI job listings (DACH region) |
-| `/api/stripe/create-checkout` | POST | Create Stripe checkout session |
+| `/api/newsletter/unsubscribe` | POST | One-click unsubscribe with a signed per-subscriber token |
+| `/api/contact` | POST | Contact form → email to `CONTACT_INBOX` |
 
 Period IDs: daily `YYYY-MM-DD` or weekly `YYYY-kwWW`
 
@@ -195,11 +197,8 @@ BEEHIIV_API_KEY=...                 # Subscriber management
 BEEHIIV_PUBLICATION_ID=pub_...      # Beehiiv publication
 NEWSLETTER_FROM_EMAIL=newsletter@datacubeai.space
 CORS_ORIGINS=["http://localhost:3000"]
-STRIPE_SECRET_KEY=               # Stripe payments
-STRIPE_WEBHOOK_SECRET=           # Stripe webhook verification
-STRIPE_PREMIUM_PRICE_ID=         # Stripe Premium subscription price
-STRIPE_API_DEVELOPER_PRICE_ID=   # Stripe Developer API tier price
-STRIPE_API_BUSINESS_PRICE_ID=    # Stripe Business API tier price
+SIGNING_SECRET=                  # One-click unsubscribe tokens (≥ 32 random characters)
+CONTACT_INBOX=                   # Contact form destination address
 ```
 
 </details>
@@ -239,11 +238,11 @@ DataCube-AI-Space/
 │   │   ├── corrections/        # Corrections policy
 │   │   ├── ai-disclosure/      # AI-use disclosure
 │   │   ├── contact/            # Publisher contact
-│   │   ├── unsubscribe/        # Newsletter unsubscribe
+│   │   ├── unsubscribe/        # One-click unsubscribe confirm page
 │   │   ├── news-sitemap.xml/   # Google News Sitemap
 │   │   ├── for-teams/          # Enterprise landing
 │   │   ├── premium/            # Premium upgrade
-│   │   └── api/checkout/       # Stripe checkout
+│   │   └── api/newsletter/unsubscribe/  # RFC 8058 one-click unsubscribe
 │   ├── components/              # React components
 │   │   ├── feeds/               # Tech, Investment, Tips feeds
 │   │   ├── trend-index.tsx      # Period trend index and topic entry points
@@ -262,7 +261,8 @@ DataCube-AI-Space/
 │   │   ├── routers/             # API endpoints
 │   │   │   ├── developer.py    # Developer API keys + rate limiting
 │   │   │   ├── jobs.py         # Job board CRUD
-│   │   │   └── stripe_webhook.py  # Stripe payments
+│   │   │   ├── newsletter.py   # One-click unsubscribe
+│   │   │   └── contact.py      # Contact form
 │   │   └── services/            # Business logic
 │   │       ├── collector.py     # 4.5-stage pipeline
 │   │       ├── llm_processor.py # LLM processing + resilient translation

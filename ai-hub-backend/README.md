@@ -19,7 +19,7 @@ FastAPI backend for the AI Information Hub — multilingual (8 languages) daily 
 - **Automated newsletter** via Resend + Beehiiv with per-subscriber language preference (idempotent send-lock per `(period_id, language)`; safe against dual-cron slots + manual re-triggers)
 - **Developer API** with tiered rate limiting (free/premium/business API keys)
 - **AI Job Board** for DACH region (job listings CRUD with admin controls)
-- **Stripe Premium Subscriptions** (checkout, webhooks, subscription management)
+- **One-click unsubscribe** (RFC 8058 `List-Unsubscribe` headers with signed per-subscriber tokens) and a rate-limited **contact form** endpoint
 
 ## LLM Models
 
@@ -156,7 +156,7 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 2. Install dependencies:
 ```bash
 pip install -r requirements.txt
-# Key dependencies include: stripe>=8.0.0, slowapi>=0.1.9
+# Key dependencies include: resend, requests, slowapi>=0.1.9
 ```
 
 3. Configure environment:
@@ -181,7 +181,9 @@ uvicorn app.main:app --reload
 
 Tests must never reach the production database: `tests/conftest.py` refuses
 any non-local `DATABASE_URL`, and integration tests delete rows. Always set a
-local URL in the same command.
+local URL in the same command. Scripts under `scripts/` refuse too
+(`app/db_guard.py`) when `DATABASE_URL` is not exported and `.env` points at a
+remote database; Railway and CI export it, so they are unaffected.
 
 ```bash
 # Unit tests (no database)
@@ -217,7 +219,7 @@ alembic downgrade -1
 |-----------|-------------|
 | `0007_add_developer_api_keys` | `api_keys` table (email, api_key, tier, calls_today, calls_total, is_active) |
 | `0008_add_job_listings` | `job_listings` table (title, company, location, salary, tags, listing_type) |
-| `0009_add_subscriptions` | `subscriptions` table (email, stripe IDs, tier, status, period dates) |
+| `0009_add_subscriptions` | `subscriptions` table (email, stripe IDs, tier, status, period dates); unused since R1 removed the legacy Stripe endpoints — membership (SP3a) reuses it |
 | `0011_primary_market_amount_nullable` | `primary_market_posts.amount_de/amount_en` made nullable — LLM returns `null` for undisclosed amounts (e.g. SEC EDGAR 8-K unregistered equity sales). Prevents a single null-amount row from aborting the entire stage 4 transaction and wiping the day's data. API layer (`routers/investment.py:44`) still coerces NULL → "N/A" for UI, so the frontend contract is unchanged. |
 | `0012_add_newsletter_sends` | `newsletter_sends` table with composite PK `(period_id, language)`, `status ∈ {in_progress, sent, failed}`, `started_at`, `completed_at`, `sent_count`, `error`. Provides idempotency for newsletter delivery (dual-cron slots, manual re-triggers, in-flight retries). |
 
@@ -243,6 +245,8 @@ Chain: 0006 -> 0007 -> 0008 -> 0009 -> 0011 -> 0012
 | `/api/admin/collect/process` | POST | Stages 2-4 only |
 | `/api/admin/collect/ma` | POST | M&A-only reprocessing |
 | `/api/admin/newsletter` | POST | Send newsletter (per-subscriber language); languages whose translations are stale or mostly not ready are held (status `held`, HTTP 502) |
+| `/api/admin/newsletter/diagnose` | POST | Pipeline check: env flags (booleans), Beehiiv subscriber counts (no addresses), content counts, test email to the required `test_email` |
+| `/api/admin/newsletter/test-send` | POST | Real newsletter render for `period_id` + `language` to `test_email` only, with one-click unsubscribe headers (use it for the DKIM `h=` check) |
 | `/api/admin/backfill-translations` | POST | Repair missing/stale/untranslated translations: `period_id` or `since` (daily periods), `dry_run` (counts only), `cheap` (cheapest translator chain), `force` (also re-translate rows that are already ok) |
 | `/api/admin/migrate` | POST | Migrate JSON data |
 | `/api/developer/register` | POST | Register for API key (returns `dcai_xxx`) |
@@ -253,10 +257,8 @@ Chain: 0006 -> 0007 -> 0008 -> 0009 -> 0011 -> 0012
 | `/api/jobs` | POST | Create job listing (admin `X-API-Key`) |
 | `/api/jobs/{id}` | PUT | Update job listing (admin `X-API-Key`) |
 | `/api/jobs/{id}` | DELETE | Soft-delete job listing (admin `X-API-Key`) |
-| `/api/stripe/webhook` | POST | Stripe webhook handler (Stripe signature) |
-| `/api/stripe/create-checkout` | POST | Create Stripe checkout session |
-| `/api/stripe/subscription/{email}` | GET | Subscription status by email |
-| `/api/stripe/cancel` | POST | Cancel subscription |
+| `/api/newsletter/unsubscribe` | POST | One-click unsubscribe: JSON `{"token": ...}` signed per subscriber, called by the site's `/api/newsletter/unsubscribe` route; `GET` is not allowed |
+| `/api/contact` | POST | Contact form → email to `CONTACT_INBOX` with reply-to the visitor; honeypot, 3/hour per IP, 20/day in total |
 | `/health` | GET | Health check |
 
 ## Deployment to Railway
@@ -284,11 +286,8 @@ railway variables set RESEND_API_KEY=re_xxxxx
 railway variables set BEEHIIV_API_KEY=xxxxx
 railway variables set BEEHIIV_PUBLICATION_ID=pub_xxxxx
 railway variables set NEWSLETTER_FROM_EMAIL=newsletter@datacubeai.space
-railway variables set STRIPE_SECRET_KEY=sk_xxxxx
-railway variables set STRIPE_WEBHOOK_SECRET=whsec_xxxxx
-railway variables set STRIPE_PREMIUM_PRICE_ID=price_xxxxx
-railway variables set STRIPE_API_DEVELOPER_PRICE_ID=price_xxxxx
-railway variables set STRIPE_API_BUSINESS_PRICE_ID=price_xxxxx
+railway variables set SIGNING_SECRET=xxxxx       # ≥ 32 random chars: python -c "import secrets; print(secrets.token_urlsafe(48))"
+railway variables set CONTACT_INBOX=you@example.com   # contact form destination
 railway variables set CORS_ORIGINS='["http://localhost:3000","https://www.datacubeai.space","https://ai-information-hub.vercel.app"]'
 ```
 
@@ -434,6 +433,7 @@ ai-hub-backend/
 │   ├── main.py              # FastAPI entry point
 │   ├── config.py            # Environment config
 │   ├── database.py          # DB connection
+│   ├── db_guard.py          # Refuses tests/scripts on a remote DB inherited from .env
 │   ├── models/              # SQLAlchemy models
 │   │   ├── __init__.py      # All models
 │   │   ├── raw.py           # Raw article/video storage
@@ -447,13 +447,18 @@ ai-hub-backend/
 │   │   ├── stock.py         # Stock endpoints (disabled, 410 — licensing)
 │   │   ├── developer.py     # Developer API (register, usage, rotate-key)
 │   │   ├── jobs.py          # Job board CRUD endpoints
-│   │   ├── stripe_webhook.py  # Stripe payments (webhook, checkout, subscriptions)
+│   │   ├── newsletter.py    # One-click unsubscribe (POST /api/newsletter/unsubscribe)
+│   │   ├── contact.py       # Contact form (POST /api/contact)
 │   │   └── ...
 │   └── services/            # Business logic
 │       ├── collector.py     # 4.5-stage pipeline
 │       ├── period_utils.py  # Period ID utilities (daily/weekly)
 │       ├── rss_fetcher.py   # RSS feeds
 │       ├── hn_fetcher.py    # Hacker News
+│       ├── beehiiv.py       # Beehiiv subscription client (unsubscribe by id, lookup by email)
+│       ├── unsubscribe_tokens.py  # Signed one-click unsubscribe tokens
+│       ├── privacy.py       # mask_email / redact_emails for log lines
+│       ├── rate_limit.py    # In-process sliding-window limiter
 │       ├── youtube_fetcher.py  # YouTube API
 │       ├── llm_processor.py # LLM processing + resilient translation (JSON validation + small-batch retry)
 │       ├── i18n_utils.py    # Language constants, get_field() helper
