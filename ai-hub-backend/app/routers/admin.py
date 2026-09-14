@@ -4,12 +4,15 @@ Admin endpoints for triggering data collection.
 
 import logging
 from fastapi import APIRouter, Depends, HTTPException, Header, BackgroundTasks
+from pydantic import BaseModel, EmailStr
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.attributes import flag_modified
 from typing import Optional
 
 from app.database import get_db, get_session_local
 from app.config import get_settings
+from app.services.privacy import mask_email, redact_emails
+from app.services.unsubscribe_tokens import usable_secret
 
 logger = logging.getLogger(__name__)
 
@@ -571,10 +574,14 @@ async def delete_translation(
     return {"status": "not_found", "table": table, "id": record_id, "lang": lang}
 
 
+class NewsletterDiagnoseBody(BaseModel):
+    test_email: EmailStr
+
+
 @router.post("/newsletter/diagnose")
 async def diagnose_newsletter(
+    body: NewsletterDiagnoseBody,
     period_id: Optional[str] = None,
-    test_email: Optional[str] = None,
     db: Session = Depends(get_db),
     _: bool = Depends(verify_api_key),
 ):
@@ -582,10 +589,10 @@ async def diagnose_newsletter(
     Diagnostic endpoint that tests each step of the newsletter pipeline independently.
 
     Returns a JSON report with results for:
-    1. Environment variable checks
-    2. Beehiiv subscriber fetch (raw first-page response)
+    1. Environment variable checks (booleans, never secret values)
+    2. Beehiiv subscriber counts (first page; counts and languages, never addresses)
     3. Content availability for the given period
-    4. Test email send via Resend
+    4. Test email send via Resend to the required `test_email`
 
     Requires X-API-Key header.
     """
@@ -594,6 +601,7 @@ async def diagnose_newsletter(
     from datetime import date, timedelta
     from app.models.week import Week
 
+    test_email = body.test_email  # JSON body, never the query string: access logs record URLs
     settings = get_settings()
     report = {
         "period_id": None,
@@ -610,6 +618,8 @@ async def diagnose_newsletter(
         "BEEHIIV_API_KEY": bool(settings.beehiiv_api_key),
         "BEEHIIV_PUBLICATION_ID": bool(settings.beehiiv_publication_id),
         "NEWSLETTER_FROM_EMAIL": settings.newsletter_from_email,
+        "SIGNING_SECRET": usable_secret(settings.signing_secret),
+        "CONTACT_INBOX": bool(settings.contact_inbox),
     }
     all_set = all([
         settings.resend_api_key,
@@ -626,8 +636,8 @@ async def diagnose_newsletter(
     report["period_id"] = period_id
     logger.info(f"[diagnose] Using period_id: {period_id}")
 
-    # ---- Step 2: Fetch Beehiiv subscribers (first page only, raw response) ----
-    logger.info("[diagnose] Step 2: Fetching Beehiiv subscribers (page 1)")
+    # ---- Step 2: Count Beehiiv subscribers (first page; never addresses) ----
+    logger.info("[diagnose] Step 2: Counting Beehiiv subscribers (page 1)")
     if settings.beehiiv_api_key and settings.beehiiv_publication_id:
         try:
             resp = http_requests.get(
@@ -636,30 +646,27 @@ async def diagnose_newsletter(
                 params={"status": "active", "limit": 100, "page": 1, "expand[]": "custom_fields"},
                 timeout=30,
             )
-            report["beehiiv_subscribers"] = {
-                "status_code": resp.status_code,
-                "ok": resp.ok,
-                "raw_response": resp.json() if resp.ok else resp.text,
-            }
+            report["beehiiv_subscribers"] = {"status_code": resp.status_code, "ok": resp.ok}
             if resp.ok:
                 data = resp.json()
                 subs = data.get("data", [])
-                report["beehiiv_subscribers"]["subscriber_count_page1"] = len(subs)
-                report["beehiiv_subscribers"]["total_pages"] = data.get("total_pages", 1)
-                # Extract emails + languages for readability
-                parsed = []
+                language_counts: dict[str, int] = {}
                 for sub in subs:
-                    email = sub.get("email", "?")
-                    lang = "de"
+                    lang = "en"
                     for field in sub.get("custom_fields", []):
-                        if field.get("name", "").lower() == "language":
-                            lang = field.get("value", "de")
-                    parsed.append({"email": email, "language": lang})
-                report["beehiiv_subscribers"]["parsed_subscribers"] = parsed
-            logger.info(f"[diagnose] Beehiiv response: {resp.status_code}, {len(resp.text)} bytes")
+                        if field.get("name", "").lower() == "language" and field.get("value"):
+                            lang = str(field["value"]).strip().lower()
+                    language_counts[lang] = language_counts.get(lang, 0) + 1
+                report["beehiiv_subscribers"].update({
+                    "subscriber_count_page1": len(subs),
+                    "total_pages": data.get("total_pages", 1),
+                    "total_results": data.get("total_results"),
+                    "language_counts": language_counts,
+                })
+            logger.info(f"[diagnose] Beehiiv response: {resp.status_code}")
         except Exception as e:
-            report["beehiiv_subscribers"] = {"error": str(e)}
-            logger.error(f"[diagnose] Beehiiv fetch failed: {e}", exc_info=True)
+            report["beehiiv_subscribers"] = {"error": redact_emails(str(e))}
+            logger.error(f"[diagnose] Beehiiv fetch failed: {redact_emails(str(e))}")
     else:
         report["beehiiv_subscribers"] = {"error": "BEEHIIV_API_KEY or BEEHIIV_PUBLICATION_ID not set"}
         logger.warning("[diagnose] Skipping Beehiiv — missing credentials")
@@ -701,15 +708,14 @@ async def diagnose_newsletter(
         report["content_check"] = {"error": str(e)}
         logger.error(f"[diagnose] Content check failed: {e}", exc_info=True)
 
-    # ---- Step 4: Send test email via Resend ----
-    recipient = test_email or settings.newsletter_from_email
-    logger.info(f"[diagnose] Step 4: Sending test email to {recipient}")
+    # ---- Step 4: Send test email via Resend (only to the explicit test_email) ----
+    logger.info(f"[diagnose] Step 4: Sending test email to {mask_email(test_email)}")
     if settings.resend_api_key:
         try:
             resend.api_key = settings.resend_api_key
             result = resend.Emails.send({
                 "from": settings.newsletter_from_email,
-                "to": [recipient],
+                "to": [test_email],
                 "subject": f"[DIAGNOSTIC] Newsletter pipeline test — {period_id}",
                 "html": (
                     "<h2>Newsletter Diagnostic Test</h2>"
@@ -719,21 +725,52 @@ async def diagnose_newsletter(
                     "<p>If you received this, Resend is working correctly.</p>"
                 ),
             })
-            report["resend_test"] = {
-                "ok": True,
-                "recipient": recipient,
-                "result": result,
-            }
+            report["resend_test"] = {"ok": True, "recipient": test_email, "result": result}
             logger.info(f"[diagnose] Resend test result: {result}")
         except Exception as e:
-            report["resend_test"] = {"ok": False, "recipient": recipient, "error": str(e)}
-            logger.error(f"[diagnose] Resend test failed: {e}", exc_info=True)
+            report["resend_test"] = {"ok": False, "recipient": test_email, "error": redact_emails(str(e))}
+            logger.error(f"[diagnose] Resend test failed: {redact_emails(str(e))}")
     else:
         report["resend_test"] = {"ok": False, "error": "RESEND_API_KEY not set"}
         logger.warning("[diagnose] Skipping Resend — missing API key")
 
     logger.info(f"[diagnose] Diagnosis complete for {period_id}")
     return report
+
+
+class NewsletterTestSendBody(BaseModel):
+    test_email: EmailStr
+
+
+@router.post("/newsletter/test-send")
+def newsletter_test_send(
+    body: NewsletterTestSendBody,
+    period_id: str,
+    language: str = "en",
+    db: Session = Depends(get_db),
+    _: bool = Depends(verify_api_key),
+):
+    """Send the real newsletter render for one period and language to `test_email` only.
+
+    No send lock, no subscriber list. Use it to check the template and, on the
+    received message, that the DKIM-Signature h= tag covers list-unsubscribe
+    and list-unsubscribe-post (spec AD3 acceptance).
+    """
+    from app.services.newsletter_sender import send_test_newsletter
+
+    test_email = body.test_email  # JSON body, never the query string: access logs record URLs
+    try:
+        result = send_test_newsletter(db, period_id, test_email, language)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    except Exception as exc:
+        logger.error(f"[test-send] failed for {mask_email(test_email)}: {type(exc).__name__}")
+        raise HTTPException(status_code=502, detail="test_send_failed")
+    if result["status"] == "no_content":
+        raise HTTPException(status_code=404, detail=result)
+    if result["failed"]:
+        raise HTTPException(status_code=502, detail=result)
+    return result
 
 
 @router.get("/health")

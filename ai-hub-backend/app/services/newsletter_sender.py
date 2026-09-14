@@ -31,8 +31,11 @@ from app.models.tip import TipPost
 from app.models.week import Week
 from app.models.newsletter_send import NewsletterSend
 from app.services.period_utils import current_day_id
+from app.services.beehiiv import find_subscription_id
 from app.services.i18n_utils import get_field, SUPPORTED_LANGUAGES
+from app.services.privacy import redact_emails
 from app.services.translation_integrity import gate_holds_language, send_gate_counts
+from app.services.unsubscribe_tokens import mint_token, usable_secret
 
 logger = logging.getLogger(__name__)
 
@@ -44,6 +47,10 @@ logger = logging.getLogger(__name__)
 _STALE_IN_PROGRESS_SECONDS = 6 * 3600  # 6 hours
 
 SITE_URL = "https://www.datacubeai.space"
+
+# Footer unsubscribe href in the rendered template; _recipient_messages replaces
+# it per recipient (personal token link, or the token-less page when degraded).
+UNSUBSCRIBE_URL_PLACEHOLDER = "__UNSUBSCRIBE_URL__"
 
 # ---------------------------------------------------------------------------
 # Design tokens (WCAG AA compliant)
@@ -966,7 +973,7 @@ def _build_email_html(data: dict, lang: str) -> str:
             </tr>
             <tr>
               <td style="padding-top:8px;font-family:{FONT_SANS};font-size:12px;">
-                <a href="{SITE_URL}/unsubscribe" style="color:{TEXT_META};text-decoration:underline;">{_s(lang, "unsubscribe")}</a>
+                <a href="{UNSUBSCRIBE_URL_PLACEHOLDER}" style="color:{TEXT_META};text-decoration:underline;">{_s(lang, "unsubscribe")}</a>
               </td>
             </tr>
           </table>
@@ -1012,6 +1019,27 @@ def _build_email_html(data: dict, lang: str) -> str:
 </html>"""
 
 
+def _build_subject(data: dict, period_id: str, lang: str) -> str:
+    """Subject line: localized date (or week) label plus a lead-story preview."""
+    lead_preview = ""
+    if data["tech"]:
+        first_content = get_field(data["tech"][0], "content", lang)
+        if first_content:
+            first_sentence = first_content.split(".")[0]
+            if len(first_sentence) > 30:
+                first_sentence = first_sentence[:27] + "..."
+            lead_preview = f": {first_sentence}"
+
+    if "-kw" in period_id:
+        week_num = period_id.split("-kw")[1]
+        subject = _s(lang, "subject_week").format(num=week_num)
+    else:
+        date_label = _format_date_label(period_id, lang)
+        subject = _s(lang, "subject_daily").format(date=date_label)
+
+    return f"\U0001f9ca {subject}{lead_preview}"
+
+
 # ---------------------------------------------------------------------------
 # 3. Fetch subscribers from Beehiiv
 # ---------------------------------------------------------------------------
@@ -1032,6 +1060,9 @@ def _fetch_beehiiv_subscribers(api_key: str, publication_id: str) -> list[dict]:
       * Unknown language values → bucketed to ``en`` and warned.
       * If NO subscriber on the first page returns any custom_fields,
         log loudly — almost certainly a Beehiiv API misconfig.
+      * Each entry keeps the Beehiiv subscription ``id``: it signs the
+        subscriber's one-click unsubscribe token. Log lines use the id,
+        never the address.
     """
     subscribers: list[dict] = []
     page = 1
@@ -1052,7 +1083,7 @@ def _fetch_beehiiv_subscribers(api_key: str, publication_id: str) -> list[dict]:
             # admin endpoint surfaces 5xx and the workflow turns red.
             raise RuntimeError(
                 f"Beehiiv API error {resp.status_code} on page {page}: "
-                f"{resp.text[:300]}"
+                f"{redact_emails(resp.text)[:300]}"
             )
 
         data = resp.json()
@@ -1078,13 +1109,13 @@ def _fetch_beehiiv_subscribers(api_key: str, publication_id: str) -> list[dict]:
                 lang = "en"
             elif raw_lang not in SUPPORTED_LANGUAGES:
                 logger.warning(
-                    f"Subscriber {email} has unrecognised language '{raw_lang}'; "
+                    f"Subscriber {sub.get('id', 'unknown')} has unrecognised language '{raw_lang}'; "
                     f"defaulting to 'en'"
                 )
                 lang = "en"
             else:
                 lang = raw_lang
-            subscribers.append({"email": email, "language": lang})
+            subscribers.append({"id": sub.get("id"), "email": email, "language": lang})
 
         total_pages = data.get("total_pages", 1)
         if page >= total_pages:
@@ -1107,13 +1138,41 @@ def _fetch_beehiiv_subscribers(api_key: str, publication_id: str) -> list[dict]:
 # 4. Send via Resend
 # ---------------------------------------------------------------------------
 
-def _send_via_resend(
+def _recipient_messages(
     from_email: str,
     subject: str,
     html_content: str,
-    recipients: list[str],
-) -> tuple[int, int]:
-    """Send newsletter to all recipients via Resend.
+    recipients: list[dict],
+    signing_secret: str,
+) -> list[dict]:
+    """One Resend message per recipient, each with a personal unsubscribe link.
+
+    With a usable SIGNING_SECRET and a Beehiiv subscription id, the footer
+    links to the token confirm page and RFC 8058 headers enable one-click
+    unsubscribe in the mail client. Otherwise the message still goes out and
+    the footer links to the token-less /unsubscribe page (send_newsletter logs
+    the degraded state once per run).
+    """
+    messages = []
+    for recipient in recipients:
+        token = mint_token(recipient.get("id"), signing_secret)
+        message = {"from": from_email, "to": [recipient["email"]], "subject": subject}
+        if token:
+            message["html"] = html_content.replace(
+                UNSUBSCRIBE_URL_PLACEHOLDER, f"{SITE_URL}/unsubscribe?t={token}"
+            )
+            message["headers"] = {
+                "List-Unsubscribe": f"<{SITE_URL}/api/newsletter/unsubscribe?t={token}>",
+                "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+            }
+        else:
+            message["html"] = html_content.replace(UNSUBSCRIBE_URL_PLACEHOLDER, f"{SITE_URL}/unsubscribe")
+        messages.append(message)
+    return messages
+
+
+def _send_via_resend(messages: list[dict]) -> tuple[int, int]:
+    """Send prepared per-recipient messages (see _recipient_messages) via Resend.
 
     Returns (sent, failed) so the caller can distinguish partial failures
     (some batches OK, some not) from total failure. Previously returned
@@ -1125,27 +1184,16 @@ def _send_via_resend(
     failed = 0
     batch_size = 100  # Resend batch API supports up to 100
 
-    for i in range(0, len(recipients), batch_size):
-        batch = recipients[i : i + batch_size]
-        emails = [
-            {
-                "from": from_email,
-                "to": [addr],
-                "subject": subject,
-                "html": html_content,
-            }
-            for addr in batch
-        ]
+    for i in range(0, len(messages), batch_size):
+        batch = messages[i : i + batch_size]
 
         try:
-            result = resend.Batch.send(emails)
+            result = resend.Batch.send(batch)
             # Resend Batch.send returns {"data": [{"id": "..."}, ...]} on success.
-            # Older code blindly bumped `sent += len(batch)` regardless of
-            # response shape — if Resend rejected the batch (unverified
-            # sender domain, invalid From, etc.) but the SDK chose not to
-            # raise, every "send" was counted as a success and nothing
-            # actually arrived. Validate the response: an "id" per email
-            # is the only proof of acceptance.
+            # An "id" per email is the only proof of acceptance: if Resend
+            # rejects a batch without raising (unverified sender domain,
+            # invalid From, ...), counting len(batch) would report deliveries
+            # that never happened.
             ids: list[str] = []
             if isinstance(result, dict):
                 payload = result.get("data") or result.get("emails")
@@ -1162,7 +1210,8 @@ def _send_via_resend(
                     failed += short
                     logger.error(
                         f"Resend batch {i // batch_size + 1}: only {len(ids)}/{len(batch)} "
-                        f"emails accepted; {short} silently rejected. result={result}"
+                        f"emails accepted; {short} silently rejected. "
+                        f"result={redact_emails(repr(result))}"
                     )
                 else:
                     logger.info(
@@ -1170,20 +1219,22 @@ def _send_via_resend(
                     )
             else:
                 # No ids in response = total batch rejection (most commonly
-                # 4xx that the SDK didn't raise on, e.g. unverified domain).
+                # a 4xx that the SDK didn't raise on, e.g. unverified domain).
                 failed += len(batch)
                 logger.error(
                     f"Resend batch {i // batch_size + 1}: ZERO ids in response — "
-                    f"treating all {len(batch)} as failed. result={result!r}"
+                    f"treating all {len(batch)} as failed. result={redact_emails(repr(result))}"
                 )
         except Exception as e:
+            # Never log the batch: it holds subscriber addresses.
             logger.error(
-                f"Resend batch error for {batch}: {e}", exc_info=True
+                f"Resend batch {i // batch_size + 1} failed for {len(batch)} recipients: "
+                f"{type(e).__name__}: {redact_emails(str(e))}"
             )
             failed += len(batch)
 
     if failed:
-        logger.warning(f"Resend partial failure: {failed}/{len(recipients)} emails failed")
+        logger.warning(f"Resend partial failure: {failed}/{len(messages)} emails failed")
     return sent, failed
 
 
@@ -1388,13 +1439,18 @@ def send_newsletter(db: Session, period_id: str | None = None) -> dict:
     # Group subscribers by language preference (8 languages supported).
     # Subs with unrecognised language already coerced to "en" in
     # _fetch_beehiiv_subscribers; this assertion is just belt-and-braces.
-    by_lang: dict[str, list[str]] = {lang: [] for lang in SUPPORTED_LANGUAGES}
+    by_lang: dict[str, list[dict]] = {lang: [] for lang in SUPPORTED_LANGUAGES}
     for sub in subscribers:
         lang = sub["language"] if sub["language"] in SUPPORTED_LANGUAGES else "en"
-        by_lang[lang].append(sub["email"])
+        by_lang[lang].append({"id": sub.get("id"), "email": sub["email"]})
 
-    lang_counts = {lang: len(addrs) for lang, addrs in by_lang.items() if addrs}
+    lang_counts = {lang: len(recipients) for lang, recipients in by_lang.items() if recipients}
     logger.info(f"Language split: {lang_counts}")
+    if not usable_secret(settings.signing_secret):
+        logger.error(
+            "SIGNING_SECRET is missing or shorter than 32 characters: sending without one-click "
+            "unsubscribe headers; footers link to the token-less /unsubscribe page"
+        )
 
     # Translation gate: never send a language carrying another story's text
     # (stale) or that is mostly untranslated; a few unready rows fall back to
@@ -1415,8 +1471,8 @@ def send_newsletter(db: Session, period_id: str | None = None) -> dict:
     total_failed = 0
     skipped_already_sent = 0
     lang_breakdown: dict[str, dict[str, int]] = {}
-    for lang, addrs in by_lang.items():
-        if not addrs:
+    for lang, recipients in by_lang.items():
+        if not recipients:
             continue
 
         gate = send_gate_counts(gate_sections, lang)
@@ -1444,33 +1500,16 @@ def send_newsletter(db: Session, period_id: str | None = None) -> dict:
 
         try:
             html_content = _build_email_html(data, lang)
-
-            # Build subject line with lead story preview
-            lead_preview = ""
-            if data["tech"]:
-                first_content = get_field(data["tech"][0], "content", lang)
-                if first_content:
-                    first_sentence = first_content.split(".")[0]
-                    if len(first_sentence) > 30:
-                        first_sentence = first_sentence[:27] + "..."
-                    lead_preview = f": {first_sentence}"
-
-            if "-kw" in period_id:
-                week_num = period_id.split("-kw")[1]
-                subject = _s(lang, "subject_week").format(num=week_num)
-            else:
-                date_label = _format_date_label(period_id, lang)
-                subject = _s(lang, "subject_daily").format(date=date_label)
-
-            subject = f"\U0001f9ca {subject}{lead_preview}"
-
-            sent, failed = _send_via_resend(
+            subject = _build_subject(data, period_id, lang)
+            messages = _recipient_messages(
                 settings.newsletter_from_email,
                 subject,
                 html_content,
-                addrs,
+                recipients,
+                settings.signing_secret,
             )
-            lang_breakdown[lang] = {"sent": sent, "failed": failed, "attempted": len(addrs)}
+            sent, failed = _send_via_resend(messages)
+            lang_breakdown[lang] = {"sent": sent, "failed": failed, "attempted": len(recipients)}
             if sent == 0 and failed > 0:
                 # Total failure: leave the lock in 'failed' so the next
                 # workflow run can retry this cohort.
@@ -1480,7 +1519,7 @@ def send_newsletter(db: Session, period_id: str | None = None) -> dict:
                 )
                 logger.error(
                     f"{lang.upper()} newsletter total failure for {period_id}: "
-                    f"{failed}/{len(addrs)} emails failed"
+                    f"{failed}/{len(recipients)} emails failed"
                 )
                 total_failed += failed
             else:
@@ -1501,8 +1540,8 @@ def send_newsletter(db: Session, period_id: str | None = None) -> dict:
                     logger.info(f"Sent {lang.upper()} newsletter: {sent} emails")
         except Exception as e:
             _mark_send_failed(db, period_id, lang, str(e))
-            lang_breakdown[lang] = {"sent": 0, "failed": len(addrs), "attempted": len(addrs)}
-            total_failed += len(addrs)
+            lang_breakdown[lang] = {"sent": 0, "failed": len(recipients), "attempted": len(recipients)}
+            total_failed += len(recipients)
             logger.exception(f"Failed to send {lang.upper()} newsletter for {period_id}: {e}")
             # Continue with other languages rather than aborting the whole run.
             continue
@@ -1538,4 +1577,63 @@ def send_newsletter(db: Session, period_id: str | None = None) -> dict:
         "skipped_already_sent": skipped_already_sent,
         "held_languages": held_languages,
         "translation_warnings": translation_warnings,
+    }
+
+
+# Used when the test address is not a Beehiiv subscriber: the headers are still
+# present for the DKIM h= check, and a click answers "unsubscribed" (Beehiiv 404)
+# without touching any real subscription.
+TEST_SEND_SUBSCRIPTION_ID = "test-send-preview"
+
+
+def send_test_newsletter(db: Session, period_id: str, test_email: str, lang: str = "en") -> dict:
+    """Send one real newsletter render to an explicit test address.
+
+    Same template, subject, personal footer link and List-Unsubscribe headers
+    as the daily send, but no send lock and no subscriber list. When the
+    address is a Beehiiv subscriber its real subscription id is used, so the
+    one-click link can be tried end to end (it unsubscribes that address).
+    """
+    settings = get_settings()
+    if not settings.resend_api_key:
+        raise ValueError("RESEND_API_KEY not configured")
+    if lang not in SUPPORTED_LANGUAGES:
+        raise ValueError(f"Unsupported language: {lang}")
+
+    data = _fetch_period_content(db, period_id)
+    total_items = (
+        len(data["tech"]) + len(data["funding"]) + len(data["tips"])
+        + len(data.get("ma", [])) + len(data.get("videos", []))
+    )
+    if total_items == 0:
+        return {"period_id": period_id, "language": lang, "status": "no_content", "sent": 0, "failed": 0}
+
+    subscription_id = None
+    if settings.beehiiv_api_key and settings.beehiiv_publication_id:
+        subscription_id = find_subscription_id(
+            settings.beehiiv_api_key, settings.beehiiv_publication_id, test_email
+        )
+
+    resend.api_key = settings.resend_api_key
+    if not usable_secret(settings.signing_secret):
+        logger.warning(
+            "SIGNING_SECRET is missing or shorter than 32 characters: the test send goes out "
+            "without one-click unsubscribe headers"
+        )
+    messages = _recipient_messages(
+        settings.newsletter_from_email,
+        f"[TEST] {_build_subject(data, period_id, lang)}",
+        _build_email_html(data, lang),
+        [{"id": subscription_id or TEST_SEND_SUBSCRIPTION_ID, "email": test_email}],
+        settings.signing_secret,
+    )
+    sent, failed = _send_via_resend(messages)
+    return {
+        "period_id": period_id,
+        "language": lang,
+        "status": "sent" if sent else "failed",
+        "sent": sent,
+        "failed": failed,
+        "one_click_headers": "headers" in messages[0],
+        "matched_subscriber": subscription_id is not None,
     }

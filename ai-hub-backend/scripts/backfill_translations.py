@@ -21,6 +21,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+from app.db_guard import guard_script_database
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s %(levelname)s: %(message)s",
@@ -29,6 +31,7 @@ logging.basicConfig(
 
 
 def main():
+    guard_script_database()
     parser = argparse.ArgumentParser(description="Repair translations for existing content")
     parser.add_argument("--period", default=None, help="Single period id, e.g. 2026-09-12")
     parser.add_argument("--since", default=None, help="All daily periods on/after YYYY-MM-DD")

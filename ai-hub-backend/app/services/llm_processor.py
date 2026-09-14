@@ -62,6 +62,17 @@ def parse_llm_json(text: str, fallback=None):
         return fallback
 
 
+# AD5 — faithfulness by prompt contract. Appended to every prompt that writes or
+# translates news prose; tests/test_prompt_contracts.py pins that they stay there.
+EPISTEMIC_RULES = """Epistemic status (faithfulness):
+- Preserve hedges at the strength the source uses: "may", "could", "reportedly", "plans to", "is expected to" and "in talks" stay hedged; never present them as completed facts.
+- Attribute claims to whoever makes them ("the company says", "according to Reuters"); benchmark results, capability claims and figures published by a company are attributed to that company.
+- Mention a response from a person or company named in a story (a denial, "declined to comment") only when the source text contains it; never invent one and never state that none was given.
+- Never upgrade a claim, rumor, plan, forecast or allegation to a fact."""
+
+TRANSLATION_FAITHFULNESS_RULES = """Preserve epistemic status: translate hedges ("may", "could", "reportedly", "plans to", "is expected to") with equally tentative wording, keep every attribution ("says", "according to", "claims"), and never turn a claim into a statement of fact."""
+
+
 class LLMProcessor:
     """LLM processing service for content generation."""
 
@@ -319,6 +330,7 @@ class LLMProcessor:
         prompt = f"""Translate the following JSON items from English to {lang_name}.
 Translate ONLY the text values. Keep these unchanged: _idx, numbers, URLs, proper nouns (company names, person names, ticker symbols), JSON structure.
 For array fields (like tags), translate each element.
+{TRANSLATION_FAITHFULNESS_RULES}
 
 Input:
 {source_json}
@@ -540,6 +552,8 @@ Editorial voice:
 - Include concrete numbers, model names, and company names when available.
 - No hype, no marketing language, no rhetorical questions.
 
+{EPISTEMIC_RULES}
+
 Rules:
 - iconType: Brain (LLM/AI models), Server (infrastructure), Zap (research), Cpu (safety/technical)
 - impact: critical (industry-changing), high (significant), medium (notable), low (informational)
@@ -693,6 +707,8 @@ Rules:
 - IMPORTANT: Each category MUST have an "en" array, even if empty
 - For secondaryMarket: ONLY include ticker and content. Price/change/marketCap will be fetched from real-time API.
 
+{EPISTEMIC_RULES}
+
 ROUND CATEGORY CLASSIFICATION (for Primary Market):
 - "Early": Pre-Seed, Seed, Angel, Accelerator (keywords: seed, angel, pre-seed, accelerator, 种子, 天使, 孵化)
 - "Series A": Series A, A+ rounds (keywords: series a, a round, a1, A轮, A+轮)
@@ -791,6 +807,8 @@ Rules:
   valid answer. Never invent or pad. Include "evidence": one verbatim
   supporting sentence per deal; omit financial figures (null) when no
   sentence supports them.
+
+{EPISTEMIC_RULES}
 
 AI INDUSTRY TAXONOMY (required - skip deal if none apply):
 - AI Infrastructure, AI Healthcare, AI Finance, AI Enterprise, AI Consumer, AI Robotics, AI Security, AI Creative, AI Education, Other AI
@@ -917,6 +935,8 @@ Write 3-5 editorial bullets ("why today matters"). STRICT rules:
 - Each bullet must contain at least one concrete number, company, or model
   name taken from the content above. Do not invent facts.
 - Write as neutral analysis, not opinion theater.
+
+{EPISTEMIC_RULES}
 
 Output ONLY valid JSON:
 {{"bullets": [{{"text": "...", "topic": "short topic tag"}}]}}"""

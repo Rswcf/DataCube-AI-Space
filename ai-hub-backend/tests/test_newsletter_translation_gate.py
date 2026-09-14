@@ -1,5 +1,6 @@
-"""The newsletter holds any language whose translations are not usable."""
+"""send_newsletter end to end with stubs: the translation gate and the one-click signing wiring."""
 
+import logging
 from types import SimpleNamespace
 
 from fastapi.testclient import TestClient
@@ -8,6 +9,10 @@ import app.services.newsletter_sender as sender
 from app.main import app
 from app.routers.admin import verify_api_key
 from app.services.translation_integrity import SRC_KEY, record_source_hash
+from app.services.unsubscribe_tokens import verify_token
+
+SECRET = "s" * 40
+RECIPIENT_IDS = {"en@example.com": "sub_en", "de@example.com": "sub_de", "zh@example.com": "sub_zh"}
 
 
 def _ready_row():
@@ -21,28 +26,31 @@ def _ready_row():
     return row
 
 
-def _patch_sender(monkeypatch, rows):
+def _patch_sender(monkeypatch, rows, signing_secret=SECRET, messages=None):
     sent = []
     monkeypatch.setattr(sender, "get_settings", lambda: SimpleNamespace(
         resend_api_key="re_test", beehiiv_api_key="bh_test", beehiiv_publication_id="pub_test",
         newsletter_from_email="News <news@example.com>", app_timezone="Europe/Berlin",
+        signing_secret=signing_secret,
     ))
     monkeypatch.setattr(sender, "_fetch_period_content", lambda db, period_id: {
         "period_id": period_id, "tech": rows, "videos": [], "funding": [], "ma": [], "tips": [],
     })
     monkeypatch.setattr(sender, "_fetch_beehiiv_subscribers", lambda api_key, publication_id: [
-        {"email": "en@example.com", "language": "en"},
-        {"email": "de@example.com", "language": "de"},
-        {"email": "zh@example.com", "language": "zh"},
+        {"id": "sub_en", "email": "en@example.com", "language": "en"},
+        {"id": "sub_de", "email": "de@example.com", "language": "de"},
+        {"id": "sub_zh", "email": "zh@example.com", "language": "zh"},
     ])
     monkeypatch.setattr(sender, "_acquire_send_lock", lambda db, period_id, lang: True)
     monkeypatch.setattr(sender, "_mark_send_sent", lambda db, period_id, lang, count: None)
     monkeypatch.setattr(sender, "_mark_send_failed", lambda db, period_id, lang, error: None)
     monkeypatch.setattr(sender, "_build_email_html", lambda data, lang: "<html></html>")
 
-    def fake_send(from_email, subject, html_content, addrs):
-        sent.append(tuple(addrs))
-        return len(addrs), 0
+    def fake_send(batch):
+        sent.append(tuple(message["to"][0] for message in batch))
+        if messages is not None:
+            messages.extend(batch)
+        return len(batch), 0
 
     monkeypatch.setattr(sender, "_send_via_resend", fake_send)
     return sent
@@ -121,3 +129,32 @@ def test_held_language_after_earlier_cron_reports_held_and_takes_no_lock(monkeyp
     assert "zh" in result["held_languages"]
     assert "zh" not in lock_calls
     assert sent == []
+
+
+def test_every_recipient_is_signed_with_the_configured_secret(monkeypatch, caplog):
+    messages = []
+    _patch_sender(monkeypatch, [_ready_row()], messages=messages)
+    caplog.set_level(logging.ERROR, logger=sender.logger.name)
+
+    sender.send_newsletter(None, "2026-09-12")
+
+    assert sorted(message["to"][0] for message in messages) == sorted(RECIPIENT_IDS)
+    for message in messages:
+        assert message["headers"]["List-Unsubscribe-Post"] == "List-Unsubscribe=One-Click"
+        token = message["headers"]["List-Unsubscribe"].split("t=", 1)[1].rstrip(">")
+        assert verify_token(token, [SECRET]) == RECIPIENT_IDS[message["to"][0]]
+    assert "SIGNING_SECRET" not in caplog.text
+
+
+def test_short_secret_sends_without_one_click_and_logs_one_error(monkeypatch, caplog):
+    messages = []
+    _patch_sender(monkeypatch, [_ready_row()], signing_secret="s" * 31, messages=messages)
+    caplog.set_level(logging.ERROR, logger=sender.logger.name)
+
+    result = sender.send_newsletter(None, "2026-09-12")
+
+    assert result["status"] == "sent"
+    assert len(messages) == 3
+    assert all("headers" not in message for message in messages)
+    errors = [r for r in caplog.records if r.levelno == logging.ERROR and "SIGNING_SECRET" in r.getMessage()]
+    assert len(errors) == 1
