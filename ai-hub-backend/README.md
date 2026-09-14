@@ -291,6 +291,8 @@ railway variables set CONTACT_INBOX=you@example.com   # contact form destination
 railway variables set CORS_ORIGINS='["http://localhost:3000","https://www.datacubeai.space","https://ai-information-hub.vercel.app"]'
 ```
 
+**Rotating `SIGNING_SECRET`:** in one change, set `SIGNING_SECRET_PREVIOUS` to the current value and `SIGNING_SECRET` to a new random value. Links in emails signed with the old key keep working while both are set. Tokens never expire, so remove `SIGNING_SECRET_PREVIOUS` only once those older links may stop working; their readers can still use the contact form. `SIGNING_SECRET_PREVIOUS` never verifies on its own: without a usable `SIGNING_SECRET`, every one-click link fails.
+
 ### 4. Deploy
 
 ```bash

@@ -30,7 +30,7 @@ class Settings(BaseSettings):
     # One-click unsubscribe tokens (HMAC-SHA256, at least 32 characters). Generate with:
     #   python -c "import secrets; print(secrets.token_urlsafe(48))"
     signing_secret: str = ""
-    signing_secret_previous: str = ""  # keeps old links valid during a key rotation
+    signing_secret_previous: str = ""  # verifies old links during a rotation, only alongside a usable signing_secret
 
     # Contact form destination (POST /api/contact)
     contact_inbox: str = ""
