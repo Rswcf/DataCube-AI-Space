@@ -58,3 +58,10 @@ def test_verification_keys_need_a_usable_current_secret():
     assert verification_keys(SimpleNamespace(signing_secret=SECRET, signing_secret_previous="short")) == [SECRET]
     assert verification_keys(SimpleNamespace(signing_secret="short", signing_secret_previous=OLD_SECRET)) == []
     assert verification_keys(SimpleNamespace(signing_secret="", signing_secret_previous=OLD_SECRET)) == []
+
+
+def test_non_string_inputs_never_raise():
+    assert mint_token(123, SECRET) is None
+    assert mint_token(b"sub_abc", SECRET) is None
+    assert verify_token(123, [SECRET]) is None
+    assert verify_token(b"v1.x", [SECRET]) is None

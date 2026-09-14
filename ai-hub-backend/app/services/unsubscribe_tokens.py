@@ -42,7 +42,7 @@ def _signature(secret: str, kid: str, subscription_id: str) -> str:
 
 def mint_token(subscription_id: str | None, secret: str | None) -> str | None:
     """Token for one subscription, or None when the secret or the id is unusable."""
-    if not usable_secret(secret) or not subscription_id:
+    if not usable_secret(secret) or not isinstance(subscription_id, str) or not subscription_id:
         return None
     if not _SUBSCRIPTION_ID_PATTERN.fullmatch(subscription_id):
         return None
@@ -52,7 +52,9 @@ def mint_token(subscription_id: str | None, secret: str | None) -> str | None:
 
 def verify_token(token: str | None, keys: list[str]) -> str | None:
     """Subscription id for a valid token, else None. Fails closed without usable keys."""
-    match = _TOKEN_PATTERN.fullmatch(token or "")
+    if not isinstance(token, str):
+        return None
+    match = _TOKEN_PATTERN.fullmatch(token)
     if not match:
         return None
     kid, subscription_id, signature = match.groups()

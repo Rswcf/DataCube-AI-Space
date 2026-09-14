@@ -59,6 +59,14 @@ def test_recipient_without_subscription_id_gets_no_one_click_headers():
     assert "headers" not in messages[0]
 
 
+def test_non_string_subscription_id_degrades_instead_of_raising():
+    messages = sender._recipient_messages(
+        "News <news@example.com>", "Subject", HTML, [{"id": 123, "email": "x@example.com"}], SECRET
+    )
+    assert "headers" not in messages[0]
+    assert 'href="https://www.datacubeai.space/unsubscribe"' in messages[0]["html"]
+
+
 def test_email_template_contains_exactly_one_unsubscribe_placeholder():
     data = {"period_id": "2026-09-12", "tech": [], "videos": [], "funding": [], "ma": [], "tips": []}
     html = sender._build_email_html(data, "en")
