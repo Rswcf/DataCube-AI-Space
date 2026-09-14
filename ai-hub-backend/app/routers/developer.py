@@ -13,6 +13,7 @@ from typing import Optional
 
 from app.database import get_db
 from app.models.developer import ApiKey
+from app.services.privacy import mask_email
 
 logger = logging.getLogger(__name__)
 
@@ -113,7 +114,7 @@ def register_api_key(body: RegisterRequest, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(record)
 
-    logger.info(f"New API key registered for {body.email}")
+    logger.info(f"New API key registered for {mask_email(body.email)}")
     return RegisterResponse(
         api_key=api_key,
         tier="free",
@@ -173,7 +174,7 @@ def rotate_api_key(
     db.add(new_record)
     db.commit()
 
-    logger.info(f"API key rotated for {record.email}")
+    logger.info(f"API key rotated for {mask_email(record.email)}")
     return RotateKeyResponse(
         new_api_key=new_key,
         message="New API key generated. The old key has been deactivated.",
@@ -221,7 +222,7 @@ def check_developer_rate_limit(request: Request, db: Session) -> Optional[ApiKey
         raise HTTPException(
             status_code=429,
             detail=f"Daily rate limit exceeded ({limit} calls/day for {record.tier} tier). "
-                   f"Upgrade your plan at https://www.datacubeai.space/pricing",
+                   f"API details: https://www.datacubeai.space/en/tools/ai-news-api",
         )
 
     # Increment counters
