@@ -25,7 +25,7 @@
 - **AD5 prompts:** edits are additive — append rule text, leave existing prompt lines unchanged.
 - **Resend quota:** Resend Free allows 100 emails/day, shared with the newsletter; the contact route caps itself at 20 emails/day.
 - **Copy:** never "Edited by …"; the unsubscribe page never tells readers to reply.
-- **Release timing:** never merge or deploy 03:00–05:30 UTC (newsletter) or 21:00–23:30 UTC (collection), and never run `railway up` while a translation backfill thread is running (the redeploy kills it).
+- **Release timing:** merging to `main` only redeploys Vercel and can happen at any time. Before `railway up`, confirm that no Daily Collection or Daily Newsletter run is in progress (`gh run list --workflow daily-collect.yml --limit 1`, and the same for `daily-newsletter.yml`) and that no translation backfill thread is running: the redeploy kills in-process work. Since PR #8 a newsletter run can start anywhere between 06:00 and 21:59 Berlin.
 - **Commits:** one commit per task (fix-up commits allowed). Every commit message ends with the trailer `Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>`. Stage by explicit path with `git -C <repo-root> add <paths>`; run git from the repository root, never from a subdirectory.
 
 ### Command reference
@@ -780,7 +780,7 @@ git -C <repo-root> commit -m "fix(security): remove unauthenticated legacy Strip
 
 **Interfaces:**
 - Consumes: `mask_email`, `redact_emails` (Task 2)
-- Produces: `Settings.signing_secret: str = ""`, `Settings.signing_secret_previous: str = ""`, `Settings.contact_inbox: str = ""` (env vars `SIGNING_SECRET`, `SIGNING_SECRET_PREVIOUS`, `CONTACT_INBOX`); `admin.py` imports `EmailStr`, `mask_email` and `redact_emails` (Task 10 reuses them); `POST /api/admin/newsletter/diagnose` requires the `test_email` query parameter and reports `env_check.variables.SIGNING_SECRET` / `CONTACT_INBOX` as booleans
+- Produces: `Settings.signing_secret: str = ""`, `Settings.signing_secret_previous: str = ""`, `Settings.contact_inbox: str = ""` (env vars `SIGNING_SECRET`, `SIGNING_SECRET_PREVIOUS`, `CONTACT_INBOX`); `admin.py` imports `BaseModel`, `EmailStr`, `mask_email` and `redact_emails` (Task 10 reuses them); `POST /api/admin/newsletter/diagnose` requires a JSON body `{"test_email": "…"}` (never a query parameter: access logs record URLs) and reports `env_check.variables.SIGNING_SECRET` / `CONTACT_INBOX` as booleans
 
 - [ ] **Step 1: Write the failing tests** — create `ai-hub-backend/tests/test_newsletter_diagnose.py`:
 
@@ -815,7 +815,7 @@ class _BeehiivPage:
         return {"data": SUBSCRIBERS, "total_pages": 1, "total_results": 3}
 
 
-def _post(monkeypatch, url):
+def _post(monkeypatch, url, body=None):
     sent = []
     monkeypatch.setattr(admin, "get_settings", lambda: SimpleNamespace(
         resend_api_key="re_test", beehiiv_api_key="bh_test", beehiiv_publication_id="pub_test",
@@ -826,7 +826,7 @@ def _post(monkeypatch, url):
     app.dependency_overrides[verify_api_key] = lambda: True
     app.dependency_overrides[get_db] = lambda: None
     try:
-        response = TestClient(app).post(url)
+        response = TestClient(app).post(url, json=body)
     finally:
         app.dependency_overrides.pop(verify_api_key, None)
         app.dependency_overrides.pop(get_db, None)
@@ -844,7 +844,7 @@ def test_new_settings_default_to_empty_and_read_the_environment(monkeypatch):
 
 
 def test_diagnose_requires_test_email(monkeypatch):
-    response, sent = _post(monkeypatch, "/api/admin/newsletter/diagnose?period_id=2026-09-12")
+    response, sent = _post(monkeypatch, "/api/admin/newsletter/diagnose?period_id=2026-09-12", body={})
 
     assert response.status_code == 422
     assert sent == []
@@ -852,7 +852,7 @@ def test_diagnose_requires_test_email(monkeypatch):
 
 def test_diagnose_returns_counts_without_subscriber_addresses(monkeypatch):
     response, sent = _post(
-        monkeypatch, "/api/admin/newsletter/diagnose?period_id=2026-09-12&test_email=founder@example.com"
+        monkeypatch, "/api/admin/newsletter/diagnose?period_id=2026-09-12", body={"test_email": "founder@example.com"}
     )
 
     assert response.status_code == 200
@@ -910,7 +910,7 @@ with
 ```python
 from typing import Optional
 
-from pydantic import EmailStr
+from pydantic import BaseModel, EmailStr
 
 from app.database import get_db, get_session_local
 from app.config import get_settings
@@ -920,9 +920,13 @@ from app.services.privacy import mask_email, redact_emails
 - [ ] **Step 5: Replace the diagnose function** — in `ai-hub-backend/app/routers/admin.py`, replace everything from `@router.post("/newsletter/diagnose")` down to and including the `    return report` line directly above `@router.get("/health")` with:
 
 ```python
+class NewsletterDiagnoseBody(BaseModel):
+    test_email: EmailStr
+
+
 @router.post("/newsletter/diagnose")
 async def diagnose_newsletter(
-    test_email: EmailStr,
+    body: NewsletterDiagnoseBody,
     period_id: Optional[str] = None,
     db: Session = Depends(get_db),
     _: bool = Depends(verify_api_key),
@@ -943,6 +947,7 @@ async def diagnose_newsletter(
     from datetime import date, timedelta
     from app.models.week import Week
 
+    test_email = body.test_email  # JSON body, never the query string: access logs record URLs
     settings = get_settings()
     report = {
         "period_id": None,
@@ -1644,7 +1649,7 @@ AD3 token: `v1.` + key id + HMAC-SHA256 over the Beehiiv subscription id; `hmac.
   - `usable_secret(secret: str | None) -> bool`
   - `mint_token(subscription_id: str | None, secret: str | None) -> str | None`
   - `verify_token(token: str | None, keys: list[str]) -> str | None` (returns the subscription id)
-  - `verification_keys(settings) -> list[str]` (usable values of `settings.signing_secret` and `settings.signing_secret_previous`, in that order)
+  - `verification_keys(settings) -> list[str]` (usable values of `settings.signing_secret` and `settings.signing_secret_previous`, in that order; empty when `settings.signing_secret` is unusable, so verification fails closed even if only the previous secret is set)
 - Token shape (Task 11 mirrors it in TypeScript): `^v1\.[0-9a-f]{8}\.[A-Za-z0-9_-]{1,64}\.[A-Za-z0-9_-]{43}$`
 
 - [ ] **Step 1: Write the failing tests** — create `ai-hub-backend/tests/test_unsubscribe_tokens.py`:
@@ -1704,9 +1709,12 @@ def test_minting_needs_a_usable_secret_and_a_plain_subscription_id():
     assert mint_token("sub/../../admin", SECRET) is None
 
 
-def test_verification_keys_skip_blank_and_short_secrets():
+def test_verification_keys_need_a_usable_current_secret():
     assert verification_keys(SimpleNamespace(signing_secret=SECRET, signing_secret_previous="")) == [SECRET]
-    assert verification_keys(SimpleNamespace(signing_secret="short", signing_secret_previous=OLD_SECRET)) == [OLD_SECRET]
+    assert verification_keys(SimpleNamespace(signing_secret=SECRET, signing_secret_previous=OLD_SECRET)) == [SECRET, OLD_SECRET]
+    assert verification_keys(SimpleNamespace(signing_secret=SECRET, signing_secret_previous="short")) == [SECRET]
+    assert verification_keys(SimpleNamespace(signing_secret="short", signing_secret_previous=OLD_SECRET)) == []
+    assert verification_keys(SimpleNamespace(signing_secret="", signing_secret_previous=OLD_SECRET)) == []
 ```
 
 - [ ] **Step 2: Run the tests to verify they fail**
@@ -1783,7 +1791,13 @@ def verify_token(token: str | None, keys: list[str]) -> str | None:
 
 
 def verification_keys(settings) -> list[str]:
-    """The current and previous signing secrets that are long enough to trust."""
+    """Usable current and previous signing secrets, current first.
+
+    Empty when SIGNING_SECRET itself is unusable: verification fails closed even
+    if SIGNING_SECRET_PREVIOUS is still set (a rotation always has a current key).
+    """
+    if not usable_secret(settings.signing_secret):
+        return []
     return [s for s in (settings.signing_secret, settings.signing_secret_previous) if usable_secret(s)]
 ```
 
@@ -1823,7 +1837,7 @@ AD3: the backend calls Beehiiv's update-subscription-by-id endpoint with `unsubs
   - `app.services.beehiiv.BeehiivError(RuntimeError)`
   - `app.services.beehiiv.unsubscribe_subscription(api_key: str, publication_id: str, subscription_id: str) -> str` (`"unsubscribed"` or `"not_found"`; raises `BeehiivError` on any other non-2xx status)
   - `app.services.beehiiv.find_subscription_id(api_key: str, publication_id: str, email: str) -> str | None` (Task 10)
-  - `POST /api/newsletter/unsubscribe`, JSON body `{"token": "<token>"}` → `200 {"status": "unsubscribed"}` · `400 {"detail": "invalid_token"}` · `503 {"detail": "unsubscribe_unavailable"}` (no usable secret or no Beehiiv settings) · `502 {"detail": "unsubscribe_failed"}` (Task 11 maps these)
+  - `POST /api/newsletter/unsubscribe`, JSON body `{"token": "<token>"}` → `200 {"status": "unsubscribed"}` · `400 {"detail": "invalid_token"}` · `503 {"detail": "unsubscribe_unavailable"}` (no usable `SIGNING_SECRET` or no Beehiiv settings) · `502 {"detail": "unsubscribe_failed"}` (Task 11 maps these)
   - `app.routers.newsletter_router`
 
 - [ ] **Step 1: Write the failing tests**
@@ -1965,6 +1979,17 @@ def test_missing_signing_secret_fails_closed(monkeypatch):
     assert calls == []
 
 
+def test_previous_secret_alone_does_not_verify(monkeypatch):
+    calls = []
+    settings = _settings(signing_secret="")
+    settings.signing_secret_previous = SECRET
+    response = _client(monkeypatch, settings, calls).post(
+        "/api/newsletter/unsubscribe", json={"token": mint_token("sub_abc", SECRET)}
+    )
+    assert response.status_code == 503
+    assert calls == []
+
+
 def test_beehiiv_failure_returns_502(monkeypatch):
     calls = []
     failure = BeehiivError("Beehiiv unsubscribe returned HTTP 500")
@@ -1985,7 +2010,7 @@ def test_get_never_unsubscribes(monkeypatch):
 - [ ] **Step 2: Run the tests to verify they fail**
 
 Run: `cd <repo-root>/ai-hub-backend && DATABASE_URL=sqlite:///./test.db OPENROUTER_API_KEY=test-key ADMIN_API_KEY=test-key venv312/bin/python -m pytest tests/test_beehiiv_client.py tests/test_newsletter_unsubscribe_router.py -q`
-Expected: collection errors — `No module named 'app.services.beehiiv'` and `No module named 'app.routers.newsletter'`.
+Expected: two collection errors (`Interrupted: 2 errors during collection`) — `ImportError: cannot import name 'beehiiv' from 'app.services'` in `test_beehiiv_client.py` and `ModuleNotFoundError: No module named 'app.routers.newsletter'` in `test_newsletter_unsubscribe_router.py`.
 
 - [ ] **Step 3: Create `ai-hub-backend/app/services/beehiiv.py`**
 
@@ -2153,7 +2178,7 @@ app.include_router(newsletter_router, prefix="/api")
 - [ ] **Step 7: Run the tests to verify they pass**
 
 Run: `cd <repo-root>/ai-hub-backend && DATABASE_URL=sqlite:///./test.db OPENROUTER_API_KEY=test-key ADMIN_API_KEY=test-key venv312/bin/python -m pytest tests/test_beehiiv_client.py tests/test_newsletter_unsubscribe_router.py -q`
-Expected: `11 passed`.
+Expected: `12 passed`.
 
 - [ ] **Step 8: Run the unit suite and lint**
 
@@ -2346,8 +2371,10 @@ The five test functions in that file stay unchanged.
 
 - [ ] **Step 2: Run the tests to verify they fail**
 
-Run: `cd <repo-root>/ai-hub-backend && DATABASE_URL=sqlite:///./test.db OPENROUTER_API_KEY=test-key ADMIN_API_KEY=test-key venv312/bin/python -m pytest tests/test_newsletter_recipient_messages.py tests/test_newsletter_translation_gate.py -q`
-Expected: collection error in `test_newsletter_recipient_messages.py` (`module 'app.services.newsletter_sender' has no attribute 'UNSUBSCRIBE_URL_PLACEHOLDER'`); in the gate file `3 failed, 2 passed` (the old sender calls `fake_send` with four arguments).
+Run: `cd <repo-root>/ai-hub-backend && DATABASE_URL=sqlite:///./test.db OPENROUTER_API_KEY=test-key ADMIN_API_KEY=test-key venv312/bin/python -m pytest tests/test_newsletter_recipient_messages.py -q`
+Expected: collection error `AttributeError: module 'app.services.newsletter_sender' has no attribute 'UNSUBSCRIBE_URL_PLACEHOLDER'` (`Interrupted: 1 error during collection`).
+Run: `cd <repo-root>/ai-hub-backend && DATABASE_URL=sqlite:///./test.db OPENROUTER_API_KEY=test-key ADMIN_API_KEY=test-key venv312/bin/python -m pytest tests/test_newsletter_translation_gate.py -q`
+Expected: `3 failed, 2 passed` — the old sender calls `fake_send` with four arguments, so `test_ready_translations_are_sent`, `test_misaligned_language_is_held` and `test_few_unready_rows_send_with_english_fallback` fail. (Run the two files separately: a collection error in one file stops pytest before any test runs.)
 
 - [ ] **Step 3: Update imports and constants in `ai-hub-backend/app/services/newsletter_sender.py`**
 
@@ -2725,11 +2752,11 @@ AD3 acceptance needs a real message: "on a test send, the `DKIM-Signature` `h=` 
 - Create: `ai-hub-backend/tests/test_newsletter_test_send.py`
 
 **Interfaces:**
-- Consumes: `find_subscription_id` (Task 8); `_build_subject`, `_recipient_messages`, `_send_via_resend`, `UNSUBSCRIBE_URL_PLACEHOLDER` (Task 9); `EmailStr`, `mask_email` imports in `admin.py` (Task 4)
+- Consumes: `find_subscription_id` (Task 8); `_build_subject`, `_recipient_messages`, `_send_via_resend`, `UNSUBSCRIBE_URL_PLACEHOLDER` (Task 9); `BaseModel`, `EmailStr`, `mask_email` imports in `admin.py` (Task 4)
 - Produces:
   - `TEST_SEND_SUBSCRIPTION_ID = "test-send-preview"`
   - `send_test_newsletter(db, period_id: str, test_email: str, lang: str = "en") -> dict` with keys `period_id`, `language`, `status` (`"sent"` | `"failed"` | `"no_content"`), `sent`, `failed`, and — when content exists — `one_click_headers` (bool) and `matched_subscriber` (bool)
-  - `POST /api/admin/newsletter/test-send?period_id=…&test_email=…&language=en` (admin key): `200` result · `400` unsupported language or missing Resend key · `404` no content · `422` missing or invalid `test_email` · `502` send failure
+  - `POST /api/admin/newsletter/test-send?period_id=…&language=en` with JSON body `{"test_email": "…"}` (admin key; the address stays out of URLs and access logs): `200` result · `400` unsupported language or missing Resend key · `404` no content · `422` missing or invalid `test_email` · `502` send failure
 
 - [ ] **Step 1: Write the failing tests** — create `ai-hub-backend/tests/test_newsletter_test_send.py`:
 
@@ -2808,9 +2835,10 @@ def test_admin_test_send_requires_a_valid_test_email(monkeypatch):
     app.dependency_overrides[get_db] = lambda: None
     try:
         client = TestClient(app)
-        missing = client.post("/api/admin/newsletter/test-send?period_id=2026-09-12")
-        invalid = client.post("/api/admin/newsletter/test-send?period_id=2026-09-12&test_email=nope")
-        ok = client.post("/api/admin/newsletter/test-send?period_id=2026-09-12&test_email=founder@example.com")
+        url = "/api/admin/newsletter/test-send?period_id=2026-09-12"
+        missing = client.post(url, json={})
+        invalid = client.post(url, json={"test_email": "nope"})
+        ok = client.post(url, json={"test_email": "founder@example.com"})
     finally:
         app.dependency_overrides.pop(verify_api_key, None)
         app.dependency_overrides.pop(get_db, None)
@@ -2914,10 +2942,14 @@ def send_test_newsletter(db: Session, period_id: str, test_email: str, lang: str
 - [ ] **Step 4: Add the endpoint** — in `ai-hub-backend/app/routers/admin.py` replace the line `@router.get("/health")` with:
 
 ```python
+class NewsletterTestSendBody(BaseModel):
+    test_email: EmailStr
+
+
 @router.post("/newsletter/test-send")
 def newsletter_test_send(
+    body: NewsletterTestSendBody,
     period_id: str,
-    test_email: EmailStr,
     language: str = "en",
     db: Session = Depends(get_db),
     _: bool = Depends(verify_api_key),
@@ -2930,6 +2962,7 @@ def newsletter_test_send(
     """
     from app.services.newsletter_sender import send_test_newsletter
 
+    test_email = body.test_email  # JSON body, never the query string: access logs record URLs
     try:
         result = send_test_newsletter(db, period_id, test_email, language)
     except ValueError as exc:
@@ -4093,7 +4126,7 @@ mv <repo-root>/ai-hub-backend/.env.r1-backup <repo-root>/ai-hub-backend/.env
 
 ## Release runbook (founder-gated)
 
-Preconditions: CI green on the PR; the R0 translation backfill thread has finished (read-only dry run unchanged for 40 minutes); current UTC time outside 03:00–05:30 and 21:00–23:30.
+Preconditions: CI green on the PR; no translation backfill thread running (read-only dry run unchanged for 40 minutes); no Daily Collection or Daily Newsletter run in progress at the moment of `railway up`.
 
 1. **Railway variables (founder approval).** First confirm `railway variables --help` lists `--skip-deploys`; if it does not, set the variables in the Railway dashboard without redeploying (a redeploy of the old code would kill a running backfill and is not needed — step 3 deploys).
    - `SIGNING_SECRET`, generated and set without printing it: `cd <repo-root>/ai-hub-backend && railway variables --service api --skip-deploys --set "SIGNING_SECRET=$(python3 -c 'import secrets; print(secrets.token_urlsafe(48))')"`
@@ -4101,8 +4134,8 @@ Preconditions: CI green on the PR; the R0 translation backfill thread has finish
 2. **Merge (founder approval):** squash-merge the PR with an explicit subject and body; this deploys the Vercel production site.
 3. **Backend deploy (founder approval):** from `main` at the squash commit, `cd <repo-root>/ai-hub-backend && railway up -d -s api`. Poll `https://api-production-3ee5.up.railway.app/openapi.json` until it lists `/api/newsletter/unsubscribe`, `/api/contact` and `/api/admin/newsletter/test-send` and no `/api/stripe/` path. Run no step 4 check before that.
 4. **Verify, recording each result in the ledger:**
-   1. `POST /api/admin/newsletter/diagnose?test_email=<founder inbox>` (pre-approved test email): `env_check.variables.SIGNING_SECRET` and `CONTACT_INBOX` are `true`; `beehiiv_subscribers` holds counts only.
-   2. `POST /api/admin/newsletter/test-send?period_id=<latest daily period>&language=en&test_email=<founder inbox>` (pre-approved): `one_click_headers` is `true`. The founder opens the message source: `List-Unsubscribe` and `List-Unsubscribe-Post` are present and the `DKIM-Signature` `h=` tag lists `list-unsubscribe` and `list-unsubscribe-post` (AD3 acceptance). If `h=` does not cover them, stop and decide before the next scheduled send.
+   1. `POST /api/admin/newsletter/diagnose` with JSON body `{"test_email": "<founder inbox>"}` (pre-approved test email): `env_check.variables.SIGNING_SECRET` and `CONTACT_INBOX` are `true`; `beehiiv_subscribers` holds counts only.
+   2. `POST /api/admin/newsletter/test-send?period_id=<latest daily period>&language=en` with JSON body `{"test_email": "<founder inbox>"}` (pre-approved): `one_click_headers` is `true`. The founder opens the message source: `List-Unsubscribe` and `List-Unsubscribe-Post` are present and the `DKIM-Signature` `h=` tag lists `list-unsubscribe` and `list-unsubscribe-post` (AD3 acceptance). If `h=` does not cover them, stop and decide before the next scheduled send.
    3. `curl -sS -o /dev/null -w "%{http_code}\n" -X POST -H "Content-Type: application/x-www-form-urlencoded" --data "List-Unsubscribe=One-Click" "https://www.datacubeai.space/api/newsletter/unsubscribe?t=invalid"` → `400`.
    4. `curl -sS -o /dev/null -w "%{http_code} %{redirect_url}\n" "https://www.datacubeai.space/api/newsletter/unsubscribe?t=abc"` → `303 https://www.datacubeai.space/unsubscribe?t=abc`.
    5. `curl -sS -o /dev/null -w "%{http_code}\n" -X POST https://api-production-3ee5.up.railway.app/api/stripe/cancel` → `404`.
@@ -4123,3 +4156,6 @@ Preconditions: CI green on the PR; the R0 translation backfill thread has finish
 - Ruling: without `SIGNING_SECRET` the token-less page points readers to the contact form; release steps 1 and 4.1 keep that state out of production — cost if wrong: readers of a degraded send need the contact form to unsubscribe.
 - Ruling: the contact route keys its per-IP limit on the first `X-Forwarded-For` hop (spoofable); the 20/day global cap is the real protection for the Resend quota.
 - Ruling: one PR for all thirteen tasks; merging is founder-gated anyway.
+- Ruling (AD3 plan review, 2026-09-14): verification needs a usable `SIGNING_SECRET`; `SIGNING_SECRET_PREVIOUS` alone never verifies (spec AD3: "fail closed without SIGNING_SECRET") — cost if wrong: during a botched rotation, delivered links fail until the current secret is restored.
+- Ruling (AD3 plan review): `diagnose` and `test-send` take `test_email` in a JSON body, because uvicorn access logs record query strings — cost if wrong: none.
+- Ruling (AD3 plan review): Task 9 Step 2 runs its two test files separately, because a collection error in one file stops pytest before any test runs.
