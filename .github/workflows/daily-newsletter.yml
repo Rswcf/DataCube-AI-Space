@@ -1,20 +1,22 @@
 name: Daily Newsletter
 
-# Sends yesterday's collected content as a newsletter at 08:00 Berlin time.
-# Data is collected the previous day at 23:xx (see daily-collect.yml).
-# This workflow fires the morning after to deliver the digest.
+# Sends yesterday's collected content as a newsletter in the Berlin morning.
+# Data is collected the previous night (see daily-collect.yml).
 
 on:
   schedule:
-    # Two cron slots to cover DST transitions and absorb GitHub Actions cron
-    # delay (typically 5-60 min, occasionally 1-2h under load).
-    # Schedule ~2h earlier than target delivery so even a delayed run lands
-    # inside the acceptable Berlin 06-10 window.
-    # - Summer (CEST, UTC+2): 04:07 UTC = 06:07 Berlin (+ delay = 06-10 Berlin)
-    # - Winter (CET,  UTC+1): 05:07 UTC = 06:07 Berlin (+ delay = 06-10 Berlin)
+    # GitHub often starts scheduled runs hours late (4-12 h in 2026-08/09), so
+    # the send cannot depend on start time: the gate below accepts 06-21 Berlin,
+    # and the backend send lock (newsletter_sends) makes every run after the
+    # first successful send a no-op.
+    # - 02:07 UTC: lands around 06-07 Berlin under a ~4 h delay (skips when on time)
+    # - 04:07 / 05:07 UTC: 06:07 Berlin in summer (CEST) / winter (CET) when on time
+    # - 09:07 UTC: catch-up after a late collection, a dropped run or a held language
     # Minute :07 (not :00) avoids GitHub's documented on-the-hour load spike.
+    - cron: "7 2 * * *"
     - cron: "7 4 * * *"
     - cron: "7 5 * * *"
+    - cron: "7 9 * * *"
   workflow_dispatch:
     inputs:
       period_id:
@@ -36,13 +38,15 @@ jobs:
         run: |
           if [ "${{ github.event_name }}" = "schedule" ]; then
             BERLIN_HOUR=$(TZ=Europe/Berlin date +%H)
-            # Accept 06-10 Berlin: covers both DST states and absorbs cron delay.
-            # Backend idempotency (newsletter_sends table) protects against the
-            # case where both cron slots succeed on the same day.
+            # Accept 06-21 Berlin. Before 06 the night's collection may still be
+            # running; after 21 a very late run would reach readers at night.
+            # The old 06-10 window skipped every edition GitHub started after
+            # 10:59 (7 of 20 days in 2026-08/09). Backend idempotency
+            # (newsletter_sends) keeps extra runs from sending twice.
             case "$BERLIN_HOUR" in
-              06|07|08|09|10) ;;
+              06|07|08|09|10|11|12|13|14|15|16|17|18|19|20|21) ;;
               *)
-                echo "Skip: Berlin hour $BERLIN_HOUR outside 06-10 delivery window"
+                echo "Skip: Berlin hour $BERLIN_HOUR outside 06-21 delivery window"
                 echo "SKIP=true" >> "$GITHUB_OUTPUT"
                 exit 0
                 ;;
@@ -51,7 +55,7 @@ jobs:
 
           PERIOD="${{ github.event.inputs.period_id }}"
           if [ -z "$PERIOD" ]; then
-            # Default: yesterday in Berlin time (content collected last night at 23:xx)
+            # Default: yesterday in Berlin time (collected the previous night)
             PERIOD=$(TZ=Europe/Berlin date -d "yesterday" +%F)
           fi
           echo "PERIOD=$PERIOD" >> "$GITHUB_OUTPUT"

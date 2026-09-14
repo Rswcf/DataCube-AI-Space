@@ -211,7 +211,7 @@ STRIPE_API_BUSINESS_PRICE_ID=    # Stripe Business API tier price
 cd ai-information-hub && vercel --prod
 ```
 
-**Backend → Railway** — Auto-applies Alembic migrations on startup. Daily collection automated via GitHub Actions (23:xx Berlin time).
+**Backend → Railway** — Auto-applies Alembic migrations on startup. Daily collection and the morning newsletter run via GitHub Actions (collection nominally 23:07 Berlin; runs that GitHub starts late still collect and send the intended day).
 
 ```bash
 cd ai-hub-backend && railway up

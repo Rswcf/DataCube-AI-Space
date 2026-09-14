@@ -24,6 +24,7 @@ jobs:
               - 'ai-information-hub/**'
             backend:
               - 'ai-hub-backend/**'
+              - '.github/workflows/daily-*.yml'
 
   frontend:
     name: Frontend (Next.js)
