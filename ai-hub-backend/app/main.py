@@ -21,7 +21,6 @@ from app.routers import (
     stock_router,
     developer_router,
     jobs_router,
-    stripe_router,
     deals_router,
 )
 
@@ -70,7 +69,6 @@ app.include_router(admin_router, prefix="/api")
 app.include_router(stock_router, prefix="/api")
 app.include_router(developer_router, prefix="/api")
 app.include_router(jobs_router, prefix="/api")
-app.include_router(stripe_router, prefix="/api")
 app.include_router(deals_router, prefix="/api")
 
 
