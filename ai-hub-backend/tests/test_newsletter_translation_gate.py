@@ -26,23 +26,24 @@ def _patch_sender(monkeypatch, rows):
     monkeypatch.setattr(sender, "get_settings", lambda: SimpleNamespace(
         resend_api_key="re_test", beehiiv_api_key="bh_test", beehiiv_publication_id="pub_test",
         newsletter_from_email="News <news@example.com>", app_timezone="Europe/Berlin",
+        signing_secret="s" * 40,
     ))
     monkeypatch.setattr(sender, "_fetch_period_content", lambda db, period_id: {
         "period_id": period_id, "tech": rows, "videos": [], "funding": [], "ma": [], "tips": [],
     })
     monkeypatch.setattr(sender, "_fetch_beehiiv_subscribers", lambda api_key, publication_id: [
-        {"email": "en@example.com", "language": "en"},
-        {"email": "de@example.com", "language": "de"},
-        {"email": "zh@example.com", "language": "zh"},
+        {"id": "sub_en", "email": "en@example.com", "language": "en"},
+        {"id": "sub_de", "email": "de@example.com", "language": "de"},
+        {"id": "sub_zh", "email": "zh@example.com", "language": "zh"},
     ])
     monkeypatch.setattr(sender, "_acquire_send_lock", lambda db, period_id, lang: True)
     monkeypatch.setattr(sender, "_mark_send_sent", lambda db, period_id, lang, count: None)
     monkeypatch.setattr(sender, "_mark_send_failed", lambda db, period_id, lang, error: None)
     monkeypatch.setattr(sender, "_build_email_html", lambda data, lang: "<html></html>")
 
-    def fake_send(from_email, subject, html_content, addrs):
-        sent.append(tuple(addrs))
-        return len(addrs), 0
+    def fake_send(messages):
+        sent.append(tuple(message["to"][0] for message in messages))
+        return len(messages), 0
 
     monkeypatch.setattr(sender, "_send_via_resend", fake_send)
     return sent
