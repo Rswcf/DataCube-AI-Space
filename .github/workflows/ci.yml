@@ -167,3 +167,13 @@ jobs:
         run: alembic upgrade head
       - name: Integration tests (PostgreSQL)
         run: python -m pytest -m integration -v
+
+  brand-guard:
+    name: Brand guard
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Script tests
+        run: python3 -m unittest scripts/test_brand_guard.py
+      - name: Legacy brand strings stay in the brand config
+        run: python3 scripts/brand_guard.py
