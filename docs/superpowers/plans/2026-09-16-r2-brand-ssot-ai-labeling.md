@@ -130,7 +130,7 @@
 | ID | Change |
 |---|---|
 | B1 | **One spelling.** "DataCube AI" becomes "Data Cube AI" wherever it is rendered: the four tool pages (text, metadata, JSON-LD, image alt text), the `SoftwareApplicationSchema` author and publisher, the week page's editorial attribution and byline, `/llms.txt`, the LLM prompts, and the collector's fallback source name. |
-| B2 | **No double-branded titles.** The rendered `<title>` names the brand once on week pages (de, en, fr, es, pt), `/editorial-policy`, `/ai-disclosure`, `/source-methodology`, `/corrections`, `/login`, `/about` ("About Data Cube AI"), `/contact` ("Contact Data Cube AI") and the article not-found page. Week pages in zh, ja and ko gain " \| Data Cube AI" in `og:title`, `twitter:title` and the CollectionPage `name`, so all eight languages match their `<title>`. |
+| B2 | **No double-branded titles.** The rendered `<title>` names the brand once on week pages (de, en, fr, es, pt), `/editorial-policy`, `/ai-disclosure`, `/source-methodology`, `/corrections`, `/login`, `/about` ("About Data Cube AI") and `/contact` ("Contact Data Cube AI"). For a missing story, the article page's `generateMetadata` returns `title: 'Article not found'`, which the title template brands once; the 404 body itself is `components/not-found-page.tsx` and names no brand. Week pages in zh, ja and ko gain " \| Data Cube AI" in `og:title`, `twitter:title` and the CollectionPage `name`, so all eight languages match their `<title>`. |
 | B3 | **robots.txt layout.** `app/robots.ts` generates the file. Comments and blank lines change, and each group lists its `Allow` lines before its `Disallow` lines. User agents, paths, crawl delays and sitemaps are unchanged. |
 | B4 | **CSV filename.** `/api/deals/export.csv` downloads as `data-cube-ai-deals.csv` (was `datacube-ai-deals.csv`). |
 
@@ -221,11 +221,11 @@ There is one copy table per app:
 | `ai-hub-backend/tests/test_newsletter_{recipient_messages,test_send,translation_gate}.py` | modify | 6 | `site_url` argument and setting |
 | `ai-hub-backend/app/routers/{deals,developer}.py`, `app/services/{rss_fetcher,collector,llm_processor}.py`, `app/models/week.py`, `app/schemas/trend.py`, `.env.example`, `tests/test_developer_rate_limit_message.py` | modify | 7 | backend identity from settings |
 | `ai-hub-backend/tests/test_brand_identity.py` | create | 7 | backend identity tests |
-| `ai-information-hub/app/layout.tsx`, `app/page.tsx`, `app/[lang]/page.tsx`, `components/structured-data.tsx`, `app/sitemap.ts`, `app/news-sitemap.xml/route.ts`, `app/feed.xml/route.ts`, `app/newsletter.xml/route.ts`, `app/api/content-summary/route.ts`, `app/api/og/route.tsx`, `app/api/chat/route.ts` | modify | 8 (14, 16) | brand from `BRAND`; labels; attribution |
-| `ai-information-hub/app/[lang]/tools/{ai-news-aggregator,ai-news-api,ai-report-generator,ai-stock-tracker}/page.tsx` | modify | 9 (13) | `fillBrand` helpers; AI label on the aggregator's live preview |
-| `ai-information-hub/app/week/[weekId]/page.tsx`, `app/[lang]/week/[weekId]/page.tsx`, `app/[lang]/news/[periodId]/[storyId]/page.tsx`, `app/[lang]/topic/[topic]/page.tsx` | modify | 10 (13, 16) | brand, titles, labels, attribution |
-| `ai-information-hub/app/{about,ai-disclosure,editorial-policy,source-methodology,corrections,contact,impressum,datenschutz,premium,for-teams,funding}/page.tsx`, `app/login/{layout,page}.tsx`, `components/{right-sidebar,sidebar,feed,home-page-client}.tsx`, `lib/translations.ts` | modify | 11 (13, 16) | brand, titles, footers |
-| `ai-information-hub/app/trust-page.tsx` | modify | 16 | founder footer line |
+| `ai-information-hub/lib/site-metadata.ts`, `components/root-shell.tsx`, `app/(site)/page.tsx`, `app/(localized)/[lang]/page.tsx`, `components/structured-data.tsx`, `app/sitemap.ts`, `app/news-sitemap.xml/route.ts`, `app/feed.xml/route.ts`, `app/newsletter.xml/route.ts`, `app/api/content-summary/route.ts`, `app/api/og/route.tsx`, `app/api/chat/route.ts` | modify | 8 (14, 16) | brand from `BRAND`; labels; attribution |
+| `ai-information-hub/app/(localized)/[lang]/tools/{ai-news-aggregator,ai-news-api,ai-report-generator,ai-stock-tracker}/page.tsx` | modify | 9 (13) | `fillBrand` helpers; AI label on the aggregator's live preview |
+| `ai-information-hub/app/(site)/week/[weekId]/page.tsx`, `app/(localized)/[lang]/week/[weekId]/page.tsx`, `app/(localized)/[lang]/news/[periodId]/[storyId]/page.tsx`, `app/(localized)/[lang]/topic/[topic]/page.tsx` | modify | 10 (13, 16) | brand, titles, labels, attribution |
+| `ai-information-hub/app/(site)/{about,ai-disclosure,editorial-policy,source-methodology,corrections,contact,impressum,datenschutz,premium,for-teams,funding}/page.tsx`, `app/(site)/login/{layout,page}.tsx`, `components/{right-sidebar,sidebar,feed,home-page-client}.tsx`, `lib/translations.ts` | modify | 11 (13, 16) | brand, titles, footers |
+| `ai-information-hub/app/(site)/trust-page.tsx` | modify | 16 | founder footer line |
 | `ai-information-hub/app/robots.ts`, `app/robots.test.ts` | create | 12 | generated robots.txt |
 | `ai-information-hub/app/llms.txt/route.ts`, `app/llms.txt/route.test.ts` | create | 12 (14) | generated llms.txt |
 | `ai-information-hub/public/robots.txt`, `ai-information-hub/public/llms.txt` | delete | 12 | replaced by routes |
@@ -326,7 +326,7 @@ Each ruling states what was decided, why, and what it costs if wrong.
   - deletes `app/layout.tsx` in favor of `lib/site-metadata.ts`, two group layouts and `components/root-shell.tsx`;
   - moves the article noindex from a middleware header into page metadata;
   - adds robots rules and moves `/api/og` to the Node.js runtime.
-- Why cost first: it is a live cost incident with the founder's decisions already taken, and R2 has no frontend code yet. Re-planning unwritten tasks is cheap; porting written ones through 29 renames and a deleted root layout is not.
+- Why cost first: it is a live cost incident with the founder's decisions already taken, and R2 has no frontend code yet. Re-planning unwritten tasks is cheap; porting written ones through 28 renames and a deleted root layout is not.
 - Phase A (Tasks 3, 4, 2, 6, 7, 15) touches nothing the cost branch touches, so it runs now. Phase B (Tasks 1, 5, 8–14, 16, 17) waits for Execution setup Step 5: the cost branch merged, this branch rebased, and every Phase B path present. Task 1 captures its goldens only after that, because the cost work legitimately changes the head, the noindex placement and the OG route.
 - Phase B task text is rebased onto the cost tree (paths, anchors, robots rules, release checks) before Phase B starts, and re-checked against the merged tree in Step 5.
 - This R2 work never commits, pushes or merges the cost branch; that belongs to its own session and the founder.
@@ -399,7 +399,7 @@ Expected:
 - the first `log` prints the commit that added `lib/site-metadata.ts`, and the second prints nothing;
 - the rebase replays the Phase A commits without conflicts, since they touch no frontend file;
 - both route-group directories exist and `app/layout.tsx` does not;
-- the frontend type check and tests are green. Record the counts as the Phase B baseline.
+- the frontend type check and tests are green: `Tests  58 passed (58)` in 5 test files on the cost tree as checked on 2026-09-16 (the cost work adds the 29 tests of `lib/middleware-matcher.test.ts`). Record the counts as the Phase B baseline.
 
 Then check that every file Phase B modifies exists:
 
@@ -410,14 +410,16 @@ from pathlib import Path
 
 plan = Path("docs/superpowers/plans/2026-09-16-r2-brand-ssot-ai-labeling.md").read_text(encoding="utf-8")
 missing = []
+created = set()  # files an earlier task creates, such as the llms.txt route and label tests that Task 14 modifies
 for task in re.split(r"\n### Task ", plan)[1:]:
     number = int(task.split(":", 1)[0])
     if number in (2, 3, 4, 6, 7, 15):
         continue
     for path in re.findall(r"^- Modify: `([^`]+)`", task, flags=re.M):
         path = re.sub(r":\d+(-\d+)?$", "", path)
-        if not any(char in path for char in "{*") and not Path(path).exists():
+        if path not in created and not any(char in path for char in "{*") and not Path(path).exists():
             missing.append((number, path))
+    created.update(re.findall(r"^- Create: `([^`]+)`", task, flags=re.M))
 print(missing or "every Phase B path exists")
 EOF
 ```
@@ -425,6 +427,54 @@ EOF
 Expected: `every Phase B path exists`.
 
 Finally, the read-only Vercel check. In the project's Environment Variables settings, confirm that Production defines none of `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_BRAND_NAME`, `NEXT_PUBLIC_BRAND_SHORT_NAME` and `NEXT_PUBLIC_FOUNDER_NAME`, or that each equals the default. Read names only; the CLI has no credentials, so use the founder's logged-in Chrome. `lib/server/api-guard.ts` already reads `NEXT_PUBLIC_SITE_URL`. If it points anywhere but the canonical site, rule on it before Task 5, because canonical URLs would move.
+
+Then check that the files Phase B was rebased against did not change before the merge. The fingerprints below were taken on 2026-09-16 from the cost worktree, plus the two local `CLAUDE.md` files:
+
+```bash
+cd <repo-root> && shasum -a 256 -c <<'EOF'
+bc33c6df89c8f1c35e695e69f4ca31b2c4075d6f07761790dadf7265ddcb60cb  .github/workflows/daily-collect.yml
+0a12f7d78f24ce4f06936981084e6f6fe7908a840e4ef6cbc87d57428263465b  CLAUDE.md
+1e31cf196c7d41658dd41364af70a83e918b896c744a0b3ff4f4602b696ccb8c  README.md
+70bee4b43d80ada9d93ef7af4d248824c4a8c39b02a75f9b4b63b85d152975a5  ai-hub-backend/README.md
+c8b576fe8d91e83cf3288dbc9b1ab8b0a9aac1aceaa79b6d03b678d571f330c2  ai-information-hub/CLAUDE.md
+adaba2e9051631b5273bd3a5877a6fc9e08b0737b18ccdd1ca789fc56fe4cb02  ai-information-hub/README.md
+43c73587de02bab685f0b52d5b2832bb7e2611693964bfb5456c2a38351ef7ca  ai-information-hub/app/(localized)/[lang]/news/[periodId]/[storyId]/page.tsx
+56d561d83430dec1d543324b9bbc2dce30558d597a38bda71c456af538c63851  ai-information-hub/app/(localized)/[lang]/page.tsx
+142d8eaa6fa3b8c2980688f0d183c43b962d53a09b0439ac2aaea302ac8db206  ai-information-hub/app/(localized)/[lang]/tools/ai-news-aggregator/page.tsx
+e66f8abf2f09398670b24366187bd455ed41189d0011483a52551bd132eee026  ai-information-hub/app/(localized)/[lang]/tools/ai-news-api/page.tsx
+08fa1aff04719f3ca5ec46fb73ddecaf5c181cf429770f9d7edbd67736305664  ai-information-hub/app/(localized)/[lang]/tools/ai-report-generator/page.tsx
+e3557f28dc951b6d7db0964affec30c860d9b8caaf4bf8612c02a2facaf59260  ai-information-hub/app/(localized)/[lang]/tools/ai-stock-tracker/page.tsx
+2fa74c1494dd3941da9e4c6ea91fc6398174bd590e2235debeeff1a781cc2f7f  ai-information-hub/app/(localized)/[lang]/topic/[topic]/page.tsx
+0dbe3de03d72bf6613c2883fc05d2d3f1e9aac4e19e86a0e6fc05b3a039cf89f  ai-information-hub/app/(localized)/[lang]/week/[weekId]/page.tsx
+9f3aabfbff805e76554a3f2191c4ec4db23de94b92a35e0edba6a7860f0734f8  ai-information-hub/app/(site)/ai-disclosure/page.tsx
+8e4bc940e6c5738fc656790ca47a7efc2f4cf36fa4ca0384a547945a21a24f2a  ai-information-hub/app/(site)/login/layout.tsx
+2c91e4e5a99b5b9c322d9adcf00e0c105791bded5d3e8a8a2542970d74256774  ai-information-hub/app/(site)/login/page.tsx
+16ece465c6b3ced49bf5b8a1a3567333da69669a1fccfebc5045470b7b1502f7  ai-information-hub/app/(site)/page.tsx
+d9c5b55ca590f06bde306aab9ba26808b2bcab7f857be5c25f780192a97aad5c  ai-information-hub/app/(site)/trust-page.tsx
+4e5a784634eebbf15e740be61aa3274199acd8af9759dd6baafe719b5e316afc  ai-information-hub/app/(site)/week/[weekId]/page.tsx
+2803bfa481de9cafe9a3f856c45d499c16d53c16c4ee62920862b6cb34dc434d  ai-information-hub/app/api/chat/route.ts
+c943ee9b36122d51a1905d147bd9de57222ef9f6f10d6481dd1834be8765eb15  ai-information-hub/app/api/content-summary/route.ts
+5b218063357fb639b8e7c05284e70b41bf7dcc0f3a887f42289b53689cc77954  ai-information-hub/app/api/og/route.tsx
+738a72296436e1d0cc686a05784b1a1b8090b5bc4b31d8eb7c2c7a4f05bd1a99  ai-information-hub/app/feed.xml/route.ts
+e57545ae18b131f414147da7551c0ac2a8575d90be635b01de8fa3baf85aa2d9  ai-information-hub/app/news-sitemap.xml/route.ts
+3c9c06f3ee4b23acab7c8f6a47bf157b4981bd7c22993d609756e945df4ff996  ai-information-hub/app/newsletter.xml/route.ts
+b37e6a9e561b600e5812edbafefdd4782d9f3cf6e664f762f767a1c6a10cc79a  ai-information-hub/app/sitemap.ts
+2aa8652cafac8eec7d60a476dd83f1cfff1352534060a8aaf919dc611bd79a3a  ai-information-hub/components/feed.tsx
+31f1b89c95f98fa0d48be41643b60cfdf8a329a0bc8d80ffa540e648710ed5ca  ai-information-hub/components/home-page-client.tsx
+b08fd2d71cf2696da08a3be817cb2b377ec3524c22c25924b812e17cedd420d3  ai-information-hub/components/right-sidebar.tsx
+cef49074512ac64e4ffbb3e1793e19ea1ffbf4e8882b5e1ace3a6b77445a55fe  ai-information-hub/components/root-shell.tsx
+00ac1d92efe346916fefeca9c62d59b3a10ca17ebb6779050385dc7a0d5bf3cc  ai-information-hub/components/sidebar.tsx
+8a5590d4c9004918894515878a7f22a7423689876d6daeb5d243f6f8fd0332a3  ai-information-hub/components/structured-data.tsx
+a63e195a0b51101af77c37884a4e5e4e5e431019b7fbd8f6b2f805ecc99efa8c  ai-information-hub/lib/server/api-guard.ts
+e8b58669075e7af7d4feaa6d075380c47dc0e3d11aac88604bf0e863d126d914  ai-information-hub/lib/site-metadata.ts
+416e7d1248b2b288f6b6be35b26fdd4dcba02130c1621592692248570ac2f085  ai-information-hub/lib/translations.ts
+1189d819882da447050540f77e5be391ec3bb6619f023f20e7b581a71b49cbe6  ai-information-hub/next.config.mjs
+bf9be346d8c40d3f55a92f78090a06192f8a38a5684498ffba296d992005f56e  ai-information-hub/vitest.config.ts
+f09d4b23ea97295721a7c54a0b48584edd4eeeb29b5158982b8a4f7b6897bd7b  docs/documentation-maintenance.md
+EOF
+```
+
+Expected: every line ends in `OK`. For each `FAILED` file, re-check the anchors of every Phase B task that modifies it against the merged file.
 
 If a path is missing, or the cost work changed shape before merging, patch the affected task text, have the patch reviewed, and commit it before dispatching Task 1.
 
@@ -520,7 +570,7 @@ These are characterization goldens: they pin today's output before any brand cha
 - Create (generated): `ai-information-hub/test/golden/__goldens__/**`
 
 **Interfaces:**
-- **Consumes:** the existing route handlers, page modules and `components/structured-data.tsx`.
+- **Consumes:** the existing route handlers and page modules, `components/structured-data.tsx`, `lib/site-metadata.ts` with the two root layouts that export it (`app/(site)/layout.tsx`, `app/(localized)/[lang]/layout.tsx`), and `components/root-shell.tsx`.
 - **Produces:**
   - `test/fixtures/api.ts`: `LANGS`, `FIXED_NOW`, `PERIOD_ID`, `WEEK_ID`, `STORY_ID`, `TOPIC`, and `stubApiFetch(overrides?: Record<string, unknown>): string[]`.
   - `test/golden/golden.ts`: `expectGolden(text: string, name: string): Promise<void>`, `stableJson(value: unknown): string`, and `normalizeHtml(html: string): string`.
@@ -815,11 +865,12 @@ describe('structured data', () => {
 Create `ai-information-hub/test/golden/metadata.test.ts`:
 
 ```ts
-import { afterEach, beforeEach, describe, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { FIXED_NOW, LANGS, PERIOD_ID, STORY_ID, TOPIC, stubApiFetch } from '../fixtures/api'
 import { expectGolden, stableJson } from './golden'
 
-// next/font and analytics only work inside the Next.js compiler; the home client component is not metadata.
+// Both root layouts load next/font and analytics through components/root-shell.tsx; those only work inside
+// the Next.js compiler. The home client component is not metadata.
 vi.mock('next/font/google', () => ({
   Geist: () => ({ variable: 'font-geist-sans' }),
   Geist_Mono: () => ({ variable: 'font-geist-mono' }),
@@ -843,37 +894,45 @@ function params<T>(value: T) {
 }
 
 describe('metadata', () => {
-  it('root layout and static pages', async () => {
-    const modules = {
-      layout: await import('@/app/layout'),
-      home: await import('@/app/page'),
-      about: await import('@/app/about/page'),
-      aiDisclosure: await import('@/app/ai-disclosure/page'),
-      contact: await import('@/app/contact/page'),
-      corrections: await import('@/app/corrections/page'),
-      datenschutz: await import('@/app/datenschutz/page'),
-      editorialPolicy: await import('@/app/editorial-policy/page'),
-      forTeams: await import('@/app/for-teams/page'),
-      funding: await import('@/app/funding/page'),
-      impressum: await import('@/app/impressum/page'),
-      login: await import('@/app/login/layout'),
-      premium: await import('@/app/premium/page'),
-      sourceMethodology: await import('@/app/source-methodology/page'),
-      unsubscribe: await import('@/app/unsubscribe/page'),
+  it('site metadata and static pages', async () => {
+    // lib/site-metadata.ts holds the site-wide metadata; both root layouts export it as is.
+    const { siteMetadata, siteViewport } = await import('@/lib/site-metadata')
+    for (const layout of [await import('@/app/(site)/layout'), await import('@/app/(localized)/[lang]/layout')]) {
+      expect(layout.metadata).toBe(siteMetadata)
+      expect(layout.viewport).toBe(siteViewport)
     }
-    const metadata = Object.fromEntries(Object.entries(modules).map(([name, mod]) => [name, mod.metadata]))
+    const modules = {
+      home: await import('@/app/(site)/page'),
+      about: await import('@/app/(site)/about/page'),
+      aiDisclosure: await import('@/app/(site)/ai-disclosure/page'),
+      contact: await import('@/app/(site)/contact/page'),
+      corrections: await import('@/app/(site)/corrections/page'),
+      datenschutz: await import('@/app/(site)/datenschutz/page'),
+      editorialPolicy: await import('@/app/(site)/editorial-policy/page'),
+      forTeams: await import('@/app/(site)/for-teams/page'),
+      funding: await import('@/app/(site)/funding/page'),
+      impressum: await import('@/app/(site)/impressum/page'),
+      login: await import('@/app/(site)/login/layout'),
+      premium: await import('@/app/(site)/premium/page'),
+      sourceMethodology: await import('@/app/(site)/source-methodology/page'),
+      unsubscribe: await import('@/app/(site)/unsubscribe/page'),
+    }
+    const metadata = {
+      siteMetadata,
+      ...Object.fromEntries(Object.entries(modules).map(([name, mod]) => [name, mod.metadata])),
+    }
     await expectGolden(stableJson(metadata), 'metadata-static.json')
   })
 
   it.each(LANGS)('localized pages in %s', async (lang) => {
-    const home = await import('@/app/[lang]/page')
-    const week = await import('@/app/[lang]/week/[weekId]/page')
-    const topic = await import('@/app/[lang]/topic/[topic]/page')
-    const article = await import('@/app/[lang]/news/[periodId]/[storyId]/page')
-    const aggregator = await import('@/app/[lang]/tools/ai-news-aggregator/page')
-    const api = await import('@/app/[lang]/tools/ai-news-api/page')
-    const report = await import('@/app/[lang]/tools/ai-report-generator/page')
-    const stock = await import('@/app/[lang]/tools/ai-stock-tracker/page')
+    const home = await import('@/app/(localized)/[lang]/page')
+    const week = await import('@/app/(localized)/[lang]/week/[weekId]/page')
+    const topic = await import('@/app/(localized)/[lang]/topic/[topic]/page')
+    const article = await import('@/app/(localized)/[lang]/news/[periodId]/[storyId]/page')
+    const aggregator = await import('@/app/(localized)/[lang]/tools/ai-news-aggregator/page')
+    const api = await import('@/app/(localized)/[lang]/tools/ai-news-api/page')
+    const report = await import('@/app/(localized)/[lang]/tools/ai-report-generator/page')
+    const stock = await import('@/app/(localized)/[lang]/tools/ai-stock-tracker/page')
     const metadata = {
       home: await home.generateMetadata(params({ lang })),
       week: await week.generateMetadata(params({ lang, weekId: PERIOD_ID })),
@@ -912,6 +971,13 @@ vi.mock('next/navigation', async (importOriginal) => ({
   useRouter: () => ({ push: () => undefined, replace: () => undefined, prefetch: () => undefined }),
 }))
 vi.mock('@/components/home-page-client', () => ({ default: () => null }))
+// The root shell loads next/font and analytics, which only work inside the Next.js compiler.
+vi.mock('next/font/google', () => ({
+  Geist: () => ({ variable: 'font-geist-sans' }),
+  Geist_Mono: () => ({ variable: 'font-geist-mono' }),
+  Newsreader: () => ({ variable: 'font-newsreader' }),
+}))
+vi.mock('@vercel/analytics/next', () => ({ Analytics: () => null }))
 
 type AnyElement = ReactElement<Record<string, unknown>>
 
@@ -942,25 +1008,25 @@ async function render(element: ReactElement | Promise<ReactElement>): Promise<st
 }
 
 const TOOLS = {
-  'ai-news-aggregator': () => import('@/app/[lang]/tools/ai-news-aggregator/page'),
-  'ai-news-api': () => import('@/app/[lang]/tools/ai-news-api/page'),
-  'ai-report-generator': () => import('@/app/[lang]/tools/ai-report-generator/page'),
-  'ai-stock-tracker': () => import('@/app/[lang]/tools/ai-stock-tracker/page'),
+  'ai-news-aggregator': () => import('@/app/(localized)/[lang]/tools/ai-news-aggregator/page'),
+  'ai-news-api': () => import('@/app/(localized)/[lang]/tools/ai-news-api/page'),
+  'ai-report-generator': () => import('@/app/(localized)/[lang]/tools/ai-report-generator/page'),
+  'ai-stock-tracker': () => import('@/app/(localized)/[lang]/tools/ai-stock-tracker/page'),
 }
 
 const STATIC_PAGES: Record<string, () => Promise<{ default: ComponentType }>> = {
-  about: () => import('@/app/about/page'),
-  'ai-disclosure': () => import('@/app/ai-disclosure/page'),
-  'editorial-policy': () => import('@/app/editorial-policy/page'),
-  'source-methodology': () => import('@/app/source-methodology/page'),
-  corrections: () => import('@/app/corrections/page'),
-  contact: () => import('@/app/contact/page'),
-  impressum: () => import('@/app/impressum/page'),
-  datenschutz: () => import('@/app/datenschutz/page'),
-  premium: () => import('@/app/premium/page'),
-  'for-teams': () => import('@/app/for-teams/page'),
-  funding: () => import('@/app/funding/page'),
-  login: () => import('@/app/login/page'),
+  about: () => import('@/app/(site)/about/page'),
+  'ai-disclosure': () => import('@/app/(site)/ai-disclosure/page'),
+  'editorial-policy': () => import('@/app/(site)/editorial-policy/page'),
+  'source-methodology': () => import('@/app/(site)/source-methodology/page'),
+  corrections: () => import('@/app/(site)/corrections/page'),
+  contact: () => import('@/app/(site)/contact/page'),
+  impressum: () => import('@/app/(site)/impressum/page'),
+  datenschutz: () => import('@/app/(site)/datenschutz/page'),
+  premium: () => import('@/app/(site)/premium/page'),
+  'for-teams': () => import('@/app/(site)/for-teams/page'),
+  funding: () => import('@/app/(site)/funding/page'),
+  login: () => import('@/app/(site)/login/page'),
 }
 
 describe('rendered pages', () => {
@@ -972,25 +1038,32 @@ describe('rendered pages', () => {
   }
 
   it('home page in en', async () => {
-    const { default: Page } = await import('@/app/[lang]/page')
+    const { default: Page } = await import('@/app/(localized)/[lang]/page')
     await expectGolden(await render(Page({ params: Promise.resolve({ lang: 'en' }) })), 'pages/home-en.html')
   })
 
   it.each(['en', 'de', 'zh'])('week page in %s', async (lang) => {
-    const { default: Page } = await import('@/app/[lang]/week/[weekId]/page')
+    const { default: Page } = await import('@/app/(localized)/[lang]/week/[weekId]/page')
     await expectGolden(await render(Page({ params: Promise.resolve({ lang, weekId: PERIOD_ID }) })), `pages/week-${lang}.html`)
   })
 
   it.each(['en', 'zh'])('article page in %s', async (lang) => {
-    const { default: Page } = await import('@/app/[lang]/news/[periodId]/[storyId]/page')
+    const { default: Page } = await import('@/app/(localized)/[lang]/news/[periodId]/[storyId]/page')
     const props = { params: Promise.resolve({ lang, periodId: PERIOD_ID, storyId: STORY_ID }) }
     await expectGolden(await render(Page(props)), `pages/article-${lang}.html`)
   })
 
   it('topic page in en', async () => {
-    const { default: Page } = await import('@/app/[lang]/topic/[topic]/page')
+    const { default: Page } = await import('@/app/(localized)/[lang]/topic/[topic]/page')
     const props = { params: Promise.resolve({ lang: 'en', topic: TOPIC }), searchParams: Promise.resolve({ period: PERIOD_ID }) }
     await expectGolden(await render(Page(props)), 'pages/topic-en.html')
+  })
+
+  // The <html> shell of both root layouts: preconnect links, the site-wide JSON-LD and the feed discovery links.
+  it.each(['en', 'zh'] as const)('root shell in %s', async (lang) => {
+    const { RootShell } = await import('@/components/root-shell')
+    const shell = createElement(RootShell, { lang, children: createElement('p', null, 'Page body') })
+    await expectGolden(await render(shell), `pages/root-shell-${lang}.html`)
   })
 
   for (const [name, load] of Object.entries(STATIC_PAGES)) {
@@ -1032,7 +1105,7 @@ describe('brand-bearing static files', () => {
 
 Run: `cd <repo-root>/ai-information-hub && export PATH=/usr/local/bin:$PATH && node --version && npx vitest run test/golden -u`
 
-Expected: `node --version` prints `v22.x`; all tests pass, and `test/golden/__goldens__/` holds:
+Expected: `node --version` prints `v22.x`; all 71 tests pass (`Snapshots  71 written`), and `test/golden/__goldens__/` holds:
 
 | Group | Files |
 |---|---|
@@ -1044,6 +1117,7 @@ Expected: `node --version` prints `v22.x`; all tests pass, and `test/golden/__go
 | Metadata | `metadata-static.json`, `metadata-{de,en,zh,fr,es,pt,ja,ko}.json` |
 | Tool pages | `pages/tool-{ai-news-aggregator,ai-news-api,ai-report-generator,ai-stock-tracker}-{en,zh}.html` |
 | Period, article, topic pages | `pages/home-en.html`, `pages/week-{en,de,zh}.html`, `pages/article-{en,zh}.html`, `pages/topic-en.html` |
+| Root shell of both root layouts | `pages/root-shell-{en,zh}.html` |
 | Static pages | `pages/{about,ai-disclosure,editorial-policy,source-methodology,corrections,contact,impressum,datenschutz,premium,for-teams,funding,login}.html` |
 | Static files | `robots.txt`, `llms.txt` |
 
@@ -1056,10 +1130,10 @@ git -C <repo-root> diff --exit-code -- ai-information-hub/test/golden/__goldens_
 ```
 
 Expected:
-- both runs pass without `-u`;
+- both runs pass without `-u` (`Tests  71 passed (71)`);
 - `git diff --exit-code` exits 0, so a run rewrites nothing.
 
-Goldens that contain dates depend on Node's ICU data. CI runs Node 22 and the default local Node is 24, so Step 9 captures under Node 22 while Step 10 re-runs under the default Node. The plan review found the goldens identical under both, apart from the login page that the `Math.random` stub fixes. If CI still fails only on date strings, record both Node versions and the differing lines in the ledger, and recapture under Node 22.
+Goldens that contain dates depend on Node's ICU data. CI runs Node 22 and the default local Node is 24, so Step 9 captures under Node 22 while Step 10 re-runs under the default Node. The plan review found the goldens identical under both, apart from the login page that the `Math.random` stub fixes. The rebase check on the cost tree (2026-09-16) captured under Node 22 and re-ran under Node 22 with `TZ=UTC CI=true` and under Node 24 in the local time zone: no golden changed. If CI still fails only on date strings, record both Node versions and the differing lines in the ledger, and recapture under Node 22.
 
 - [ ] **Step 11: Check the golden content**
 
@@ -1088,13 +1162,13 @@ cd <repo-root>/ai-information-hub && npx vitest run test/golden/routes.test.ts
 ```
 
 Expected:
-- the first run fails on `feed-en.xml` only, with `exit=1`;
+- the first run fails on `feed-en.xml` only (`Tests  1 failed | 21 passed (22)`), with `exit=1`;
 - after the checkout, the run passes.
 
 - [ ] **Step 13: Run the frontend suite**
 
 Run: `cd <repo-root>/ai-information-hub && npm run lint && npm test`
-Expected: the type check is clean, and all tests pass (the 29 existing tests plus the new goldens).
+Expected: the type check is clean, and all tests pass: `Tests  129 passed (129)` in 10 files (the 58 existing tests plus the 71 goldens).
 
 - [ ] **Step 14: Commit**
 
@@ -1927,7 +2001,7 @@ Create `scripts/page_snapshot_paths.txt`:
 # Live data: these pages also change when a collection or backfill changes the stories.
 /en
 /de
-/en/topic/openai?period=2026-09-13
+/en/topic/openai
 /en/tools/ai-news-aggregator
 /zh/tools/ai-news-aggregator
 ```
@@ -2178,7 +2252,7 @@ export function absoluteUrl(path: string, brand: Brand = BRAND): string {
   return `${brand.siteUrl}${path.startsWith('/') ? path : `/${path}`}`
 }
 
-/** "<title> | <brand>": the format the root layout's title template produces. */
+/** "<title> | <brand>": the format the title template in lib/site-metadata.ts produces. */
 export function brandedTitle(title: string, brand: Brand = BRAND): string {
   return `${title} | ${brand.name}`
 }
@@ -2237,7 +2311,7 @@ describe('next.config redirects', () => {
 - [ ] **Step 6: Run the tests to see them fail**
 
 Run: `cd <repo-root>/ai-information-hub && npx vitest run test/next-config.test.ts`
-Expected: FAIL with `config.redirects is not a function`.
+Expected: FAIL in all 3 tests with `Error: next.config.mjs must define redirects()`.
 
 - [ ] **Step 7: Move the redirect into `next.config.mjs`**
 
@@ -2356,9 +2430,9 @@ cd <repo-root>/ai-information-hub && npx vitest run test/golden && npm run lint 
 
 Expected:
 - `brand guard: clean`;
-- the goldens pass unchanged;
+- the goldens pass unchanged (`Tests  71 passed (71)`);
 - the type check is clean;
-- all tests pass.
+- all tests pass: `Tests  141 passed (141)` in 12 files.
 
 - [ ] **Step 11: Commit**
 
@@ -3075,14 +3149,16 @@ Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
 
 ### Task 8: Shared frontend surfaces
 
-This task applies the Brand replacement rules to the root layout, both home pages, the JSON-LD components, the sitemaps, the Atom feeds, the content summary, the OG image and the chat prompt.
+This task applies the Brand replacement rules to the site metadata and the `<html>` shell that both root layouts share, both home pages, the JSON-LD components, the sitemaps, the Atom feeds, the content summary, the OG image and the chat prompt.
 - The only intended golden change is B1 in `structured-data.json`: `SoftwareApplicationSchema` spelled "DataCube AI".
-- `app/layout.tsx` keeps rendering `authors` as "Data Cube Team" until Task 16.
+- `lib/site-metadata.ts` keeps `authors` as "Data Cube Team" until Task 16.
+- The root layouts `app/(site)/layout.tsx` and `app/(localized)/[lang]/layout.tsx` contain no brand string: they export `siteMetadata` and render `RootShell`, so they stay unchanged.
 
 **Files:**
-- Modify: `ai-information-hub/app/layout.tsx`
-- Modify: `ai-information-hub/app/page.tsx`
-- Modify: `ai-information-hub/app/[lang]/page.tsx`
+- Modify: `ai-information-hub/lib/site-metadata.ts`
+- Modify: `ai-information-hub/components/root-shell.tsx`
+- Modify: `ai-information-hub/app/(site)/page.tsx`
+- Modify: `ai-information-hub/app/(localized)/[lang]/page.tsx`
 - Modify: `ai-information-hub/components/structured-data.tsx`
 - Modify: `ai-information-hub/app/sitemap.ts`
 - Modify: `ai-information-hub/app/news-sitemap.xml/route.ts`
@@ -3098,13 +3174,14 @@ This task applies the Brand replacement rules to the root layout, both home page
 
 - [ ] **Step 1: List the brand lines in the task's files**
 
-Run: `git -C <repo-root> grep -n -E "Data ?Cube|datacubeai" -- ai-information-hub/app/layout.tsx ai-information-hub/app/page.tsx ':(literal)ai-information-hub/app/[lang]/page.tsx' ai-information-hub/components/structured-data.tsx ai-information-hub/app/sitemap.ts ai-information-hub/app/news-sitemap.xml/route.ts ai-information-hub/app/feed.xml/route.ts ai-information-hub/app/newsletter.xml/route.ts ai-information-hub/app/api/content-summary/route.ts ai-information-hub/app/api/og/route.tsx ai-information-hub/app/api/chat/route.ts`
+Run: `git -C <repo-root> grep -n -E "Data ?Cube|datacubeai" -- ai-information-hub/lib/site-metadata.ts ai-information-hub/components/root-shell.tsx 'ai-information-hub/app/(site)/page.tsx' ':(literal)ai-information-hub/app/(localized)/[lang]/page.tsx' ai-information-hub/components/structured-data.tsx ai-information-hub/app/sitemap.ts ai-information-hub/app/news-sitemap.xml/route.ts ai-information-hub/app/feed.xml/route.ts ai-information-hub/app/newsletter.xml/route.ts ai-information-hub/app/api/content-summary/route.ts ai-information-hub/app/api/og/route.tsx ai-information-hub/app/api/chat/route.ts`
 
-Expected: about 164 lines. The biggest contributors are `structured-data.tsx` (55), `page.tsx` (24) and `layout.tsx` (23).
+Expected: 164 lines. The biggest contributors are `structured-data.tsx` (55), `app/(site)/page.tsx` (24), `lib/site-metadata.ts` (22) and `app/(localized)/[lang]/page.tsx` (19); `components/root-shell.tsx` has 1.
 
 - [ ] **Step 2: Apply the rules file by file**
 
-**`app/layout.tsx`**
+**`lib/site-metadata.ts`** (the `siteMetadata` object both root layouts export)
+- Add `import { BRAND, absoluteUrl } from '@/lib/brand'`.
 - `metadataBase: new URL(BRAND.siteUrl)`.
 - `title.default: `${BRAND.name} | Daily AI News, Investment Signals & Practical Tips``; `title.template: `%s | ${BRAND.name}``.
 - `authors: [{ name: `${BRAND.shortName} Team` }]`. The output is unchanged; Task 16 replaces it.
@@ -3112,16 +3189,20 @@ Expected: about 164 lines. The biggest contributors are `structured-data.tsx` (5
 - `openGraph.url: BRAND.siteUrl`; `openGraph.siteName: BRAND.name`.
 - The Open Graph and Twitter titles and image `alt` texts become template literals with `${BRAND.name}`.
 - `alternates.canonical: BRAND.siteUrl`; each language `absoluteUrl('/de')` … `absoluteUrl('/ko')`; `'x-default': BRAND.siteUrl`.
-- The feed discovery links: `title={`${BRAND.name} (${l.toUpperCase()})`}`.
 
-**`app/page.tsx`**
+**`components/root-shell.tsx`** (the `<html>` shell both root layouts render)
+- Add `import { BRAND } from '@/lib/brand'`.
+- The feed discovery links: `title={`Data Cube AI (${l.toUpperCase()})`}` becomes `title={`${BRAND.name} (${l.toUpperCase()})`}`.
+- Leave the rest unchanged, including the `OrganizationSchema`, `WebsiteSchema` and `FAQSchema` elements. The golden `pages/root-shell-{en,zh}.html` pins this output.
+
+**`app/(site)/page.tsx`**
 - `title: { absolute: `${BRAND.name} | Daily AI News` }`.
 - `canonical: absoluteUrl('/en')`; languages `absoluteUrl('/de')` …; `'x-default': absoluteUrl('/')`, because the old value ends in `/`.
 - `openGraph.url: absoluteUrl('/en')`.
 - Titles and image `alt` texts become template literals.
 - The eight `h1:` values become template literals starting with `${BRAND.name}`.
 
-**`app/[lang]/page.tsx`**
+**`app/(localized)/[lang]/page.tsx`**
 - The `META` `title` and `ogAlt` values become template literals.
 - `localizedHome = absoluteUrl(`/${lang}`)`.
 - `'x-default': BRAND.siteUrl`.
@@ -3178,7 +3259,7 @@ Expected: about 164 lines. The biggest contributors are `structured-data.tsx` (5
 - [ ] **Step 3: Guard and type check**
 
 ```bash
-cd <repo-root> && python3 scripts/brand_guard.py ai-information-hub/app/layout.tsx ai-information-hub/app/page.tsx 'ai-information-hub/app/[lang]/page.tsx' ai-information-hub/components/structured-data.tsx ai-information-hub/app/sitemap.ts ai-information-hub/app/news-sitemap.xml/route.ts ai-information-hub/app/feed.xml/route.ts ai-information-hub/app/newsletter.xml/route.ts ai-information-hub/app/api/content-summary/route.ts ai-information-hub/app/api/og/route.tsx ai-information-hub/app/api/chat/route.ts
+cd <repo-root> && python3 scripts/brand_guard.py ai-information-hub/lib/site-metadata.ts ai-information-hub/components/root-shell.tsx 'ai-information-hub/app/(site)/page.tsx' 'ai-information-hub/app/(localized)/[lang]/page.tsx' ai-information-hub/components/structured-data.tsx ai-information-hub/app/sitemap.ts ai-information-hub/app/news-sitemap.xml/route.ts ai-information-hub/app/feed.xml/route.ts ai-information-hub/app/newsletter.xml/route.ts ai-information-hub/app/api/content-summary/route.ts ai-information-hub/app/api/og/route.tsx ai-information-hub/app/api/chat/route.ts
 cd <repo-root>/ai-information-hub && npm run lint
 ```
 
@@ -3210,7 +3291,7 @@ EOF
 
 Expected: exactly one line, `B1 only: ai-information-hub/test/golden/__goldens__/structured-data.json`.
 
-If any other golden fails, the edit changed output. Fix the code rather than the golden.
+If any other golden fails, the edit changed output. Fix the code rather than the golden. In particular, `metadata-static.json` (the site metadata) and `pages/root-shell-{en,zh}.html` (the feed discovery link titles) must pass unchanged.
 
 - [ ] **Step 5: Frontend suite**
 
@@ -3220,8 +3301,8 @@ Expected: all tests pass.
 - [ ] **Step 6: Commit**
 
 ```bash
-git -C <repo-root> add ai-information-hub/app/layout.tsx ai-information-hub/app/page.tsx ':(literal)ai-information-hub/app/[lang]/page.tsx' ai-information-hub/components/structured-data.tsx ai-information-hub/app/sitemap.ts ai-information-hub/app/news-sitemap.xml/route.ts ai-information-hub/app/feed.xml/route.ts ai-information-hub/app/newsletter.xml/route.ts ai-information-hub/app/api/content-summary/route.ts ai-information-hub/app/api/og/route.tsx ai-information-hub/app/api/chat/route.ts ai-information-hub/test/golden/__goldens__/structured-data.json
-git -C <repo-root> commit -m "refactor(brand): layout, home, JSON-LD, sitemaps, feeds, summary and OG read the brand config (B1)
+git -C <repo-root> add ai-information-hub/lib/site-metadata.ts ai-information-hub/components/root-shell.tsx 'ai-information-hub/app/(site)/page.tsx' ':(literal)ai-information-hub/app/(localized)/[lang]/page.tsx' ai-information-hub/components/structured-data.tsx ai-information-hub/app/sitemap.ts ai-information-hub/app/news-sitemap.xml/route.ts ai-information-hub/app/feed.xml/route.ts ai-information-hub/app/newsletter.xml/route.ts ai-information-hub/app/api/content-summary/route.ts ai-information-hub/app/api/og/route.tsx ai-information-hub/app/api/chat/route.ts ai-information-hub/test/golden/__goldens__/structured-data.json
+git -C <repo-root> commit -m "refactor(brand): site metadata, root shell, home, JSON-LD, sitemaps, feeds, summary and OG read the brand config (B1)
 
 Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
 ```
@@ -3236,10 +3317,10 @@ The four tool pages hold about 170 brand strings, most of them in per-page trans
 - The only intended golden change is B1.
 
 **Files:**
-- Modify: `ai-information-hub/app/[lang]/tools/ai-news-aggregator/page.tsx`
-- Modify: `ai-information-hub/app/[lang]/tools/ai-news-api/page.tsx`
-- Modify: `ai-information-hub/app/[lang]/tools/ai-report-generator/page.tsx`
-- Modify: `ai-information-hub/app/[lang]/tools/ai-stock-tracker/page.tsx`
+- Modify: `ai-information-hub/app/(localized)/[lang]/tools/ai-news-aggregator/page.tsx`
+- Modify: `ai-information-hub/app/(localized)/[lang]/tools/ai-news-api/page.tsx`
+- Modify: `ai-information-hub/app/(localized)/[lang]/tools/ai-report-generator/page.tsx`
+- Modify: `ai-information-hub/app/(localized)/[lang]/tools/ai-stock-tracker/page.tsx`
 - Modify (regenerated): `ai-information-hub/test/golden/__goldens__/metadata-*.json`, `ai-information-hub/test/golden/__goldens__/pages/tool-*.html`
 
 **Interfaces:**
@@ -3257,7 +3338,7 @@ from pathlib import Path
 
 LANG_LINE = re.compile(r"^\s+(de|en|zh|fr|es|pt|ja|ko): ")
 for slug in ("ai-news-aggregator", "ai-news-api", "ai-report-generator", "ai-stock-tracker"):
-    path = Path(f"ai-information-hub/app/[lang]/tools/{slug}/page.tsx")
+    path = Path(f"ai-information-hub/app/(localized)/[lang]/tools/{slug}/page.tsx")
     lines = path.read_text(encoding="utf-8").split("\n")
     changed = 0
     for index, line in enumerate(lines):
@@ -3282,7 +3363,7 @@ const t = (map: L, lang: string) => fillBrand(map[lang] || map.en)
 
 - [ ] **Step 3: Replace what the script did not cover**
 
-Run: `git -C <repo-root> grep -n -E "Data ?Cube|datacubeai" -- ':(literal)ai-information-hub/app/[lang]/tools'`
+Run: `git -C <repo-root> grep -n -i -E "data[ _-]?cube" -- ':(literal)ai-information-hub/app/(localized)/[lang]/tools'`
 
 Replace every remaining hit:
 
@@ -3293,6 +3374,7 @@ Replace every remaining hit:
 | `alt: 'DataCube AI …'` | `` alt: `${BRAND.name} …` `` |
 | JSX text `DataCube AI` | `{BRAND.name}` |
 | `Data Cube AI · Tools` | `{BRAND.name} · Tools` |
+| The comparison-table key `datacube` in the aggregator page: the `COMPARE_ROWS` type, its eight rows (`datacube: true, …`) and `row.datacube` | the key `ours`. The key is never rendered, so the goldens do not change |
 | A map value that sits on its own line after the language key | the placeholder `{brand}` |
 
 Run the grep again. Expected: no output.
@@ -3338,7 +3420,7 @@ If a golden shows `{brand}` or `OTHER CHANGES`, a map value reaches the output w
 - [ ] **Step 6: Guard, type check, suite**
 
 ```bash
-cd <repo-root> && python3 scripts/brand_guard.py 'ai-information-hub/app/[lang]/tools/ai-news-aggregator/page.tsx' 'ai-information-hub/app/[lang]/tools/ai-news-api/page.tsx' 'ai-information-hub/app/[lang]/tools/ai-report-generator/page.tsx' 'ai-information-hub/app/[lang]/tools/ai-stock-tracker/page.tsx'
+cd <repo-root> && python3 scripts/brand_guard.py 'ai-information-hub/app/(localized)/[lang]/tools/ai-news-aggregator/page.tsx' 'ai-information-hub/app/(localized)/[lang]/tools/ai-news-api/page.tsx' 'ai-information-hub/app/(localized)/[lang]/tools/ai-report-generator/page.tsx' 'ai-information-hub/app/(localized)/[lang]/tools/ai-stock-tracker/page.tsx'
 cd <repo-root>/ai-information-hub && npm run lint && npm test
 ```
 
@@ -3350,7 +3432,7 @@ Expected:
 - [ ] **Step 7: Commit**
 
 ```bash
-git -C <repo-root> add ':(literal)ai-information-hub/app/[lang]/tools' ai-information-hub/test/golden/__goldens__
+git -C <repo-root> add ':(literal)ai-information-hub/app/(localized)/[lang]/tools' ai-information-hub/test/golden/__goldens__
 git -C <repo-root> commit -m "refactor(brand): tool pages fill the brand from the config (B1)
 
 Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
@@ -3363,17 +3445,17 @@ Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
 This task brands the period, article and topic pages from the config and fixes the double-branded week and not-found titles (B2). The takeaways anchor moves to `FROZEN_IDS`. The editorial byline stays for now, with its spelling unified (B1); Task 13 replaces it.
 
 **Files:**
-- Modify: `ai-information-hub/app/week/[weekId]/page.tsx`
-- Modify: `ai-information-hub/app/[lang]/week/[weekId]/page.tsx`
-- Modify: `ai-information-hub/app/[lang]/news/[periodId]/[storyId]/page.tsx`
-- Modify: `ai-information-hub/app/[lang]/topic/[topic]/page.tsx`
+- Modify: `ai-information-hub/app/(site)/week/[weekId]/page.tsx`
+- Modify: `ai-information-hub/app/(localized)/[lang]/week/[weekId]/page.tsx`
+- Modify: `ai-information-hub/app/(localized)/[lang]/news/[periodId]/[storyId]/page.tsx`
+- Modify: `ai-information-hub/app/(localized)/[lang]/topic/[topic]/page.tsx`
 - Modify (regenerated): `metadata-*.json`, `pages/week-*.html`
 
 **Interfaces:**
 - **Consumes:** `BRAND`, `FROZEN_IDS`, `absoluteUrl`, `brandedTitle`, `fillBrand` (Task 5); the goldens from Task 1.
 - **Produces:** the week page still renders the byline span and `labelEditorialAttribution`. Task 13 replaces both.
 
-- [ ] **Step 1: `app/week/[weekId]/page.tsx`**
+- [ ] **Step 1: `app/(site)/week/[weekId]/page.tsx`**
 
 **Helper and imports**
 - Import `BRAND, FROZEN_IDS, absoluteUrl, brandedTitle, fillBrand` from `@/lib/brand`.
@@ -3397,19 +3479,32 @@ This task brands the period, article and topic pages from the config and fixes t
 - `CollectionPageSchema`: `name={brandedTitle(t(metaTitles(periodLabel), lang))}`.
 - `speakableCssSelector={takeawayBullets.length > 0 ? [`#${FROZEN_IDS.takeawaysAnchorId}`] : undefined}`.
 - The takeaways section: `id={FROZEN_IDS.takeawaysAnchorId}`.
-- The comment naming the anchor refers to "the takeaways anchor (`FROZEN_IDS.takeawaysAnchorId`)".
-- The byline span: `<span className="font-medium">{BRAND.name} Editorial</span>`.
-- The comment "Honestly attributed to DataCube AI Editorial (never an invented human)" becomes "Labeled as AI-generated with a link to /ai-disclosure (never an invented human)".
+- In the Key Takeaways comment, ``The #dcai-takeaways id is referenced as the `speakable` cssSelector`` becomes ``The takeaways anchor (FROZEN_IDS.takeawaysAnchorId) is referenced as the `speakable` cssSelector``.
+- The byline span `<span className="font-medium">Data Cube AI Editorial</span>` becomes `<span className="font-medium">{BRAND.name} Editorial</span>`.
+- In the comment above the editorial brief, replace these two lines:
+
+```tsx
+          Honestly attributed to DataCube AI Editorial (never an invented
+          human) with a link to /ai-disclosure. */}
+```
+
+with:
+
+```tsx
+          Labeled as AI-generated with a link to /ai-disclosure (never an
+          invented human). */}
+```
+
 - `ArticleSchema`: `url={absoluteUrl(articleHref(lang, weekId, techStoryId(post)))}`.
 
-- [ ] **Step 2: `app/[lang]/week/[weekId]/page.tsx`**
+- [ ] **Step 2: `app/(localized)/[lang]/week/[weekId]/page.tsx`**
 
 - Import `absoluteUrl`.
 - `'x-default': absoluteUrl(`/en/week/${weekId}`)`.
 - `hreflangEntries[toBcp47(code)] = absoluteUrl(`/${code}/week/${weekId}`)`.
 - `canonical: absoluteUrl(`/${lang}/week/${weekId}`)`.
 
-- [ ] **Step 3: `app/[lang]/news/[periodId]/[storyId]/page.tsx`**
+- [ ] **Step 3: `app/(localized)/[lang]/news/[periodId]/[storyId]/page.tsx`**
 
 **Helper and imports**
 - Import `BRAND, fillBrand`.
@@ -3427,7 +3522,7 @@ This task brands the period, article and topic pages from the config and fixes t
   - `publisher.name: BRAND.name`;
   - the breadcrumb `name: BRAND.name`.
 
-- [ ] **Step 4: `app/[lang]/topic/[topic]/page.tsx`**
+- [ ] **Step 4: `app/(localized)/[lang]/topic/[topic]/page.tsx`**
 
 - Import `BRAND, absoluteUrl`.
 - Breadcrumb items: `absoluteUrl(`/${lang}`)` and `absoluteUrl(`/${lang}/topic/${topic}`)`.
@@ -3439,7 +3534,7 @@ This task brands the period, article and topic pages from the config and fixes t
 - [ ] **Step 5: Guard and type check**
 
 ```bash
-cd <repo-root> && python3 scripts/brand_guard.py 'ai-information-hub/app/week/[weekId]/page.tsx' 'ai-information-hub/app/[lang]/week/[weekId]/page.tsx' 'ai-information-hub/app/[lang]/news/[periodId]/[storyId]/page.tsx' 'ai-information-hub/app/[lang]/topic/[topic]/page.tsx'
+cd <repo-root> && python3 scripts/brand_guard.py 'ai-information-hub/app/(site)/week/[weekId]/page.tsx' 'ai-information-hub/app/(localized)/[lang]/week/[weekId]/page.tsx' 'ai-information-hub/app/(localized)/[lang]/news/[periodId]/[storyId]/page.tsx' 'ai-information-hub/app/(localized)/[lang]/topic/[topic]/page.tsx'
 cd <repo-root>/ai-information-hub && npm run lint
 ```
 
@@ -3475,7 +3570,7 @@ Expected: all tests pass.
 - [ ] **Step 8: Commit**
 
 ```bash
-git -C <repo-root> add ':(literal)ai-information-hub/app/week/[weekId]/page.tsx' ':(literal)ai-information-hub/app/[lang]/week/[weekId]/page.tsx' ':(literal)ai-information-hub/app/[lang]/news/[periodId]/[storyId]/page.tsx' ':(literal)ai-information-hub/app/[lang]/topic/[topic]/page.tsx' ai-information-hub/test/golden/__goldens__
+git -C <repo-root> add ':(literal)ai-information-hub/app/(site)/week/[weekId]/page.tsx' ':(literal)ai-information-hub/app/(localized)/[lang]/week/[weekId]/page.tsx' ':(literal)ai-information-hub/app/(localized)/[lang]/news/[periodId]/[storyId]/page.tsx' ':(literal)ai-information-hub/app/(localized)/[lang]/topic/[topic]/page.tsx' ai-information-hub/test/golden/__goldens__
 git -C <repo-root> commit -m "refactor(brand): week, article and topic pages read the brand config; single-branded titles (B1, B2)
 
 Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
@@ -3491,9 +3586,9 @@ This task brands the static pages, the SPA components and the login page from th
 - `lib/settings-context.tsx` stays unchanged (Ruling R-4).
 
 **Files:**
-- Modify: `ai-information-hub/app/{about,ai-disclosure,editorial-policy,source-methodology,corrections,contact,impressum,datenschutz,premium,for-teams,funding}/page.tsx`
-- Modify: `ai-information-hub/app/login/layout.tsx`
-- Modify: `ai-information-hub/app/login/page.tsx`
+- Modify: `ai-information-hub/app/(site)/{about,ai-disclosure,editorial-policy,source-methodology,corrections,contact,impressum,datenschutz,premium,for-teams,funding}/page.tsx`
+- Modify: `ai-information-hub/app/(site)/login/layout.tsx`
+- Modify: `ai-information-hub/app/(site)/login/page.tsx`
 - Modify: `ai-information-hub/components/right-sidebar.tsx`
 - Modify: `ai-information-hub/components/sidebar.tsx`
 - Modify: `ai-information-hub/components/feed.tsx`
@@ -3528,10 +3623,10 @@ Apply the Brand replacement rules to each page's `metadata`, `config` and JSX:
   - the error link `href={BRAND.githubIssuesUrl}`.
 
 **Login**
-- `app/login/layout.tsx`:
+- `app/(site)/login/layout.tsx`:
   - `title: 'Login'` (B2);
   - `` description: `Gateway page for ${BRAND.name} Space.` ``.
-- `app/login/page.tsx`:
+- `app/(site)/login/page.tsx`:
   - import `BRAND`;
   - replace all eight `title1: "Data Cube",` with `title1: BRAND.shortName,`.
 
@@ -3566,7 +3661,7 @@ Expected:
 - [ ] **Step 4: Guard and type check**
 
 ```bash
-cd <repo-root> && python3 scripts/brand_guard.py ai-information-hub/app/about/page.tsx ai-information-hub/app/ai-disclosure/page.tsx ai-information-hub/app/editorial-policy/page.tsx ai-information-hub/app/source-methodology/page.tsx ai-information-hub/app/corrections/page.tsx ai-information-hub/app/contact/page.tsx ai-information-hub/app/impressum/page.tsx ai-information-hub/app/datenschutz/page.tsx ai-information-hub/app/premium/page.tsx ai-information-hub/app/for-teams/page.tsx ai-information-hub/app/funding/page.tsx ai-information-hub/app/login/layout.tsx ai-information-hub/app/login/page.tsx ai-information-hub/components/right-sidebar.tsx ai-information-hub/components/sidebar.tsx ai-information-hub/components/feed.tsx ai-information-hub/components/home-page-client.tsx ai-information-hub/lib/translations.ts
+cd <repo-root> && python3 scripts/brand_guard.py 'ai-information-hub/app/(site)/about/page.tsx' 'ai-information-hub/app/(site)/ai-disclosure/page.tsx' 'ai-information-hub/app/(site)/editorial-policy/page.tsx' 'ai-information-hub/app/(site)/source-methodology/page.tsx' 'ai-information-hub/app/(site)/corrections/page.tsx' 'ai-information-hub/app/(site)/contact/page.tsx' 'ai-information-hub/app/(site)/impressum/page.tsx' 'ai-information-hub/app/(site)/datenschutz/page.tsx' 'ai-information-hub/app/(site)/premium/page.tsx' 'ai-information-hub/app/(site)/for-teams/page.tsx' 'ai-information-hub/app/(site)/funding/page.tsx' 'ai-information-hub/app/(site)/login/layout.tsx' 'ai-information-hub/app/(site)/login/page.tsx' ai-information-hub/components/right-sidebar.tsx ai-information-hub/components/sidebar.tsx ai-information-hub/components/feed.tsx ai-information-hub/components/home-page-client.tsx ai-information-hub/lib/translations.ts
 cd <repo-root>/ai-information-hub && npm run lint
 ```
 
@@ -3597,7 +3692,7 @@ Expected: all tests pass.
 - [ ] **Step 7: Commit**
 
 ```bash
-git -C <repo-root> add ai-information-hub/app/about ai-information-hub/app/ai-disclosure ai-information-hub/app/editorial-policy ai-information-hub/app/source-methodology ai-information-hub/app/corrections ai-information-hub/app/contact ai-information-hub/app/impressum ai-information-hub/app/datenschutz ai-information-hub/app/premium ai-information-hub/app/for-teams ai-information-hub/app/funding ai-information-hub/app/login ai-information-hub/components/right-sidebar.tsx ai-information-hub/components/sidebar.tsx ai-information-hub/components/feed.tsx ai-information-hub/components/home-page-client.tsx ai-information-hub/lib/translations.ts ai-information-hub/test/golden/__goldens__/metadata-static.json
+git -C <repo-root> add 'ai-information-hub/app/(site)/about' 'ai-information-hub/app/(site)/ai-disclosure' 'ai-information-hub/app/(site)/editorial-policy' 'ai-information-hub/app/(site)/source-methodology' 'ai-information-hub/app/(site)/corrections' 'ai-information-hub/app/(site)/contact' 'ai-information-hub/app/(site)/impressum' 'ai-information-hub/app/(site)/datenschutz' 'ai-information-hub/app/(site)/premium' 'ai-information-hub/app/(site)/for-teams' 'ai-information-hub/app/(site)/funding' 'ai-information-hub/app/(site)/login' ai-information-hub/components/right-sidebar.tsx ai-information-hub/components/sidebar.tsx ai-information-hub/components/feed.tsx ai-information-hub/components/home-page-client.tsx ai-information-hub/lib/translations.ts ai-information-hub/test/golden/__goldens__/metadata-static.json
 git -C <repo-root> commit -m "refactor(brand): trust, legal, marketing pages, components and login read the brand config (B2)
 
 Deletes the unused dataCube and team translation keys.
@@ -3605,14 +3700,14 @@ Deletes the unused dataCube and team translation keys.
 Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
 ```
 
-`git add` on a page directory also stages its other files, such as `app/for-teams/contact-form.tsx`, if they changed. Run `git -C <repo-root> status --short` first and check that only intended files are staged.
+`git add` on a page directory also stages its other files, such as `app/(site)/for-teams/contact-form.tsx`, if they changed. Run `git -C <repo-root> status --short` first and check that only intended files are staged.
 
 ---
 
 ### Task 12: Generated robots.txt and llms.txt; workflow site URL
 
 This task implements AD1's "brand-bearing static files become generated routes":
-- `/robots.txt` comes from `app/robots.ts`, with semantics identical to today's file (B3);
+- `/robots.txt` comes from `app/robots.ts`, with semantics identical to today's file (B3), including the cost work's `Disallow: /*/topic/*?` in every group and its `meta-externalagent` group;
 - `/llms.txt` comes from a route built from `BRAND`, byte-identical except for B1;
 - the IndexNow step in `daily-collect.yml` reads `vars.SITE_URL`, with the legacy site as fallback.
 
@@ -3699,6 +3794,15 @@ describe('robots.txt', () => {
     const former = readFileSync(new URL('../test/golden/__goldens__/robots.txt', import.meta.url), 'utf8')
     expect(parse(resolveRobots(robots()))).toEqual(parse(former))
   })
+
+  it('keeps topic filter variants out of every crawler group and blocks meta-externalagent entirely', () => {
+    const { groups } = parse(resolveRobots(robots()))
+    const meta = groups.filter((group) => group.agents.includes('meta-externalagent'))
+    expect(meta).toEqual([{ agents: ['meta-externalagent'], allow: [], disallow: ['/'] }])
+    for (const group of groups.filter((group) => !meta.includes(group))) {
+      expect(group.disallow, group.agents.join(', ')).toContain('/*/topic/*?')
+    }
+  })
 })
 ```
 
@@ -3715,7 +3819,9 @@ import { absoluteUrl } from '@/lib/brand'
 
 // Groups do not inherit from the wildcard group, so every crawler group repeats the blocked paths.
 const ALLOW = ['/', '/api/content-summary']
-const DISALLOW = ['/api/', '/login']
+// '/*/topic/*?' keeps the topic filter variants (?section=, ?period=, ?page=, ?q=) out of reach: they are
+// uncached dynamic renders, and only the filter-free topic page is meant to be crawled.
+const DISALLOW = ['/api/', '/login', '/*/topic/*?']
 const AI_CRAWLERS_WITH_DELAY = [
   'GPTBot',
   'ChatGPT-User',
@@ -3736,6 +3842,8 @@ export default function robots(): MetadataRoute.Robots {
       ...AI_CRAWLERS_WITHOUT_DELAY.map((userAgent) => ({ userAgent, allow: ALLOW, disallow: DISALLOW })),
       // Common Crawl feeds many AI training corpora; allowing it helps long-tail AI citation.
       { userAgent: 'CCBot', allow: ALLOW, disallow: DISALLOW, crawlDelay: 2 },
+      // Meta's AI-training crawler brings no referrals; the Vercel WAF has denied it since 2026-09-15.
+      { userAgent: 'meta-externalagent', disallow: '/' },
     ],
     sitemap: [absoluteUrl('/sitemap.xml'), absoluteUrl('/news-sitemap.xml')],
   }
@@ -3743,7 +3851,7 @@ export default function robots(): MetadataRoute.Robots {
 ```
 
 Run: `cd <repo-root>/ai-information-hub && npx vitest run app/robots.test.ts`
-Expected: PASS.
+Expected: PASS (2 tests).
 
 - [ ] **Step 4: Write the failing llms.txt test**
 
@@ -3935,7 +4043,7 @@ cd <repo-root>/ai-hub-backend && DATABASE_URL=sqlite:///./test.db OPENROUTER_API
 Expected:
 - `brand guard: clean`;
 - the type check is clean;
-- all frontend tests pass;
+- all frontend tests pass: `Tests  142 passed (142)` in 13 files;
 - the workflow gate tests pass.
 
 - [ ] **Step 9: Commit**
@@ -3961,11 +4069,11 @@ This task implements the AD7 label on the HTML surfaces that show AI-written pro
 - Create: `ai-information-hub/components/ai-label.tsx`
 - Create: `ai-information-hub/components/feed-masthead.tsx`
 - Create: `ai-information-hub/test/ai-label-surfaces.test.ts`
-- Modify: `ai-information-hub/app/week/[weekId]/page.tsx`
-- Modify: `ai-information-hub/app/[lang]/news/[periodId]/[storyId]/page.tsx`
-- Modify: `ai-information-hub/app/[lang]/topic/[topic]/page.tsx`
+- Modify: `ai-information-hub/app/(site)/week/[weekId]/page.tsx`
+- Modify: `ai-information-hub/app/(localized)/[lang]/news/[periodId]/[storyId]/page.tsx`
+- Modify: `ai-information-hub/app/(localized)/[lang]/topic/[topic]/page.tsx`
 - Modify: `ai-information-hub/components/feed.tsx`
-- Modify: `ai-information-hub/app/[lang]/tools/ai-news-aggregator/page.tsx`
+- Modify: `ai-information-hub/app/(localized)/[lang]/tools/ai-news-aggregator/page.tsx`
 - Modify (regenerated): `pages/week-{en,de,zh}.html`, `pages/article-{en,zh}.html`, `pages/topic-en.html`, `pages/tool-ai-news-aggregator-{en,zh}.html`
 
 **Interfaces:**
@@ -4187,7 +4295,7 @@ afterEach(() => {
 
 describe.each(LANGS)('AI label on HTML surfaces in %s', (lang) => {
   it('week page: label in the header, no editorial byline', async () => {
-    const { default: WeekPage } = await import('@/app/[lang]/week/[weekId]/page')
+    const { default: WeekPage } = await import('@/app/(localized)/[lang]/week/[weekId]/page')
     const html = await render(WeekPage({ params: Promise.resolve({ lang, weekId: PERIOD_ID }) }))
     expectLabel(html, lang)
     expect(html.indexOf('data-ai-label')).toBeLessThan(html.indexOf('id="takeaways-heading"'))
@@ -4195,19 +4303,21 @@ describe.each(LANGS)('AI label on HTML surfaces in %s', (lang) => {
   })
 
   it('article page: short label in the byline slot, full label under the headline', async () => {
-    const { default: ArticlePage } = await import('@/app/[lang]/news/[periodId]/[storyId]/page')
+    const { default: ArticlePage } = await import('@/app/(localized)/[lang]/news/[periodId]/[storyId]/page')
     const html = await render(ArticlePage({ params: Promise.resolve({ lang, periodId: PERIOD_ID, storyId: STORY_ID }) }))
     expectLabel(html, lang)
     expect(html).toContain(`>${escapeHtml(aiLabelShort(lang))}</a>`)
     expect(html.indexOf('data-ai-label')).toBeLessThan(html.indexOf('id="source-brief-heading"'))
+    // Visible bylines only: the NewsArticle JSON-LD keeps "<brand> Editorial" as its author until Task 16 (L3).
+    const visible = html.replace(/<script[^>]*>[\s\S]*?<\/script>/g, '')
     for (const byline of ['Editorial', 'Redaktion', '编辑部', 'Redaction', 'Redaccion', '編集部', '편집팀']) {
-      expect(html).not.toContain(`${BRAND.name} ${byline}`)
-      expect(html).not.toContain(`${byline} ${BRAND.name}`)
+      expect(visible).not.toContain(`${BRAND.name} ${byline}`)
+      expect(visible).not.toContain(`${byline} ${BRAND.name}`)
     }
   })
 
   it('topic page: label in the header', async () => {
-    const { default: TopicPage } = await import('@/app/[lang]/topic/[topic]/page')
+    const { default: TopicPage } = await import('@/app/(localized)/[lang]/topic/[topic]/page')
     const props = { params: Promise.resolve({ lang, topic: TOPIC }), searchParams: Promise.resolve({ period: PERIOD_ID }) }
     const html = await render(TopicPage(props))
     expectLabel(html, lang)
@@ -4215,7 +4325,7 @@ describe.each(LANGS)('AI label on HTML surfaces in %s', (lang) => {
   })
 
   it('AI News Aggregator tool page: label above the live preview', async () => {
-    const { default: ToolPage } = await import('@/app/[lang]/tools/ai-news-aggregator/page')
+    const { default: ToolPage } = await import('@/app/(localized)/[lang]/tools/ai-news-aggregator/page')
     const html = await render(ToolPage({ params: Promise.resolve({ lang }) }))
     expectLabel(html, lang)
     expect(html.indexOf('data-ai-label')).toBeLessThan(html.indexOf('OpenAI ships a new reasoning model'))
@@ -4228,13 +4338,13 @@ describe.each(LANGS)('AI label on HTML surfaces in %s', (lang) => {
 ```
 
 Run: `cd <repo-root>/ai-information-hub && npx vitest run test/ai-label-surfaces.test.ts`
-Expected:
+Expected: `Tests  32 failed | 8 passed (40)`:
 - the week, article, topic and aggregator tests fail (no `data-ai-label`) in all eight languages;
 - the masthead tests pass.
 
 - [ ] **Step 5: Put the label on the pages**
 
-**`app/week/[weekId]/page.tsx`**
+**`app/(site)/week/[weekId]/page.tsx`**
 - Import `AiLabel` from `@/components/ai-label`. Remove `BRAND` from the `@/lib/brand` import if nothing else uses it.
 - Delete the `const labelByline: L = …` line.
 - Replace the byline paragraph in the header:
@@ -4271,7 +4381,7 @@ const labelEditorialAttribution: L = {
 }
 ```
 
-**`app/[lang]/news/[periodId]/[storyId]/page.tsx`**
+**`app/(localized)/[lang]/news/[periodId]/[storyId]/page.tsx`**
 - Import `AiLabel` from `@/components/ai-label`, and `AI_DISCLOSURE_PATH` and `aiLabelShort` from `@/lib/ai-label`.
 - Delete the `byline` entry from `labels`.
 - In the header grid, replace `<span>{t(labels.byline, lang)}</span>` with:
@@ -4286,7 +4396,7 @@ const labelEditorialAttribution: L = {
             <AiLabel lang={lang} className="mx-auto mt-4 max-w-3xl text-sm text-muted-foreground" />
 ```
 
-**`app/[lang]/topic/[topic]/page.tsx`**
+**`app/(localized)/[lang]/topic/[topic]/page.tsx`**
 - Import `AiLabel` from `@/components/ai-label`.
 - Insert this line directly after the first `</p>` that follows `<h1 className="text-3xl font-bold">{topicTitle}</h1>`:
 
@@ -4294,7 +4404,7 @@ const labelEditorialAttribution: L = {
         <AiLabel lang={lang} className="mt-2 text-sm text-muted-foreground" />
 ```
 
-**`app/[lang]/tools/ai-news-aggregator/page.tsx`**
+**`app/(localized)/[lang]/tools/ai-news-aggregator/page.tsx`**
 - Import `AiLabel` from `@/components/ai-label`.
 - In "Section B: Live News Preview", directly after the `<p>` that renders `{t(PREVIEW_LEAD, lang)}`, add the label. It renders only when the preview shows AI summaries:
 
@@ -4337,19 +4447,19 @@ Expected:
 - [ ] **Step 8: Guard, type check, suite**
 
 ```bash
-cd <repo-root> && python3 scripts/brand_guard.py ai-information-hub/lib/ai-label.ts ai-information-hub/components/ai-label.tsx ai-information-hub/components/feed-masthead.tsx ai-information-hub/components/feed.tsx 'ai-information-hub/app/week/[weekId]/page.tsx' 'ai-information-hub/app/[lang]/news/[periodId]/[storyId]/page.tsx' 'ai-information-hub/app/[lang]/topic/[topic]/page.tsx' 'ai-information-hub/app/[lang]/tools/ai-news-aggregator/page.tsx'
+cd <repo-root> && python3 scripts/brand_guard.py ai-information-hub/lib/ai-label.ts ai-information-hub/components/ai-label.tsx ai-information-hub/components/feed-masthead.tsx ai-information-hub/components/feed.tsx 'ai-information-hub/app/(site)/week/[weekId]/page.tsx' 'ai-information-hub/app/(localized)/[lang]/news/[periodId]/[storyId]/page.tsx' 'ai-information-hub/app/(localized)/[lang]/topic/[topic]/page.tsx' 'ai-information-hub/app/(localized)/[lang]/tools/ai-news-aggregator/page.tsx'
 cd <repo-root>/ai-information-hub && npm run lint && npm test
 ```
 
 Expected:
 - `brand guard: clean`;
 - the type check is clean;
-- all tests pass.
+- all tests pass: `Tests  193 passed (193)` in 15 files.
 
 - [ ] **Step 9: Commit**
 
 ```bash
-git -C <repo-root> add ai-information-hub/lib/ai-label.ts ai-information-hub/lib/ai-label.test.ts ai-information-hub/components/ai-label.tsx ai-information-hub/components/feed-masthead.tsx ai-information-hub/components/feed.tsx ai-information-hub/test/ai-label-surfaces.test.ts ':(literal)ai-information-hub/app/week/[weekId]/page.tsx' ':(literal)ai-information-hub/app/[lang]/news/[periodId]/[storyId]/page.tsx' ':(literal)ai-information-hub/app/[lang]/topic/[topic]/page.tsx' ':(literal)ai-information-hub/app/[lang]/tools/ai-news-aggregator/page.tsx' ai-information-hub/test/golden/__goldens__
+git -C <repo-root> add ai-information-hub/lib/ai-label.ts ai-information-hub/lib/ai-label.test.ts ai-information-hub/components/ai-label.tsx ai-information-hub/components/feed-masthead.tsx ai-information-hub/components/feed.tsx ai-information-hub/test/ai-label-surfaces.test.ts ':(literal)ai-information-hub/app/(site)/week/[weekId]/page.tsx' ':(literal)ai-information-hub/app/(localized)/[lang]/news/[periodId]/[storyId]/page.tsx' ':(literal)ai-information-hub/app/(localized)/[lang]/topic/[topic]/page.tsx' ':(literal)ai-information-hub/app/(localized)/[lang]/tools/ai-news-aggregator/page.tsx' ai-information-hub/test/golden/__goldens__
 git -C <repo-root> commit -m "feat(ai-label): AI label on week, article, topic pages, the home feed and the aggregator preview; bylines replaced (L1, L2)
 
 Spec AD7: copy in lib/ai-label.ts, AiLabel component, render tests per surface and language.
@@ -4388,11 +4498,33 @@ This task puts the AD7 label on the surfaces machines read:
 In `ai-information-hub/test/ai-label-surfaces.test.ts`:
 - add `import { NextRequest } from 'next/server'`;
 - add `absoluteUrl` to the `@/lib/brand` import;
+- add `aiLabelForImage` to the `@/lib/ai-label` import;
 - append:
 
 ```ts
 function escapeRegExp(text: string): string {
   return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+// next/og renders with fonts. This stand-in keeps the element tree it is given, so the OG test reads the
+// image text without fonts or network.
+vi.mock('next/og', () => ({
+  ImageResponse: class {
+    element: unknown
+    constructor(element: unknown) {
+      this.element = element
+    }
+  },
+}))
+
+/** Every string in a JSX element tree, in render order. */
+function textOf(node: unknown): string[] {
+  if (typeof node === 'string' || typeof node === 'number') return [String(node)]
+  if (Array.isArray(node)) return node.flatMap(textOf)
+  if (node && typeof node === 'object' && 'props' in node) {
+    return textOf((node as { props: { children?: unknown } }).props.children)
+  }
+  return []
 }
 
 describe('AI label on machine-readable surfaces', () => {
@@ -4431,11 +4563,18 @@ describe('AI label on machine-readable surfaces', () => {
     expect(text).toContain(label)
     expect(text.indexOf(label)).toBeLessThan(text.indexOf('## Content Sections'))
   })
+
+  it.each(['en', 'zh'])('OG image text in %s', async (lang) => {
+    const { GET } = await import('@/app/api/og/route')
+    const image = (await GET(new NextRequest(`${SITE}/api/og?period=${PERIOD_ID}&lang=${lang}`))) as unknown as { element: unknown }
+    // English on the image for zh, ja and ko (Ruling R-5); aiLabelForImage encodes that choice.
+    expect(textOf(image.element)).toContain(aiLabelForImage(lang))
+  })
 })
 ```
 
 Run: `cd <repo-root>/ai-information-hub && npx vitest run test/ai-label-surfaces.test.ts`
-Expected: the new machine-surface tests fail; the Task 13 tests still pass.
+Expected: `Tests  21 failed | 40 passed (61)`. The 21 new machine-surface tests fail (feed.xml 8, newsletter.xml 2, content summary 8, llms.txt 1, OG image 2); the 40 Task 13 tests still pass.
 
 - [ ] **Step 2: Add the label to each surface**
 
@@ -4445,7 +4584,7 @@ Expected: the new machine-surface tests fail; the Task 13 tests still pass.
 
 **`app/newsletter.xml/route.ts`**
 - Import `aiLabel` from `@/lib/ai-label`.
-- In `buildDigestHtml`, directly after `const weekUrl = …;`, add `parts.push(`<p><em>${escapeXml(aiLabel(lang))}</em></p>`);`.
+- In `buildDigestHtml`, directly after its `const weekUrl = …;` line (an identical line further down belongs to `GET`), add `parts.push(`<p><em>${escapeXml(aiLabel(lang))}</em></p>`);`.
 - Above the `atom` template, add `const subtitle = lang === 'de' ? `Täglicher KI-News Digest von ${BRAND.name}` : `Daily AI news digest from ${BRAND.name}`;`.
 - Set the feed subtitle to `<subtitle>${escapeXml(`${subtitle} · ${aiLabel(lang)}`)}</subtitle>`.
 
@@ -4475,7 +4614,7 @@ Expected: the new machine-surface tests fail; the Task 13 tests still pass.
 - [ ] **Step 3: Run the tests to see them pass**
 
 Run: `cd <repo-root>/ai-information-hub && npx vitest run test/ai-label-surfaces.test.ts`
-Expected: PASS (all tests in the file).
+Expected: PASS (61 tests).
 
 - [ ] **Step 4: Regenerate and review the route goldens**
 
@@ -4501,7 +4640,7 @@ cd <repo-root>/ai-information-hub && npm run lint && npm test
 Expected:
 - `brand guard: clean`;
 - the type check is clean;
-- all tests pass.
+- all tests pass: `Tests  214 passed (214)` in 15 files.
 
 - [ ] **Step 6: Commit**
 
@@ -4709,11 +4848,11 @@ This task implements the rest of AD7:
 
 **Files:**
 - Modify: `ai-information-hub/components/structured-data.tsx`
-- Modify: `ai-information-hub/app/[lang]/news/[periodId]/[storyId]/page.tsx`
-- Modify: `ai-information-hub/app/layout.tsx`
+- Modify: `ai-information-hub/app/(localized)/[lang]/news/[periodId]/[storyId]/page.tsx`
+- Modify: `ai-information-hub/lib/site-metadata.ts`
 - Modify: `ai-information-hub/components/right-sidebar.tsx`
-- Modify: `ai-information-hub/app/trust-page.tsx`
-- Modify: `ai-information-hub/app/ai-disclosure/page.tsx`
+- Modify: `ai-information-hub/app/(site)/trust-page.tsx`
+- Modify: `ai-information-hub/app/(site)/ai-disclosure/page.tsx`
 - Create: `ai-information-hub/test/attribution.test.ts`
 - Modify (regenerated): `metadata-static.json`, `pages/ai-disclosure.html`, `pages/article-{en,zh}.html`
 
@@ -4759,7 +4898,7 @@ describe('Organization attribution (spec AD7)', () => {
   it('authors articles as the Organization', async () => {
     vi.useFakeTimers({ now: FIXED_NOW, toFake: ['Date'] })
     stubApiFetch()
-    const { default: ArticlePage } = await import('@/app/[lang]/news/[periodId]/[storyId]/page')
+    const { default: ArticlePage } = await import('@/app/(localized)/[lang]/news/[periodId]/[storyId]/page')
     const html = renderToStaticMarkup(await ArticlePage({ params: Promise.resolve({ lang: 'en', periodId: PERIOD_ID, storyId: STORY_ID }) }))
     const blocks = [...html.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/g)].flatMap((match) => JSON.parse(match[1]))
     const article = blocks.find((block: { '@type'?: string }) => block['@type'] === 'NewsArticle')
@@ -4767,12 +4906,12 @@ describe('Organization attribution (spec AD7)', () => {
   })
 
   it('shows "Made by" in the trust page footer only when a founder is configured', async () => {
-    const unset = await import('@/app/trust-page')
+    const unset = await import('@/app/(site)/trust-page')
     expect(renderToStaticMarkup(createElement(unset.TrustPage, { config: trustConfig }))).not.toContain('Made by')
 
     vi.resetModules()
     vi.stubEnv('NEXT_PUBLIC_FOUNDER_NAME', 'Jane Doe')
-    const configured = await import('@/app/trust-page')
+    const configured = await import('@/app/(site)/trust-page')
     const html = renderToStaticMarkup(createElement(configured.TrustPage, { config: trustConfig })).replaceAll('<!-- -->', '')
     expect(html).toContain('Made by Jane Doe')
   })
@@ -4827,16 +4966,16 @@ export function OrganizationSchema() {
 }
 ```
 
-**`app/[lang]/news/[periodId]/[storyId]/page.tsx`**
+**`app/(localized)/[lang]/news/[periodId]/[storyId]/page.tsx`**
 - In the NewsArticle JSON-LD: `author: { '@type': 'Organization', name: BRAND.name, url: BRAND.siteUrl }` (L3).
 
-**`app/layout.tsx`**
-- `authors: [{ name: BRAND.name, url: BRAND.siteUrl }]` (L3).
+**`lib/site-metadata.ts`**
+- `authors: [{ name: BRAND.name, url: BRAND.siteUrl }]` (L3), replacing the `${BRAND.shortName} Team` entry that Task 8 left.
 
 **`components/right-sidebar.tsx`**
 - Directly after the copyright paragraph, add `{BRAND.founderName ? <p>Made by {BRAND.founderName}</p> : null}`.
 
-**`app/trust-page.tsx`**
+**`app/(site)/trust-page.tsx`**
 - Import `BRAND` from `@/lib/brand`.
 - Inside `<footer>`, directly after `</nav>`, add:
 
@@ -4846,7 +4985,7 @@ export function OrganizationSchema() {
         ) : null}
 ```
 
-**`app/ai-disclosure/page.tsx`** (L4)
+**`app/(site)/ai-disclosure/page.tsx`** (L4)
 - `description: `AI usage disclosure for ${BRAND.name} content collection, summarization, categorization, translation, and curation.``
 - `openGraph.description: `How ${BRAND.name} uses AI for collection, summarization, categorization, and translation.``
 - Insert this as the first entry of `config.sections`, and leave the existing sections unchanged:
@@ -4878,28 +5017,28 @@ Expected: the first run fails only in `metadata-static.json`, `pages/ai-disclosu
 
 | Golden | Change |
 |---|---|
-| `metadata-static.json` | `layout.authors` becomes `[{ "name": "Data Cube AI", "url": "https://www.datacubeai.space" }]` (L3); the `aiDisclosure` description and `openGraph.description` no longer mention review (L4) |
+| `metadata-static.json` | `siteMetadata.authors` becomes `[{ "name": "Data Cube AI", "url": "https://www.datacubeai.space" }]` (L3); the `aiDisclosure` description and `openGraph.description` no longer mention review (L4) |
 | `pages/ai-disclosure.html` | the new first section, with the section numbers of the following sections shifted by one (L4) |
 | `pages/article-{en,zh}.html` | the NewsArticle author object (L3) |
 
-`structured-data.json` is unchanged, because no founder is configured.
+`structured-data.json` and `pages/root-shell-{en,zh}.html`, which renders `OrganizationSchema` in the head, are unchanged, because no founder is configured.
 
 - [ ] **Step 5: Guard, type check, suite**
 
 ```bash
-cd <repo-root> && python3 scripts/brand_guard.py ai-information-hub/components/structured-data.tsx 'ai-information-hub/app/[lang]/news/[periodId]/[storyId]/page.tsx' ai-information-hub/app/layout.tsx ai-information-hub/components/right-sidebar.tsx ai-information-hub/app/trust-page.tsx ai-information-hub/app/ai-disclosure/page.tsx
+cd <repo-root> && python3 scripts/brand_guard.py ai-information-hub/components/structured-data.tsx 'ai-information-hub/app/(localized)/[lang]/news/[periodId]/[storyId]/page.tsx' ai-information-hub/lib/site-metadata.ts ai-information-hub/components/right-sidebar.tsx 'ai-information-hub/app/(site)/trust-page.tsx' 'ai-information-hub/app/(site)/ai-disclosure/page.tsx'
 cd <repo-root>/ai-information-hub && npm run lint && npm test
 ```
 
 Expected:
 - `brand guard: clean`;
 - the type check is clean;
-- all tests pass.
+- all tests pass: `Tests  217 passed (217)` in 16 files.
 
 - [ ] **Step 6: Commit**
 
 ```bash
-git -C <repo-root> add ai-information-hub/components/structured-data.tsx ':(literal)ai-information-hub/app/[lang]/news/[periodId]/[storyId]/page.tsx' ai-information-hub/app/layout.tsx ai-information-hub/components/right-sidebar.tsx ai-information-hub/app/trust-page.tsx ai-information-hub/app/ai-disclosure/page.tsx ai-information-hub/test/attribution.test.ts ai-information-hub/test/golden/__goldens__
+git -C <repo-root> add ai-information-hub/components/structured-data.tsx ':(literal)ai-information-hub/app/(localized)/[lang]/news/[periodId]/[storyId]/page.tsx' ai-information-hub/lib/site-metadata.ts ai-information-hub/components/right-sidebar.tsx 'ai-information-hub/app/(site)/trust-page.tsx' 'ai-information-hub/app/(site)/ai-disclosure/page.tsx' ai-information-hub/test/attribution.test.ts ai-information-hub/test/golden/__goldens__
 git -C <repo-root> commit -m "feat(attribution): Organization authorship, founder only when configured, honest AI disclosure (L3, L4)
 
 Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
@@ -4929,13 +5068,18 @@ This task brings the documentation in line with the new structure, following the
 Run:
 
 ```bash
-git -C <repo-root> grep -n -E "vercel\.json|public/(robots|llms)\.txt|DataCube AI Editorial|%s \| DataCube AI|lib/\*\*/\*\.test\.ts, app/\*\*/\*\.test\.ts\)" -- README.md ai-information-hub/README.md ai-hub-backend/README.md docs/documentation-maintenance.md
-cd <repo-root> && grep -n -E "vercel\.json|public/(robots|llms)\.txt|DataCube AI Editorial|%s \| DataCube AI|lib/\*\*/\*\.test\.ts, app/\*\*/\*\.test\.ts\)" CLAUDE.md ai-information-hub/CLAUDE.md
+git -C <repo-root> grep -n -E 'vercel\.json|public/(robots|llms)\.txt|DataCube AI Editorial|%s \| DataCube AI|app/\*\*/\*\.test\.ts`?\)' -- README.md ai-information-hub/README.md ai-hub-backend/README.md docs/documentation-maintenance.md
+cd <repo-root> && grep -n -E 'vercel\.json|public/(robots|llms)\.txt|DataCube AI Editorial|%s \| DataCube AI|app/\*\*/\*\.test\.ts`?\)' CLAUDE.md ai-information-hub/CLAUDE.md
 ```
 
 The second command uses plain `grep`: both `CLAUDE.md` files are git-ignored, and `git grep` searches tracked files only.
 
-Expected: the lines that Steps 2–6 change.
+Expected: 12 lines, each of which Steps 2–5 change:
+- `README.md`: the `vercel.json` tree line;
+- `ai-information-hub/README.md`: the unit-test glob line and the `vercel.json` redirect line;
+- `docs/documentation-maintenance.md`: the `public/llms.txt` and `public/robots.txt` rows;
+- `CLAUDE.md`: the `vercel.json` line in the Architecture box and in the directory tree;
+- `ai-information-hub/CLAUDE.md`: the `vercel.json` tree line, the `npm test` comment, and the AI Editorial Brief, WWW Redirect and layout-template lines.
 
 - [ ] **Step 2: Root `CLAUDE.md` (local only, never staged)**
 
@@ -4943,15 +5087,15 @@ Expected: the lines that Steps 2–6 change.
 - Replace `│  vercel.json: non-www → www permanent redirect (308)    │` with `│  next.config.mjs: non-www → www permanent redirect (308)│`.
 
 **Directory tree**
-- Delete the `vercel.json` line.
-- Under `public/`, delete the `llms.txt` and `robots.txt` lines.
-- Under `app/`, add:
+- Delete the line `│   ├── vercel.json            # Non-www → www 308 redirect`.
+- Under `public/`, delete `│   │   ├── llms.txt          # AI crawler site description` and `│   │   └── robots.txt        # Crawler rules`, and change `│   │   ├── data/             # Static JSON fallback` to `│   │   └── data/             # Static JSON fallback`.
+- Directly after `│   │   ├── newsletter.xml/    # Newsletter XML feed`, add:
   - `│   │   ├── robots.ts         # Generated robots.txt (brand config)`;
   - `│   │   ├── llms.txt/         # Generated llms.txt route (brand config)`.
-- Change the `lib/` comment to `# Utils, types, API client, brand config (brand.ts), AI label copy (ai-label.ts)`.
+- Change `│   ├── lib/                  # Utils, types, API client` to `│   ├── lib/                  # Utils, types, API client, brand config (brand.ts), AI label copy (ai-label.ts)`.
 
 **New section**
-Insert this before `## Directory Structure`:
+Insert this directly before the line `## Directory Structure` that follows the Architecture box (the file also has a `### Directory Structure` further down):
 
 ```markdown
 ### Brand identity and AI labels (R2)
@@ -4966,7 +5110,7 @@ Insert this before `## Directory Structure`:
   - the non-www → www 308 in `next.config.mjs` `redirects()`.
 - **AI labels (spec AD7)**:
   - Copy lives in `lib/ai-label.ts` (site) and in `EMAIL_STRINGS` `ai_label`/`ai_label_link` (email).
-  - `AiLabel` renders on week, article and topic pages and in the home feed masthead.
+  - `AiLabel` renders on week, article and topic pages, in the home feed masthead and above the AI News Aggregator tool page's live preview.
   - Feeds, the content summary, llms.txt and the OG image carry the label text.
   - No person-like bylines: articles are authored by the Organization, and "Made by <founder>" renders only when a founder name is set.
 - **Goldens**: `ai-information-hub/test/golden/` and `ai-hub-backend/tests/goldens/` pin brand-bearing output. Regenerate them only for an intended change: `npx vitest run <file> -u`, or `UPDATE_GOLDENS=1` for pytest.
@@ -4974,23 +5118,23 @@ Insert this before `## Directory Structure`:
 ```
 
 **Environment Variables**
-- Frontend block: add `# NEXT_PUBLIC_BRAND_NAME / NEXT_PUBLIC_BRAND_SHORT_NAME / NEXT_PUBLIC_SITE_URL / NEXT_PUBLIC_FOUNDER_NAME — optional; defaults in lib/brand-defaults.json`.
-- Backend block: add `# BRAND_NAME, BRAND_SHORT_NAME, SITE_URL, FOUNDER_NAME, NEWSLETTER_FROM_NAME, API_KEY_PREFIX, RSS_USER_AGENT, GITHUB_ISSUES_URL, API_TITLE — optional; defaults in app/config.py`.
+- `### Frontend (.env.local)` block: after its last line, `BEEHIIV_PUBLICATION_ID=pub_...   # Beehiiv publication ID`, add `# NEXT_PUBLIC_BRAND_NAME / NEXT_PUBLIC_BRAND_SHORT_NAME / NEXT_PUBLIC_SITE_URL / NEXT_PUBLIC_FOUNDER_NAME — optional; defaults in lib/brand-defaults.json`.
+- `### Backend (.env or Railway)` block: after its last line, `CONTACT_INBOX=...                # Contact form destination`, add `# BRAND_NAME, BRAND_SHORT_NAME, SITE_URL, FOUNDER_NAME, NEWSLETTER_FROM_NAME, API_KEY_PREFIX, RSS_USER_AGENT, GITHUB_ISSUES_URL, API_TITLE — optional; defaults in app/config.py`.
 
 - [ ] **Step 3: `ai-information-hub/CLAUDE.md` (local only, never staged)**
 
-**Quick Reference file table:** add three rows:
+**Quick Reference file table:** directly after the `lib/settings-context.tsx` row, add three rows:
 - `lib/brand.ts`: brand config (`BRAND`, `fillBrand`, `absoluteUrl`, `brandedTitle`, `FROZEN_IDS`) over `lib/brand-defaults.json`;
 - `lib/ai-label.ts`: AI label copy (8 languages);
 - `components/ai-label.tsx`: the `AiLabel` component.
 
 **Directory tree**
-- Delete the `vercel.json` line.
-- Under `public/`, delete `llms.txt` and `robots.txt`.
-- Under `app/`, add `robots.ts` and `llms.txt/`.
+- Delete the line `├── vercel.json              # Non-www → www 308 redirect`.
+- Under `public/`, delete `│   ├── llms.txt              # AI crawler site description` and `│   └── robots.txt            # Crawler rules + crawl-delay`, and change `│   ├── data/                 # Static JSON fallback` to `│   └── data/                 # Static JSON fallback`.
+- Directly after `│   ├── newsletter.xml/        # Newsletter XML feed`, add `│   ├── robots.ts             # Generated robots.txt (brand config)` and `│   ├── llms.txt/             # Generated llms.txt route (brand config)`.
 
 **Commands**
-- The `npm test` comment becomes `# Vitest unit tests (lib/**/*.test.ts, app/**/*.test.ts, test/**/*.test.ts)`.
+- `npm test                 # Vitest unit tests (lib/**/*.test.ts, app/**/*.test.ts)` becomes `npm test                 # Vitest unit tests (lib/**/*.test.ts, app/**/*.test.ts, test/**/*.test.ts)`.
 
 **SEO & GEO table**
 
@@ -4999,30 +5143,42 @@ Insert this before `## Directory Structure`:
 | WWW Redirect | ``| WWW Redirect | `next.config.mjs` `redirects()` | 308 permanent redirect from non-www to www; hosts from the brand config |`` |
 | Robots.txt | description starts with "Generated by `app/robots.ts`." |
 | llms.txt | description starts with "Served by `app/llms.txt/route.ts` from the brand config." |
-| AI Editorial Brief | ends with "labeled as AI-generated analysis with an /ai-disclosure link (never a human or team byline)" |
+| AI Editorial Brief | `attributed to "DataCube AI Editorial" with an /ai-disclosure link (never an invented human)` becomes `labeled as AI-generated analysis with an /ai-disclosure link (never a human or team byline)` |
 
 **SEO Metadata Patterns**
-- Replace the layout-template bullet with: ``- **Layout template**: `%s | <BRAND.name>` — child page titles never contain the brand; use `brandedTitle()` for `openGraph`/`twitter` titles and JSON-LD names``.
+- Replace the bullet ``- **Layout template**: `%s | DataCube AI` — child pages should NOT include "| DataCube AI" in their title`` with ``- **Layout template**: `%s | <BRAND.name>` in `lib/site-metadata.ts`, shared by both root layouts — child page titles never contain the brand; use `brandedTitle()` for `openGraph`/`twitter` titles and JSON-LD names``.
 
 - [ ] **Step 4: `README.md` and `ai-information-hub/README.md`**
 
 **`README.md`**
-- Delete the tree line `│   ├── vercel.json              # Non-www → www redirect`.
+- Delete the tree line `│   ├── vercel.json              # Non-www → www redirect`. The next line, `│   └── middleware.ts …`, already closes that subtree.
 
 **`ai-information-hub/README.md`**
 - Replace `- Non-www → www permanent redirect via vercel.json` with ``- Non-www → www permanent redirect via `next.config.mjs` `redirects()` ``.
-- In its environment section, add the four optional `NEXT_PUBLIC_*` brand variables with the note "defaults in `lib/brand-defaults.json`".
+- In the line that starts with `- Unit tests:`, replace ``(`npm test`, `lib/**/*.test.ts`, `app/**/*.test.ts`)`` with ``(`npm test`, `lib/**/*.test.ts`, `app/**/*.test.ts`, `test/**/*.test.ts`)``.
+- The README has no environment section. Insert this section directly before `## Tech Stack`:
+
+```markdown
+## Brand Configuration
+
+Optional build-time variables. Their defaults, in `lib/brand-defaults.json`, are the current brand:
+
+- `NEXT_PUBLIC_BRAND_NAME`
+- `NEXT_PUBLIC_BRAND_SHORT_NAME`
+- `NEXT_PUBLIC_SITE_URL`
+- `NEXT_PUBLIC_FOUNDER_NAME` (empty by default; when set, "Made by <founder>" and `Organization.founder` appear)
+```
 
 - [ ] **Step 5: `ai-hub-backend/README.md` and `docs/documentation-maintenance.md`**
 
 **`ai-hub-backend/README.md`**
-- In the environment-variables section, add the optional brand settings, one line each: `BRAND_NAME`, `BRAND_SHORT_NAME`, `SITE_URL`, `FOUNDER_NAME`, `NEWSLETTER_FROM_NAME`, `API_KEY_PREFIX` (≤ 8, new keys only), `RSS_USER_AGENT`, `GITHUB_ISSUES_URL`, `API_TITLE`.
-- Add the sentence "The defaults in `app/config.py` are the current brand; `NEWSLETTER_FROM_EMAIL`, `RSS_USER_AGENT` and `CORS_ORIGINS` derive from `SITE_URL` when unset."
+- Under `### 3. Set Environment Variables`, directly before the paragraph that starts with ``**Rotating `SIGNING_SECRET`:**``, add the paragraph `**Optional brand settings.**` followed by one bullet each: `BRAND_NAME`, `BRAND_SHORT_NAME`, `SITE_URL`, `FOUNDER_NAME`, `NEWSLETTER_FROM_NAME`, `API_KEY_PREFIX` (≤ 8, new keys only), `RSS_USER_AGENT`, `GITHUB_ISSUES_URL`, `API_TITLE`.
+- After the bullets, add the sentence "The defaults in `app/config.py` are the current brand; `NEWSLETTER_FROM_EMAIL`, `RSS_USER_AGENT` and `CORS_ORIGINS` derive from `SITE_URL` when unset."
 
 **`docs/documentation-maintenance.md`**
 - Replace the `ai-information-hub/public/llms.txt` row path with `ai-information-hub/app/llms.txt/route.ts`.
 - Replace the `ai-information-hub/public/robots.txt` row path with `ai-information-hub/app/robots.ts`.
-- Add a checklist row: `| Brand name, site URL or founder | `lib/brand-defaults.json`, `app/config.py`, both CLAUDE.md files; run `python3 scripts/brand_guard.py` |`.
+- Directly after the `| Deployment or environment variables | … |` row, add the checklist row `| Brand name, site URL or founder | `lib/brand-defaults.json`, `app/config.py`, both CLAUDE.md files; run `python3 scripts/brand_guard.py` |`.
 
 - [ ] **Step 6: Local collaboration context (not committed)**
 
@@ -5049,7 +5205,7 @@ cd <repo-root>/ai-hub-backend && DATABASE_URL=postgresql://postgres:test@localho
 Expected:
 - `brand guard: clean`;
 - 12 script tests OK;
-- the frontend type check is clean and all tests pass;
+- the frontend type check is clean and all tests pass: `Tests  217 passed (217)` in 16 files;
 - ruff is clean;
 - all backend unit and integration tests pass.
 
@@ -5128,7 +5284,7 @@ Open the PR against `main` with `gh pr create`. The body contains:
 | Check | Command | Expected |
 |---|---|---|
 | Apex redirect | `curl -sI "https://datacubeai.space/en?x=1"` | `308` and `location: https://www.datacubeai.space/en?x=1` |
-| robots.txt | `curl -s https://www.datacubeai.space/robots.txt` | the user-agent groups and both sitemaps that `app/robots.ts` defines |
+| robots.txt | `curl -s https://www.datacubeai.space/robots.txt` | the user-agent groups and both sitemaps that `app/robots.ts` defines: `Disallow: /*/topic/*?` in every group except `meta-externalagent`, which has only `Disallow: /` |
 | llms.txt | `curl -s https://www.datacubeai.space/llms.txt \| head -8` | the AI label line |
 | Week page | `curl -s https://www.datacubeai.space/en/week/2026-09-13 \| grep -o -E '<title>[^<]*</title>\|data-ai-label'` | a single-branded title and `data-ai-label` |
 | Home masthead | `curl -s https://www.datacubeai.space/en \| grep -c 'data-ai-label'` | `1` or more |
