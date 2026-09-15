@@ -55,10 +55,22 @@ def test_explicit_environment_values_win_over_derived_defaults(monkeypatch):
     monkeypatch.setenv("SITE_URL", "https://www.acme.example")
     monkeypatch.setenv("NEWSLETTER_FROM_EMAIL", "Legacy <news@example.com>")
     monkeypatch.setenv("CORS_ORIGINS", '["https://only.example"]')
+    monkeypatch.setenv("RSS_USER_AGENT", "LegacyBot/1.0")
     settings = _settings()
     assert settings.site_url == "https://www.acme.example"
     assert settings.newsletter_from_email == "Legacy <news@example.com>"
     assert settings.cors_origins == ["https://only.example"]
+    assert settings.rss_user_agent == "LegacyBot/1.0"
+
+
+def test_explicitly_empty_values_are_not_replaced_by_derived_defaults(monkeypatch):
+    monkeypatch.setenv("CORS_ORIGINS", "[]")
+    assert _settings().cors_origins == []
+
+
+def test_sender_display_name_with_special_characters_is_quoted():
+    settings = _settings(newsletter_from_name="Acme, Inc.", site_url="https://www.acme.example")
+    assert settings.newsletter_from_email == '"Acme, Inc." <newsletter@acme.example>'
 
 
 def test_api_key_prefix_is_at_most_eight_characters():
