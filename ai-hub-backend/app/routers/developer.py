@@ -11,6 +11,7 @@ from pydantic import BaseModel, EmailStr
 from sqlalchemy.orm import Session
 from typing import Optional
 
+from app.config import get_settings
 from app.database import get_db
 from app.models.developer import ApiKey
 from app.services.privacy import mask_email
@@ -29,8 +30,11 @@ TIER_LIMITS = {
 
 
 def _generate_api_key() -> str:
-    """Generate a new API key in the format dcai_ + 32 hex chars."""
-    return "dcai_" + secrets.token_hex(16)
+    """Generate a new API key: Settings.api_key_prefix plus 32 hex characters.
+
+    Stored keys are looked up by exact value, so keys issued under an older prefix keep working.
+    """
+    return get_settings().api_key_prefix + secrets.token_hex(16)
 
 
 def _get_api_key_record(
@@ -200,7 +204,6 @@ def check_developer_rate_limit(request: Request, db: Session) -> Optional[ApiKey
         return None
 
     # Ignore admin API keys (they are not developer keys)
-    from app.config import get_settings
     settings = get_settings()
     if api_key_header == settings.admin_api_key:
         return None
@@ -222,7 +225,7 @@ def check_developer_rate_limit(request: Request, db: Session) -> Optional[ApiKey
         raise HTTPException(
             status_code=429,
             detail=f"Daily rate limit exceeded ({limit} calls/day for {record.tier} tier). "
-                   f"API details: https://www.datacubeai.space/en/tools/ai-news-api",
+                   f"API details: {settings.site_url}/en/tools/ai-news-api",
         )
 
     # Increment counters

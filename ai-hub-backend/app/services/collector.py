@@ -59,7 +59,7 @@ def _source_author(item: dict) -> dict:
             name = host.removeprefix("www.") if host else ""
         except (ValueError, AttributeError):
             name = ""
-    name = str(name) if name else "DataCube AI"
+    name = str(name) if name else get_settings().brand_name
     words = [w for w in name.replace(".", " ").split() if w]
     initials = "".join(w[0] for w in words[:2]).upper() or "AI"
     return {"name": name, "handle": "", "avatar": initials, "verified": False}
