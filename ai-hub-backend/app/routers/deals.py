@@ -72,6 +72,7 @@ CSV_COLUMNS = [
     "status",
 ]
 
+
 def _disclosure(settings: Settings) -> str:
     """Data-use disclosure returned with deal data; links the site and the public issue tracker."""
     return (
