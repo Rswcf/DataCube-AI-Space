@@ -20,6 +20,16 @@ def test_email_uses_the_brand_settings(monkeypatch):
     assert "datacubeai" not in html
 
 
+def test_brand_name_with_special_characters_is_escaped(monkeypatch):
+    monkeypatch.setattr(sender, "get_settings", lambda: Settings(_env_file=None, brand_name="Acme & Co"))
+
+    html = sender._build_email_html(period_data(), "en")
+
+    assert "Acme &amp; Co" in html
+    assert "subscribed to the Acme &amp; Co newsletter." in html
+    assert "Acme & Co" not in html
+
+
 def test_recipient_links_use_the_site_url_argument():
     html = f'<a href="{sender.UNSUBSCRIBE_URL_PLACEHOLDER}">u</a>'
     recipients = [{"id": "sub_1", "email": "reader@example.com"}]

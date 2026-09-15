@@ -2,6 +2,7 @@
 Application configuration loaded from environment variables.
 """
 
+from email.utils import formataddr
 from functools import lru_cache
 from urllib.parse import urlsplit
 
@@ -95,11 +96,14 @@ class Settings(BaseSettings):
     @model_validator(mode="after")
     def _derive_brand_defaults(self) -> "Settings":
         self.site_url = self.site_url.rstrip("/")
-        if not self.newsletter_from_email:
-            self.newsletter_from_email = f"{self.newsletter_from_name} <newsletter@{self.site_domain}>"
-        if not self.rss_user_agent:
+        # Test membership in model_fields_set, not truthiness: an explicitly supplied empty
+        # value (e.g. CORS_ORIGINS=[]) must win over the derived default, same as any other
+        # explicit value. Truthiness would treat "explicitly empty" the same as "unset".
+        if "newsletter_from_email" not in self.model_fields_set:
+            self.newsletter_from_email = formataddr((self.newsletter_from_name, f"newsletter@{self.site_domain}"))
+        if "rss_user_agent" not in self.model_fields_set:
             self.rss_user_agent = f"Mozilla/5.0 (compatible; AI-Hub-Bot/1.0; +{self.site_url})"
-        if not self.cors_origins:
+        if "cors_origins" not in self.model_fields_set:
             self.cors_origins = [
                 "http://localhost:3000",
                 "http://localhost:3002",
