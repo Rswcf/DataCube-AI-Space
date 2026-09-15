@@ -27,7 +27,11 @@ def test_rate_limit_message_links_to_the_api_tool_page(monkeypatch):
     )
     db = SimpleNamespace(query=lambda model: _Query(record))
     request = SimpleNamespace(headers={"X-API-Key": "dcai_test"})
-    monkeypatch.setattr("app.config.get_settings", lambda: SimpleNamespace(admin_api_key="admin-key"))
+    monkeypatch.setattr(
+        developer,
+        "get_settings",
+        lambda: SimpleNamespace(admin_api_key="admin-key", site_url="https://www.datacubeai.space"),
+    )
 
     with pytest.raises(HTTPException) as excinfo:
         developer.check_developer_rate_limit(request, db)

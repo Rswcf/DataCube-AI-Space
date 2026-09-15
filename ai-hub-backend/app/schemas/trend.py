@@ -43,5 +43,5 @@ class TrendsFeedResponse(BaseModel):
     trends: dict  # {"de": [...], "en": [...]}
     teamMembers: dict  # {"de": [...], "en": [...]}
     # AI editorial brief keyed by language: {"en": [{"text","topic"}], ...}.
-    # Attributed to "DataCube AI Editorial" in the UI (see /ai-disclosure).
+    # Shown in the UI as AI-generated analysis (see /ai-disclosure).
     editorial: Optional[dict] = None
