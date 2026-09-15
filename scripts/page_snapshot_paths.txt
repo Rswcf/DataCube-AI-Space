@@ -29,6 +29,6 @@
 # Live data: these pages also change when a collection or backfill changes the stories.
 /en
 /de
-/en/topic/openai?period=2026-09-13
+/en/topic/openai
 /en/tools/ai-news-aggregator
 /zh/tools/ai-news-aggregator
