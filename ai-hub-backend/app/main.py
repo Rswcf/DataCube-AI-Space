@@ -37,15 +37,15 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifespan handler for startup/shutdown."""
-    logger.info("Starting AI Hub API...")
+    logger.info("Starting %s...", get_settings().api_title)
     yield
-    logger.info("Shutting down AI Hub API...")
+    logger.info("Shutting down %s...", get_settings().api_title)
 
 
 settings = get_settings()
 
 app = FastAPI(
-    title="AI Hub API",
+    title=settings.api_title,
     description="Backend API for the AI Information Hub - bilingual AI news aggregator",
     version="1.0.0",
     lifespan=lifespan,
@@ -120,7 +120,7 @@ async def developer_rate_limit_middleware(request, call_next):
 async def root():
     """Root endpoint with API info."""
     return {
-        "name": "AI Hub API",
+        "name": settings.api_title,
         "version": "1.0.0",
         "docs": "/docs",
         "endpoints": {
