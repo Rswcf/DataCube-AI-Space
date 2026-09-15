@@ -385,6 +385,8 @@ Expected: everything green. Write the pass and deselect counts into the ledger. 
 
 Run this only after the founder has merged the Vercel cost work (Ruling R-11).
 
+Execution paused between Phase A and Phase B, and `ai-hub-backend/.env` was restored for the pause. Park it again before any other command: `mv <repo-root>/ai-hub-backend/.env <repo-root>/ai-hub-backend/.env.r2-backup`.
+
 ```bash
 git -C <repo-root> fetch origin
 git -C <repo-root> log --oneline -1 origin/main -- ai-information-hub/lib/site-metadata.ts
