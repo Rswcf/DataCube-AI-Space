@@ -1,0 +1,34 @@
+# Site paths compared right before and right after a release.
+# Capture both snapshots inside one window with no collection or translation backfill.
+# Period 2026-09-13 is frozen, so its pages change only when the code changes.
+/en/week/2026-09-13
+/de/week/2026-09-13
+/zh/week/2026-09-13
+/ja/week/2026-09-13
+/en/news/2026-09-13/tech-2843
+/zh/news/2026-09-13/tech-2843
+/en/tools/ai-news-api
+/en/tools/ai-report-generator
+/en/tools/ai-stock-tracker
+/about
+/ai-disclosure
+/editorial-policy
+/source-methodology
+/corrections
+/contact
+/impressum
+/datenschutz
+/premium
+/for-teams
+/login
+/unsubscribe
+/robots.txt
+/llms.txt
+/api/content-summary?lang=en&periodId=2026-09-13
+/api/content-summary?lang=zh&periodId=2026-09-13
+# Live data: these pages also change when a collection or backfill changes the stories.
+/en
+/de
+/en/topic/openai?period=2026-09-13
+/en/tools/ai-news-aggregator
+/zh/tools/ai-news-aggregator
