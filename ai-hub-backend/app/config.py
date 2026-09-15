@@ -33,7 +33,7 @@ class Settings(BaseSettings):
     founder_name: str = ""  # "Made by <founder>" renders only when set
     newsletter_from_name: str = "Data Cube AI"
     api_key_prefix: str = Field(default="dcai_", max_length=8)  # new developer keys only; stored keys keep working
-    rss_user_agent: str = ""  # empty: "Mozilla/5.0 (compatible; AI-Hub-Bot/1.0; +<site_url>)"
+    rss_user_agent: str = ""  # unset: "Mozilla/5.0 (compatible; AI-Hub-Bot/1.0; +<site_url>)"; an explicit value (even "") is kept
     github_issues_url: str = "https://github.com/Rswcf/DataCube-AI-Space/issues"
     api_title: str = "AI Hub API"
 
@@ -41,7 +41,7 @@ class Settings(BaseSettings):
     resend_api_key: str = ""
     beehiiv_api_key: str = ""
     beehiiv_publication_id: str = ""
-    newsletter_from_email: str = ""  # empty: "<newsletter_from_name> <newsletter@<site domain>>"
+    newsletter_from_email: str = ""  # unset: "<newsletter_from_name> <newsletter@<site domain>>"; an explicit value (even "") is kept
 
     # One-click unsubscribe tokens (HMAC-SHA256, at least 32 characters). Generate with:
     #   python -c "import secrets; print(secrets.token_urlsafe(48))"
@@ -58,7 +58,7 @@ class Settings(BaseSettings):
     stripe_api_developer_price_id: str = ""
     stripe_api_business_price_id: str = ""
 
-    # CORS (empty: local dev servers, site_url and the Vercel production alias)
+    # CORS (unset: local dev servers, site_url and the Vercel production alias; an explicit value, even [], is kept)
     cors_origins: list[str] = []
 
     # Collection settings
