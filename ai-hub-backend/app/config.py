@@ -3,6 +3,9 @@ Application configuration loaded from environment variables.
 """
 
 from functools import lru_cache
+from urllib.parse import urlsplit
+
+from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings
 
 
@@ -21,11 +24,23 @@ class Settings(BaseSettings):
     admin_api_key: str = ""
     app_timezone: str = "Europe/Berlin"
 
+    # Brand identity (spec AD1). The defaults are the current brand; a rename changes these values or
+    # their environment variables, never the code. Keep in step with ai-information-hub/lib/brand-defaults.json.
+    brand_name: str = "Data Cube AI"
+    brand_short_name: str = "Data Cube"
+    site_url: str = "https://www.datacubeai.space"
+    founder_name: str = ""  # "Made by <founder>" renders only when set
+    newsletter_from_name: str = "Data Cube AI"
+    api_key_prefix: str = Field(default="dcai_", max_length=8)  # new developer keys only; stored keys keep working
+    rss_user_agent: str = ""  # empty: "Mozilla/5.0 (compatible; AI-Hub-Bot/1.0; +<site_url>)"
+    github_issues_url: str = "https://github.com/Rswcf/DataCube-AI-Space/issues"
+    api_title: str = "AI Hub API"
+
     # Newsletter
     resend_api_key: str = ""
     beehiiv_api_key: str = ""
     beehiiv_publication_id: str = ""
-    newsletter_from_email: str = "Data Cube AI <newsletter@datacubeai.space>"
+    newsletter_from_email: str = ""  # empty: "<newsletter_from_name> <newsletter@<site domain>>"
 
     # One-click unsubscribe tokens (HMAC-SHA256, at least 32 characters). Generate with:
     #   python -c "import secrets; print(secrets.token_urlsafe(48))"
@@ -42,13 +57,8 @@ class Settings(BaseSettings):
     stripe_api_developer_price_id: str = ""
     stripe_api_business_price_id: str = ""
 
-    # CORS
-    cors_origins: list[str] = [
-        "http://localhost:3000",
-        "http://localhost:3002",
-        "https://www.datacubeai.space",
-        "https://ai-information-hub.vercel.app",
-    ]
+    # CORS (empty: local dev servers, site_url and the Vercel production alias)
+    cors_origins: list[str] = []
 
     # Collection settings
     hn_min_points: int = 100
@@ -75,6 +85,28 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
+
+    @property
+    def site_domain(self) -> str:
+        """The site host without a leading "www.", e.g. for sender addresses and link text."""
+        host = urlsplit(self.site_url).hostname or ""
+        return host.removeprefix("www.")
+
+    @model_validator(mode="after")
+    def _derive_brand_defaults(self) -> "Settings":
+        self.site_url = self.site_url.rstrip("/")
+        if not self.newsletter_from_email:
+            self.newsletter_from_email = f"{self.newsletter_from_name} <newsletter@{self.site_domain}>"
+        if not self.rss_user_agent:
+            self.rss_user_agent = f"Mozilla/5.0 (compatible; AI-Hub-Bot/1.0; +{self.site_url})"
+        if not self.cors_origins:
+            self.cors_origins = [
+                "http://localhost:3000",
+                "http://localhost:3002",
+                self.site_url,
+                "https://ai-information-hub.vercel.app",
+            ]
+        return self
 
 
 @lru_cache

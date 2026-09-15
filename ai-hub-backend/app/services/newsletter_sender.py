@@ -46,8 +46,6 @@ logger = logging.getLogger(__name__)
 # 6h is deliberately conservative; tighten once we add a heartbeat.
 _STALE_IN_PROGRESS_SECONDS = 6 * 3600  # 6 hours
 
-SITE_URL = "https://www.datacubeai.space"
-
 # Footer unsubscribe href in the rendered template; _recipient_messages replaces
 # it per recipient (personal token link, or the token-less page when degraded).
 UNSUBSCRIBE_URL_PLACEHOLDER = "__UNSUBSCRIBE_URL__"
@@ -108,7 +106,7 @@ EMAIL_STRINGS: dict[str, dict[str, str]] = {
         "watch_label": "Auf YouTube ansehen",
         "cta": "Alle News vom {date} lesen \u2192",
         "promo_headline": "Die Signale, die z\u00e4hlen. Die Workflows, die helfen.",
-        "footer_msg": "Du erh\u00e4ltst diese E-Mail, weil du den Data Cube AI Newsletter abonniert hast.",
+        "footer_msg": "Du erh\u00e4ltst diese E-Mail, weil du den {brand} Newsletter abonniert hast.",
         "unsubscribe": "Abmelden",
         "subject_week": "KI-News KW {num}",
         "subject_daily": "KI-News {date}",
@@ -129,7 +127,7 @@ EMAIL_STRINGS: dict[str, dict[str, str]] = {
         "watch_label": "Watch on YouTube",
         "cta": "Read all news from {date} \u2192",
         "promo_headline": "The signals that matter. The workflows you need.",
-        "footer_msg": "You received this email because you subscribed to the Data Cube AI newsletter.",
+        "footer_msg": "You received this email because you subscribed to the {brand} newsletter.",
         "unsubscribe": "Unsubscribe",
         "subject_week": "AI News Week {num}",
         "subject_daily": "AI News {date}",
@@ -150,7 +148,7 @@ EMAIL_STRINGS: dict[str, dict[str, str]] = {
         "watch_label": "\u5728YouTube\u89c2\u770b",
         "cta": "\u9605\u8bfb{date}\u7684\u6240\u6709\u65b0\u95fb \u2192",
         "promo_headline": "\u91cd\u8981\u7684 AI \u4fe1\u53f7\u3002\u53ef\u7528\u7684\u5de5\u4f5c\u6d41\u3002",
-        "footer_msg": "\u60a8\u6536\u5230\u6b64\u90ae\u4ef6\u662f\u56e0\u4e3a\u60a8\u8ba2\u9605\u4e86Data Cube AI\u901a\u8baf\u3002",
+        "footer_msg": "\u60a8\u6536\u5230\u6b64\u90ae\u4ef6\u662f\u56e0\u4e3a\u60a8\u8ba2\u9605\u4e86{brand}\u901a\u8baf\u3002",
         "unsubscribe": "\u53d6\u6d88\u8ba2\u9605",
         "subject_week": "AI\u65b0\u95fb \u7b2c{num}\u5468",
         "subject_daily": "AI\u65b0\u95fb {date}",
@@ -171,7 +169,7 @@ EMAIL_STRINGS: dict[str, dict[str, str]] = {
         "watch_label": "Voir sur YouTube",
         "cta": "Lire toutes les actualit\u00e9s du {date} \u2192",
         "promo_headline": "Les signaux qui comptent. Les workflows utiles.",
-        "footer_msg": "Vous recevez cet e-mail car vous \u00eates abonn\u00e9(e) \u00e0 la newsletter Data Cube AI.",
+        "footer_msg": "Vous recevez cet e-mail car vous \u00eates abonn\u00e9(e) \u00e0 la newsletter {brand}.",
         "unsubscribe": "Se d\u00e9sabonner",
         "subject_week": "Actu IA Semaine {num}",
         "subject_daily": "Actu IA {date}",
@@ -192,7 +190,7 @@ EMAIL_STRINGS: dict[str, dict[str, str]] = {
         "watch_label": "Ver en YouTube",
         "cta": "Leer todas las noticias del {date} \u2192",
         "promo_headline": "Las se\u00f1ales que importan. Los flujos que necesitas.",
-        "footer_msg": "Recibes este correo porque te suscribiste al bolet\u00edn de Data Cube AI.",
+        "footer_msg": "Recibes este correo porque te suscribiste al bolet\u00edn de {brand}.",
         "unsubscribe": "Cancelar suscripci\u00f3n",
         "subject_week": "Noticias IA Semana {num}",
         "subject_daily": "Noticias IA {date}",
@@ -213,7 +211,7 @@ EMAIL_STRINGS: dict[str, dict[str, str]] = {
         "watch_label": "Assistir no YouTube",
         "cta": "Ler todas as not\u00edcias de {date} \u2192",
         "promo_headline": "Os sinais que importam. Os fluxos que ajudam.",
-        "footer_msg": "Voc\u00ea recebeu este e-mail por estar inscrito na newsletter Data Cube AI.",
+        "footer_msg": "Voc\u00ea recebeu este e-mail por estar inscrito na newsletter {brand}.",
         "unsubscribe": "Cancelar inscri\u00e7\u00e3o",
         "subject_week": "Not\u00edcias IA Semana {num}",
         "subject_daily": "Not\u00edcias IA {date}",
@@ -234,7 +232,7 @@ EMAIL_STRINGS: dict[str, dict[str, str]] = {
         "watch_label": "YouTube\u3067\u898b\u308b",
         "cta": "{date}\u306e\u5168\u30cb\u30e5\u30fc\u30b9\u3092\u8aad\u3080 \u2192",
         "promo_headline": "\u91cd\u8981\u306aAI\u30b7\u30b0\u30ca\u30eb\u3002\u4f7f\u3048\u308b\u30ef\u30fc\u30af\u30d5\u30ed\u30fc\u3002",
-        "footer_msg": "Data Cube AI\u30cb\u30e5\u30fc\u30b9\u30ec\u30bf\u30fc\u3092\u8cfc\u8aad\u3057\u3066\u3044\u308b\u305f\u3081\u3053\u306e\u30e1\u30fc\u30eb\u304c\u5c4a\u3044\u3066\u3044\u307e\u3059\u3002",
+        "footer_msg": "{brand}\u30cb\u30e5\u30fc\u30b9\u30ec\u30bf\u30fc\u3092\u8cfc\u8aad\u3057\u3066\u3044\u308b\u305f\u3081\u3053\u306e\u30e1\u30fc\u30eb\u304c\u5c4a\u3044\u3066\u3044\u307e\u3059\u3002",
         "unsubscribe": "\u8cfc\u8aad\u89e3\u9664",
         "subject_week": "AI\u30cb\u30e5\u30fc\u30b9 \u7b2c{num}\u9031",
         "subject_daily": "AI\u30cb\u30e5\u30fc\u30b9 {date}",
@@ -255,7 +253,7 @@ EMAIL_STRINGS: dict[str, dict[str, str]] = {
         "watch_label": "YouTube\uc5d0\uc11c \ubcf4\uae30",
         "cta": "{date} \ubaa8\ub4e0 \ub274\uc2a4 \uc77d\uae30 \u2192",
         "promo_headline": "\uc911\uc694\ud55c AI \uc2e0\ud638. \ubc14\ub85c \uc4f0\ub294 \uc6cc\ud06c\ud50c\ub85c.",
-        "footer_msg": "Data Cube AI \ub274\uc2a4\ub808\ud130\ub97c \uad6c\ub3c5\ud558\uc168\uae30 \ub54c\ubb38\uc5d0 \uc774 \uc774\uba54\uc77c\uc744 \ubc1b\uc73c\uc168\uc2b5\ub2c8\ub2e4.",
+        "footer_msg": "{brand} \ub274\uc2a4\ub808\ud130\ub97c \uad6c\ub3c5\ud558\uc168\uae30 \ub54c\ubb38\uc5d0 \uc774 \uc774\uba54\uc77c\uc744 \ubc1b\uc73c\uc168\uc2b5\ub2c8\ub2e4.",
         "unsubscribe": "\uad6c\ub3c5 \ud574\uc9c0",
         "subject_week": "AI \ub274\uc2a4 {num}\uc8fc\ucc28",
         "subject_daily": "AI \ub274\uc2a4 {date}",
@@ -361,7 +359,7 @@ def _brand_lockup(text_color: str = TEXT_HEADLINE, muted_color: str = TEXT_META,
       <tr>
         <td valign="middle" style="padding:0 10px 0 0;">{_brand_mark(34)}</td>
         <td valign="middle" style="font-family:{FONT_SANS};font-size:13px;font-weight:800;letter-spacing:1.1px;text-transform:uppercase;color:{text_color};line-height:1.15;">
-          Data Cube AI
+          {_esc(get_settings().brand_name)}
           <div style="font-family:{FONT_SANS};font-size:11px;font-weight:600;letter-spacing:0.7px;text-transform:none;color:{muted_color};padding-top:3px;">
             Intelligence memo
           </div>
@@ -564,8 +562,10 @@ def _format_date_label(period_id: str, lang: str) -> str:
 
 def _build_email_html(data: dict, lang: str) -> str:
     """Build a professional HTML newsletter email."""
+    settings = get_settings()
+    brand_name = _esc(settings.brand_name)
     period_id = data["period_id"]
-    week_url = f"{SITE_URL}/{lang}/week/{period_id}"
+    week_url = f"{settings.site_url}/{lang}/week/{period_id}"
     date_label = _format_date_label(period_id, lang)
 
     title = f"{'KI' if lang == 'de' else 'AI'}-News \u2014 {date_label}"
@@ -607,7 +607,7 @@ def _build_email_html(data: dict, lang: str) -> str:
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
             <tr>
               <td align="center" style="padding-top:16px;font-family:{FONT_DISPLAY};font-size:48px;font-weight:400;letter-spacing:-1.1px;color:{TEXT_HEADLINE};line-height:0.95;">
-                Data Cube AI
+                {brand_name}
               </td>
             </tr>
             <tr>
@@ -913,7 +913,7 @@ def _build_email_html(data: dict, lang: str) -> str:
                  style="background-color:{BG_PROMO};border:1px solid {TEXT_HEADLINE};">
             <tr>
               <td align="center" style="padding:34px 28px 10px;font-family:{FONT_SANS};font-size:11px;font-weight:800;letter-spacing:1.1px;text-transform:uppercase;color:{TEXT_HEADLINE};">
-                Data Cube AI
+                {brand_name}
               </td>
             </tr>
             <tr>
@@ -953,12 +953,12 @@ def _build_email_html(data: dict, lang: str) -> str:
             </tr>
             <tr>
               <td style="padding-bottom:10px;">
-                <a href="{SITE_URL}" style="font-family:{FONT_SANS};font-size:13px;font-weight:700;color:{LINK_COLOR};text-decoration:none;border-bottom:1px solid {ACCENT_BRAND};">datacubeai.space</a>
+                <a href="{settings.site_url}" style="font-family:{FONT_SANS};font-size:13px;font-weight:700;color:{LINK_COLOR};text-decoration:none;border-bottom:1px solid {ACCENT_BRAND};">{_esc(settings.site_domain)}</a>
               </td>
             </tr>
             <tr>
               <td style="font-family:{FONT_SANS};font-size:12px;color:{TEXT_META};line-height:1.6;">
-                {_esc(_s(lang, "footer_msg"))}
+                {_esc(_s(lang, "footer_msg").format(brand=settings.brand_name))}
               </td>
             </tr>
             <tr>
@@ -968,7 +968,7 @@ def _build_email_html(data: dict, lang: str) -> str:
             </tr>
             <tr>
               <td style="padding-top:8px;font-family:{FONT_SANS};font-size:12px;color:{TEXT_META};">
-                Data Cube AI &bull; Frankfurt am Main, Germany
+                {brand_name} &bull; Frankfurt am Main, Germany
               </td>
             </tr>
             <tr>
@@ -1144,6 +1144,7 @@ def _recipient_messages(
     html_content: str,
     recipients: list[dict],
     signing_secret: str,
+    site_url: str,
 ) -> list[dict]:
     """One Resend message per recipient, each with a personal unsubscribe link.
 
@@ -1159,14 +1160,14 @@ def _recipient_messages(
         message = {"from": from_email, "to": [recipient["email"]], "subject": subject}
         if token:
             message["html"] = html_content.replace(
-                UNSUBSCRIBE_URL_PLACEHOLDER, f"{SITE_URL}/unsubscribe?t={token}"
+                UNSUBSCRIBE_URL_PLACEHOLDER, f"{site_url}/unsubscribe?t={token}"
             )
             message["headers"] = {
-                "List-Unsubscribe": f"<{SITE_URL}/api/newsletter/unsubscribe?t={token}>",
+                "List-Unsubscribe": f"<{site_url}/api/newsletter/unsubscribe?t={token}>",
                 "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
             }
         else:
-            message["html"] = html_content.replace(UNSUBSCRIBE_URL_PLACEHOLDER, f"{SITE_URL}/unsubscribe")
+            message["html"] = html_content.replace(UNSUBSCRIBE_URL_PLACEHOLDER, f"{site_url}/unsubscribe")
         messages.append(message)
     return messages
 
@@ -1507,6 +1508,7 @@ def send_newsletter(db: Session, period_id: str | None = None) -> dict:
                 html_content,
                 recipients,
                 settings.signing_secret,
+                settings.site_url,
             )
             sent, failed = _send_via_resend(messages)
             lang_breakdown[lang] = {"sent": sent, "failed": failed, "attempted": len(recipients)}
@@ -1626,6 +1628,7 @@ def send_test_newsletter(db: Session, period_id: str, test_email: str, lang: str
         _build_email_html(data, lang),
         [{"id": subscription_id or TEST_SEND_SUBSCRIPTION_ID, "email": test_email}],
         settings.signing_secret,
+        settings.site_url,
     )
     sent, failed = _send_via_resend(messages)
     return {

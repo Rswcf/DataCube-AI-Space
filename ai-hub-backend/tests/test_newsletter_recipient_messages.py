@@ -11,6 +11,7 @@ import app.services.newsletter_sender as sender
 from app.services.unsubscribe_tokens import verify_token
 
 SECRET = "s" * 40
+SITE = "https://www.datacubeai.space"
 HTML = f'<p>news</p><a href="{sender.UNSUBSCRIBE_URL_PLACEHOLDER}">Unsubscribe</a>'
 RECIPIENTS = [
     {"id": "sub_one", "email": "one@example.com"},
@@ -23,7 +24,7 @@ def _token_from(url):
 
 
 def test_messages_carry_the_rfc8058_header_pair_with_a_valid_token():
-    messages = sender._recipient_messages("News <news@example.com>", "Subject", HTML, RECIPIENTS, SECRET)
+    messages = sender._recipient_messages("News <news@example.com>", "Subject", HTML, RECIPIENTS, SECRET, SITE)
 
     assert [m["to"] for m in messages] == [["one@example.com"], ["two@example.com"]]
     for message, recipient in zip(messages, RECIPIENTS):
@@ -37,7 +38,7 @@ def test_messages_carry_the_rfc8058_header_pair_with_a_valid_token():
 
 
 def test_footer_link_is_personal_and_points_at_the_confirm_page():
-    messages = sender._recipient_messages("News <news@example.com>", "Subject", HTML, RECIPIENTS, SECRET)
+    messages = sender._recipient_messages("News <news@example.com>", "Subject", HTML, RECIPIENTS, SECRET, SITE)
 
     first, second = (m["html"] for m in messages)
     assert sender.UNSUBSCRIBE_URL_PLACEHOLDER not in first
@@ -47,7 +48,7 @@ def test_footer_link_is_personal_and_points_at_the_confirm_page():
 
 
 def test_without_a_usable_secret_messages_degrade_but_still_send():
-    messages = sender._recipient_messages("News <news@example.com>", "Subject", HTML, RECIPIENTS, "")
+    messages = sender._recipient_messages("News <news@example.com>", "Subject", HTML, RECIPIENTS, "", SITE)
 
     assert all("headers" not in m for m in messages)
     assert all('href="https://www.datacubeai.space/unsubscribe"' in m["html"] for m in messages)
@@ -55,14 +56,14 @@ def test_without_a_usable_secret_messages_degrade_but_still_send():
 
 def test_recipient_without_subscription_id_gets_no_one_click_headers():
     messages = sender._recipient_messages(
-        "News <news@example.com>", "Subject", HTML, [{"id": None, "email": "x@example.com"}], SECRET
+        "News <news@example.com>", "Subject", HTML, [{"id": None, "email": "x@example.com"}], SECRET, SITE
     )
     assert "headers" not in messages[0]
 
 
 def test_non_string_subscription_id_degrades_instead_of_raising():
     messages = sender._recipient_messages(
-        "News <news@example.com>", "Subject", HTML, [{"id": 123, "email": "x@example.com"}], SECRET
+        "News <news@example.com>", "Subject", HTML, [{"id": 123, "email": "x@example.com"}], SECRET, SITE
     )
     assert "headers" not in messages[0]
     assert 'href="https://www.datacubeai.space/unsubscribe"' in messages[0]["html"]
