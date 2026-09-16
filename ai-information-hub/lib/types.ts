@@ -166,6 +166,14 @@ export interface TipPost {
 export interface TrendItem {
   category: string; // e.g., "AI · Trending" or "KI · Trend"
   title: string;
+  /**
+   * The English title of the same trend, when available. Topic links are
+   * derived from it rather than from `title`: capitalisation only marks a
+   * proper noun in English (German capitalises every noun, CJK capitalises
+   * nothing), while the Latin-script brand names it yields survive verbatim
+   * into every translation. See `trendTopicSlug`.
+   */
+  titleEn?: string;
   posts?: number;
   /** Proprietary momentum signal from our own topic history (backend-computed) */
   momentum?: "new" | "rising" | "returning";

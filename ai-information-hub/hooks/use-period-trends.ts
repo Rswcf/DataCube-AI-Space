@@ -8,79 +8,36 @@ type TrendsResponse = {
   trends?: Record<string, TrendItem[] | undefined>;
 };
 
-const fallbackTrendsEN: TrendItem[] = [
-  { category: "AI", title: "GPT-5" },
-  { category: "Technology", title: "NVIDIA Blackwell" },
-  { category: "Finance", title: "AI Stocks" },
-  { category: "Science", title: "AlphaFold 3" },
-  { category: "Startups", title: "Anthropic" },
-];
+// There is deliberately no hardcoded fallback list. Until 2026-09-16 this file
+// shipped one (GPT-5, NVIDIA Blackwell, AlphaFold 3, AI Stocks, Anthropic),
+// which rendered as the "What's happening?" rail before the fetch resolved and
+// therefore also in the server-rendered HTML: invented 2024-era topics
+// presented as today's trends, linking to topic pages that mostly 404ed. An
+// empty list shows the skeleton the component already has.
+export function getFallbackTrends(_language: string): TrendItem[] {
+  return [];
+}
 
-const fallbackTrends: Record<string, TrendItem[]> = {
-  de: [
-    { category: "KI", title: "GPT-5" },
-    { category: "Technologie", title: "NVIDIA Blackwell" },
-    { category: "Finanzen", title: "KI-Aktien" },
-    { category: "Wissenschaft", title: "AlphaFold 3" },
-    { category: "Startups", title: "Anthropic" },
-  ],
-  en: fallbackTrendsEN,
-  zh: [
-    { category: "AI", title: "GPT-5" },
-    { category: "技术", title: "NVIDIA Blackwell" },
-    { category: "资本", title: "AI 投资" },
-    { category: "科学", title: "AlphaFold 3" },
-    { category: "公司", title: "Anthropic" },
-  ],
-  fr: [
-    { category: "IA", title: "GPT-5" },
-    { category: "Technologie", title: "NVIDIA Blackwell" },
-    { category: "Finance", title: "Actions IA" },
-    { category: "Science", title: "AlphaFold 3" },
-    { category: "Startups", title: "Anthropic" },
-  ],
-  es: [
-    { category: "IA", title: "GPT-5" },
-    { category: "Tecnologia", title: "NVIDIA Blackwell" },
-    { category: "Finanzas", title: "Acciones de IA" },
-    { category: "Ciencia", title: "AlphaFold 3" },
-    { category: "Startups", title: "Anthropic" },
-  ],
-  pt: [
-    { category: "IA", title: "GPT-5" },
-    { category: "Tecnologia", title: "NVIDIA Blackwell" },
-    { category: "Financas", title: "Acoes de IA" },
-    { category: "Ciencia", title: "AlphaFold 3" },
-    { category: "Startups", title: "Anthropic" },
-  ],
-  ja: [
-    { category: "AI", title: "GPT-5" },
-    { category: "技術", title: "NVIDIA Blackwell" },
-    { category: "金融", title: "AI 株" },
-    { category: "科学", title: "AlphaFold 3" },
-    { category: "スタートアップ", title: "Anthropic" },
-  ],
-  ko: [
-    { category: "AI", title: "GPT-5" },
-    { category: "기술", title: "NVIDIA Blackwell" },
-    { category: "금융", title: "AI 주식" },
-    { category: "과학", title: "AlphaFold 3" },
-    { category: "스타트업", title: "Anthropic" },
-  ],
-};
-
-export function getFallbackTrends(language: string): TrendItem[] {
-  return fallbackTrends[language] || fallbackTrendsEN;
+/**
+ * Pair each localized trend with its English counterpart by position. The
+ * backend builds every language's list from the same trends in the same order,
+ * so index alignment holds; a length mismatch simply leaves `titleEn` unset and
+ * the chip renders without a link.
+ */
+function withEnglishTitles(items: TrendItem[], englishItems: TrendItem[] | undefined): TrendItem[] {
+  if (!englishItems || englishItems.length !== items.length) return items;
+  return items.map((item, index) => ({ ...item, titleEn: englishItems[index]?.title }));
 }
 
 function selectTrends(data: TrendsResponse, language: string): TrendItem[] {
+  const englishTrends = data.trends?.en;
+
   const languageTrends = data.trends?.[language];
-  if (languageTrends && languageTrends.length > 0) return languageTrends;
+  if (languageTrends && languageTrends.length > 0) return withEnglishTitles(languageTrends, englishTrends);
 
   const germanTrends = data.trends?.de;
-  if (germanTrends && germanTrends.length > 0) return germanTrends;
+  if (germanTrends && germanTrends.length > 0) return withEnglishTitles(germanTrends, englishTrends);
 
-  const englishTrends = data.trends?.en;
   if (englishTrends && englishTrends.length > 0) return englishTrends;
 
   return getFallbackTrends(language);
