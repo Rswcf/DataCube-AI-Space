@@ -17,6 +17,7 @@ import {
   periodPublishedDate,
 } from '@/lib/period-utils'
 import { tagTopicSlug } from '@/lib/topic-utils'
+import { ARTICLE_HEADLINE, splitHeadlineDeck } from '@/lib/text-split'
 import type {
   InvestmentData,
   MAPost,
@@ -229,43 +230,6 @@ function cleanText(value: string | undefined): string {
   return (value || '').replace(/\s+/g, ' ').trim()
 }
 
-function sentenceCaseFragment(text: string): string {
-  if (!text) return ''
-  return /^[a-z]/.test(text) ? `${text[0].toUpperCase()}${text.slice(1)}` : text
-}
-
-function splitHeadlineDeck(content: string): [string, string] {
-  const clean = cleanText(content)
-  if (!clean) return ['', '']
-
-  for (const separator of [': ', ' - ']) {
-    const position = clean.indexOf(separator)
-    if (position >= 24 && position <= 92 && position + separator.length < clean.length) {
-      const headline = clean.slice(0, position + (separator.trim().length === 1 ? 1 : 0)).replace(/[ .,-;:]+$/, '')
-      return [headline, sentenceCaseFragment(clean.slice(position + separator.length).trim())]
-    }
-  }
-
-  for (const separator of ['. ', '? ', '! ']) {
-    const position = clean.indexOf(separator)
-    if (position >= 32 && position <= 150 && position + separator.length < clean.length) {
-      return [
-        clean.slice(0, position + 1).trim(),
-        sentenceCaseFragment(clean.slice(position + separator.length).trim()),
-      ]
-    }
-  }
-
-  if (clean.length <= 130) return [clean, '']
-
-  const cut = clean.lastIndexOf(' ', 130)
-  if (cut <= 0) return [`${clean.slice(0, 130)}...`, clean.slice(130)]
-  return [
-    `${clean.slice(0, cut).replace(/[ .,-;:]+$/, '')}...`,
-    sentenceCaseFragment(clean.slice(cut).trim()),
-  ]
-}
-
 function uniqueTags(tags: (string | undefined)[]): string[] {
   return Array.from(new Set(tags.map((tag) => cleanText(tag)).filter(Boolean))).slice(0, 6)
 }
@@ -297,7 +261,7 @@ async function fetchFeed<T>(periodId: string, endpoint: string, filename: string
 }
 
 function techToStory(post: TechPost, lang: AppLanguage): ArticleStory {
-  const [headline, deck] = splitHeadlineDeck(post.content)
+  const [headline, deck] = splitHeadlineDeck(post.content, ARTICLE_HEADLINE)
   const isVideo = Boolean(post.isVideo)
   return {
     id: `${isVideo ? 'video' : 'tech'}-${post.id}`,
@@ -321,7 +285,7 @@ function techToStory(post: TechPost, lang: AppLanguage): ArticleStory {
 }
 
 function tipToStory(post: TipPost, lang: AppLanguage): ArticleStory {
-  const [headline, deck] = splitHeadlineDeck(post.content)
+  const [headline, deck] = splitHeadlineDeck(post.content, ARTICLE_HEADLINE)
   return {
     id: `tip-${post.id}`,
     kind: 'tip',
