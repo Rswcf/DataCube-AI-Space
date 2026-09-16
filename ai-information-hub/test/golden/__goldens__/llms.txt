@@ -63,7 +63,7 @@ Filtered variants (?period=, ?section=, ?page=, ?q=) are views of that canonical
 page: excluded in robots.txt and marked noindex — cite the canonical URL.
 
 ## Languages
-German (de) — default | English (en) | Chinese (zh) | French (fr) | Spanish (es) | Portuguese (pt) | Japanese (ja) | Korean (ko)
+English (en) — default | German (de) | Chinese (zh) | French (fr) | Spanish (es) | Portuguese (pt) | Japanese (ja) | Korean (ko)
 
 ## Authority
 Published daily since January 2026, curating 35+ sources including
