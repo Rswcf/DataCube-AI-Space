@@ -101,9 +101,10 @@ const MIN_TREND_ENTITY_LENGTH = 4
  * for the localized chip that links to it.
  */
 export function trendTopicSlug(title: string): string | null {
-  for (const raw of (title || '').split(/[^\p{L}\p{N}]+/u)) {
-    // Drop a possessive before judging the word ("Microsoft's" → "Microsoft").
-    const token = raw.replace(/[’']?s$/u, '')
+  // Apostrophes are separators here, so "Microsoft's" already yields
+  // "Microsoft" and a lone "s". Do not strip a trailing "s" on top of that: it
+  // would also cut names that end in one (Databricks, Siemens, Genesis).
+  for (const token of (title || '').split(/[^\p{L}\p{N}]+/u)) {
     // Four characters minimum: the topic page matches by substring, so a short
     // token is a trap — "act" (from "EU AI Act") would pull in every article
     // containing "impact" or "contract". Short tickers like IBM or ARM are lost
