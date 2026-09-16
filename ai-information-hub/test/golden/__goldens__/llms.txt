@@ -22,7 +22,7 @@ Typically around 5 practical tips per day.
 Typically 2 curated YouTube videos about AI developments per day.
 
 ## Free AI Tools
-DataCube AI offers free, multilingual AI-powered tools:
+Data Cube AI offers free, multilingual AI-powered tools:
 
 - AI News Aggregator: https://www.datacubeai.space/en/tools/ai-news-aggregator
   Curates daily AI news from 35+ sources in 8 languages.
