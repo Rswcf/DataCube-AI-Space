@@ -1,0 +1,38 @@
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Data Cube AIとは？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Data Cube AIは多言語（8言語：DE、EN、ZH、FR、ES、PT、JA、KO）対応の毎日のAIニュースアグリゲーターです。40以上のソースから技術的ブレークスルー、投資ニュース、実践ヒント、YouTube動画を厳選しています。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "コンテンツはどのくらいの頻度で更新されますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "コンテンツは毎日ベルリン時間の深夜に更新され、新しいテクノロジー記事、投資ニュース、実践ヒントが追加されます。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Data Cube AIはどの言語をサポートしていますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Data Cube AIは8言語をサポートしています：ドイツ語、英語、中国語、フランス語、スペイン語、ポルトガル語、日本語、韓国語。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Data Cube AIはどのような種類のAIニュースをカバーしていますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Data Cube AIは3つの主要カテゴリをカバーしています：テック（AIブレークスルー、研究、製品発表）、投資（資金調達、M&A、市場動向）、ヒント（実用的なAIツールとプロンプト）。"
+      }
+    }
+  ]
+}

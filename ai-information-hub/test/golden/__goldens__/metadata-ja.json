@@ -1,0 +1,336 @@
+{
+  "home": {
+    "title": {
+      "absolute": "Data Cube AI | 毎日のAIニュースとインサイト"
+    },
+    "description": "無料多言語AIニュースアグリゲーター：生成AI・LLM最新情報、AI投資シグナル、実践ヒント – 40以上のソースから毎日厳選、8言語対応。",
+    "alternates": {
+      "canonical": "https://www.datacubeai.space/ja",
+      "languages": {
+        "x-default": "https://www.datacubeai.space",
+        "de": "https://www.datacubeai.space/de",
+        "en": "https://www.datacubeai.space/en",
+        "zh-Hans": "https://www.datacubeai.space/zh",
+        "fr": "https://www.datacubeai.space/fr",
+        "es": "https://www.datacubeai.space/es",
+        "pt": "https://www.datacubeai.space/pt",
+        "ja": "https://www.datacubeai.space/ja",
+        "ko": "https://www.datacubeai.space/ko"
+      }
+    },
+    "openGraph": {
+      "title": "Data Cube AI | 毎日のAIニュースとインサイト",
+      "description": "厳選されたAIニュース、投資情報、実践ティップス — 8言語で毎日更新。",
+      "url": "https://www.datacubeai.space/ja",
+      "images": [
+        {
+          "url": "/og-image.jpg",
+          "width": 1200,
+          "height": 630,
+          "alt": "Data Cube AI – AIと人間の知恵が出会う場所"
+        }
+      ]
+    },
+    "twitter": {
+      "card": "summary_large_image",
+      "title": "Data Cube AI | 毎日のAIニュースとインサイト",
+      "description": "厳選されたAIニュース、投資情報、実践ティップス — 8言語で毎日更新。",
+      "images": [
+        {
+          "url": "/og-image.jpg",
+          "alt": "Data Cube AI – AIと人間の知恵が出会う場所"
+        }
+      ]
+    }
+  },
+  "week": {
+    "title": "AIニュース Sep 13, 2026 — テクノロジー、投資＆実用ヒント",
+    "description": "Sep 13, 2026のAIニュース厳選：技術的ブレークスルー、投資シグナル、実践ヒント – 毎日更新。",
+    "alternates": {
+      "canonical": "https://www.datacubeai.space/ja/week/2026-09-13",
+      "languages": {
+        "x-default": "https://www.datacubeai.space/en/week/2026-09-13",
+        "de": "https://www.datacubeai.space/de/week/2026-09-13",
+        "en": "https://www.datacubeai.space/en/week/2026-09-13",
+        "zh-Hans": "https://www.datacubeai.space/zh/week/2026-09-13",
+        "fr": "https://www.datacubeai.space/fr/week/2026-09-13",
+        "es": "https://www.datacubeai.space/es/week/2026-09-13",
+        "pt": "https://www.datacubeai.space/pt/week/2026-09-13",
+        "ja": "https://www.datacubeai.space/ja/week/2026-09-13",
+        "ko": "https://www.datacubeai.space/ko/week/2026-09-13"
+      }
+    },
+    "openGraph": {
+      "title": "AIニュース Sep 13, 2026 — テクノロジー、投資＆実用ヒント",
+      "description": "Sep 13, 2026のAIニュース厳選：技術的ブレークスルー、投資シグナル、実践ヒント – 毎日更新。",
+      "url": "https://www.datacubeai.space/ja/week/2026-09-13",
+      "type": "article",
+      "publishedTime": "2026-09-13T00:00:00.000Z",
+      "images": [
+        {
+          "url": "/api/og?period=2026-09-13&lang=ja",
+          "width": 1200,
+          "height": 630,
+          "alt": "Data Cube AI – AIニュース Sep 13, 2026"
+        }
+      ]
+    },
+    "twitter": {
+      "card": "summary_large_image",
+      "title": "AIニュース Sep 13, 2026 — テクノロジー、投資＆実用ヒント",
+      "description": "Sep 13, 2026のAIニュース厳選：技術的ブレークスルー、投資シグナル、実践ヒント – 毎日更新。",
+      "images": [
+        {
+          "url": "/api/og?period=2026-09-13&lang=ja",
+          "alt": "Data Cube AI – AIニュース Sep 13, 2026"
+        }
+      ]
+    }
+  },
+  "topic": {
+    "title": "Openai AIニュース – 最新レポート＆分析",
+    "description": "OpenaiのAI厳選記事：テクノロジー、投資シグナル、実践ヒント。",
+    "robots": {
+      "index": false,
+      "follow": false
+    },
+    "alternates": {
+      "canonical": "https://www.datacubeai.space/ja/topic/openai",
+      "languages": {
+        "x-default": "https://www.datacubeai.space/en/topic/openai",
+        "de": "https://www.datacubeai.space/de/topic/openai",
+        "en": "https://www.datacubeai.space/en/topic/openai",
+        "zh-Hans": "https://www.datacubeai.space/zh/topic/openai",
+        "fr": "https://www.datacubeai.space/fr/topic/openai",
+        "es": "https://www.datacubeai.space/es/topic/openai",
+        "pt": "https://www.datacubeai.space/pt/topic/openai",
+        "ja": "https://www.datacubeai.space/ja/topic/openai",
+        "ko": "https://www.datacubeai.space/ko/topic/openai"
+      }
+    },
+    "openGraph": {
+      "title": "Openai AIニュース – 最新レポート＆分析",
+      "description": "OpenaiのAI厳選記事：テクノロジー、投資シグナル、実践ヒント。",
+      "url": "https://www.datacubeai.space/ja/topic/openai",
+      "type": "article",
+      "images": [
+        {
+          "url": "/og-image.jpg",
+          "width": 1200,
+          "height": 630,
+          "alt": "Data Cube AI – Openai"
+        }
+      ]
+    }
+  },
+  "article": {
+    "title": "OpenAI ships a new reasoning model for developers",
+    "description": "OpenAI ships a new reasoning model for developers: the release adds tool use and a lower price (ja).",
+    "robots": {
+      "index": false,
+      "follow": true
+    },
+    "alternates": {
+      "canonical": "https://www.datacubeai.space/ja/news/2026-09-13/tech-101",
+      "languages": {
+        "x-default": "https://www.datacubeai.space/en/news/2026-09-13/tech-101",
+        "de": "https://www.datacubeai.space/de/news/2026-09-13/tech-101",
+        "en": "https://www.datacubeai.space/en/news/2026-09-13/tech-101",
+        "zh-Hans": "https://www.datacubeai.space/zh/news/2026-09-13/tech-101",
+        "fr": "https://www.datacubeai.space/fr/news/2026-09-13/tech-101",
+        "es": "https://www.datacubeai.space/es/news/2026-09-13/tech-101",
+        "pt": "https://www.datacubeai.space/pt/news/2026-09-13/tech-101",
+        "ja": "https://www.datacubeai.space/ja/news/2026-09-13/tech-101",
+        "ko": "https://www.datacubeai.space/ko/news/2026-09-13/tech-101"
+      }
+    },
+    "openGraph": {
+      "title": "OpenAI ships a new reasoning model for developers",
+      "description": "OpenAI ships a new reasoning model for developers: the release adds tool use and a lower price (ja).",
+      "url": "https://www.datacubeai.space/ja/news/2026-09-13/tech-101",
+      "type": "article",
+      "publishedTime": "2026-09-13T09:00:00.000Z",
+      "images": [
+        {
+          "url": "/og-image.jpg",
+          "width": 1200,
+          "height": 630,
+          "alt": "Data Cube AI"
+        }
+      ]
+    },
+    "twitter": {
+      "card": "summary_large_image",
+      "title": "OpenAI ships a new reasoning model for developers",
+      "description": "OpenAI ships a new reasoning model for developers: the release adds tool use and a lower price (ja).",
+      "images": [
+        "/og-image.jpg"
+      ]
+    }
+  },
+  "articleNotFound": {
+    "title": "Article not found | Data Cube AI",
+    "robots": {
+      "index": false,
+      "follow": true
+    }
+  },
+  "tools": {
+    "aggregator": {
+      "title": {
+        "absolute": "無料AIニュースアグリゲーター — 35以上のソース、8言語、毎日更新 | DataCube AI"
+      },
+      "description": "DataCube AIの無料AIニュースアグリゲーターは35以上のソースから毎日ニュースを厳選。テクノロジー、投資、ヒント、動画を8言語で提供。",
+      "alternates": {
+        "canonical": "https://www.datacubeai.space/ja/tools/ai-news-aggregator",
+        "languages": {
+          "x-default": "https://www.datacubeai.space/en/tools/ai-news-aggregator",
+          "de": "https://www.datacubeai.space/de/tools/ai-news-aggregator",
+          "en": "https://www.datacubeai.space/en/tools/ai-news-aggregator",
+          "zh-Hans": "https://www.datacubeai.space/zh/tools/ai-news-aggregator",
+          "fr": "https://www.datacubeai.space/fr/tools/ai-news-aggregator",
+          "es": "https://www.datacubeai.space/es/tools/ai-news-aggregator",
+          "pt": "https://www.datacubeai.space/pt/tools/ai-news-aggregator",
+          "ja": "https://www.datacubeai.space/ja/tools/ai-news-aggregator",
+          "ko": "https://www.datacubeai.space/ko/tools/ai-news-aggregator"
+        }
+      },
+      "openGraph": {
+        "title": "無料AIニュースアグリゲーター — 35以上のソース、8言語、毎日更新 | DataCube AI",
+        "description": "DataCube AIの無料AIニュースアグリゲーターは35以上のソースから毎日ニュースを厳選。テクノロジー、投資、ヒント、動画を8言語で提供。",
+        "url": "https://www.datacubeai.space/ja/tools/ai-news-aggregator",
+        "images": [
+          {
+            "url": "/og-image.jpg",
+            "width": 1200,
+            "height": 630,
+            "alt": "DataCube AI News Aggregator"
+          }
+        ]
+      },
+      "twitter": {
+        "card": "summary_large_image",
+        "title": "無料AIニュースアグリゲーター — 35以上のソース、8言語、毎日更新 | DataCube AI",
+        "description": "DataCube AIの無料AIニュースアグリゲーターは35以上のソースから毎日ニュースを厳選。テクノロジー、投資、ヒント、動画を8言語で提供。",
+        "images": [
+          {
+            "url": "/og-image.jpg",
+            "alt": "DataCube AI News Aggregator"
+          }
+        ]
+      }
+    },
+    "api": {
+      "title": {
+        "absolute": "無料AIニュースAPI — 8言語のキュレーションAIニュースデータ | DataCube AI"
+      },
+      "description": "35以上のソースからのAIニュース用無料REST API。テクノロジー、投資、ヒント、動画を8言語で。JSON応答、認証不要。",
+      "alternates": {
+        "canonical": "https://www.datacubeai.space/ja/tools/ai-news-api",
+        "languages": {
+          "x-default": "https://www.datacubeai.space/en/tools/ai-news-api",
+          "de": "https://www.datacubeai.space/de/tools/ai-news-api",
+          "en": "https://www.datacubeai.space/en/tools/ai-news-api",
+          "zh-Hans": "https://www.datacubeai.space/zh/tools/ai-news-api",
+          "fr": "https://www.datacubeai.space/fr/tools/ai-news-api",
+          "es": "https://www.datacubeai.space/es/tools/ai-news-api",
+          "pt": "https://www.datacubeai.space/pt/tools/ai-news-api",
+          "ja": "https://www.datacubeai.space/ja/tools/ai-news-api",
+          "ko": "https://www.datacubeai.space/ko/tools/ai-news-api"
+        }
+      },
+      "openGraph": {
+        "title": "無料AIニュースAPI — 8言語のキュレーションAIニュースデータ | DataCube AI",
+        "description": "35以上のソースからのAIニュース用無料REST API。テクノロジー、投資、ヒント、動画を8言語で。JSON応答、認証不要。",
+        "url": "https://www.datacubeai.space/ja/tools/ai-news-api",
+        "images": [
+          {
+            "url": "/og-image.jpg",
+            "width": 1200,
+            "height": 630,
+            "alt": "DataCube AI News API"
+          }
+        ]
+      },
+      "twitter": {
+        "card": "summary_large_image",
+        "title": "無料AIニュースAPI — 8言語のキュレーションAIニュースデータ | DataCube AI",
+        "description": "35以上のソースからのAIニュース用無料REST API。テクノロジー、投資、ヒント、動画を8言語で。JSON応答、認証不要。",
+        "images": [
+          {
+            "url": "/og-image.jpg",
+            "alt": "DataCube AI News API"
+          }
+        ]
+      }
+    },
+    "report": {
+      "title": {
+        "absolute": "無料AIレポートジェネレーター — AIレポートを数秒で作成 | DataCube AI"
+      },
+      "description": "DataCube AIで無料AIレポートを生成。ストリーミング生成、5つのエクスポート形式（DOCX、HTML、Markdown、TXT、JSON）。週刊・日刊AI分析。",
+      "alternates": {
+        "canonical": "https://www.datacubeai.space/ja/tools/ai-report-generator",
+        "languages": {
+          "x-default": "https://www.datacubeai.space/en/tools/ai-report-generator",
+          "de": "https://www.datacubeai.space/de/tools/ai-report-generator",
+          "en": "https://www.datacubeai.space/en/tools/ai-report-generator",
+          "zh-Hans": "https://www.datacubeai.space/zh/tools/ai-report-generator",
+          "fr": "https://www.datacubeai.space/fr/tools/ai-report-generator",
+          "es": "https://www.datacubeai.space/es/tools/ai-report-generator",
+          "pt": "https://www.datacubeai.space/pt/tools/ai-report-generator",
+          "ja": "https://www.datacubeai.space/ja/tools/ai-report-generator",
+          "ko": "https://www.datacubeai.space/ko/tools/ai-report-generator"
+        }
+      },
+      "openGraph": {
+        "title": "無料AIレポートジェネレーター — AIレポートを数秒で作成 | DataCube AI",
+        "description": "DataCube AIで無料AIレポートを生成。ストリーミング生成、5つのエクスポート形式（DOCX、HTML、Markdown、TXT、JSON）。週刊・日刊AI分析。",
+        "url": "https://www.datacubeai.space/ja/tools/ai-report-generator",
+        "images": [
+          {
+            "url": "/og-image.jpg",
+            "width": 1200,
+            "height": 630,
+            "alt": "DataCube AI Report Generator"
+          }
+        ]
+      },
+      "twitter": {
+        "card": "summary_large_image",
+        "title": "無料AIレポートジェネレーター — AIレポートを数秒で作成 | DataCube AI",
+        "description": "DataCube AIで無料AIレポートを生成。ストリーミング生成、5つのエクスポート形式（DOCX、HTML、Markdown、TXT、JSON）。週刊・日刊AI分析。",
+        "images": [
+          {
+            "url": "/og-image.jpg",
+            "alt": "DataCube AI Report Generator"
+          }
+        ]
+      }
+    },
+    "stock": {
+      "robots": {
+        "index": false,
+        "follow": true
+      },
+      "title": {
+        "absolute": "AI株式トラッカー(一時停止中)| DataCube AI"
+      },
+      "description": "ライブ市場データはライセンス審査のため一時停止中です。ディールと資金調達データは AI Funding Tracker でご覧いただけます。",
+      "alternates": {
+        "canonical": "https://www.datacubeai.space/ja/tools/ai-stock-tracker",
+        "languages": {
+          "x-default": "https://www.datacubeai.space/en/tools/ai-stock-tracker",
+          "de": "https://www.datacubeai.space/de/tools/ai-stock-tracker",
+          "en": "https://www.datacubeai.space/en/tools/ai-stock-tracker",
+          "zh-Hans": "https://www.datacubeai.space/zh/tools/ai-stock-tracker",
+          "fr": "https://www.datacubeai.space/fr/tools/ai-stock-tracker",
+          "es": "https://www.datacubeai.space/es/tools/ai-stock-tracker",
+          "pt": "https://www.datacubeai.space/pt/tools/ai-stock-tracker",
+          "ja": "https://www.datacubeai.space/ja/tools/ai-stock-tracker",
+          "ko": "https://www.datacubeai.space/ko/tools/ai-stock-tracker"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,336 @@
+{
+  "home": {
+    "title": {
+      "absolute": "Data Cube AI | 매일 AI 뉴스 & 인사이트"
+    },
+    "description": "무료 다국어 AI 뉴스 애그리게이터: 생성형 AI 돌파구, LLM 최신 뉴스, AI 투자 신호, 실용 팁 – 40개 이상 소스에서 매일 엄선, 8개 언어 지원.",
+    "alternates": {
+      "canonical": "https://www.datacubeai.space/ko",
+      "languages": {
+        "x-default": "https://www.datacubeai.space",
+        "de": "https://www.datacubeai.space/de",
+        "en": "https://www.datacubeai.space/en",
+        "zh-Hans": "https://www.datacubeai.space/zh",
+        "fr": "https://www.datacubeai.space/fr",
+        "es": "https://www.datacubeai.space/es",
+        "pt": "https://www.datacubeai.space/pt",
+        "ja": "https://www.datacubeai.space/ja",
+        "ko": "https://www.datacubeai.space/ko"
+      }
+    },
+    "openGraph": {
+      "title": "Data Cube AI | 매일 AI 뉴스 & 인사이트",
+      "description": "엄선된 AI 뉴스, 투자 정보, 실용 팁 — 8개 언어로 매일 업데이트.",
+      "url": "https://www.datacubeai.space/ko",
+      "images": [
+        {
+          "url": "/og-image.jpg",
+          "width": 1200,
+          "height": 630,
+          "alt": "Data Cube AI – AI와 인간의 통찰력이 만나는 곳"
+        }
+      ]
+    },
+    "twitter": {
+      "card": "summary_large_image",
+      "title": "Data Cube AI | 매일 AI 뉴스 & 인사이트",
+      "description": "엄선된 AI 뉴스, 투자 정보, 실용 팁 — 8개 언어로 매일 업데이트.",
+      "images": [
+        {
+          "url": "/og-image.jpg",
+          "alt": "Data Cube AI – AI와 인간의 통찰력이 만나는 곳"
+        }
+      ]
+    }
+  },
+  "week": {
+    "title": "AI 뉴스 Sep 13, 2026 — 기술, 투자 및 실용 팁",
+    "description": "Sep 13, 2026 AI 뉴스 큐레이션: 기술 돌파구, 투자 신호, 실용 팁 – 매일 업데이트.",
+    "alternates": {
+      "canonical": "https://www.datacubeai.space/ko/week/2026-09-13",
+      "languages": {
+        "x-default": "https://www.datacubeai.space/en/week/2026-09-13",
+        "de": "https://www.datacubeai.space/de/week/2026-09-13",
+        "en": "https://www.datacubeai.space/en/week/2026-09-13",
+        "zh-Hans": "https://www.datacubeai.space/zh/week/2026-09-13",
+        "fr": "https://www.datacubeai.space/fr/week/2026-09-13",
+        "es": "https://www.datacubeai.space/es/week/2026-09-13",
+        "pt": "https://www.datacubeai.space/pt/week/2026-09-13",
+        "ja": "https://www.datacubeai.space/ja/week/2026-09-13",
+        "ko": "https://www.datacubeai.space/ko/week/2026-09-13"
+      }
+    },
+    "openGraph": {
+      "title": "AI 뉴스 Sep 13, 2026 — 기술, 투자 및 실용 팁",
+      "description": "Sep 13, 2026 AI 뉴스 큐레이션: 기술 돌파구, 투자 신호, 실용 팁 – 매일 업데이트.",
+      "url": "https://www.datacubeai.space/ko/week/2026-09-13",
+      "type": "article",
+      "publishedTime": "2026-09-13T00:00:00.000Z",
+      "images": [
+        {
+          "url": "/api/og?period=2026-09-13&lang=ko",
+          "width": 1200,
+          "height": 630,
+          "alt": "Data Cube AI – AI 뉴스 Sep 13, 2026"
+        }
+      ]
+    },
+    "twitter": {
+      "card": "summary_large_image",
+      "title": "AI 뉴스 Sep 13, 2026 — 기술, 투자 및 실용 팁",
+      "description": "Sep 13, 2026 AI 뉴스 큐레이션: 기술 돌파구, 투자 신호, 실용 팁 – 매일 업데이트.",
+      "images": [
+        {
+          "url": "/api/og?period=2026-09-13&lang=ko",
+          "alt": "Data Cube AI – AI 뉴스 Sep 13, 2026"
+        }
+      ]
+    }
+  },
+  "topic": {
+    "title": "Openai AI 뉴스 – 최신 보도 & 분석",
+    "description": "Openai AI 큐레이션: 기술 뉴스, 투자 신호, 실용 팁.",
+    "robots": {
+      "index": false,
+      "follow": false
+    },
+    "alternates": {
+      "canonical": "https://www.datacubeai.space/ko/topic/openai",
+      "languages": {
+        "x-default": "https://www.datacubeai.space/en/topic/openai",
+        "de": "https://www.datacubeai.space/de/topic/openai",
+        "en": "https://www.datacubeai.space/en/topic/openai",
+        "zh-Hans": "https://www.datacubeai.space/zh/topic/openai",
+        "fr": "https://www.datacubeai.space/fr/topic/openai",
+        "es": "https://www.datacubeai.space/es/topic/openai",
+        "pt": "https://www.datacubeai.space/pt/topic/openai",
+        "ja": "https://www.datacubeai.space/ja/topic/openai",
+        "ko": "https://www.datacubeai.space/ko/topic/openai"
+      }
+    },
+    "openGraph": {
+      "title": "Openai AI 뉴스 – 최신 보도 & 분석",
+      "description": "Openai AI 큐레이션: 기술 뉴스, 투자 신호, 실용 팁.",
+      "url": "https://www.datacubeai.space/ko/topic/openai",
+      "type": "article",
+      "images": [
+        {
+          "url": "/og-image.jpg",
+          "width": 1200,
+          "height": 630,
+          "alt": "Data Cube AI – Openai"
+        }
+      ]
+    }
+  },
+  "article": {
+    "title": "OpenAI ships a new reasoning model for developers",
+    "description": "OpenAI ships a new reasoning model for developers: the release adds tool use and a lower price (ko).",
+    "robots": {
+      "index": false,
+      "follow": true
+    },
+    "alternates": {
+      "canonical": "https://www.datacubeai.space/ko/news/2026-09-13/tech-101",
+      "languages": {
+        "x-default": "https://www.datacubeai.space/en/news/2026-09-13/tech-101",
+        "de": "https://www.datacubeai.space/de/news/2026-09-13/tech-101",
+        "en": "https://www.datacubeai.space/en/news/2026-09-13/tech-101",
+        "zh-Hans": "https://www.datacubeai.space/zh/news/2026-09-13/tech-101",
+        "fr": "https://www.datacubeai.space/fr/news/2026-09-13/tech-101",
+        "es": "https://www.datacubeai.space/es/news/2026-09-13/tech-101",
+        "pt": "https://www.datacubeai.space/pt/news/2026-09-13/tech-101",
+        "ja": "https://www.datacubeai.space/ja/news/2026-09-13/tech-101",
+        "ko": "https://www.datacubeai.space/ko/news/2026-09-13/tech-101"
+      }
+    },
+    "openGraph": {
+      "title": "OpenAI ships a new reasoning model for developers",
+      "description": "OpenAI ships a new reasoning model for developers: the release adds tool use and a lower price (ko).",
+      "url": "https://www.datacubeai.space/ko/news/2026-09-13/tech-101",
+      "type": "article",
+      "publishedTime": "2026-09-13T09:00:00.000Z",
+      "images": [
+        {
+          "url": "/og-image.jpg",
+          "width": 1200,
+          "height": 630,
+          "alt": "Data Cube AI"
+        }
+      ]
+    },
+    "twitter": {
+      "card": "summary_large_image",
+      "title": "OpenAI ships a new reasoning model for developers",
+      "description": "OpenAI ships a new reasoning model for developers: the release adds tool use and a lower price (ko).",
+      "images": [
+        "/og-image.jpg"
+      ]
+    }
+  },
+  "articleNotFound": {
+    "title": "Article not found | Data Cube AI",
+    "robots": {
+      "index": false,
+      "follow": true
+    }
+  },
+  "tools": {
+    "aggregator": {
+      "title": {
+        "absolute": "무료 AI 뉴스 집합기 — 35개+ 소스, 8개 언어, 매일 업데이트 | DataCube AI"
+      },
+      "description": "DataCube AI의 무료 AI 뉴스 집합기는 35개 이상 소스에서 매일 뉴스를 선별합니다. 기술, 투자, 팁, 동영상을 8개 언어로 제공합니다.",
+      "alternates": {
+        "canonical": "https://www.datacubeai.space/ko/tools/ai-news-aggregator",
+        "languages": {
+          "x-default": "https://www.datacubeai.space/en/tools/ai-news-aggregator",
+          "de": "https://www.datacubeai.space/de/tools/ai-news-aggregator",
+          "en": "https://www.datacubeai.space/en/tools/ai-news-aggregator",
+          "zh-Hans": "https://www.datacubeai.space/zh/tools/ai-news-aggregator",
+          "fr": "https://www.datacubeai.space/fr/tools/ai-news-aggregator",
+          "es": "https://www.datacubeai.space/es/tools/ai-news-aggregator",
+          "pt": "https://www.datacubeai.space/pt/tools/ai-news-aggregator",
+          "ja": "https://www.datacubeai.space/ja/tools/ai-news-aggregator",
+          "ko": "https://www.datacubeai.space/ko/tools/ai-news-aggregator"
+        }
+      },
+      "openGraph": {
+        "title": "무료 AI 뉴스 집합기 — 35개+ 소스, 8개 언어, 매일 업데이트 | DataCube AI",
+        "description": "DataCube AI의 무료 AI 뉴스 집합기는 35개 이상 소스에서 매일 뉴스를 선별합니다. 기술, 투자, 팁, 동영상을 8개 언어로 제공합니다.",
+        "url": "https://www.datacubeai.space/ko/tools/ai-news-aggregator",
+        "images": [
+          {
+            "url": "/og-image.jpg",
+            "width": 1200,
+            "height": 630,
+            "alt": "DataCube AI News Aggregator"
+          }
+        ]
+      },
+      "twitter": {
+        "card": "summary_large_image",
+        "title": "무료 AI 뉴스 집합기 — 35개+ 소스, 8개 언어, 매일 업데이트 | DataCube AI",
+        "description": "DataCube AI의 무료 AI 뉴스 집합기는 35개 이상 소스에서 매일 뉴스를 선별합니다. 기술, 투자, 팁, 동영상을 8개 언어로 제공합니다.",
+        "images": [
+          {
+            "url": "/og-image.jpg",
+            "alt": "DataCube AI News Aggregator"
+          }
+        ]
+      }
+    },
+    "api": {
+      "title": {
+        "absolute": "무료 AI 뉴스 API — 8개 언어 큐레이션 AI 뉴스 데이터 | DataCube AI"
+      },
+      "description": "35개+ 소스의 큐레이션 AI 뉴스를 위한 무료 REST API. 기술, 투자, 팁, 동영상을 8개 언어로. JSON 응답, 인증 불필요.",
+      "alternates": {
+        "canonical": "https://www.datacubeai.space/ko/tools/ai-news-api",
+        "languages": {
+          "x-default": "https://www.datacubeai.space/en/tools/ai-news-api",
+          "de": "https://www.datacubeai.space/de/tools/ai-news-api",
+          "en": "https://www.datacubeai.space/en/tools/ai-news-api",
+          "zh-Hans": "https://www.datacubeai.space/zh/tools/ai-news-api",
+          "fr": "https://www.datacubeai.space/fr/tools/ai-news-api",
+          "es": "https://www.datacubeai.space/es/tools/ai-news-api",
+          "pt": "https://www.datacubeai.space/pt/tools/ai-news-api",
+          "ja": "https://www.datacubeai.space/ja/tools/ai-news-api",
+          "ko": "https://www.datacubeai.space/ko/tools/ai-news-api"
+        }
+      },
+      "openGraph": {
+        "title": "무료 AI 뉴스 API — 8개 언어 큐레이션 AI 뉴스 데이터 | DataCube AI",
+        "description": "35개+ 소스의 큐레이션 AI 뉴스를 위한 무료 REST API. 기술, 투자, 팁, 동영상을 8개 언어로. JSON 응답, 인증 불필요.",
+        "url": "https://www.datacubeai.space/ko/tools/ai-news-api",
+        "images": [
+          {
+            "url": "/og-image.jpg",
+            "width": 1200,
+            "height": 630,
+            "alt": "DataCube AI News API"
+          }
+        ]
+      },
+      "twitter": {
+        "card": "summary_large_image",
+        "title": "무료 AI 뉴스 API — 8개 언어 큐레이션 AI 뉴스 데이터 | DataCube AI",
+        "description": "35개+ 소스의 큐레이션 AI 뉴스를 위한 무료 REST API. 기술, 투자, 팁, 동영상을 8개 언어로. JSON 응답, 인증 불필요.",
+        "images": [
+          {
+            "url": "/og-image.jpg",
+            "alt": "DataCube AI News API"
+          }
+        ]
+      }
+    },
+    "report": {
+      "title": {
+        "absolute": "무료 AI 보고서 생성기 — AI 보고서를 몇 초 만에 생성 | DataCube AI"
+      },
+      "description": "DataCube AI로 무료 AI 보고서를 생성하세요. 스트리밍 생성, 5가지 내보내기 형식 (DOCX, HTML, Markdown, TXT, JSON). 주간 및 일간 AI 분석.",
+      "alternates": {
+        "canonical": "https://www.datacubeai.space/ko/tools/ai-report-generator",
+        "languages": {
+          "x-default": "https://www.datacubeai.space/en/tools/ai-report-generator",
+          "de": "https://www.datacubeai.space/de/tools/ai-report-generator",
+          "en": "https://www.datacubeai.space/en/tools/ai-report-generator",
+          "zh-Hans": "https://www.datacubeai.space/zh/tools/ai-report-generator",
+          "fr": "https://www.datacubeai.space/fr/tools/ai-report-generator",
+          "es": "https://www.datacubeai.space/es/tools/ai-report-generator",
+          "pt": "https://www.datacubeai.space/pt/tools/ai-report-generator",
+          "ja": "https://www.datacubeai.space/ja/tools/ai-report-generator",
+          "ko": "https://www.datacubeai.space/ko/tools/ai-report-generator"
+        }
+      },
+      "openGraph": {
+        "title": "무료 AI 보고서 생성기 — AI 보고서를 몇 초 만에 생성 | DataCube AI",
+        "description": "DataCube AI로 무료 AI 보고서를 생성하세요. 스트리밍 생성, 5가지 내보내기 형식 (DOCX, HTML, Markdown, TXT, JSON). 주간 및 일간 AI 분석.",
+        "url": "https://www.datacubeai.space/ko/tools/ai-report-generator",
+        "images": [
+          {
+            "url": "/og-image.jpg",
+            "width": 1200,
+            "height": 630,
+            "alt": "DataCube AI Report Generator"
+          }
+        ]
+      },
+      "twitter": {
+        "card": "summary_large_image",
+        "title": "무료 AI 보고서 생성기 — AI 보고서를 몇 초 만에 생성 | DataCube AI",
+        "description": "DataCube AI로 무료 AI 보고서를 생성하세요. 스트리밍 생성, 5가지 내보내기 형식 (DOCX, HTML, Markdown, TXT, JSON). 주간 및 일간 AI 분석.",
+        "images": [
+          {
+            "url": "/og-image.jpg",
+            "alt": "DataCube AI Report Generator"
+          }
+        ]
+      }
+    },
+    "stock": {
+      "robots": {
+        "index": false,
+        "follow": true
+      },
+      "title": {
+        "absolute": "AI 주식 추적기(일시 중지)| DataCube AI"
+      },
+      "description": "실시간 시장 데이터는 라이선스 검토 기간 동안 일시 중지됩니다. 딜 및 자금 조달 데이터는 AI Funding Tracker에서 확인할 수 있습니다.",
+      "alternates": {
+        "canonical": "https://www.datacubeai.space/ko/tools/ai-stock-tracker",
+        "languages": {
+          "x-default": "https://www.datacubeai.space/en/tools/ai-stock-tracker",
+          "de": "https://www.datacubeai.space/de/tools/ai-stock-tracker",
+          "en": "https://www.datacubeai.space/en/tools/ai-stock-tracker",
+          "zh-Hans": "https://www.datacubeai.space/zh/tools/ai-stock-tracker",
+          "fr": "https://www.datacubeai.space/fr/tools/ai-stock-tracker",
+          "es": "https://www.datacubeai.space/es/tools/ai-stock-tracker",
+          "pt": "https://www.datacubeai.space/pt/tools/ai-stock-tracker",
+          "ja": "https://www.datacubeai.space/ja/tools/ai-stock-tracker",
+          "ko": "https://www.datacubeai.space/ko/tools/ai-stock-tracker"
+        }
+      }
+    }
+  }
+}

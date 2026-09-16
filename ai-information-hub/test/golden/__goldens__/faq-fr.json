@@ -1,0 +1,38 @@
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Qu'est-ce que Data Cube AI ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Data Cube AI est un agrégateur d'actualités IA multilingue (8 langues) qui sélectionne quotidiennement des percées technologiques, des nouvelles d'investissement, des conseils pratiques et des vidéos YouTube à partir de plus de 40 sources."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "À quelle fréquence le contenu est-il mis à jour ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Le contenu est mis à jour quotidiennement en fin de soirée (heure de Berlin), avec de nouveaux articles tech, des actualités investissement et des conseils pratiques."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Quelles langues sont prises en charge ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Data Cube AI prend en charge 8 langues : allemand, anglais, chinois, français, espagnol, portugais, japonais et coréen."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Quels types d'actualités IA couvre Data Cube AI ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Data Cube AI couvre trois catégories : Tech (percées IA, recherche, lancements de produits), Investissement (levées de fonds, M&A, mouvements de marché) et Astuces (outils IA pratiques et prompts)."
+      }
+    }
+  ]
+}

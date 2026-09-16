@@ -1,0 +1,38 @@
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Was ist Data Cube AI?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Data Cube AI ist ein mehrsprachiger (8 Sprachen: DE, EN, ZH, FR, ES, PT, JA, KO) täglicher KI-News-Aggregator. Er kuratiert Technologie-Durchbrüche, Investment-News, praktische Tipps und YouTube-Videos aus über 40 Quellen."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Wie oft wird der Inhalt aktualisiert?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Der Inhalt wird täglich am späten Abend (Europe/Berlin) aktualisiert, mit neuen Tech-Meldungen, Investment-News und praktischen Tipps."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Welche Sprachen unterstützt Data Cube AI?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Data Cube AI unterstützt 8 Sprachen: Deutsch, Englisch, Chinesisch, Französisch, Spanisch, Portugiesisch, Japanisch und Koreanisch."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Welche Arten von KI-News deckt Data Cube AI ab?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Data Cube AI deckt drei Hauptkategorien ab: Tech (KI-Durchbrüche, Forschung, Produkteinführungen), Investment (Finanzierungsrunden, M&A, Marktbewegungen) und Tipps (praktische KI-Tools und Prompts)."
+      }
+    }
+  ]
+}

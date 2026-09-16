@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="ko">
+  <title>Data Cube AI – 매일 AI 뉴스</title>
+  <subtitle>엄선된 AI 뉴스: 기술, 투자, 실용 팁</subtitle>
+  <link href="https://www.datacubeai.space/feed.xml?lang=ko" rel="self" type="application/atom+xml" />
+  <link href="https://www.datacubeai.space" rel="alternate" type="text/html" />
+  <id>tag:datacubeai.space,2026:feed:ko</id>
+  <updated>2026-09-13T12:00:00.000Z</updated>
+  <author>
+    <name>Data Cube AI</name>
+    <uri>https://www.datacubeai.space</uri>
+  </author>
+  <generator>Data Cube AI</generator>
+  <entry>
+    <title>Chip startup expands inference capacity in Europe with a new data center (ko).</title>
+    <link href="https://www.datacubeai.space/ko/news/2026-09-13/tech-102" rel="alternate" />
+    <id>tag:datacubeai.space,2026:ko:2026-09-13-tech-102</id>
+    <updated>2026-09-13T11:30:00.000Z</updated>
+    <summary type="text">Chip startup expands inference capacity in Europe with a new data center (ko).</summary>
+    <category term="Infrastructure" />
+    <source>
+      <title>Example Wire</title>
+      <link href="https://example.com/chips" />
+    </source>
+  </entry>
+  <entry>
+    <title>Chip startup expands inference capacity in Europe with a new data center (ko).</title>
+    <link href="https://www.datacubeai.space/ko/news/2026-09-12/tech-102" rel="alternate" />
+    <id>tag:datacubeai.space,2026:ko:2026-09-12-tech-102</id>
+    <updated>2026-09-13T11:30:00.000Z</updated>
+    <summary type="text">Chip startup expands inference capacity in Europe with a new data center (ko).</summary>
+    <category term="Infrastructure" />
+    <source>
+      <title>Example Wire</title>
+      <link href="https://example.com/chips" />
+    </source>
+  </entry>
+  <entry>
+    <title>Chip startup expands inference capacity in Europe with a new data center (ko).</title>
+    <link href="https://www.datacubeai.space/ko/news/2026-kw37/tech-102" rel="alternate" />
+    <id>tag:datacubeai.space,2026:ko:2026-kw37-tech-102</id>
+    <updated>2026-09-13T11:30:00.000Z</updated>
+    <summary type="text">Chip startup expands inference capacity in Europe with a new data center (ko).</summary>
+    <category term="Infrastructure" />
+    <source>
+      <title>Example Wire</title>
+      <link href="https://example.com/chips" />
+    </source>
+  </entry>
+  <entry>
+    <title>OpenAI ships a new reasoning model for developers: the release adds tool use and a lower price (ko).</title>
+    <link href="https://www.datacubeai.space/ko/news/2026-09-13/tech-101" rel="alternate" />
+    <id>tag:datacubeai.space,2026:ko:2026-09-13-tech-101</id>
+    <updated>2026-09-13T09:00:00.000Z</updated>
+    <summary type="text">OpenAI ships a new reasoning model for developers: the release adds tool use and a lower price (ko).</summary>
+    <category term="LLM" />
+    <source>
+      <title>Example News</title>
+      <link href="https://example.com/openai-model" />
+    </source>
+  </entry>
+  <entry>
+    <title>OpenAI ships a new reasoning model for developers: the release adds tool use and a lower price (ko).</title>
+    <link href="https://www.datacubeai.space/ko/news/2026-09-12/tech-101" rel="alternate" />
+    <id>tag:datacubeai.space,2026:ko:2026-09-12-tech-101</id>
+    <updated>2026-09-13T09:00:00.000Z</updated>
+    <summary type="text">OpenAI ships a new reasoning model for developers: the release adds tool use and a lower price (ko).</summary>
+    <category term="LLM" />
+    <source>
+      <title>Example News</title>
+      <link href="https://example.com/openai-model" />
+    </source>
+  </entry>
+  <entry>
+    <title>OpenAI ships a new reasoning model for developers: the release adds tool use and a lower price (ko).</title>
+    <link href="https://www.datacubeai.space/ko/news/2026-kw37/tech-101" rel="alternate" />
+    <id>tag:datacubeai.space,2026:ko:2026-kw37-tech-101</id>
+    <updated>2026-09-13T09:00:00.000Z</updated>
+    <summary type="text">OpenAI ships a new reasoning model for developers: the release adds tool use and a lower price (ko).</summary>
+    <category term="LLM" />
+    <source>
+      <title>Example News</title>
+      <link href="https://example.com/openai-model" />
+    </source>
+  </entry>
+</feed>
