@@ -3572,6 +3572,8 @@ git -C <repo-root> diff --stat -- ai-information-hub/test/golden/__goldens__
 git -C <repo-root> diff -U0 -- ai-information-hub/test/golden/__goldens__ | grep -E '^[-+] ' | sort | uniq -c | sort -rn | head -40
 ```
 
+The `grep` only sees the JSON goldens: each `pages/*.html` golden is a single line, so its diff lines start `-<` / `+<` with no space and never match. Classify the HTML goldens with a token diff instead (split on `<[^>]+>|[^<]+` and compare with `difflib.SequenceMatcher`), and check the `--stat` file count against the table so a skipped file cannot pass silently.
+
 Expected: the changed goldens are exactly these, and every changed line matches one of these items:
 
 | Golden | Change |
