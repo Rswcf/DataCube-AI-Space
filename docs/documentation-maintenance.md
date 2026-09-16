@@ -21,6 +21,7 @@ Some assistant-context files (`CLAUDE.md` and `.ai-collab/context/*`) may be git
 | `.ai-collab/context/codebase-map.md` | Current route and file map |
 | `docs/brand-guidelines.md` | Brand system (dated snapshot — design principles only) |
 | `docs/seo-geo-optimization-plan.md` | Dated snapshot (2026-05); live SEO strategy lives in `.ai-collab/context/seo-growth-ads-strategy-2026-07.md` |
+| `docs/monetization-plan.md` | Dated snapshot (2026-05); live monetization direction lives in `docs/superpowers/specs/2026-09-13-independent-newsletter-program-design.md` |
 | `ai-information-hub/public/llms.txt` | AI crawler and citation-facing site description |
 | `ai-information-hub/public/robots.txt` | Crawler access policy |
 
