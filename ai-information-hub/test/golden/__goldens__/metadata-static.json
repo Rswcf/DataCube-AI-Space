@@ -292,13 +292,13 @@
   },
   "editorialPolicy": {
     "title": "Editorial Policy",
-    "description": "Editorial policy for Data Cube AI, including source attribution, curation rules, corrections, and AI-assisted processing.",
+    "description": "Editorial policy for Data Cube AI, including source attribution, curation rules, corrections, and AI-generated content.",
     "alternates": {
       "canonical": "https://www.datacubeai.space/editorial-policy"
     },
     "openGraph": {
       "title": "Editorial Policy | Data Cube AI",
-      "description": "How Data Cube AI selects sources, summarizes AI news, labels AI-assisted processing, and handles corrections.",
+      "description": "How Data Cube AI selects sources, summarizes AI news, labels AI-generated content, and handles corrections.",
       "url": "https://www.datacubeai.space/editorial-policy",
       "images": [
         {

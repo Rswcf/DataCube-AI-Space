@@ -4,11 +4,11 @@ import { TrustPage, type TrustPageConfig } from '../trust-page'
 
 export const metadata: Metadata = {
   title: 'Editorial Policy',
-  description: `Editorial policy for ${BRAND.name}, including source attribution, curation rules, corrections, and AI-assisted processing.`,
+  description: `Editorial policy for ${BRAND.name}, including source attribution, curation rules, corrections, and AI-generated content.`,
   alternates: { canonical: absoluteUrl('/editorial-policy') },
   openGraph: {
     title: brandedTitle('Editorial Policy'),
-    description: `How ${BRAND.name} selects sources, summarizes AI news, labels AI-assisted processing, and handles corrections.`,
+    description: `How ${BRAND.name} selects sources, summarizes AI news, labels AI-generated content, and handles corrections.`,
     url: absoluteUrl('/editorial-policy'),
     images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: BRAND.name }],
   },
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 const config: TrustPageConfig = {
   label: 'Editorial Policy',
   title: `How ${BRAND.name} Curates Intelligence`,
-  description: 'Our editorial policy is built around attribution, clear summaries, source traceability, and conservative labeling of AI-assisted content.',
+  description: 'Our editorial policy is built around attribution, clear summaries, source traceability, and clear labeling of AI-generated content.',
   sections: [
     {
       title: 'Selection Criteria',

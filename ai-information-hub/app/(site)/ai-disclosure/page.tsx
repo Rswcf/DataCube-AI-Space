@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 const config: TrustPageConfig = {
   label: 'AI Disclosure',
   title: `How ${BRAND.name} Uses AI`,
-  description: `${BRAND.name} uses automated and AI-assisted workflows to process public source material into concise multilingual briefings.`,
+  description: `${BRAND.name} uses automated, AI-driven workflows to turn public source material into concise multilingual briefings.`,
   sections: [
     {
       title: 'AI-Generated Content',
@@ -38,7 +38,7 @@ const config: TrustPageConfig = {
     {
       title: 'What AI Does Not Mean',
       body: [
-        'AI assistance does not make a summary a primary source. The original publisher remains the best source for full context, quotes, legal details, financial numbers, and later updates.',
+        'An AI-generated summary is not a primary source. The original publisher remains the best source for full context, quotes, legal details, financial numbers, and later updates.',
       ],
     },
     {

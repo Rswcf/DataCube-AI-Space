@@ -217,7 +217,7 @@ export function Sidebar({ activeTab, onTabChange, selectedWeekId, onWeekChange }
             {language === "de" ? "Kontakt" : "Contact"}
           </a>
           <a href="/editorial-policy" className="text-xs text-muted-foreground hover:text-foreground transition-colors focus-visible:ring-2 focus-visible:ring-ring rounded">
-            {language === "de" ? "Redaktion" : "Editorial"}
+            {language === "de" ? "Redaktionsrichtlinien" : "Editorial Policy"}
           </a>
           <a href="/impressum" className="text-xs text-muted-foreground hover:text-foreground transition-colors focus-visible:ring-2 focus-visible:ring-ring rounded">
             {language === "de" ? "Impressum" : "Legal Notice"}
