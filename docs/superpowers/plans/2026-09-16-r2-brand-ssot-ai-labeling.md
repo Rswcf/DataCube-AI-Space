@@ -151,6 +151,7 @@
 | ID | Change |
 |---|---|
 | C1 | **llms.txt default language.** The Languages line names English as the default ("English (en) — default | German (de) | …"); it named German, which has been false since the 2026-08 repositioning. |
+| C2 | **Aggregator live preview.** The AI News Aggregator tool page shows the newest day's posts (and so its AI label) instead of a permanent "Latest posts are loading…": it read a `days` key the `/weeks` response does not have and fell back to an empty week id. |
 
 Nothing changes while `NEXT_PUBLIC_FOUNDER_NAME` (frontend) and `FOUNDER_NAME` (backend) are unset; Release step 0 sets both to `Deepviews` (founder decision, 2026-09-16). Once set, the trust-page footers, the homepage sidebar and every email show "Made by Deepviews", and the Organization JSON-LD gains `founder`, typed `Organization` (Ruling R-15).
 
