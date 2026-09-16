@@ -1,9 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createElement, type ReactElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
+import { NextRequest } from 'next/server'
 import { FeedMasthead } from '@/components/feed-masthead'
-import { AI_DISCLOSURE_PATH, aiLabel, aiLabelLinkText, aiLabelShort } from '@/lib/ai-label'
-import { BRAND } from '@/lib/brand'
+import { AI_DISCLOSURE_PATH, aiLabel, aiLabelForImage, aiLabelLinkText, aiLabelShort } from '@/lib/ai-label'
+import { BRAND, absoluteUrl } from '@/lib/brand'
 import { FIXED_NOW, LANGS, PERIOD_ID, STORY_ID, TOPIC, stubApiFetch } from './fixtures/api'
 
 vi.mock('next/link', () => ({
@@ -81,5 +82,75 @@ describe.each(LANGS)('AI label on HTML surfaces in %s', (lang) => {
 
   it('home feed masthead', async () => {
     expectLabel(await render(createElement(FeedMasthead, { issueLabel: 'Sep 13, 2026', language: lang })), lang)
+  })
+})
+
+function escapeRegExp(text: string): string {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+// next/og renders with fonts. This stand-in keeps the element tree it is given, so the OG test reads the
+// image text without fonts or network.
+vi.mock('next/og', () => ({
+  ImageResponse: class {
+    element: unknown
+    constructor(element: unknown) {
+      this.element = element
+    }
+  },
+}))
+
+/** Every string in a JSX element tree, in render order. */
+function textOf(node: unknown): string[] {
+  if (typeof node === 'string' || typeof node === 'number') return [String(node)]
+  if (Array.isArray(node)) return node.flatMap(textOf)
+  if (node && typeof node === 'object' && 'props' in node) {
+    return textOf((node as { props: { children?: unknown } }).props.children)
+  }
+  return []
+}
+
+describe('AI label on machine-readable surfaces', () => {
+  const SITE = 'https://www.example.com'
+
+  it.each(LANGS)('feed.xml subtitle in %s', async (lang) => {
+    const { GET } = await import('@/app/feed.xml/route')
+    const xml = await (await GET(new NextRequest(`${SITE}/feed.xml?lang=${lang}`))).text()
+    expect(xml).toMatch(new RegExp(`<subtitle>[^<]* · ${escapeRegExp(aiLabel(lang))}</subtitle>`))
+  })
+
+  it.each(['de', 'en'])('newsletter.xml subtitle and every entry in %s', async (lang) => {
+    const { GET } = await import('@/app/newsletter.xml/route')
+    const xml = await (await GET(new NextRequest(`${SITE}/newsletter.xml?lang=${lang}`))).text()
+    expect(xml).toContain(` · ${aiLabel(lang)}</subtitle>`)
+    const entries = xml.split('<entry>').slice(1)
+    expect(entries.length).toBeGreaterThan(0)
+    for (const entry of entries) {
+      expect(entry).toContain(`<content type="html">&lt;p&gt;&lt;em&gt;${aiLabel(lang)}&lt;/em&gt;&lt;/p&gt;`)
+    }
+  })
+
+  it.each(LANGS)('content summary in %s: label below the title, AI-generated footer', async (lang) => {
+    const { GET } = await import('@/app/api/content-summary/route')
+    const md = await (await GET(new NextRequest(`${SITE}/api/content-summary?lang=${lang}&periodId=${PERIOD_ID}`))).text()
+    const label = `\n\n> ${aiLabel(lang)} ${absoluteUrl(AI_DISCLOSURE_PATH)}\n\n`
+    expect(md).toContain(label)
+    expect(md.indexOf(label)).toBeLessThan(md.indexOf('## Summary Statistics'))
+    expect(md).toContain('Content is AI-generated')
+  })
+
+  it('llms.txt carries the label in its introduction', async () => {
+    const { GET } = await import('@/app/llms.txt/route')
+    const text = await GET().text()
+    const label = `> ${aiLabel('en')} How we use AI: ${absoluteUrl(AI_DISCLOSURE_PATH)}`
+    expect(text).toContain(label)
+    expect(text.indexOf(label)).toBeLessThan(text.indexOf('## Content Sections'))
+  })
+
+  it.each(['en', 'zh'])('OG image text in %s', async (lang) => {
+    const { GET } = await import('@/app/api/og/route')
+    const image = (await GET(new NextRequest(`${SITE}/api/og?period=${PERIOD_ID}&lang=${lang}`))) as unknown as { element: unknown }
+    // English on the image for zh, ja and ko (Ruling R-5); aiLabelForImage encodes that choice.
+    expect(textOf(image.element)).toContain(aiLabelForImage(lang))
   })
 })

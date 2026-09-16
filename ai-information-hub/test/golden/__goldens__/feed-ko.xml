@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="ko">
   <title>Data Cube AI – 매일 AI 뉴스</title>
-  <subtitle>엄선된 AI 뉴스: 기술, 투자, 실용 팁</subtitle>
+  <subtitle>엄선된 AI 뉴스: 기술, 투자, 실용 팁 · AI 생성: 요약은 링크된 출처를 바탕으로 AI가 작성했습니다.</subtitle>
   <link href="https://www.datacubeai.space/feed.xml?lang=ko" rel="self" type="application/atom+xml" />
   <link href="https://www.datacubeai.space" rel="alternate" type="text/html" />
   <id>tag:datacubeai.space,2026:feed:ko</id>

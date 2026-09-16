@@ -9,6 +9,8 @@ license: CC BY 4.0
 
 # Data Cube AI - AI News Sep 13, 2026
 
+> AI 생성: 요약은 링크된 출처를 바탕으로 AI가 작성했습니다. https://www.datacubeai.space/ai-disclosure
+
 ## Summary Statistics
 - **Tech articles**: 2 posts covering 2 categories
 - **Funding rounds**: 1 rounds ($50M)
@@ -61,7 +63,7 @@ Ask for JSON and validate it against a schema before acting.
 ---
 
 ## About Data Cube AI
-Data Cube AI is a multilingual (8 languages) daily AI news aggregator curating content from 40+ sources including RSS feeds, Hacker News, YouTube, and Reddit communities. Content is AI-assisted and updated daily in the late evening (Europe/Berlin time).
+Data Cube AI is a multilingual (8 languages) daily AI news aggregator curating content from 40+ sources including RSS feeds, Hacker News, YouTube, and Reddit communities. Content is AI-generated and updated daily in the late evening (Europe/Berlin time).
 
 Source: [Data Cube AI](https://www.datacubeai.space) | [API Documentation](https://www.datacubeai.space/llms.txt)
 

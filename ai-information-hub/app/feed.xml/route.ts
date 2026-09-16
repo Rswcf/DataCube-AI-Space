@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
 import { absoluteArticleUrl, techStoryId } from '@/lib/article-routes';
+import { aiLabel } from '@/lib/ai-label';
 import { BRAND, FROZEN_IDS } from '@/lib/brand';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api-production-3ee5.up.railway.app/api';
@@ -143,7 +144,7 @@ export async function GET(request: NextRequest) {
   const atom = `<?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="${lang}">
   <title>${escapeXml(feedTitle)}</title>
-  <subtitle>${escapeXml(feedSubtitle)}</subtitle>
+  <subtitle>${escapeXml(`${feedSubtitle} · ${aiLabel(lang)}`)}</subtitle>
   <link href="${SITE_URL}/feed.xml?lang=${lang}" rel="self" type="application/atom+xml" />
   <link href="${SITE_URL}" rel="alternate" type="text/html" />
   <id>${FROZEN_IDS.atomTagPrefix}feed:${lang}</id>

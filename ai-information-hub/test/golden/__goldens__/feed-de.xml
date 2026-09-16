@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="de">
   <title>Data Cube AI – Tägliche KI-News</title>
-  <subtitle>Kuratierte KI-Nachrichten: Technologie, Investment und Tipps</subtitle>
+  <subtitle>Kuratierte KI-Nachrichten: Technologie, Investment und Tipps · KI-generiert: Die Zusammenfassungen schreibt eine KI auf Grundlage der verlinkten Quellen.</subtitle>
   <link href="https://www.datacubeai.space/feed.xml?lang=de" rel="self" type="application/atom+xml" />
   <link href="https://www.datacubeai.space" rel="alternate" type="text/html" />
   <id>tag:datacubeai.space,2026:feed:de</id>

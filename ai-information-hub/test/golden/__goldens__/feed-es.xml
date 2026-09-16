@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="es">
   <title>Data Cube AI – Noticias diarias de IA</title>
-  <subtitle>Noticias de IA seleccionadas: tecnología, inversión y consejos</subtitle>
+  <subtitle>Noticias de IA seleccionadas: tecnología, inversión y consejos · Generado por IA: resúmenes redactados por IA a partir de las fuentes enlazadas.</subtitle>
   <link href="https://www.datacubeai.space/feed.xml?lang=es" rel="self" type="application/atom+xml" />
   <link href="https://www.datacubeai.space" rel="alternate" type="text/html" />
   <id>tag:datacubeai.space,2026:feed:es</id>

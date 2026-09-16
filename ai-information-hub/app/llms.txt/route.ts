@@ -1,3 +1,4 @@
+import { AI_DISCLOSURE_PATH, aiLabel } from '@/lib/ai-label'
 import { BRAND } from '@/lib/brand'
 
 // Site description for AI crawlers, generated from the brand config at build time (spec AD1).
@@ -9,6 +10,8 @@ function llmsText(): string {
 
 > Multilingual (DE, EN, ZH, FR, ES, PT, JA, KO) daily AI news aggregator curating tech breakthroughs,
 > investment news, practical tips, and YouTube videos from 35+ sources.
+>
+> ${aiLabel('en')} How we use AI: ${site}${AI_DISCLOSURE_PATH}
 
 ## Content Sections
 

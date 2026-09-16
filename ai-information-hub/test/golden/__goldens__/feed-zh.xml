@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="zh">
   <title>Data Cube AI – 每日AI新闻</title>
-  <subtitle>精选AI新闻：技术、投资与实用技巧</subtitle>
+  <subtitle>精选AI新闻：技术、投资与实用技巧 · AI 生成：摘要由 AI 根据所链接的来源撰写。</subtitle>
   <link href="https://www.datacubeai.space/feed.xml?lang=zh" rel="self" type="application/atom+xml" />
   <link href="https://www.datacubeai.space" rel="alternate" type="text/html" />
   <id>tag:datacubeai.space,2026:feed:zh</id>

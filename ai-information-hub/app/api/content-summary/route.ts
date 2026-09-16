@@ -1,4 +1,5 @@
 import { NextRequest } from 'next/server';
+import { AI_DISCLOSURE_PATH, aiLabel } from '@/lib/ai-label';
 import { BRAND, absoluteUrl } from '@/lib/brand';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api-production-3ee5.up.railway.app/api';
@@ -175,6 +176,7 @@ export async function GET(request: NextRequest) {
   let md = `---\ntitle: "${BRAND.name} - AI News ${periodLabel}"\nlanguage: ${lang}\nperiod: ${periodId}\ngenerated: ${generatedTimestamp}\nsource: ${BRAND.siteUrl}\nlicense: CC BY 4.0\n---\n\n`;
 
   md += `# ${title}\n\n`;
+  md += `> ${aiLabel(lang)} ${absoluteUrl(AI_DISCLOSURE_PATH)}\n\n`;
 
   // --- Summary Statistics ---
   if (section === 'all') {
@@ -275,7 +277,7 @@ export async function GET(request: NextRequest) {
 
   md += `---\n\n`;
   md += `## About ${BRAND.name}\n`;
-  md += `${BRAND.name} is a multilingual (8 languages) daily AI news aggregator curating content from 40+ sources including RSS feeds, Hacker News, YouTube, and Reddit communities. Content is AI-assisted and updated daily in the late evening (Europe/Berlin time).\n\n`;
+  md += `${BRAND.name} is a multilingual (8 languages) daily AI news aggregator curating content from 40+ sources including RSS feeds, Hacker News, YouTube, and Reddit communities. Content is AI-generated and updated daily in the late evening (Europe/Berlin time).\n\n`;
   md += `Source: [${BRAND.name}](${BRAND.siteUrl}) | [API Documentation](${absoluteUrl('/llms.txt')})\n\n`;
   md += `Canonical URL: ${absoluteUrl(`/api/content-summary?${permalinkParams.toString()}`)}\n\n`;
   md += `*Citation: ${BRAND.name} (${BRAND.apexHost}), ${periodId}*\n`;

@@ -1,4 +1,5 @@
 import { NextRequest } from 'next/server';
+import { aiLabel } from '@/lib/ai-label';
 import { BRAND, FROZEN_IDS } from '@/lib/brand';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api-production-3ee5.up.railway.app/api';
@@ -90,6 +91,7 @@ function buildDigestHtml(
   const parts: string[] = [];
   const label = periodLabel(periodId, lang);
   const weekUrl = `${SITE_URL}/${lang}/week/${periodId}`;
+  parts.push(`<p><em>${escapeXml(aiLabel(lang))}</em></p>`);
 
   // Tech
   const techPosts: TechPost[] = (techData?.[lang] || []).filter(p => !p.isVideo);
@@ -230,11 +232,12 @@ export async function GET(request: NextRequest) {
 
   const feedTitle = lang === 'de' ? `${BRAND.name} — Newsletter Digest` : `${BRAND.name} — Newsletter Digest`;
   const now = new Date().toISOString();
+  const subtitle = lang === 'de' ? `Täglicher KI-News Digest von ${BRAND.name}` : `Daily AI news digest from ${BRAND.name}`;
 
   const atom = `<?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="${lang}">
   <title>${escapeXml(feedTitle)}</title>
-  <subtitle>${lang === 'de' ? `Täglicher KI-News Digest von ${BRAND.name}` : `Daily AI news digest from ${BRAND.name}`}</subtitle>
+  <subtitle>${escapeXml(`${subtitle} · ${aiLabel(lang)}`)}</subtitle>
   <link href="${SITE_URL}/newsletter.xml?lang=${lang}" rel="self" type="application/atom+xml" />
   <link href="${SITE_URL}" rel="alternate" type="text/html" />
   <id>${FROZEN_IDS.atomTagPrefix}newsletter:${lang}</id>

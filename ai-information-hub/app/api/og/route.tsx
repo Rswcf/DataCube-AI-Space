@@ -1,5 +1,6 @@
 import { ImageResponse } from 'next/og'
 import type { NextRequest } from 'next/server'
+import { aiLabelForImage } from '@/lib/ai-label'
 import { BRAND } from '@/lib/brand'
 
 // Runs on the default Node.js runtime (Fluid Compute). It used to be an Edge
@@ -132,6 +133,9 @@ export async function GET(request: NextRequest) {
             ))}
           </div>
         )}
+
+        {/* AI label (spec AD7); English outside the bundled Latin font (Ruling R-5) */}
+        <div style={{ fontSize: 16, color: '#888', marginTop: 20 }}>{aiLabelForImage(lang)}</div>
 
         {/* Language badges */}
         <div

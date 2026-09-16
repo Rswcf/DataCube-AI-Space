@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="de">
   <title>Data Cube AI — Newsletter Digest</title>
-  <subtitle>Täglicher KI-News Digest von Data Cube AI</subtitle>
+  <subtitle>Täglicher KI-News Digest von Data Cube AI · KI-generiert: Die Zusammenfassungen schreibt eine KI auf Grundlage der verlinkten Quellen.</subtitle>
   <link href="https://www.datacubeai.space/newsletter.xml?lang=de" rel="self" type="application/atom+xml" />
   <link href="https://www.datacubeai.space" rel="alternate" type="text/html" />
   <id>tag:datacubeai.space,2026:newsletter:de</id>
@@ -15,7 +15,8 @@
     <link href="https://www.datacubeai.space/de/week/2026-09-12" rel="alternate" />
     <id>tag:datacubeai.space,2026:digest-2026-09-12-de</id>
     <updated>2026-09-12T08:00:00.000Z</updated>
-    <content type="html">&lt;h2&gt;🔬 Technologie&lt;/h2&gt;
+    <content type="html">&lt;p&gt;&lt;em&gt;KI-generiert: Die Zusammenfassungen schreibt eine KI auf Grundlage der verlinkten Quellen.&lt;/em&gt;&lt;/p&gt;
+&lt;h2&gt;🔬 Technologie&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;LLM&lt;/strong&gt; (high): OpenAI ships a new reasoning model for developers: the release adds tool use and a lower price (de). &lt;a href=&quot;https://example.com/openai-model&quot;&gt;[Example News]&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;Infrastructure&lt;/strong&gt; (medium): Chip startup expands inference capacity in Europe with a new data center (de). &lt;a href=&quot;https://example.com/chips&quot;&gt;[Example Wire]&lt;/a&gt;&lt;/li&gt;
@@ -48,7 +49,8 @@
     <link href="https://www.datacubeai.space/de/week/2026-09-13" rel="alternate" />
     <id>tag:datacubeai.space,2026:digest-2026-09-13-de</id>
     <updated>2026-09-13T08:00:00.000Z</updated>
-    <content type="html">&lt;h2&gt;🔬 Technologie&lt;/h2&gt;
+    <content type="html">&lt;p&gt;&lt;em&gt;KI-generiert: Die Zusammenfassungen schreibt eine KI auf Grundlage der verlinkten Quellen.&lt;/em&gt;&lt;/p&gt;
+&lt;h2&gt;🔬 Technologie&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;LLM&lt;/strong&gt; (high): OpenAI ships a new reasoning model for developers: the release adds tool use and a lower price (de). &lt;a href=&quot;https://example.com/openai-model&quot;&gt;[Example News]&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;Infrastructure&lt;/strong&gt; (medium): Chip startup expands inference capacity in Europe with a new data center (de). &lt;a href=&quot;https://example.com/chips&quot;&gt;[Example Wire]&lt;/a&gt;&lt;/li&gt;

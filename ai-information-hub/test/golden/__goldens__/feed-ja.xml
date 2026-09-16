@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="ja">
   <title>Data Cube AI – 毎日のAIニュース</title>
-  <subtitle>厳選AIニュース：テクノロジー、投資、実践ヒント</subtitle>
+  <subtitle>厳選AIニュース：テクノロジー、投資、実践ヒント · AI生成：要約はリンク先の情報源をもとにAIが作成しています。</subtitle>
   <link href="https://www.datacubeai.space/feed.xml?lang=ja" rel="self" type="application/atom+xml" />
   <link href="https://www.datacubeai.space" rel="alternate" type="text/html" />
   <id>tag:datacubeai.space,2026:feed:ja</id>

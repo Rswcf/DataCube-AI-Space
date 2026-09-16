@@ -2,6 +2,8 @@
 
 > Multilingual (DE, EN, ZH, FR, ES, PT, JA, KO) daily AI news aggregator curating tech breakthroughs,
 > investment news, practical tips, and YouTube videos from 35+ sources.
+>
+> AI-generated: summaries written by AI from the linked sources. How we use AI: https://www.datacubeai.space/ai-disclosure
 
 ## Content Sections
 
