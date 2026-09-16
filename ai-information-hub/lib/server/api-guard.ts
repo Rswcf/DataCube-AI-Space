@@ -1,6 +1,8 @@
+import { BRAND } from "@/lib/brand";
+
 const DEFAULT_ALLOWED_HOSTS = new Set([
-  "datacubeai.space",
-  "www.datacubeai.space",
+  BRAND.apexHost,
+  BRAND.siteHost,
   "ai-information-hub.vercel.app",
   "localhost",
   "127.0.0.1",
