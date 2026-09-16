@@ -1,7 +1,10 @@
-import { ImageResponse } from '@vercel/og'
+import { ImageResponse } from 'next/og'
 import type { NextRequest } from 'next/server'
 
-export const runtime = 'edge'
+// Runs on the default Node.js runtime (Fluid Compute). It used to be an Edge
+// Function, which is billed as separate execution units and cannot share the
+// data cache with the rest of the app. The image only changes when a period's
+// content changes, so the CDN keeps it for a day (see the headers below).
 
 const API_BASE = 'https://api-production-3ee5.up.railway.app/api'
 
@@ -156,6 +159,9 @@ export async function GET(request: NextRequest) {
     {
       width: 1200,
       height: 630,
+      headers: {
+        'Cache-Control': 'public, s-maxage=86400, stale-while-revalidate=604800',
+      },
     }
   )
 }

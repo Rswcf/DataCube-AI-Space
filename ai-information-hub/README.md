@@ -39,7 +39,7 @@ vercel --prod
 - Extended FAB buttons: Report and Chat show pill-shaped icon + text label on first visit, auto-collapse to circles after 4s, re-expand on desktop hover
 - Accessible UI (44px touch targets, focus-visible, aria-hidden, skip-to-content, prefers-reduced-motion, ARIA dialog on mobile drawers, body scroll lock, safe-area-inset support)
 - Trust pages: `/about`, `/editorial-policy`, `/source-methodology`, `/corrections`, `/ai-disclosure`, `/contact`
-- Dynamic OG images per week page via @vercel/og (edge runtime)
+- Dynamic OG images per week page via next/og (Node runtime, CDN-cached for a day)
 - FAQ structured data on topic pages (localized in all 8 languages)
 - Keyword-optimized SEO: localized metadata, H1/H2/H3 headings, lead paragraphs, and breadcrumbs across all 8 languages
 - Login page supports all 8 languages with language selector row
