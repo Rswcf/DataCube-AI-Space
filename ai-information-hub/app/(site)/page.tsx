@@ -46,7 +46,7 @@ export const metadata: Metadata = {
         url: '/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: `${BRAND.name} – Where AI meets human insight`,
+        alt: BRAND.name,
       },
     ],
   },
@@ -57,7 +57,7 @@ export const metadata: Metadata = {
     images: [
       {
         url: '/og-image.jpg',
-        alt: `${BRAND.name} – Where AI meets human insight`,
+        alt: BRAND.name,
       },
     ],
   },
