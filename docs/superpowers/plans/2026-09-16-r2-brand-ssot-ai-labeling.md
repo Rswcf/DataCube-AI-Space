@@ -343,6 +343,11 @@ Each ruling states what was decided, why, and what it costs if wrong.
 - Why: the new AI disclosure copy says every email carries the label. With this order, no email leaves the old backend while that copy is live. The backend deploys from the merge commit, never from the feature branch.
 - Cost if wrong: a window of hours in which the disclosure page overstates the email label.
 
+**R-15 — `Organization.founder` is typed `Organization`, not `Person`.**
+- Why: on 2026-09-16 the founder chose the byline "Made by Deepviews" — a brand the founder owns, not a person's name. A JSON-LD `{"@type": "Person", "name": "Deepviews"}` would be a false structured-data claim, which AD7 exists to prevent. schema.org's `founder` accepts a Person or an Organization.
+- The visible text is unchanged: "Made by <founder>" in the trust-page footer, the right sidebar and the emails.
+- Cost if wrong: if the founder later configures a person's name, the type needs changing back (one line in `components/structured-data.tsx` and its test).
+
 ## Execution setup (controller, once, before Task 1)
 
 - [ ] **Step 1: Confirm the branch and a clean tree**
@@ -4920,9 +4925,9 @@ const trustConfig = { label: 'Label', title: 'Title', description: 'Description'
 describe('Organization attribution (spec AD7)', () => {
   it('names a founder only when one is configured', () => {
     expect(organizationSchema(buildBrand({}))).not.toHaveProperty('founder')
-    expect(organizationSchema(buildBrand({ NEXT_PUBLIC_FOUNDER_NAME: 'Jane Doe' })).founder).toEqual({
-      '@type': 'Person',
-      name: 'Jane Doe',
+    expect(organizationSchema(buildBrand({ NEXT_PUBLIC_FOUNDER_NAME: 'Acme Labs' })).founder).toEqual({
+      '@type': 'Organization',
+      name: 'Acme Labs',
     })
   })
 
@@ -4941,10 +4946,10 @@ describe('Organization attribution (spec AD7)', () => {
     expect(renderToStaticMarkup(createElement(unset.TrustPage, { config: trustConfig }))).not.toContain('Made by')
 
     vi.resetModules()
-    vi.stubEnv('NEXT_PUBLIC_FOUNDER_NAME', 'Jane Doe')
+    vi.stubEnv('NEXT_PUBLIC_FOUNDER_NAME', 'Acme Labs')
     const configured = await import('@/app/(site)/trust-page')
     const html = renderToStaticMarkup(createElement(configured.TrustPage, { config: trustConfig })).replaceAll('<!-- -->', '')
-    expect(html).toContain('Made by Jane Doe')
+    expect(html).toContain('Made by Acme Labs')
   })
 })
 ```
@@ -4982,8 +4987,9 @@ export function organizationSchema(brand: Brand = BRAND): Record<string, unknown
       'AI policy',
     ],
     sameAs: [],
-    // Spec AD7: the founder appears as Organization.founder only once a name is configured.
-    ...(brand.founderName ? { founder: { '@type': 'Person', name: brand.founderName } } : {}),
+    // Spec AD7: the founder appears as Organization.founder only once a name is configured. The configured
+    // byline is a brand (Ruling R-15), so it is typed as an Organization; a person's name would need 'Person'.
+    ...(brand.founderName ? { founder: { '@type': 'Organization', name: brand.founderName } } : {}),
   }
 }
 
