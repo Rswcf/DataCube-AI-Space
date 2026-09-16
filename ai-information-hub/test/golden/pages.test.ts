@@ -31,13 +31,8 @@ vi.mock('next/navigation', async (importOriginal) => ({
 // comment just explained is out of scope here. See task-1-review.md §3 and the task-1
 // report's "Fix round 1" section for the full disclosure.
 vi.mock('@/components/home-page-client', () => ({ default: () => null }))
-// The root shell loads next/font and analytics, which only work inside the Next.js compiler.
-vi.mock('next/font/google', () => ({
-  Geist: () => ({ variable: 'font-geist-sans' }),
-  Geist_Mono: () => ({ variable: 'font-geist-mono' }),
-  Newsreader: () => ({ variable: 'font-newsreader' }),
-}))
-vi.mock('@vercel/analytics/next', () => ({ Analytics: () => null }))
+// next/font/google + @vercel/analytics/next are mocked globally in test/setup.ts
+// (the root shell loads them, and that only works inside the Next.js compiler).
 
 type AnyElement = ReactElement<Record<string, unknown>>
 

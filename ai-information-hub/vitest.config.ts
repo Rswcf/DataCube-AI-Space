@@ -15,6 +15,7 @@ export default defineConfig({
     // were captured) makes every golden byte-stable regardless of the machine or
     // CI runner's local zone. See task-1-review.md §2.
     env: { TZ: "UTC" },
+    setupFiles: ["./test/setup.ts"],
     include: ["lib/**/*.test.ts", "app/**/*.test.ts", "test/**/*.test.ts"],
   },
 });

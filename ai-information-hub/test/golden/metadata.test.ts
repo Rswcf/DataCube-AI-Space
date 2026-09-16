@@ -2,14 +2,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { FIXED_NOW, LANGS, PERIOD_ID, STORY_ID, TOPIC, stubApiFetch } from '../fixtures/api'
 import { expectGolden, stableJson } from './golden'
 
-// Both root layouts load next/font and analytics through components/root-shell.tsx; those only work inside
-// the Next.js compiler. The home client component is not metadata.
-vi.mock('next/font/google', () => ({
-  Geist: () => ({ variable: 'font-geist-sans' }),
-  Geist_Mono: () => ({ variable: 'font-geist-mono' }),
-  Newsreader: () => ({ variable: 'font-newsreader' }),
-}))
-vi.mock('@vercel/analytics/next', () => ({ Analytics: () => null }))
+// next/font/google + @vercel/analytics/next are mocked globally in test/setup.ts
+// (both root layouts load them through components/root-shell.tsx, and that only
+// works inside the Next.js compiler). The home client component is not metadata.
 vi.mock('@/components/home-page-client', () => ({ default: () => null }))
 
 beforeEach(() => {
