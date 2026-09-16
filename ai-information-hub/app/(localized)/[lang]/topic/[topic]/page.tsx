@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
+import { AiLabel } from '@/components/ai-label'
 import { isSupportedLanguage, toBcp47, SUPPORTED_LANGUAGES, type AppLanguage } from '@/lib/i18n'
 import { indexById, matchesTopicTerms, toTopicSlug, topicSlugToQuery, topicSlugToTitle } from '@/lib/topic-utils'
 import { BRAND, absoluteUrl } from '@/lib/brand'
@@ -570,6 +571,7 @@ export default async function TopicPage({ params, searchParams }: Props) {
         <p className="mt-2 text-sm text-muted-foreground">
           {t({ de: 'Themen-Archiv', en: 'Topic archive', zh: '主题归档', fr: 'Archive thématique', es: 'Archivo temático', pt: 'Arquivo temático', ja: 'トピックアーカイブ', ko: '주제 아카이브' })} • {total} {t({ de: 'Treffer', en: 'matches', zh: '条结果', fr: 'résultats', es: 'resultados', pt: 'resultados', ja: '件', ko: '건' })}
         </p>
+        <AiLabel lang={lang} className="mt-2 text-sm text-muted-foreground" />
         <p className="mt-3 text-sm text-muted-foreground">
           <a className="underline" href={`/${lang}`}>{t({ de: 'Zur Startseite', en: 'Back to home', zh: '返回首页', fr: "Retour à l'accueil", es: 'Volver al inicio', pt: 'Voltar ao início', ja: 'ホームに戻る', ko: '홈으로 돌아가기' })}</a>
           <span> • </span>

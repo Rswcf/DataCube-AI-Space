@@ -1,10 +1,11 @@
 import type { Metadata } from 'next'
+import { AiLabel } from '@/components/ai-label'
 import { ArticleSchema, VideoSchema, BreadcrumbListSchema, CollectionPageSchema } from '@/components/structured-data'
 import { formatPeriodTitle, periodPublishedDate } from '@/lib/period-utils'
 import type { TechPost, MultilingualData, InvestmentData, TipPost, ImpactLevel } from '@/lib/types'
 import { tagTopicSlug } from '@/lib/topic-utils'
 import { isSupportedLanguage, SUPPORTED_LANGUAGES, toBcp47 } from '@/lib/i18n'
-import { BRAND, FROZEN_IDS, absoluteUrl, brandedTitle, fillBrand } from '@/lib/brand'
+import { FROZEN_IDS, absoluteUrl, brandedTitle, fillBrand } from '@/lib/brand'
 import {
   ARTICLE_CTA_LABELS,
   articleHref,
@@ -161,14 +162,14 @@ const h2Editorial: L = {
 }
 
 const labelEditorialAttribution: L = {
-  de: 'KI-generierte Analyse von {brand} Editorial — mehr erfahren',
-  en: 'AI-generated analysis by {brand} Editorial — learn how we work',
-  zh: '由 {brand} Editorial 生成的 AI 分析 — 了解我们的方法',
-  fr: 'Analyse générée par IA — {brand} Editorial',
-  es: 'Análisis generado por IA — {brand} Editorial',
-  pt: 'Análise gerada por IA — {brand} Editorial',
-  ja: '{brand} Editorial による AI 生成分析',
-  ko: '{brand} Editorial의 AI 생성 분석',
+  de: 'KI-generierte Analyse — mehr erfahren',
+  en: 'AI-generated analysis — learn how we work',
+  zh: 'AI 生成的分析 — 了解我们的方法',
+  fr: 'Analyse générée par IA',
+  es: 'Análisis generado por IA',
+  pt: 'Análise gerada por IA',
+  ja: 'AI 生成分析',
+  ko: 'AI 생성 분석',
 }
 
 // periodPublishedDate is imported from lib/period-utils — shared with
@@ -284,7 +285,6 @@ const thDealType: L = { de: 'Dealtyp', en: 'Deal Type', zh: '交易类型', fr: 
 // Misc UI labels
 // ---------------------------------------------------------------------------
 const labelLanguage: L = { de: 'Sprache:', en: 'Language:', zh: '语言：', fr: 'Langue :', es: 'Idioma:', pt: 'Idioma:', ja: '言語：', ko: '언어:' }
-const labelByline: L = { de: 'Von', en: 'By', zh: '作者：', fr: 'Par', es: 'Por', pt: 'Por', ja: '著者：', ko: '작성:' }
 const labelPublished: L = { de: 'Veröffentlicht', en: 'Published', zh: '发布于', fr: 'Publié', es: 'Publicado', pt: 'Publicado', ja: '公開日', ko: '게시일' }
 const labelContact: L = { de: 'Kontakt', en: 'Contact', zh: '联系', fr: 'Contact', es: 'Contacto', pt: 'Contato', ja: 'お問い合わせ', ko: '문의' }
 const labelPrivacy: L = { de: 'Datenschutz', en: 'Privacy Policy', zh: '隐私政策', fr: 'Confidentialité', es: 'Privacidad', pt: 'Privacidade', ja: 'プライバシー', ko: '개인정보' }
@@ -571,10 +571,9 @@ export default async function WeekPage({ params, searchParams }: Props) {
           ))}
         </p>
         <p className="mt-2 text-sm text-gray-600">
-          <span>{t(labelByline, lang)} <span className="font-medium">{BRAND.name} Editorial</span></span>
-          <span> • </span>
           <time dateTime={publishedIso}>{t(labelPublished, lang)} {publishedDateLabel}</time>
         </p>
+        <AiLabel lang={lang} className="mt-2 text-sm text-gray-600" />
       </header>
 
       {/* Key Takeaways — extractive (no LLM), localized heading.

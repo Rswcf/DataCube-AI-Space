@@ -4,6 +4,8 @@ import { notFound } from 'next/navigation'
 import { cache } from 'react'
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
+import { AiLabel } from '@/components/ai-label'
+import { AI_DISCLOSURE_PATH, aiLabelShort } from '@/lib/ai-label'
 import type {
   AppLanguage,
 } from '@/lib/i18n'
@@ -189,16 +191,6 @@ const labels = {
     pt: 'Topicos relacionados',
     ja: '関連トピック',
     ko: '관련 주제',
-  },
-  byline: {
-    de: '{brand} Redaktion',
-    en: '{brand} Editorial',
-    zh: '{brand} 编辑部',
-    fr: 'Redaction {brand}',
-    es: 'Redaccion {brand}',
-    pt: 'Editorial {brand}',
-    ja: '{brand} 編集部',
-    ko: '{brand} 편집팀',
   },
 } satisfies Record<string, Dictionary>
 
@@ -591,10 +583,11 @@ export default async function ArticlePage({ params }: Props) {
                 {story.deck}
               </p>
             ) : null}
+            <AiLabel lang={lang} className="mx-auto mt-4 max-w-3xl text-sm text-muted-foreground" />
           </div>
 
           <div className="grid gap-3 border-t border-foreground pt-4 font-sans text-[11px] font-bold uppercase tracking-[0.16em] text-muted-foreground sm:grid-cols-3">
-            <span>{t(labels.byline, lang)}</span>
+            <a href={AI_DISCLOSURE_PATH} className="underline hover:no-underline">{aiLabelShort(lang)}</a>
             <time className="sm:text-center" dateTime={publishedIso}>
               {dateLabel(publishedIso, lang)}
             </time>

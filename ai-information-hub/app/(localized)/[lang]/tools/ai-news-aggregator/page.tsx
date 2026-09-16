@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import { AiLabel } from '@/components/ai-label'
 import { SUPPORTED_LANGUAGES, isSupportedLanguage, toBcp47 } from '@/lib/i18n'
 import { BRAND, fillBrand } from '@/lib/brand'
 import { Rss, Globe, Calendar, TrendingUp, Lightbulb, Play, ArrowRight, Check, X } from 'lucide-react'
@@ -739,6 +740,7 @@ export default async function AINewsAggregatorToolPage({ params }: Props) {
           <p className="mt-4 text-muted-foreground leading-relaxed">
             {t(PREVIEW_LEAD, lang)}
           </p>
+          {previewPosts.length > 0 ? <AiLabel lang={lang} className="mt-2 text-sm text-muted-foreground" /> : null}
 
           {previewPosts.length > 0 ? (
             <div className="mt-8 grid gap-4">
