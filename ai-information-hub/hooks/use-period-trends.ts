@@ -12,8 +12,9 @@ type TrendsResponse = {
 // shipped one (GPT-5, NVIDIA Blackwell, AlphaFold 3, AI Stocks, Anthropic),
 // which rendered as the "What's happening?" rail before the fetch resolved and
 // therefore also in the server-rendered HTML: invented 2024-era topics
-// presented as today's trends, linking to topic pages that mostly 404ed. An
-// empty list shows the skeleton the component already has.
+// presented as today's trends, linking to topic pages that mostly 404ed. While
+// a period is still loading, the hook reports `loading` so the rail shows its
+// skeleton; see `usePeriodTrends`.
 export function getFallbackTrends(_language: string): TrendItem[] {
   return [];
 }
@@ -51,20 +52,28 @@ async function fetchJson(url: string, signal: AbortSignal): Promise<TrendsRespon
 
 export function usePeriodTrends(weekId: string, language: string, enabled = true) {
   const [trends, setTrends] = useState<TrendItem[]>(() => getFallbackTrends(language));
-  const [loading, setLoading] = useState(false);
+
+  // `loading` is derived, not stored: it is true whenever there is a period to
+  // load and no fetch for exactly this period + language has settled yet. A
+  // stored flag starts false and only flips inside an effect, and effects never
+  // run in a server render — so the first paint (and the server HTML crawlers
+  // read) said "No trends available." before anything had been fetched
+  // (2026-09-16). Deriving it also covers the first frame after the mobile
+  // drawer opens and after the period changes.
+  const requestKey = enabled && weekId ? `${weekId}|${language}` : "";
+  const [settledKey, setSettledKey] = useState("");
 
   useEffect(() => {
     if (!enabled || !weekId) {
       setTrends(getFallbackTrends(language));
-      setLoading(false);
       return;
     }
 
+    const key = `${weekId}|${language}`;
     const controller = new AbortController();
     const { signal } = controller;
 
     async function loadTrends() {
-      setLoading(true);
       const apiUrl = USE_API ? `${API_BASE}/trends/${weekId}` : `/data/${weekId}/trends.json`;
 
       try {
@@ -83,7 +92,7 @@ export function usePeriodTrends(weekId: string, language: string, enabled = true
           setTrends(getFallbackTrends(language));
         }
       } finally {
-        if (!signal.aborted) setLoading(false);
+        if (!signal.aborted) setSettledKey(key);
       }
     }
 
@@ -92,5 +101,6 @@ export function usePeriodTrends(weekId: string, language: string, enabled = true
     return () => controller.abort();
   }, [enabled, weekId, language]);
 
+  const loading = requestKey !== "" && settledKey !== requestKey;
   return { trends, loading };
 }
