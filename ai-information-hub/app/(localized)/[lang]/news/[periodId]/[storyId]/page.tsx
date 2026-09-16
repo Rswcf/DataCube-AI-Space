@@ -490,7 +490,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: story.headline,
     description,
-    robots: INDEXED_ARTICLE_LANGS.has(lang) ? undefined : { index: false, follow: true },
+    // Spread, never `robots: undefined`. Next merges metadata by key, and an own
+    // key with an undefined value still overrides the root layout — which silently
+    // stripped the index/follow + googleBot preview directives from every indexed
+    // article and topic hub when this shipped (2026-09-16).
+    ...(INDEXED_ARTICLE_LANGS.has(lang) ? {} : { robots: { index: false, follow: true } }),
     alternates: {
       canonical,
       languages: {

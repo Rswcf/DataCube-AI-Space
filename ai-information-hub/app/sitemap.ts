@@ -197,14 +197,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Tool pages - all 8 languages (individual tools)
   // ai-stock-tracker removed: paused + noindexed pending market-data licensing
   const toolSlugs = ['ai-news-aggregator', 'ai-report-generator', 'ai-news-api']
-  const toolEntries = toolSlugs.flatMap((slug) =>
-    SUPPORTED_LANGUAGES.map((lang) => ({
-      url: `${baseUrl}/${lang}/tools/${slug}`,
+  const toolEntries = [
+    // The tools index every tool page links back to.
+    ...SUPPORTED_LANGUAGES.map((lang) => ({
+      url: `${baseUrl}/${lang}/tools`,
       lastModified: now,
       changeFrequency: 'weekly' as const,
-      priority: 0.8,
-    }))
-  )
+      priority: 0.6,
+    })),
+    ...toolSlugs.flatMap((slug) =>
+      SUPPORTED_LANGUAGES.map((lang) => ({
+        url: `${baseUrl}/${lang}/tools/${slug}`,
+        lastModified: now,
+        changeFrequency: 'weekly' as const,
+        priority: 0.8,
+      }))
+    ),
+  ]
 
   // Root serves the German homepage for users who arrive without a language
   // segment. It still canonicalizes to /de, but stays discoverable for crawlers
