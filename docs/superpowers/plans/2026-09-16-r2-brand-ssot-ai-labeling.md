@@ -138,11 +138,13 @@
 
 | ID | Change |
 |---|---|
-| L1 | **AI label** near the top of: week/day pages, article pages, topic pages, the home feed masthead, the AI News Aggregator tool page's live preview, every email, the `/feed.xml` and `/newsletter.xml` subtitles, each `/newsletter.xml` entry, `/api/content-summary`, `/llms.txt`, and the OG image. |
+| L1 | **AI label** near the top of: week/day pages, article pages, topic pages, the home feed masthead, the homepage's screen-reader summary, the AI News Aggregator tool page's live preview, every email and its inbox preheader, the `/feed.xml` and `/newsletter.xml` subtitles, each `/feed.xml` entry summary, each `/newsletter.xml` entry, `/api/content-summary`, `/llms.txt`, and the OG image. The preheader, feed-entry and homepage-summary placements come from the final review (I-4, M-2): inbox lists and feed readers show that text first. |
 | L2 | **Bylines.** The label replaces the week page's "By Data Cube AI Editorial" and the article page's "Data Cube AI Editorial / Redaktion / 编辑部 / …". The week page's editorial-brief attribution drops the editorial byline. |
 | L3 | **Organization authorship.** Article JSON-LD `author` becomes the Organization (name and url). The root metadata `authors` becomes the Organization (was "Data Cube Team"). |
 | L4 | **AI disclosure page.** Its metadata no longer claims human review. A new first section says content is AI-generated and published without human review. |
 | L5 | **Content-summary footer** says "AI-generated" instead of "AI-assisted". |
+| L6 | **Policy wording.** The AI disclosure and editorial policy pages say "AI-generated" (or "AI-driven") where they said "AI-assisted", and the German sidebar link reads "Redaktionsrichtlinien" instead of "Redaktion" (final review I-1, M-1). |
+| L7 | **OG image alt text** is the brand name alone; "Where AI meets human insight" credited human involvement (final review I-2). Separate commit — if the founder keeps the tagline, that commit is reverted before merge. |
 
 **Content correction (outside the brand and label work, labelled separately)**
 
@@ -5238,7 +5240,7 @@ These files are git-ignored. Never stage them.
 
 ```bash
 cd <repo-root> && python3 scripts/brand_guard.py
-cd <repo-root> && python3 -m unittest scripts/test_brand_guard.py scripts/test_page_snapshot.py
+cd <repo-root> && python3 -m unittest scripts/test_brand_guard.py scripts/test_page_snapshot.py scripts/test_brand_parity.py
 cd <repo-root>/ai-information-hub && npm run lint && npm test
 cd <repo-root>/ai-hub-backend && venv312/bin/python -m ruff check app/ scripts/ tests/
 cd <repo-root>/ai-hub-backend && DATABASE_URL=sqlite:///./test.db OPENROUTER_API_KEY=test-key ADMIN_API_KEY=test-key venv312/bin/python -m pytest -m "not integration" -q
@@ -5311,8 +5313,11 @@ Open the PR against `main` with `gh pr create`. The body contains:
 
 ## Release (founder-gated)
 
-0. **Founder byline (decided 2026-09-16, Ruling R-10): `Deepviews`.** With founder approval for each variable, set `NEXT_PUBLIC_FOUNDER_NAME=Deepviews` for Vercel Production and `FOUNDER_NAME=Deepviews` on the Railway `api` service. The step 4 merge builds with the first; the step 7 deploy reads the second. If the founder withholds approval, release without the line and keep the item open in the ledger and the project memory.
-1. **Variables (read-only, names only).**
+0. **Founder byline (decided 2026-09-16, Ruling R-10): `Deepviews`.** Each variable needs founder approval.
+   - Vercel: set `NEXT_PUBLIC_FOUNDER_NAME=Deepviews` for Production before step 4, so the merge build inlines it. Setting a Vercel variable does not deploy anything by itself.
+   - Railway: do not set `FOUNDER_NAME` here. Setting a variable redeploys the `api` service by default, and that process runs the collection and the newsletter send, so a redeploy mid-run can kill a collection or leave a send lock `in_progress` for six hours (final review I-3). Set it inside the step 2 window, right before step 7, with `railway variables --set FOUNDER_NAME=Deepviews -s api --skip-deploys`; step 7's `railway up` applies it.
+   - If the founder withholds approval, release without the line and keep the item open in the ledger and the project memory.
+1. **Variables (read-only, names only).** Also confirm that the founder name will be identical on both sides (`NEXT_PUBLIC_FOUNDER_NAME` on Vercel, `FOUNDER_NAME` on Railway once step 7 sets it); otherwise the site and the emails name different makers (final review M-4).
    - **Vercel:** in the project's Environment Variables settings, confirm that Production defines none of `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_BRAND_NAME` and `NEXT_PUBLIC_BRAND_SHORT_NAME`, or that each equals the default. `NEXT_PUBLIC_FOUNDER_NAME` may exist only as step 0 set it. The CLI has no credentials, so use the founder's logged-in Chrome, or ask the founder. If `NEXT_PUBLIC_SITE_URL` points anywhere but the canonical site, stop: canonical URLs would move.
    - **Railway:** `cd <repo-root>/ai-hub-backend && railway variables -s api --json | python3 -c "import json,sys; print(sorted(json.load(sys.stdin)))"` prints names only. Compare with the 2026-09-16 list in Global Constraints. Any new brand variable other than step 0's `FOUNDER_NAME` must equal its default, or stop.
    - **GitHub:** `gh variable list --repo Rswcf/DataCube-AI-Space` shows no `SITE_URL`, or one equal to the canonical site.
@@ -5343,14 +5348,14 @@ Open the PR against `main` with `gh pr create`. The body contains:
 6. **After snapshot and comparison.**
    - `python3 scripts/page_snapshot.py capture … --out <scratchpad>/r2-after.json`
    - `python3 scripts/page_snapshot.py compare <scratchpad>/r2-before.json <scratchpad>/r2-after.json`
-   - Map every difference to B1–B3 or L1–L5.
+   - Map every difference to an entry under "Intended output changes": B1–B3, L1–L7, C1, or the configured-founder output ("Made by Deepviews" and the Organization `founder` in the JSON-LD). A literal reading of an older list would roll back a correct release (final review M-3).
    - On the live-data paths at the end of the path list, a difference that only changes stories, counts or dates is data. That holds only while `gh run list` shows no collection or backfill between steps 3 and 6.
    - Any other unmapped difference: the founder promotes the previous production deployment in Vercel (instant rollback), or approves a revert PR. Then fix it on a new branch.
 7. **Backend deploy — founder approval required, in the same sitting as step 4 (Ruling R-14).**
    - Check again that no run is in progress.
    - `git -C <repo-root> switch main && git -C <repo-root> pull --ff-only`, then confirm that `git -C <repo-root> log --oneline -1` shows the merge commit.
    - `cd <repo-root>/ai-hub-backend && railway up -d -s api`
-   - Wait until `curl -s https://api-production-3ee5.up.railway.app/ | python3 -c "import json,sys; print(json.load(sys.stdin)['name'])"` prints `AI Hub API`.
+   - Wait until `curl -s https://api-production-3ee5.up.railway.app/ | python3 -c "import json,sys; print(json.load(sys.stdin)['name'])"` prints `AI Hub API`. That proves the API is up, not that the new build is live — it prints the same before and after. The B4 check below and step 8's label and "Made by" rows prove the new code.
    - Then `curl -s -D - -o /dev/null https://api-production-3ee5.up.railway.app/api/deals/export.csv | grep -i content-disposition` shows `data-cube-ai-deals.csv` (B4). The check uses GET, since the route may not answer HEAD.
    - **Backend rollback (spec §8):** the founder redeploys the previous deployment from the Railway dashboard (Deployments, previous deployment, Redeploy). With approval, the CLI equivalent is `git -C <repo-root> switch --detach <previous main sha>`, then `cd <repo-root>/ai-hub-backend && railway up -d -s api`, then `git -C <repo-root> switch main`.
 8. **Test sends (pre-approved, founder's inbox only).** Send the latest daily period in `en` and `zh` to the founder's test address:
