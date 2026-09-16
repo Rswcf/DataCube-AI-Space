@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import LegacyWeekPage, {
   generateMetadata as generateLegacyMetadata,
   generateStaticParams as generateLegacyStaticParams,
-} from '../../../week/[weekId]/page'
+} from '@/app/(site)/week/[weekId]/page'
 import { isSupportedLanguage, SUPPORTED_LANGUAGES, toBcp47 } from '@/lib/i18n'
 
 export const revalidate = 3600

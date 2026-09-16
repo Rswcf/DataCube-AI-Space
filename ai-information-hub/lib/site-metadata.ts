@@ -1,23 +1,9 @@
-import React from "react"
 import type { Metadata } from 'next'
-import { headers } from 'next/headers'
-import { Geist, Geist_Mono, Newsreader } from 'next/font/google'
-import { Analytics } from '@vercel/analytics/next'
-import { SettingsProvider } from '@/lib/settings-context'
-import { isSupportedLanguage, toBcp47 } from '@/lib/i18n'
-import type { AppLanguage } from '@/lib/i18n'
-import { OrganizationSchema, WebsiteSchema, FAQSchema } from '@/components/structured-data'
-import './globals.css'
 
-const geist = Geist({ subsets: ["latin"], variable: "--font-geist-sans" });
-const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono" });
-const newsreader = Newsreader({
-  subsets: ["latin"],
-  variable: "--font-newsreader",
-  display: "swap",
-});
-
-export const metadata: Metadata = {
+// Site-wide metadata shared by both root layouts (app/(site)/layout.tsx and
+// app/(localized)/[lang]/layout.tsx). Pages override what they need via
+// their own metadata / generateMetadata.
+export const siteMetadata: Metadata = {
   metadataBase: new URL('https://www.datacubeai.space'),
   title: {
     default: 'Data Cube AI | Daily AI News, Investment Signals & Practical Tips',
@@ -135,47 +121,8 @@ export const metadata: Metadata = {
   },
 }
 
-export const viewport = {
+export const siteViewport = {
   width: 'device-width' as const,
   initialScale: 1,
   viewportFit: 'cover' as const,
 };
-
-export default async function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode
-}>) {
-  const headersList = await headers()
-  const rawLang = headersList.get('x-lang') || 'en'
-  const htmlLang = isSupportedLanguage(rawLang) ? toBcp47(rawLang as AppLanguage) : rawLang
-  const initialLanguage: AppLanguage = isSupportedLanguage(rawLang) ? rawLang : 'en'
-
-  return (
-    <html lang={htmlLang} suppressHydrationWarning>
-      <head>
-        <link rel="preconnect" href="https://api-production-3ee5.up.railway.app" />
-        <link rel="preconnect" href="https://img.youtube.com" />
-        <link rel="dns-prefetch" href="https://www.youtube.com" />
-        <OrganizationSchema />
-        <WebsiteSchema />
-        <FAQSchema lang={rawLang} />
-        {['de', 'en', 'zh', 'fr', 'es', 'pt', 'ja', 'ko'].map((l) => (
-          <link key={l} rel="alternate" type="application/atom+xml" title={`Data Cube AI (${l.toUpperCase()})`} href={`/feed.xml?lang=${l}`} />
-        ))}
-      </head>
-      <body className={`${geist.variable} ${geistMono.variable} ${newsreader.variable} font-sans antialiased`}>
-        <a
-          href="#main-content"
-          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:rounded-lg focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground focus:shadow-lg"
-        >
-          Skip to content
-        </a>
-        <SettingsProvider initialLanguage={initialLanguage}>
-          {children}
-        </SettingsProvider>
-        <Analytics />
-      </body>
-    </html>
-  )
-}
