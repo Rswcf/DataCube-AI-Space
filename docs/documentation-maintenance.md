@@ -22,8 +22,8 @@ Some assistant-context files (`CLAUDE.md` and `.ai-collab/context/*`) may be git
 | `docs/brand-guidelines.md` | Brand system (dated snapshot — design principles only) |
 | `docs/seo-geo-optimization-plan.md` | Dated snapshot (2026-05); live SEO strategy lives in `.ai-collab/context/seo-growth-ads-strategy-2026-07.md` |
 | `docs/monetization-plan.md` | Dated snapshot (2026-05); live monetization direction lives in `docs/superpowers/specs/2026-09-13-independent-newsletter-program-design.md` |
-| `ai-information-hub/public/llms.txt` | AI crawler and citation-facing site description |
-| `ai-information-hub/public/robots.txt` | Crawler access policy |
+| `ai-information-hub/app/llms.txt/route.ts` | AI crawler and citation-facing site description |
+| `ai-information-hub/app/robots.ts` | Crawler access policy |
 
 Strategy, launch, keyword-audit, and roadmap files under `.ai-collab/context/` may be dated planning snapshots. If they are not updated, add or preserve a header that makes their snapshot status clear.
 
@@ -40,6 +40,7 @@ When a change touches one of these areas, update all matching docs in the same c
 | Brand, typography, or major frontend style | frontend README, brand guidelines, `project-overview.md`, `codebase-map.md` |
 | SEO/GEO implementation | SEO/GEO plan implementation log, `llms.txt`, `robots.txt` if crawler policy changes |
 | Deployment or environment variables | root README, service README, both `CLAUDE.md` files |
+| Brand name, site URL or founder | `lib/brand-defaults.json`, `app/config.py`, both CLAUDE.md files; run `python3 scripts/brand_guard.py` |
 
 ## Best Practices
 
