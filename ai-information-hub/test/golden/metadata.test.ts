@@ -59,6 +59,7 @@ describe('metadata', () => {
     const article = await import('@/app/(localized)/[lang]/news/[periodId]/[storyId]/page')
     const aggregator = await import('@/app/(localized)/[lang]/tools/ai-news-aggregator/page')
     const api = await import('@/app/(localized)/[lang]/tools/ai-news-api/page')
+    const index = await import('@/app/(localized)/[lang]/tools/page')
     const report = await import('@/app/(localized)/[lang]/tools/ai-report-generator/page')
     const stock = await import('@/app/(localized)/[lang]/tools/ai-stock-tracker/page')
     const metadata = {
@@ -76,6 +77,7 @@ describe('metadata', () => {
       tools: {
         aggregator: await aggregator.generateMetadata(params({ lang })),
         api: await api.generateMetadata(params({ lang })),
+        index: await index.generateMetadata(params({ lang })),
         report: await report.generateMetadata(params({ lang })),
         stock: await stock.generateMetadata(params({ lang })),
       },

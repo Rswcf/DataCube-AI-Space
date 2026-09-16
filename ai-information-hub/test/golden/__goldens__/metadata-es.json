@@ -296,6 +296,32 @@
         ]
       }
     },
+    "index": {
+      "title": {
+        "absolute": "Herramientas de IA gratuitas | DataCube AI"
+      },
+      "description": "Todas las herramientas de IA gratuitas de DataCube AI: agregador de noticias, generador de informes y API abierta. Sin cuenta.",
+      "alternates": {
+        "canonical": "https://www.datacubeai.space/es/tools",
+        "languages": {
+          "x-default": "https://www.datacubeai.space/en/tools",
+          "de": "https://www.datacubeai.space/de/tools",
+          "en": "https://www.datacubeai.space/en/tools",
+          "zh-Hans": "https://www.datacubeai.space/zh/tools",
+          "fr": "https://www.datacubeai.space/fr/tools",
+          "es": "https://www.datacubeai.space/es/tools",
+          "pt": "https://www.datacubeai.space/pt/tools",
+          "ja": "https://www.datacubeai.space/ja/tools",
+          "ko": "https://www.datacubeai.space/ko/tools"
+        }
+      },
+      "openGraph": {
+        "title": "Herramientas de IA gratuitas | DataCube AI",
+        "description": "Todas las herramientas de IA gratuitas de DataCube AI: agregador de noticias, generador de informes y API abierta. Sin cuenta.",
+        "url": "https://www.datacubeai.space/es/tools",
+        "type": "website"
+      }
+    },
     "report": {
       "title": {
         "absolute": "Generador de Informes IA | DataCube AI"

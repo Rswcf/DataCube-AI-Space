@@ -296,6 +296,32 @@
         ]
       }
     },
+    "index": {
+      "title": {
+        "absolute": "무료 AI 도구 | DataCube AI"
+      },
+      "description": "DataCube AI의 모든 무료 AI 도구: 뉴스 집합기, 보고서 생성기, 오픈 뉴스 API. 계정 불필요.",
+      "alternates": {
+        "canonical": "https://www.datacubeai.space/ko/tools",
+        "languages": {
+          "x-default": "https://www.datacubeai.space/en/tools",
+          "de": "https://www.datacubeai.space/de/tools",
+          "en": "https://www.datacubeai.space/en/tools",
+          "zh-Hans": "https://www.datacubeai.space/zh/tools",
+          "fr": "https://www.datacubeai.space/fr/tools",
+          "es": "https://www.datacubeai.space/es/tools",
+          "pt": "https://www.datacubeai.space/pt/tools",
+          "ja": "https://www.datacubeai.space/ja/tools",
+          "ko": "https://www.datacubeai.space/ko/tools"
+        }
+      },
+      "openGraph": {
+        "title": "무료 AI 도구 | DataCube AI",
+        "description": "DataCube AI의 모든 무료 AI 도구: 뉴스 집합기, 보고서 생성기, 오픈 뉴스 API. 계정 불필요.",
+        "url": "https://www.datacubeai.space/ko/tools",
+        "type": "website"
+      }
+    },
     "report": {
       "title": {
         "absolute": "무료 AI 보고서 생성기 — AI 보고서를 몇 초 만에 생성 | DataCube AI"

@@ -67,6 +67,7 @@ const TOOLS = {
   'ai-news-api': () => import('@/app/(localized)/[lang]/tools/ai-news-api/page'),
   'ai-report-generator': () => import('@/app/(localized)/[lang]/tools/ai-report-generator/page'),
   'ai-stock-tracker': () => import('@/app/(localized)/[lang]/tools/ai-stock-tracker/page'),
+  index: () => import('@/app/(localized)/[lang]/tools/page'),
 }
 
 const STATIC_PAGES: Record<string, () => Promise<{ default: ComponentType }>> = {

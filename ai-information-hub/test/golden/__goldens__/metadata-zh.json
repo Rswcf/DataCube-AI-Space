@@ -292,6 +292,32 @@
         ]
       }
     },
+    "index": {
+      "title": {
+        "absolute": "免费 AI 工具 | DataCube AI"
+      },
+      "description": "DataCube AI 的全部免费 AI 工具：新闻聚合器、报告生成器和开放新闻 API。无需注册。",
+      "alternates": {
+        "canonical": "https://www.datacubeai.space/zh/tools",
+        "languages": {
+          "x-default": "https://www.datacubeai.space/en/tools",
+          "de": "https://www.datacubeai.space/de/tools",
+          "en": "https://www.datacubeai.space/en/tools",
+          "zh-Hans": "https://www.datacubeai.space/zh/tools",
+          "fr": "https://www.datacubeai.space/fr/tools",
+          "es": "https://www.datacubeai.space/es/tools",
+          "pt": "https://www.datacubeai.space/pt/tools",
+          "ja": "https://www.datacubeai.space/ja/tools",
+          "ko": "https://www.datacubeai.space/ko/tools"
+        }
+      },
+      "openGraph": {
+        "title": "免费 AI 工具 | DataCube AI",
+        "description": "DataCube AI 的全部免费 AI 工具：新闻聚合器、报告生成器和开放新闻 API。无需注册。",
+        "url": "https://www.datacubeai.space/zh/tools",
+        "type": "website"
+      }
+    },
     "report": {
       "title": {
         "absolute": "免费AI报告生成器 — 一键生成AI周报和日报 | DataCube AI"
