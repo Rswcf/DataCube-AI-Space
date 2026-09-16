@@ -129,7 +129,7 @@
 
 | ID | Change |
 |---|---|
-| B1 | **One spelling.** "DataCube AI" becomes "Data Cube AI" wherever it is rendered: the four tool pages (text, metadata, JSON-LD, image alt text), the `SoftwareApplicationSchema` author and publisher, the week page's editorial attribution and byline, `/llms.txt`, the LLM prompts, and the collector's fallback source name. |
+| B1 | **One spelling.** "DataCube AI" becomes "Data Cube AI" wherever it is rendered: the four tool pages and the tools index that main added in PR #12 (text, metadata, JSON-LD, image alt text), the `SoftwareApplicationSchema` author and publisher, the week page's editorial attribution and byline, `/llms.txt`, the LLM prompts, and the collector's fallback source name. |
 | B2 | **No double-branded titles.** The rendered `<title>` names the brand once on week pages (de, en, fr, es, pt), `/editorial-policy`, `/ai-disclosure`, `/source-methodology`, `/corrections`, `/login`, `/about` ("About Data Cube AI") and `/contact` ("Contact Data Cube AI"). For a missing story, the article page's `generateMetadata` returns `title: 'Article not found'`, which the title template brands once; the 404 body itself is `components/not-found-page.tsx` and names no brand. Week pages in zh, ja and ko gain " \| Data Cube AI" in `og:title`, `twitter:title` and the CollectionPage `name`, so all eight languages match their `<title>`. |
 | B3 | **robots.txt layout.** `app/robots.ts` generates the file. Comments and blank lines change, and each group lists its `Allow` lines before its `Disallow` lines. User agents, paths, crawl delays and sitemaps are unchanged. |
 | B4 | **CSV filename.** `/api/deals/export.csv` downloads as `data-cube-ai-deals.csv` (was `datacube-ai-deals.csv`). |
@@ -144,7 +144,13 @@
 | L4 | **AI disclosure page.** Its metadata no longer claims human review. A new first section says content is AI-generated and published without human review. |
 | L5 | **Content-summary footer** says "AI-generated" instead of "AI-assisted". |
 
-Nothing changes while `NEXT_PUBLIC_FOUNDER_NAME` (frontend) and `FOUNDER_NAME` (backend) are unset; Release step 0 sets both to `Deepviews` (founder decision, 2026-09-16).
+**Content correction (outside the brand and label work, labelled separately)**
+
+| ID | Change |
+|---|---|
+| C1 | **llms.txt default language.** The Languages line names English as the default ("English (en) — default | German (de) | …"); it named German, which has been false since the 2026-08 repositioning. |
+
+Nothing changes while `NEXT_PUBLIC_FOUNDER_NAME` (frontend) and `FOUNDER_NAME` (backend) are unset; Release step 0 sets both to `Deepviews` (founder decision, 2026-09-16). Once set, the trust-page footers, the homepage sidebar and every email show "Made by Deepviews", and the Organization JSON-LD gains `founder`, typed `Organization` (Ruling R-15).
 
 ## AI label copy
 
