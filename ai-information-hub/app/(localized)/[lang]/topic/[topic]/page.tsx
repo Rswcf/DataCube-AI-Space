@@ -4,6 +4,7 @@ import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import { isSupportedLanguage, toBcp47, SUPPORTED_LANGUAGES, type AppLanguage } from '@/lib/i18n'
 import { indexById, matchesTopicTerms, toTopicSlug, topicSlugToQuery, topicSlugToTitle } from '@/lib/topic-utils'
+import { BRAND, absoluteUrl } from '@/lib/brand'
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api-production-3ee5.up.railway.app/api'
 
@@ -284,13 +285,13 @@ function buildBreadcrumbSchema(lang: AppLanguage, topic: string, topicTitle: str
           ja: 'ホーム',
           ko: '홈',
         } as Record<string, string>)[lang] || 'Home',
-        item: `https://www.datacubeai.space/${lang}`,
+        item: absoluteUrl(`/${lang}`),
       },
       {
         '@type': 'ListItem',
         position: 2,
         name: topicTitle,
-        item: `https://www.datacubeai.space/${lang}/topic/${topic}`,
+        item: absoluteUrl(`/${lang}/topic/${topic}`),
       },
     ],
   }
@@ -381,7 +382,7 @@ function buildItemListSchema(lang: AppLanguage, topicTitle: string, buckets: Top
   const items = buckets.slice(0, 20).map((bucket, index) => ({
     '@type': 'ListItem',
     position: index + 1,
-    url: `https://www.datacubeai.space/${lang}/week/${bucket.periodId}`,
+    url: absoluteUrl(`/${lang}/week/${bucket.periodId}`),
     name: `${topicTitle} - ${bucket.periodId}`,
   }))
 
@@ -402,7 +403,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
 
   const topicQuery = normalizeTopicQuery(query.q)
   const topicTitle = topicDisplayTitle(topic, topicQuery)
-  const localizedUrl = `https://www.datacubeai.space/${lang}/topic/${topic}`
+  const localizedUrl = absoluteUrl(`/${lang}/topic/${topic}`)
   const section = parseSection(query.section)
   const period = isValidPeriodId(query.period) ? query.period : ''
 
@@ -442,11 +443,11 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
     alternates: {
       canonical: canonicalUrl,
       languages: {
-        'x-default': `https://www.datacubeai.space/en/topic/${topic}`,
+        'x-default': absoluteUrl(`/en/topic/${topic}`),
         ...Object.fromEntries(
           SUPPORTED_LANGUAGES.map((code) => [
             toBcp47(code),
-            `https://www.datacubeai.space/${code}/topic/${topic}`,
+            absoluteUrl(`/${code}/topic/${topic}`),
           ])
         ),
       },
@@ -461,7 +462,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
           url: '/og-image.jpg',
           width: 1200,
           height: 630,
-          alt: `Data Cube AI – ${topicTitle}`,
+          alt: `${BRAND.name} – ${topicTitle}`,
         },
       ],
     },

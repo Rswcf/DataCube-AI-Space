@@ -44,7 +44,7 @@
     }
   },
   "week": {
-    "title": "KI-News 13.09.2026 | Data Cube AI",
+    "title": "KI-News 13.09.2026",
     "description": "Kuratierte KI-News der 13.09.2026: Technologie, Investment-Signale, praktische Tipps und Quellenlinks auf Data Cube AI.",
     "alternates": {
       "canonical": "https://www.datacubeai.space/de/week/2026-09-13",
@@ -197,7 +197,7 @@
     }
   },
   "articleNotFound": {
-    "title": "Article not found | Data Cube AI",
+    "title": "Article not found",
     "robots": {
       "index": false,
       "follow": true

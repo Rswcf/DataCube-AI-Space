@@ -44,7 +44,7 @@
     }
   },
   "week": {
-    "title": "AI News Sep 13, 2026 | Data Cube AI",
+    "title": "AI News Sep 13, 2026",
     "description": "Curated AI news for Sep 13, 2026: technology, investment signals, practical tips, and source links on Data Cube AI.",
     "alternates": {
       "canonical": "https://www.datacubeai.space/en/week/2026-09-13",
@@ -197,7 +197,7 @@
     }
   },
   "articleNotFound": {
-    "title": "Article not found | Data Cube AI",
+    "title": "Article not found",
     "robots": {
       "index": false,
       "follow": true

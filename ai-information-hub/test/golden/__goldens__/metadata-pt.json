@@ -44,7 +44,7 @@
     }
   },
   "week": {
-    "title": "Notícias IA Sep 13, 2026 | Data Cube AI",
+    "title": "Notícias IA Sep 13, 2026",
     "description": "Notícias de IA para Sep 13, 2026: tecnologia, sinais de investimento, dicas práticas e fontes no Data Cube AI.",
     "alternates": {
       "canonical": "https://www.datacubeai.space/pt/week/2026-09-13",
@@ -201,7 +201,7 @@
     }
   },
   "articleNotFound": {
-    "title": "Article not found | Data Cube AI",
+    "title": "Article not found",
     "robots": {
       "index": false,
       "follow": true

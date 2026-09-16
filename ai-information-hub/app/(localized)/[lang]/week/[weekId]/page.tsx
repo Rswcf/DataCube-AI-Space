@@ -5,6 +5,7 @@ import LegacyWeekPage, {
   generateStaticParams as generateLegacyStaticParams,
 } from '@/app/(site)/week/[weekId]/page'
 import { isSupportedLanguage, SUPPORTED_LANGUAGES, toBcp47 } from '@/lib/i18n'
+import { absoluteUrl } from '@/lib/brand'
 
 export const revalidate = 3600
 
@@ -23,16 +24,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   // Override hreflang alternates to include all 8 languages
   const hreflangEntries: Record<string, string> = {
-    'x-default': `https://www.datacubeai.space/en/week/${weekId}`,
+    'x-default': absoluteUrl(`/en/week/${weekId}`),
   }
   for (const code of SUPPORTED_LANGUAGES) {
-    hreflangEntries[toBcp47(code)] = `https://www.datacubeai.space/${code}/week/${weekId}`
+    hreflangEntries[toBcp47(code)] = absoluteUrl(`/${code}/week/${weekId}`)
   }
 
   return {
     ...baseMeta,
     alternates: {
-      canonical: `https://www.datacubeai.space/${lang}/week/${weekId}`,
+      canonical: absoluteUrl(`/${lang}/week/${weekId}`),
       languages: hreflangEntries,
     },
   }

@@ -61,7 +61,7 @@
       }
     },
     "openGraph": {
-      "title": "AI 뉴스 Sep 13, 2026 — 기술, 투자 및 실용 팁",
+      "title": "AI 뉴스 Sep 13, 2026 — 기술, 투자 및 실용 팁 | Data Cube AI",
       "description": "Sep 13, 2026 AI 뉴스 큐레이션: 기술 돌파구, 투자 신호, 실용 팁 – 매일 업데이트.",
       "url": "https://www.datacubeai.space/ko/week/2026-09-13",
       "type": "article",
@@ -77,7 +77,7 @@
     },
     "twitter": {
       "card": "summary_large_image",
-      "title": "AI 뉴스 Sep 13, 2026 — 기술, 투자 및 실용 팁",
+      "title": "AI 뉴스 Sep 13, 2026 — 기술, 투자 및 실용 팁 | Data Cube AI",
       "description": "Sep 13, 2026 AI 뉴스 큐레이션: 기술 돌파구, 투자 신호, 실용 팁 – 매일 업데이트.",
       "images": [
         {
@@ -201,7 +201,7 @@
     }
   },
   "articleNotFound": {
-    "title": "Article not found | Data Cube AI",
+    "title": "Article not found",
     "robots": {
       "index": false,
       "follow": true
