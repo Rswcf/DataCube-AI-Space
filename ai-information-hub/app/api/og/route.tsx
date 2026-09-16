@@ -1,5 +1,6 @@
 import { ImageResponse } from 'next/og'
 import type { NextRequest } from 'next/server'
+import { BRAND } from '@/lib/brand'
 
 // Runs on the default Node.js runtime (Fluid Compute). It used to be an Edge
 // Function, which is billed as separate execution units and cannot share the
@@ -85,7 +86,7 @@ export async function GET(request: NextRequest) {
             letterSpacing: '0.05em',
           }}
         >
-          Data Cube AI
+          {BRAND.name}
         </div>
 
         {/* Period title */}

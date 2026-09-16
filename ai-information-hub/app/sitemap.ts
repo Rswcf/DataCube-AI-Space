@@ -11,6 +11,7 @@ import {
 } from '@/lib/article-routes'
 import { SUPPORTED_LANGUAGES } from '@/lib/i18n'
 import { periodPublishedDate } from '@/lib/period-utils'
+import { BRAND } from '@/lib/brand'
 
 interface WeeksResponse {
   weeks: { id: string; days?: { id: string }[] }[]
@@ -99,7 +100,7 @@ function candidateLastModified(candidate: ArticleCandidate, periodId: string): D
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://www.datacubeai.space'
+  const baseUrl = BRAND.siteUrl
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api-production-3ee5.up.railway.app/api'
 
   // Fetch all periods from API with static file fallback

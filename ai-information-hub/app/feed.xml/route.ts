@@ -1,8 +1,9 @@
 import { NextRequest } from 'next/server';
 import { absoluteArticleUrl, techStoryId } from '@/lib/article-routes';
+import { BRAND, FROZEN_IDS } from '@/lib/brand';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api-production-3ee5.up.railway.app/api';
-const SITE_URL = 'https://www.datacubeai.space';
+const SITE_URL = BRAND.siteUrl;
 
 interface TechPost {
   id: number;
@@ -86,15 +87,15 @@ export async function GET(request: NextRequest) {
   }
 
   const feedTitle = ({
-    de: 'Data Cube AI – Tägliche KI-News',
-    en: 'Data Cube AI – Daily AI News',
-    zh: 'Data Cube AI – 每日AI新闻',
-    fr: 'Data Cube AI – Actualités IA quotidiennes',
-    es: 'Data Cube AI – Noticias diarias de IA',
-    pt: 'Data Cube AI – Notícias diárias de IA',
-    ja: 'Data Cube AI – 毎日のAIニュース',
-    ko: 'Data Cube AI – 매일 AI 뉴스',
-  } as Record<string, string>)[lang] || 'Data Cube AI – Daily AI News';
+    de: `${BRAND.name} – Tägliche KI-News`,
+    en: `${BRAND.name} – Daily AI News`,
+    zh: `${BRAND.name} – 每日AI新闻`,
+    fr: `${BRAND.name} – Actualités IA quotidiennes`,
+    es: `${BRAND.name} – Noticias diarias de IA`,
+    pt: `${BRAND.name} – Notícias diárias de IA`,
+    ja: `${BRAND.name} – 毎日のAIニュース`,
+    ko: `${BRAND.name} – 매일 AI 뉴스`,
+  } as Record<string, string>)[lang] || `${BRAND.name} – Daily AI News`;
   const feedSubtitle = ({
     de: 'Kuratierte KI-Nachrichten: Technologie, Investment und Tipps',
     en: 'Curated AI news: Technology, Investment, and Tips',
@@ -123,7 +124,7 @@ export async function GET(request: NextRequest) {
       return `  <entry>
     <title>${escapeXml(title)}</title>
     <link href="${escapeXml(postUrl)}" rel="alternate" />
-    <id>tag:datacubeai.space,2026:${lang}:${post.periodId}-${storyId}</id>
+    <id>${FROZEN_IDS.atomTagPrefix}${lang}:${post.periodId}-${storyId}</id>
     <updated>${updated}</updated>
     <summary type="text">${escapeXml(post.content)}</summary>
     <category term="${escapeXml(post.category)}" />
@@ -145,13 +146,13 @@ export async function GET(request: NextRequest) {
   <subtitle>${escapeXml(feedSubtitle)}</subtitle>
   <link href="${SITE_URL}/feed.xml?lang=${lang}" rel="self" type="application/atom+xml" />
   <link href="${SITE_URL}" rel="alternate" type="text/html" />
-  <id>tag:datacubeai.space,2026:feed:${lang}</id>
+  <id>${FROZEN_IDS.atomTagPrefix}feed:${lang}</id>
   <updated>${feedUpdated}</updated>
   <author>
-    <name>Data Cube AI</name>
+    <name>${escapeXml(BRAND.name)}</name>
     <uri>${SITE_URL}</uri>
   </author>
-  <generator>Data Cube AI</generator>
+  <generator>${escapeXml(BRAND.name)}</generator>
 ${entries}
 </feed>`;
 

@@ -1,4 +1,5 @@
 import { NextRequest } from 'next/server';
+import { BRAND, absoluteUrl } from '@/lib/brand';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api-production-3ee5.up.railway.app/api';
 
@@ -94,7 +95,7 @@ export async function GET(request: NextRequest) {
   }
 
   if (!periodId) {
-    return new Response('# Data Cube AI\n\nNo content available.', {
+    return new Response(`# ${BRAND.name}\n\nNo content available.`, {
       headers: {
         'Content-Type': 'text/markdown; charset=utf-8',
         'Cache-Control': 'public, s-maxage=3600',
@@ -131,8 +132,8 @@ export async function GET(request: NextRequest) {
   }
 
   const title = lang === 'de'
-    ? `Data Cube AI - KI-News ${periodLabel}`
-    : `Data Cube AI - AI News ${periodLabel}`;
+    ? `${BRAND.name} - KI-News ${periodLabel}`
+    : `${BRAND.name} - AI News ${periodLabel}`;
 
   // --- Pre-compute all filtered data for statistics and content ---
 
@@ -171,7 +172,7 @@ export async function GET(request: NextRequest) {
   }
 
   // --- Structured metadata header (YAML frontmatter) ---
-  let md = `---\ntitle: "Data Cube AI - AI News ${periodLabel}"\nlanguage: ${lang}\nperiod: ${periodId}\ngenerated: ${generatedTimestamp}\nsource: https://www.datacubeai.space\nlicense: CC BY 4.0\n---\n\n`;
+  let md = `---\ntitle: "${BRAND.name} - AI News ${periodLabel}"\nlanguage: ${lang}\nperiod: ${periodId}\ngenerated: ${generatedTimestamp}\nsource: ${BRAND.siteUrl}\nlicense: CC BY 4.0\n---\n\n`;
 
   md += `# ${title}\n\n`;
 
@@ -273,11 +274,11 @@ export async function GET(request: NextRequest) {
   if (topic) permalinkParams.set('topic', topic);
 
   md += `---\n\n`;
-  md += `## About Data Cube AI\n`;
-  md += `Data Cube AI is a multilingual (8 languages) daily AI news aggregator curating content from 40+ sources including RSS feeds, Hacker News, YouTube, and Reddit communities. Content is AI-assisted and updated daily in the late evening (Europe/Berlin time).\n\n`;
-  md += `Source: [Data Cube AI](https://www.datacubeai.space) | [API Documentation](https://www.datacubeai.space/llms.txt)\n\n`;
-  md += `Canonical URL: https://www.datacubeai.space/api/content-summary?${permalinkParams.toString()}\n\n`;
-  md += `*Citation: Data Cube AI (datacubeai.space), ${periodId}*\n`;
+  md += `## About ${BRAND.name}\n`;
+  md += `${BRAND.name} is a multilingual (8 languages) daily AI news aggregator curating content from 40+ sources including RSS feeds, Hacker News, YouTube, and Reddit communities. Content is AI-assisted and updated daily in the late evening (Europe/Berlin time).\n\n`;
+  md += `Source: [${BRAND.name}](${BRAND.siteUrl}) | [API Documentation](${absoluteUrl('/llms.txt')})\n\n`;
+  md += `Canonical URL: ${absoluteUrl(`/api/content-summary?${permalinkParams.toString()}`)}\n\n`;
+  md += `*Citation: ${BRAND.name} (${BRAND.apexHost}), ${periodId}*\n`;
 
   return new Response(md, {
     headers: {

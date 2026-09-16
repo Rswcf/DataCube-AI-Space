@@ -14,6 +14,7 @@ import {
   LANGUAGE_NAMES,
   normalizeLanguage,
 } from "@/lib/server/period-context";
+import { BRAND } from "@/lib/brand";
 
 const openrouter = createOpenAI({
   baseURL: "https://openrouter.ai/api/v1",
@@ -47,7 +48,7 @@ export async function POST(req: Request) {
       await fetchPeriodDataWithFallback(weekId);
     const weekContext = condensePeriodData(tech, investment, tips, trends, lang);
 
-    const systemPrompt = `You are the Data Cube AI Hub Assistant — a concise helper for the Data Cube AI Information Hub platform.
+    const systemPrompt = `You are the ${BRAND.name} Hub Assistant — a concise helper for the ${BRAND.name} Information Hub platform.
 
 SCOPE:
 - Answer questions about this week's AI news, trends, investments, and tips shown on the platform.

@@ -1,19 +1,20 @@
+import { BRAND, absoluteUrl } from '@/lib/brand'
 import { TechPost } from '@/lib/types'
 
 export function OrganizationSchema() {
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'NewsMediaOrganization',
-    name: 'Data Cube AI',
-    url: 'https://www.datacubeai.space',
-    logo: 'https://www.datacubeai.space/icon.svg',
+    name: BRAND.name,
+    url: BRAND.siteUrl,
+    logo: absoluteUrl('/icon.svg'),
     description: 'Multilingual AI news aggregator providing daily tech, investment, and tips content in 8 languages.',
     foundingDate: '2026-01',
-    publishingPrinciples: 'https://www.datacubeai.space/editorial-policy',
-    ethicsPolicy: 'https://www.datacubeai.space/editorial-policy',
-    correctionsPolicy: 'https://www.datacubeai.space/corrections',
-    ownershipFundingInfo: 'https://www.datacubeai.space/about',
-    diversityPolicy: 'https://www.datacubeai.space/source-methodology',
+    publishingPrinciples: absoluteUrl('/editorial-policy'),
+    ethicsPolicy: absoluteUrl('/editorial-policy'),
+    correctionsPolicy: absoluteUrl('/corrections'),
+    ownershipFundingInfo: absoluteUrl('/about'),
+    diversityPolicy: absoluteUrl('/source-methodology'),
     knowsAbout: [
       'artificial intelligence',
       'generative AI',
@@ -37,13 +38,13 @@ export function WebsiteSchema() {
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: 'Data Cube AI',
-    url: 'https://www.datacubeai.space',
+    name: BRAND.name,
+    url: BRAND.siteUrl,
     inLanguage: ['de', 'en', 'zh', 'fr', 'es', 'pt', 'ja', 'ko'],
     description: 'Daily AI news aggregator with tech breakthroughs, investment news, and practical tips.',
     potentialAction: {
       '@type': 'SearchAction',
-      target: 'https://www.datacubeai.space/?search={search_term_string}',
+      target: absoluteUrl('/?search={search_term_string}'),
       'query-input': 'required name=search_term_string',
     },
   }
@@ -63,11 +64,11 @@ export function ArticleSchema({ post, inLanguage = 'de', url }: { post: TechPost
   const headline = (firstLine && firstLine.length > 0 ? firstLine : post.content).slice(0, 110)
 
   // Semantics: this is OUR summary page, not the original article.
-  //   url / mainEntityOfPage  -> the Data Cube story fragment where the schema lives
+  //   url / mainEntityOfPage  -> our story fragment where the schema lives
   //   isBasedOn               -> the external source we summarised, if any
   // Previously mainEntityOfPage pointed at the external source, which is
   // schema.org-wrong (the "main entity" of this page IS this page).
-  const canonicalUrl = url || 'https://www.datacubeai.space'
+  const canonicalUrl = url || BRAND.siteUrl
   const schema: Record<string, unknown> = {
     '@context': 'https://schema.org',
     '@type': 'NewsArticle',
@@ -75,22 +76,22 @@ export function ArticleSchema({ post, inLanguage = 'de', url }: { post: TechPost
     description: post.content,
     datePublished: post.timestamp,
     dateModified: post.timestamp,
-    image: 'https://www.datacubeai.space/og-image.jpg',
+    image: absoluteUrl('/og-image.jpg'),
     inLanguage,
     isAccessibleForFree: true,
     url: canonicalUrl,
     mainEntityOfPage: canonicalUrl,
     author: {
       '@type': 'Organization',
-      name: 'Data Cube AI',
-      url: 'https://www.datacubeai.space',
+      name: BRAND.name,
+      url: BRAND.siteUrl,
     },
     publisher: {
       '@type': 'Organization',
-      name: 'Data Cube AI',
+      name: BRAND.name,
       logo: {
         '@type': 'ImageObject',
-        url: 'https://www.datacubeai.space/icon.svg',
+        url: absoluteUrl('/icon.svg'),
       },
     },
     // NOTE: `speakable` deliberately NOT set here. A per-item speakable on an
@@ -126,12 +127,12 @@ export function VideoSchema({ video }: { video: TechPost }) {
     embedUrl: `https://www.youtube-nocookie.com/embed/${video.videoId}`,
     publisher: {
       '@type': 'Organization',
-      name: 'Data Cube AI',
+      name: BRAND.name,
     },
     author: {
       '@type': 'Organization',
-      name: 'Data Cube AI',
-      url: 'https://www.datacubeai.space',
+      name: BRAND.name,
+      url: BRAND.siteUrl,
     },
   }
 
@@ -146,52 +147,52 @@ export function VideoSchema({ video }: { video: TechPost }) {
 export function FAQSchema({ lang = 'en' }: { lang?: string }) {
   const faqs: Record<string, Array<{ q: string; a: string }>> = {
     de: [
-      { q: 'Was ist Data Cube AI?', a: 'Data Cube AI ist ein mehrsprachiger (8 Sprachen: DE, EN, ZH, FR, ES, PT, JA, KO) täglicher KI-News-Aggregator. Er kuratiert Technologie-Durchbrüche, Investment-News, praktische Tipps und YouTube-Videos aus über 40 Quellen.' },
+      { q: `Was ist ${BRAND.name}?`, a: `${BRAND.name} ist ein mehrsprachiger (8 Sprachen: DE, EN, ZH, FR, ES, PT, JA, KO) täglicher KI-News-Aggregator. Er kuratiert Technologie-Durchbrüche, Investment-News, praktische Tipps und YouTube-Videos aus über 40 Quellen.` },
       { q: 'Wie oft wird der Inhalt aktualisiert?', a: 'Der Inhalt wird täglich am späten Abend (Europe/Berlin) aktualisiert, mit neuen Tech-Meldungen, Investment-News und praktischen Tipps.' },
-      { q: 'Welche Sprachen unterstützt Data Cube AI?', a: 'Data Cube AI unterstützt 8 Sprachen: Deutsch, Englisch, Chinesisch, Französisch, Spanisch, Portugiesisch, Japanisch und Koreanisch.' },
-      { q: 'Welche Arten von KI-News deckt Data Cube AI ab?', a: 'Data Cube AI deckt drei Hauptkategorien ab: Tech (KI-Durchbrüche, Forschung, Produkteinführungen), Investment (Finanzierungsrunden, M&A, Marktbewegungen) und Tipps (praktische KI-Tools und Prompts).' },
+      { q: `Welche Sprachen unterstützt ${BRAND.name}?`, a: `${BRAND.name} unterstützt 8 Sprachen: Deutsch, Englisch, Chinesisch, Französisch, Spanisch, Portugiesisch, Japanisch und Koreanisch.` },
+      { q: `Welche Arten von KI-News deckt ${BRAND.name} ab?`, a: `${BRAND.name} deckt drei Hauptkategorien ab: Tech (KI-Durchbrüche, Forschung, Produkteinführungen), Investment (Finanzierungsrunden, M&A, Marktbewegungen) und Tipps (praktische KI-Tools und Prompts).` },
     ],
     en: [
-      { q: 'What is Data Cube AI?', a: 'Data Cube AI is a multilingual (8 languages: DE, EN, ZH, FR, ES, PT, JA, KO) daily AI news aggregator that curates tech breakthroughs, investment news, practical tips, and YouTube videos from 40+ sources.' },
+      { q: `What is ${BRAND.name}?`, a: `${BRAND.name} is a multilingual (8 languages: DE, EN, ZH, FR, ES, PT, JA, KO) daily AI news aggregator that curates tech breakthroughs, investment news, practical tips, and YouTube videos from 40+ sources.` },
       { q: 'How often is the content updated?', a: 'Content is updated daily in the late evening (Europe/Berlin time), with new tech posts, investment news, and practical tips curated every day.' },
-      { q: 'What languages does Data Cube AI support?', a: 'Data Cube AI supports 8 languages: German, English, Chinese, French, Spanish, Portuguese, Japanese, and Korean.' },
-      { q: 'What types of AI news does Data Cube AI cover?', a: 'Data Cube AI covers three main categories: Tech (AI breakthroughs, research, and product launches), Investment (funding rounds, M&A, market movements), and Tips (practical AI tools and prompts).' },
+      { q: `What languages does ${BRAND.name} support?`, a: `${BRAND.name} supports 8 languages: German, English, Chinese, French, Spanish, Portuguese, Japanese, and Korean.` },
+      { q: `What types of AI news does ${BRAND.name} cover?`, a: `${BRAND.name} covers three main categories: Tech (AI breakthroughs, research, and product launches), Investment (funding rounds, M&A, market movements), and Tips (practical AI tools and prompts).` },
     ],
     zh: [
-      { q: '什么是Data Cube AI？', a: 'Data Cube AI是一个多语言（8种语言：DE、EN、ZH、FR、ES、PT、JA、KO）每日AI新闻聚合器，精选技术突破、投资新闻、实用技巧和YouTube视频，来源超过40个。' },
+      { q: `什么是${BRAND.name}？`, a: `${BRAND.name}是一个多语言（8种语言：DE、EN、ZH、FR、ES、PT、JA、KO）每日AI新闻聚合器，精选技术突破、投资新闻、实用技巧和YouTube视频，来源超过40个。` },
       { q: '内容多久更新一次？', a: '内容每天在柏林时间深夜更新，包含新的技术报道、投资新闻和实用技巧。' },
-      { q: 'Data Cube AI支持哪些语言？', a: 'Data Cube AI支持8种语言：德语、英语、中文、法语、西班牙语、葡萄牙语、日语和韩语。' },
-      { q: 'Data Cube AI涵盖哪些类型的AI新闻？', a: 'Data Cube AI涵盖三大类别：科技（AI突破、研究、产品发布）、投资（融资轮次、并购、市场动态）和技巧（实用AI工具和提示词）。' },
+      { q: `${BRAND.name}支持哪些语言？`, a: `${BRAND.name}支持8种语言：德语、英语、中文、法语、西班牙语、葡萄牙语、日语和韩语。` },
+      { q: `${BRAND.name}涵盖哪些类型的AI新闻？`, a: `${BRAND.name}涵盖三大类别：科技（AI突破、研究、产品发布）、投资（融资轮次、并购、市场动态）和技巧（实用AI工具和提示词）。` },
     ],
     fr: [
-      { q: "Qu'est-ce que Data Cube AI ?", a: "Data Cube AI est un agrégateur d'actualités IA multilingue (8 langues) qui sélectionne quotidiennement des percées technologiques, des nouvelles d'investissement, des conseils pratiques et des vidéos YouTube à partir de plus de 40 sources." },
+      { q: `Qu'est-ce que ${BRAND.name} ?`, a: `${BRAND.name} est un agrégateur d'actualités IA multilingue (8 langues) qui sélectionne quotidiennement des percées technologiques, des nouvelles d'investissement, des conseils pratiques et des vidéos YouTube à partir de plus de 40 sources.` },
       { q: 'À quelle fréquence le contenu est-il mis à jour ?', a: 'Le contenu est mis à jour quotidiennement en fin de soirée (heure de Berlin), avec de nouveaux articles tech, des actualités investissement et des conseils pratiques.' },
-      { q: 'Quelles langues sont prises en charge ?', a: 'Data Cube AI prend en charge 8 langues : allemand, anglais, chinois, français, espagnol, portugais, japonais et coréen.' },
-      { q: "Quels types d'actualités IA couvre Data Cube AI ?", a: "Data Cube AI couvre trois catégories : Tech (percées IA, recherche, lancements de produits), Investissement (levées de fonds, M&A, mouvements de marché) et Astuces (outils IA pratiques et prompts)." },
+      { q: 'Quelles langues sont prises en charge ?', a: `${BRAND.name} prend en charge 8 langues : allemand, anglais, chinois, français, espagnol, portugais, japonais et coréen.` },
+      { q: `Quels types d'actualités IA couvre ${BRAND.name} ?`, a: `${BRAND.name} couvre trois catégories : Tech (percées IA, recherche, lancements de produits), Investissement (levées de fonds, M&A, mouvements de marché) et Astuces (outils IA pratiques et prompts).` },
     ],
     es: [
-      { q: '¿Qué es Data Cube AI?', a: 'Data Cube AI es un agregador de noticias de IA multilingüe (8 idiomas) que selecciona diariamente avances tecnológicos, noticias de inversión, consejos prácticos y videos de YouTube de más de 40 fuentes.' },
+      { q: `¿Qué es ${BRAND.name}?`, a: `${BRAND.name} es un agregador de noticias de IA multilingüe (8 idiomas) que selecciona diariamente avances tecnológicos, noticias de inversión, consejos prácticos y videos de YouTube de más de 40 fuentes.` },
       { q: '¿Con qué frecuencia se actualiza el contenido?', a: 'El contenido se actualiza diariamente a última hora de la tarde (hora de Berlín), con nuevas noticias de tecnología, inversión y consejos prácticos.' },
-      { q: '¿Qué idiomas admite Data Cube AI?', a: 'Data Cube AI admite 8 idiomas: alemán, inglés, chino, francés, español, portugués, japonés y coreano.' },
-      { q: '¿Qué tipos de noticias de IA cubre Data Cube AI?', a: 'Data Cube AI cubre tres categorías principales: Tecnología (avances en IA, investigación, lanzamientos), Inversión (rondas de financiación, M&A, movimientos de mercado) y Consejos (herramientas de IA prácticas y prompts).' },
+      { q: `¿Qué idiomas admite ${BRAND.name}?`, a: `${BRAND.name} admite 8 idiomas: alemán, inglés, chino, francés, español, portugués, japonés y coreano.` },
+      { q: `¿Qué tipos de noticias de IA cubre ${BRAND.name}?`, a: `${BRAND.name} cubre tres categorías principales: Tecnología (avances en IA, investigación, lanzamientos), Inversión (rondas de financiación, M&A, movimientos de mercado) y Consejos (herramientas de IA prácticas y prompts).` },
     ],
     pt: [
-      { q: 'O que é o Data Cube AI?', a: 'Data Cube AI é um agregador de notícias de IA multilíngue (8 idiomas) que seleciona diariamente avanços tecnológicos, notícias de investimento, dicas práticas e vídeos do YouTube de mais de 40 fontes.' },
+      { q: `O que é o ${BRAND.name}?`, a: `${BRAND.name} é um agregador de notícias de IA multilíngue (8 idiomas) que seleciona diariamente avanços tecnológicos, notícias de investimento, dicas práticas e vídeos do YouTube de mais de 40 fontes.` },
       { q: 'Com que frequência o conteúdo é atualizado?', a: 'O conteúdo é atualizado diariamente no fim da noite (horário de Berlim), com novas notícias de tecnologia, investimento e dicas práticas.' },
-      { q: 'Quais idiomas o Data Cube AI suporta?', a: 'Data Cube AI suporta 8 idiomas: alemão, inglês, chinês, francês, espanhol, português, japonês e coreano.' },
-      { q: 'Que tipos de notícias de IA o Data Cube AI cobre?', a: 'Data Cube AI cobre três categorias: Tecnologia (avanços em IA, pesquisa, lançamentos), Investimento (rodadas de financiamento, M&A, movimentos de mercado) e Dicas (ferramentas de IA práticas e prompts).' },
+      { q: `Quais idiomas o ${BRAND.name} suporta?`, a: `${BRAND.name} suporta 8 idiomas: alemão, inglês, chinês, francês, espanhol, português, japonês e coreano.` },
+      { q: `Que tipos de notícias de IA o ${BRAND.name} cobre?`, a: `${BRAND.name} cobre três categorias: Tecnologia (avanços em IA, pesquisa, lançamentos), Investimento (rodadas de financiamento, M&A, movimentos de mercado) e Dicas (ferramentas de IA práticas e prompts).` },
     ],
     ja: [
-      { q: 'Data Cube AIとは？', a: 'Data Cube AIは多言語（8言語：DE、EN、ZH、FR、ES、PT、JA、KO）対応の毎日のAIニュースアグリゲーターです。40以上のソースから技術的ブレークスルー、投資ニュース、実践ヒント、YouTube動画を厳選しています。' },
+      { q: `${BRAND.name}とは？`, a: `${BRAND.name}は多言語（8言語：DE、EN、ZH、FR、ES、PT、JA、KO）対応の毎日のAIニュースアグリゲーターです。40以上のソースから技術的ブレークスルー、投資ニュース、実践ヒント、YouTube動画を厳選しています。` },
       { q: 'コンテンツはどのくらいの頻度で更新されますか？', a: 'コンテンツは毎日ベルリン時間の深夜に更新され、新しいテクノロジー記事、投資ニュース、実践ヒントが追加されます。' },
-      { q: 'Data Cube AIはどの言語をサポートしていますか？', a: 'Data Cube AIは8言語をサポートしています：ドイツ語、英語、中国語、フランス語、スペイン語、ポルトガル語、日本語、韓国語。' },
-      { q: 'Data Cube AIはどのような種類のAIニュースをカバーしていますか？', a: 'Data Cube AIは3つの主要カテゴリをカバーしています：テック（AIブレークスルー、研究、製品発表）、投資（資金調達、M&A、市場動向）、ヒント（実用的なAIツールとプロンプト）。' },
+      { q: `${BRAND.name}はどの言語をサポートしていますか？`, a: `${BRAND.name}は8言語をサポートしています：ドイツ語、英語、中国語、フランス語、スペイン語、ポルトガル語、日本語、韓国語。` },
+      { q: `${BRAND.name}はどのような種類のAIニュースをカバーしていますか？`, a: `${BRAND.name}は3つの主要カテゴリをカバーしています：テック（AIブレークスルー、研究、製品発表）、投資（資金調達、M&A、市場動向）、ヒント（実用的なAIツールとプロンプト）。` },
     ],
     ko: [
-      { q: 'Data Cube AI란 무엇인가요?', a: 'Data Cube AI는 다국어(8개 언어: DE, EN, ZH, FR, ES, PT, JA, KO) 일일 AI 뉴스 애그리게이터입니다. 40개 이상의 소스에서 기술 돌파구, 투자 뉴스, 실용 팁, YouTube 동영상을 엄선합니다.' },
+      { q: `${BRAND.name}란 무엇인가요?`, a: `${BRAND.name}는 다국어(8개 언어: DE, EN, ZH, FR, ES, PT, JA, KO) 일일 AI 뉴스 애그리게이터입니다. 40개 이상의 소스에서 기술 돌파구, 투자 뉴스, 실용 팁, YouTube 동영상을 엄선합니다.` },
       { q: '콘텐츠는 얼마나 자주 업데이트되나요?', a: '콘텐츠는 매일 베를린 시간 늦은 저녁에 업데이트되며, 새로운 기술 기사, 투자 뉴스, 실용 팁이 추가됩니다.' },
-      { q: 'Data Cube AI는 어떤 언어를 지원하나요?', a: 'Data Cube AI는 8개 언어를 지원합니다: 독일어, 영어, 중국어, 프랑스어, 스페인어, 포르투갈어, 일본어, 한국어.' },
-      { q: 'Data Cube AI는 어떤 종류의 AI 뉴스를 다루나요?', a: 'Data Cube AI는 세 가지 주요 카테고리를 다룹니다: 기술(AI 돌파구, 연구, 제품 출시), 투자(펀딩 라운드, M&A, 시장 동향), 팁(실용적인 AI 도구 및 프롬프트).' },
+      { q: `${BRAND.name}는 어떤 언어를 지원하나요?`, a: `${BRAND.name}는 8개 언어를 지원합니다: 독일어, 영어, 중국어, 프랑스어, 스페인어, 포르투갈어, 일본어, 한국어.` },
+      { q: `${BRAND.name}는 어떤 종류의 AI 뉴스를 다루나요?`, a: `${BRAND.name}는 세 가지 주요 카테고리를 다룹니다: 기술(AI 돌파구, 연구, 제품 출시), 투자(펀딩 라운드, M&A, 시장 동향), 팁(실용적인 AI 도구 및 프롬프트).` },
     ],
   }
 
@@ -224,8 +225,8 @@ export function BreadcrumbListSchema({ weekId, weekLabel, lang = 'en' }: { weekI
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: homeLabel, item: `https://www.datacubeai.space/${lang}` },
-      { '@type': 'ListItem', position: 2, name: weekLabel, item: `https://www.datacubeai.space/${lang}/week/${weekId}` },
+      { '@type': 'ListItem', position: 1, name: homeLabel, item: absoluteUrl(`/${lang}`) },
+      { '@type': 'ListItem', position: 2, name: weekLabel, item: absoluteUrl(`/${lang}/week/${weekId}`) },
     ],
   }
   return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
@@ -257,15 +258,15 @@ export function SoftwareApplicationSchema({
     },
     author: {
       '@type': 'Organization',
-      name: 'DataCube AI',
-      url: 'https://www.datacubeai.space',
+      name: BRAND.name,
+      url: BRAND.siteUrl,
     },
     publisher: {
       '@type': 'Organization',
-      name: 'DataCube AI',
+      name: BRAND.name,
       logo: {
         '@type': 'ImageObject',
-        url: 'https://www.datacubeai.space/icon.svg',
+        url: absoluteUrl('/icon.svg'),
       },
     },
     inLanguage: ['de', 'en', 'zh-Hans', 'fr', 'es', 'pt', 'ja', 'ko'],
@@ -357,13 +358,13 @@ export function CollectionPageSchema({
     isAccessibleForFree: true,
     isPartOf: {
       '@type': 'WebSite',
-      name: 'Data Cube AI',
-      url: 'https://www.datacubeai.space',
+      name: BRAND.name,
+      url: BRAND.siteUrl,
     },
     publisher: {
       '@type': 'Organization',
-      name: 'Data Cube AI',
-      url: 'https://www.datacubeai.space',
+      name: BRAND.name,
+      url: BRAND.siteUrl,
     },
   }
   if (datePublished) schema.datePublished = datePublished
