@@ -244,6 +244,7 @@ export function RightSidebar({ weekId, onSearchChange }: RightSidebarProps) {
             </a>
           </nav>
           <p>&copy; 2026 {BRAND.shortName}, All Rights Reserved</p>
+          {BRAND.founderName ? <p>Made by {BRAND.founderName}</p> : null}
         </div>
       </div>
     </aside>

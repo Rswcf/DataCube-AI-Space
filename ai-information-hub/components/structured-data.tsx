@@ -1,20 +1,20 @@
-import { BRAND, absoluteUrl } from '@/lib/brand'
+import { BRAND, absoluteUrl, type Brand } from '@/lib/brand'
 import { TechPost } from '@/lib/types'
 
-export function OrganizationSchema() {
-  const schema = {
+export function organizationSchema(brand: Brand = BRAND): Record<string, unknown> {
+  return {
     '@context': 'https://schema.org',
     '@type': 'NewsMediaOrganization',
-    name: BRAND.name,
-    url: BRAND.siteUrl,
-    logo: absoluteUrl('/icon.svg'),
+    name: brand.name,
+    url: brand.siteUrl,
+    logo: absoluteUrl('/icon.svg', brand),
     description: 'Multilingual AI news aggregator providing daily tech, investment, and tips content in 8 languages.',
     foundingDate: '2026-01',
-    publishingPrinciples: absoluteUrl('/editorial-policy'),
-    ethicsPolicy: absoluteUrl('/editorial-policy'),
-    correctionsPolicy: absoluteUrl('/corrections'),
-    ownershipFundingInfo: absoluteUrl('/about'),
-    diversityPolicy: absoluteUrl('/source-methodology'),
+    publishingPrinciples: absoluteUrl('/editorial-policy', brand),
+    ethicsPolicy: absoluteUrl('/editorial-policy', brand),
+    correctionsPolicy: absoluteUrl('/corrections', brand),
+    ownershipFundingInfo: absoluteUrl('/about', brand),
+    diversityPolicy: absoluteUrl('/source-methodology', brand),
     knowsAbout: [
       'artificial intelligence',
       'generative AI',
@@ -24,12 +24,17 @@ export function OrganizationSchema() {
       'AI policy',
     ],
     sameAs: [],
+    // Spec AD7: the founder appears as Organization.founder only once a name is configured. The configured
+    // byline is a brand (Ruling R-15), so it is typed as an Organization; a person's name would need 'Person'.
+    ...(brand.founderName ? { founder: { '@type': 'Organization', name: brand.founderName } } : {}),
   }
+}
 
+export function OrganizationSchema() {
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema()) }}
     />
   )
 }

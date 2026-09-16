@@ -32,7 +32,7 @@ export const siteMetadata: Metadata = {
     // Korean
     'AI 뉴스', '인공지능 뉴스', 'AI 투자',
   ],
-  authors: [{ name: `${BRAND.shortName} Team` }],
+  authors: [{ name: BRAND.name, url: BRAND.siteUrl }],
   creator: BRAND.name,
   publisher: BRAND.name,
   generator: 'Next.js',

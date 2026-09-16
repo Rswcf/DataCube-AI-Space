@@ -52,7 +52,8 @@
     ],
     "authors": [
       {
-        "name": "Data Cube Team"
+        "name": "Data Cube AI",
+        "url": "https://www.datacubeai.space"
       }
     ],
     "creator": "Data Cube AI",
@@ -209,13 +210,13 @@
   },
   "aiDisclosure": {
     "title": "AI Disclosure",
-    "description": "AI usage disclosure for Data Cube AI content collection, summarization, categorization, translation, curation, and human review.",
+    "description": "AI usage disclosure for Data Cube AI content collection, summarization, categorization, translation, and curation.",
     "alternates": {
       "canonical": "https://www.datacubeai.space/ai-disclosure"
     },
     "openGraph": {
       "title": "AI Disclosure | Data Cube AI",
-      "description": "How Data Cube AI uses AI-assisted workflows for collection, summarization, categorization, translation, and review.",
+      "description": "How Data Cube AI uses AI for collection, summarization, categorization, and translation.",
       "url": "https://www.datacubeai.space/ai-disclosure",
       "images": [
         {

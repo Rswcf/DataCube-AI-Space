@@ -500,7 +500,8 @@ function jsonLdFor(story: ArticleStory, lang: AppLanguage, periodId: string, sto
       mainEntityOfPage: url,
       author: {
         '@type': 'Organization',
-        name: `${BRAND.name} Editorial`,
+        name: BRAND.name,
+        url: BRAND.siteUrl,
       },
       publisher: {
         '@type': 'Organization',
