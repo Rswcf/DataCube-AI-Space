@@ -9,19 +9,11 @@ import {
   techStoryId,
   tipStoryId,
 } from '@/lib/article-routes'
-import { toTopicSlug } from '@/lib/topic-utils'
 import { SUPPORTED_LANGUAGES } from '@/lib/i18n'
 import { periodPublishedDate } from '@/lib/period-utils'
 
 interface WeeksResponse {
   weeks: { id: string; days?: { id: string }[] }[]
-}
-
-interface TrendsResponse {
-  trends?: {
-    de?: { title?: string }[]
-    en?: { title?: string }[]
-  }
 }
 
 interface SitemapStoryPost {
@@ -44,27 +36,6 @@ interface ArticleCandidate {
 // `periodPublishedDate` from lib/period-utils is the shared source of truth
 // for period-id → Date conversion across sitemap.ts + week/page.tsx.
 const lastModFromId = periodPublishedDate
-
-async function getTopicTitlesByLanguage(periodId: string, apiUrl: string): Promise<{ de: string[]; en: string[] }> {
-  let data: TrendsResponse | null = null
-  try {
-    const res = await fetch(`${apiUrl}/trends/${periodId}`, { next: { revalidate: 3600 } })
-    if (res.ok) data = (await res.json()) as TrendsResponse
-  } catch {}
-
-  if (!data) {
-    try {
-      const filePath = path.join(process.cwd(), 'public', 'data', periodId, 'trends.json')
-      const raw = await readFile(filePath, 'utf-8')
-      data = JSON.parse(raw) as TrendsResponse
-    } catch {}
-  }
-
-  return {
-    de: (data?.trends?.de || []).map((i) => (i.title || '').trim()).filter(Boolean),
-    en: (data?.trends?.en || []).map((i) => (i.title || '').trim()).filter(Boolean),
-  }
-}
 
 async function getFeedFromApiOrFile<T>(periodId: string, apiUrl: string, endpoint: string, filename: string): Promise<T | null> {
   try {
@@ -181,38 +152,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }))
   })
 
-  const deTopicSet = new Set<string>()
-  const enTopicSet = new Set<string>()
-  for (const periodId of periodIds.slice(0, 8)) {
-    const titles = await getTopicTitlesByLanguage(periodId, apiUrl)
-    for (const t of titles.de) {
-      const s = toTopicSlug(t)
-      if (s && s !== 'topic') deTopicSet.add(s)
-    }
-    for (const t of titles.en) {
-      const s = toTopicSlug(t)
-      if (s && s !== 'topic') enTopicSet.add(s)
-    }
-  }
-
-  // Filter out empty or invalid slugs to avoid sitemap entries pointing to empty topic pages.
-  // Note: Topics with 0 matching articles may still appear if trends data includes them
-  // but actual article matching yields nothing. A full fix would require querying article
-  // counts per topic, which is too expensive at sitemap generation time.
-  const deSlugs = Array.from(deTopicSet).filter((s) => s.length > 1).slice(0, 30)
-  const enSlugs = Array.from(enTopicSet).filter((s) => s.length > 1).slice(0, 30)
-
-  const topicEntries = SUPPORTED_LANGUAGES.flatMap((lang) => {
-    const slugs = lang === 'de' ? deSlugs : enSlugs
-    // Skip languages with no topic data to avoid empty topic pages in sitemap.
-    if (slugs.length === 0) return []
-    return slugs.map((topic) => ({
-      url: `${baseUrl}/${lang}/topic/${topic}`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly' as const,
-      priority: 0.5,
-    }))
-  })
+  // Topic hubs are deliberately NOT advertised here. Their slugs come from
+  // LLM-written trend headlines, and a hub only renders entries when every word
+  // of the slug appears in one stored item — so most of them hold nothing and
+  // now answer 404 (measured 2026-09-16 on this branch: 17 of 30 EN slugs, and
+  // 12 of 12 sampled DE/FR/JA ones). A sitemap of 404s costs crawl budget and
+  // fills Search Console with errors. Re-add them once topic slugs are derived
+  // from entities (companies, models) instead of headlines, and verified to
+  // resolve. The hubs stay reachable through the trend links on week pages.
 
   const articlePeriods = await Promise.all(
     periodIds.slice(0, 8).map(async (periodId) => ({
@@ -311,7 +258,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...trustEntries,
     ...langHomeEntries,
     ...toolEntries,
-    ...topicEntries,
     ...articleEntries,
     ...periodEntries,
   ]
