@@ -3,6 +3,9 @@ import { createElement, type ComponentType, type ReactElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { FIXED_NOW, PERIOD_ID, STORY_ID, TOPIC, stubApiFetch } from '../fixtures/api'
 import { expectGolden, normalizeHtml } from './golden'
+import { Feed } from '@/components/feed'
+import { RightSidebar } from '@/components/right-sidebar'
+import { SettingsProvider } from '@/lib/settings-context'
 
 vi.mock('next/link', () => ({
   default: ({ href, children, prefetch: _prefetch, ...rest }: any) =>
@@ -12,6 +15,21 @@ vi.mock('next/navigation', async (importOriginal) => ({
   ...(await importOriginal<typeof import('next/navigation')>()),
   useRouter: () => ({ push: () => undefined, replace: () => undefined, prefetch: () => undefined }),
 }))
+// HomePageClient (and, through it, Feed/RightSidebar) calls useSettings(), which throws
+// outside a SettingsProvider — and HomePageClient composes Sidebar, ChatWidget,
+// ReportGenerator and TrendIndex too, each with its own hooks, so rendering the whole
+// composite here is a much larger, less contained surface than what this file otherwise
+// renders. Mocked to () => null for every *page* golden (home-en.html only pins the
+// sr-only SEO shell), and the two brand-bearing pieces of it are instead rendered
+// directly and honestly below: the `<h1>Data Cube AI</h1>` masthead (feed.tsx:93, via
+// `Feed`, wrapped in a real SettingsProvider so useSettings() doesn't throw) and the
+// desktop newsletter eyebrow (right-sidebar.tsx:106, via `RightSidebar`, same wrapper).
+// components/home-page-client.tsx:428 carries the same eyebrow text a third time, for
+// the mobile settings drawer — that one stays uncovered: it only renders once
+// `showMobileSettings` is true, which is internal useState with no default-true escape
+// hatch short of rendering (and forcing open) the full HomePageClient composite this
+// comment just explained is out of scope here. See task-1-review.md §3 and the task-1
+// report's "Fix round 1" section for the full disclosure.
 vi.mock('@/components/home-page-client', () => ({ default: () => null }))
 // The root shell loads next/font and analytics, which only work inside the Next.js compiler.
 vi.mock('next/font/google', () => ({
@@ -106,6 +124,28 @@ describe('rendered pages', () => {
     const { RootShell } = await import('@/components/root-shell')
     const shell = createElement(RootShell, { lang, children: createElement('p', null, 'Page body') })
     await expectGolden(await render(shell), `pages/root-shell-${lang}.html`)
+  })
+
+  // The homepage masthead (<h1>Data Cube AI</h1>, feed.tsx:93) is otherwise unreachable:
+  // home-en.html only pins the sr-only SEO shell because HomePageClient is mocked above.
+  // useSettings() throws outside a SettingsProvider, so wrap in a real one (initialLanguage
+  // only, same as the real [lang] root layout) rather than mocking useSettings itself.
+  it.each(['en', 'zh'] as const)('feed masthead in %s', async (lang) => {
+    const feed = createElement(SettingsProvider, {
+      initialLanguage: lang,
+      children: createElement(Feed, { activeTab: 'tech', selectedWeekId: PERIOD_ID, onWeekChange: () => undefined, searchQuery: '' }),
+    })
+    await expectGolden(await render(feed), `pages/feed-${lang}.html`)
+  })
+
+  // The desktop newsletter box's "Data Cube AI" eyebrow (right-sidebar.tsx:106) — same
+  // reasoning and wrapper as the Feed masthead above.
+  it.each(['en', 'zh'] as const)('right sidebar in %s', async (lang) => {
+    const sidebar = createElement(SettingsProvider, {
+      initialLanguage: lang,
+      children: createElement(RightSidebar, { weekId: PERIOD_ID, onSearchChange: () => undefined }),
+    })
+    await expectGolden(await render(sidebar), `pages/right-sidebar-${lang}.html`)
   })
 
   for (const [name, load] of Object.entries(STATIC_PAGES)) {
