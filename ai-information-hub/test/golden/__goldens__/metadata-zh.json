@@ -206,9 +206,9 @@
   "tools": {
     "aggregator": {
       "title": {
-        "absolute": "免费AI新闻聚合器 — 35+信息源, 8种语言, 每日更新 | DataCube AI"
+        "absolute": "免费AI新闻聚合器 — 35+信息源, 8种语言, 每日更新 | Data Cube AI"
       },
-      "description": "DataCube AI免费AI新闻聚合器，每日从35+信息源精选新闻。涵盖技术突破、投资动态、实用技巧和视频，支持8种语言。",
+      "description": "Data Cube AI免费AI新闻聚合器，每日从35+信息源精选新闻。涵盖技术突破、投资动态、实用技巧和视频，支持8种语言。",
       "alternates": {
         "canonical": "https://www.datacubeai.space/zh/tools/ai-news-aggregator",
         "languages": {
@@ -224,33 +224,33 @@
         }
       },
       "openGraph": {
-        "title": "免费AI新闻聚合器 — 35+信息源, 8种语言, 每日更新 | DataCube AI",
-        "description": "DataCube AI免费AI新闻聚合器，每日从35+信息源精选新闻。涵盖技术突破、投资动态、实用技巧和视频，支持8种语言。",
+        "title": "免费AI新闻聚合器 — 35+信息源, 8种语言, 每日更新 | Data Cube AI",
+        "description": "Data Cube AI免费AI新闻聚合器，每日从35+信息源精选新闻。涵盖技术突破、投资动态、实用技巧和视频，支持8种语言。",
         "url": "https://www.datacubeai.space/zh/tools/ai-news-aggregator",
         "images": [
           {
             "url": "/og-image.jpg",
             "width": 1200,
             "height": 630,
-            "alt": "DataCube AI News Aggregator"
+            "alt": "Data Cube AI News Aggregator"
           }
         ]
       },
       "twitter": {
         "card": "summary_large_image",
-        "title": "免费AI新闻聚合器 — 35+信息源, 8种语言, 每日更新 | DataCube AI",
-        "description": "DataCube AI免费AI新闻聚合器，每日从35+信息源精选新闻。涵盖技术突破、投资动态、实用技巧和视频，支持8种语言。",
+        "title": "免费AI新闻聚合器 — 35+信息源, 8种语言, 每日更新 | Data Cube AI",
+        "description": "Data Cube AI免费AI新闻聚合器，每日从35+信息源精选新闻。涵盖技术突破、投资动态、实用技巧和视频，支持8种语言。",
         "images": [
           {
             "url": "/og-image.jpg",
-            "alt": "DataCube AI News Aggregator"
+            "alt": "Data Cube AI News Aggregator"
           }
         ]
       }
     },
     "api": {
       "title": {
-        "absolute": "免费AI新闻API — 8种语言的精选AI新闻数据 | DataCube AI"
+        "absolute": "免费AI新闻API — 8种语言的精选AI新闻数据 | Data Cube AI"
       },
       "description": "免费REST API，来自35+来源的精选AI新闻。技术、投资、技巧、视频，支持8种语言。JSON响应，无需认证。",
       "alternates": {
@@ -268,7 +268,7 @@
         }
       },
       "openGraph": {
-        "title": "免费AI新闻API — 8种语言的精选AI新闻数据 | DataCube AI",
+        "title": "免费AI新闻API — 8种语言的精选AI新闻数据 | Data Cube AI",
         "description": "免费REST API，来自35+来源的精选AI新闻。技术、投资、技巧、视频，支持8种语言。JSON响应，无需认证。",
         "url": "https://www.datacubeai.space/zh/tools/ai-news-api",
         "images": [
@@ -276,27 +276,27 @@
             "url": "/og-image.jpg",
             "width": 1200,
             "height": 630,
-            "alt": "DataCube AI News API"
+            "alt": "Data Cube AI News API"
           }
         ]
       },
       "twitter": {
         "card": "summary_large_image",
-        "title": "免费AI新闻API — 8种语言的精选AI新闻数据 | DataCube AI",
+        "title": "免费AI新闻API — 8种语言的精选AI新闻数据 | Data Cube AI",
         "description": "免费REST API，来自35+来源的精选AI新闻。技术、投资、技巧、视频，支持8种语言。JSON响应，无需认证。",
         "images": [
           {
             "url": "/og-image.jpg",
-            "alt": "DataCube AI News API"
+            "alt": "Data Cube AI News API"
           }
         ]
       }
     },
     "index": {
       "title": {
-        "absolute": "免费 AI 工具 | DataCube AI"
+        "absolute": "免费 AI 工具 | Data Cube AI"
       },
-      "description": "DataCube AI 的全部免费 AI 工具：新闻聚合器、报告生成器和开放新闻 API。无需注册。",
+      "description": "Data Cube AI 的全部免费 AI 工具：新闻聚合器、报告生成器和开放新闻 API。无需注册。",
       "alternates": {
         "canonical": "https://www.datacubeai.space/zh/tools",
         "languages": {
@@ -312,17 +312,17 @@
         }
       },
       "openGraph": {
-        "title": "免费 AI 工具 | DataCube AI",
-        "description": "DataCube AI 的全部免费 AI 工具：新闻聚合器、报告生成器和开放新闻 API。无需注册。",
+        "title": "免费 AI 工具 | Data Cube AI",
+        "description": "Data Cube AI 的全部免费 AI 工具：新闻聚合器、报告生成器和开放新闻 API。无需注册。",
         "url": "https://www.datacubeai.space/zh/tools",
         "type": "website"
       }
     },
     "report": {
       "title": {
-        "absolute": "免费AI报告生成器 — 一键生成AI周报和日报 | DataCube AI"
+        "absolute": "免费AI报告生成器 — 一键生成AI周报和日报 | Data Cube AI"
       },
-      "description": "使用DataCube AI免费生成AI报告。流式生成、5种导出格式（DOCX、HTML、Markdown、TXT、JSON）。每周和每日AI新闻分析。",
+      "description": "使用Data Cube AI免费生成AI报告。流式生成、5种导出格式（DOCX、HTML、Markdown、TXT、JSON）。每周和每日AI新闻分析。",
       "alternates": {
         "canonical": "https://www.datacubeai.space/zh/tools/ai-report-generator",
         "languages": {
@@ -338,26 +338,26 @@
         }
       },
       "openGraph": {
-        "title": "免费AI报告生成器 — 一键生成AI周报和日报 | DataCube AI",
-        "description": "使用DataCube AI免费生成AI报告。流式生成、5种导出格式（DOCX、HTML、Markdown、TXT、JSON）。每周和每日AI新闻分析。",
+        "title": "免费AI报告生成器 — 一键生成AI周报和日报 | Data Cube AI",
+        "description": "使用Data Cube AI免费生成AI报告。流式生成、5种导出格式（DOCX、HTML、Markdown、TXT、JSON）。每周和每日AI新闻分析。",
         "url": "https://www.datacubeai.space/zh/tools/ai-report-generator",
         "images": [
           {
             "url": "/og-image.jpg",
             "width": 1200,
             "height": 630,
-            "alt": "DataCube AI Report Generator"
+            "alt": "Data Cube AI Report Generator"
           }
         ]
       },
       "twitter": {
         "card": "summary_large_image",
-        "title": "免费AI报告生成器 — 一键生成AI周报和日报 | DataCube AI",
-        "description": "使用DataCube AI免费生成AI报告。流式生成、5种导出格式（DOCX、HTML、Markdown、TXT、JSON）。每周和每日AI新闻分析。",
+        "title": "免费AI报告生成器 — 一键生成AI周报和日报 | Data Cube AI",
+        "description": "使用Data Cube AI免费生成AI报告。流式生成、5种导出格式（DOCX、HTML、Markdown、TXT、JSON）。每周和每日AI新闻分析。",
         "images": [
           {
             "url": "/og-image.jpg",
-            "alt": "DataCube AI Report Generator"
+            "alt": "Data Cube AI Report Generator"
           }
         ]
       }
@@ -368,7 +368,7 @@
         "follow": true
       },
       "title": {
-        "absolute": "AI 股票追踪器(暂停中)| DataCube AI"
+        "absolute": "AI 股票追踪器(暂停中)| Data Cube AI"
       },
       "description": "实时行情数据在数据授权审查期间暂停。交易与融资数据仍可在 AI Funding Tracker 查看。",
       "alternates": {

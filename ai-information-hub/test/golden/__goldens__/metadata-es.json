@@ -210,9 +210,9 @@
   "tools": {
     "aggregator": {
       "title": {
-        "absolute": "Agregador de Noticias IA | DataCube AI"
+        "absolute": "Agregador de Noticias IA | Data Cube AI"
       },
-      "description": "El agregador de noticias IA gratuito de DataCube AI selecciona noticias diarias de 35+ fuentes. Tecnología, inversiones, consejos y videos en 8 idiomas.",
+      "description": "El agregador de noticias IA gratuito de Data Cube AI selecciona noticias diarias de 35+ fuentes. Tecnología, inversiones, consejos y videos en 8 idiomas.",
       "alternates": {
         "canonical": "https://www.datacubeai.space/es/tools/ai-news-aggregator",
         "languages": {
@@ -228,33 +228,33 @@
         }
       },
       "openGraph": {
-        "title": "Agregador de Noticias IA | DataCube AI",
-        "description": "El agregador de noticias IA gratuito de DataCube AI selecciona noticias diarias de 35+ fuentes. Tecnología, inversiones, consejos y videos en 8 idiomas.",
+        "title": "Agregador de Noticias IA | Data Cube AI",
+        "description": "El agregador de noticias IA gratuito de Data Cube AI selecciona noticias diarias de 35+ fuentes. Tecnología, inversiones, consejos y videos en 8 idiomas.",
         "url": "https://www.datacubeai.space/es/tools/ai-news-aggregator",
         "images": [
           {
             "url": "/og-image.jpg",
             "width": 1200,
             "height": 630,
-            "alt": "DataCube AI News Aggregator"
+            "alt": "Data Cube AI News Aggregator"
           }
         ]
       },
       "twitter": {
         "card": "summary_large_image",
-        "title": "Agregador de Noticias IA | DataCube AI",
-        "description": "El agregador de noticias IA gratuito de DataCube AI selecciona noticias diarias de 35+ fuentes. Tecnología, inversiones, consejos y videos en 8 idiomas.",
+        "title": "Agregador de Noticias IA | Data Cube AI",
+        "description": "El agregador de noticias IA gratuito de Data Cube AI selecciona noticias diarias de 35+ fuentes. Tecnología, inversiones, consejos y videos en 8 idiomas.",
         "images": [
           {
             "url": "/og-image.jpg",
-            "alt": "DataCube AI News Aggregator"
+            "alt": "Data Cube AI News Aggregator"
           }
         ]
       }
     },
     "api": {
       "title": {
-        "absolute": "API de Noticias IA | DataCube AI"
+        "absolute": "API de Noticias IA | Data Cube AI"
       },
       "description": "API REST gratuita para noticias IA de 35+ fuentes. Tecnología, inversiones, consejos, videos en 8 idiomas. Respuestas JSON, sin autenticación.",
       "alternates": {
@@ -272,7 +272,7 @@
         }
       },
       "openGraph": {
-        "title": "API de Noticias IA | DataCube AI",
+        "title": "API de Noticias IA | Data Cube AI",
         "description": "API REST gratuita para noticias IA de 35+ fuentes. Tecnología, inversiones, consejos, videos en 8 idiomas. Respuestas JSON, sin autenticación.",
         "url": "https://www.datacubeai.space/es/tools/ai-news-api",
         "images": [
@@ -280,27 +280,27 @@
             "url": "/og-image.jpg",
             "width": 1200,
             "height": 630,
-            "alt": "DataCube AI News API"
+            "alt": "Data Cube AI News API"
           }
         ]
       },
       "twitter": {
         "card": "summary_large_image",
-        "title": "API de Noticias IA | DataCube AI",
+        "title": "API de Noticias IA | Data Cube AI",
         "description": "API REST gratuita para noticias IA de 35+ fuentes. Tecnología, inversiones, consejos, videos en 8 idiomas. Respuestas JSON, sin autenticación.",
         "images": [
           {
             "url": "/og-image.jpg",
-            "alt": "DataCube AI News API"
+            "alt": "Data Cube AI News API"
           }
         ]
       }
     },
     "index": {
       "title": {
-        "absolute": "Herramientas de IA gratuitas | DataCube AI"
+        "absolute": "Herramientas de IA gratuitas | Data Cube AI"
       },
-      "description": "Todas las herramientas de IA gratuitas de DataCube AI: agregador de noticias, generador de informes y API abierta. Sin cuenta.",
+      "description": "Todas las herramientas de IA gratuitas de Data Cube AI: agregador de noticias, generador de informes y API abierta. Sin cuenta.",
       "alternates": {
         "canonical": "https://www.datacubeai.space/es/tools",
         "languages": {
@@ -316,17 +316,17 @@
         }
       },
       "openGraph": {
-        "title": "Herramientas de IA gratuitas | DataCube AI",
-        "description": "Todas las herramientas de IA gratuitas de DataCube AI: agregador de noticias, generador de informes y API abierta. Sin cuenta.",
+        "title": "Herramientas de IA gratuitas | Data Cube AI",
+        "description": "Todas las herramientas de IA gratuitas de Data Cube AI: agregador de noticias, generador de informes y API abierta. Sin cuenta.",
         "url": "https://www.datacubeai.space/es/tools",
         "type": "website"
       }
     },
     "report": {
       "title": {
-        "absolute": "Generador de Informes IA | DataCube AI"
+        "absolute": "Generador de Informes IA | Data Cube AI"
       },
-      "description": "Genere informes de IA con DataCube AI: streaming, exportaciones y análisis diarios o semanales.",
+      "description": "Genere informes de IA con Data Cube AI: streaming, exportaciones y análisis diarios o semanales.",
       "alternates": {
         "canonical": "https://www.datacubeai.space/es/tools/ai-report-generator",
         "languages": {
@@ -342,26 +342,26 @@
         }
       },
       "openGraph": {
-        "title": "Generador de Informes IA | DataCube AI",
-        "description": "Genere informes de IA con DataCube AI: streaming, exportaciones y análisis diarios o semanales.",
+        "title": "Generador de Informes IA | Data Cube AI",
+        "description": "Genere informes de IA con Data Cube AI: streaming, exportaciones y análisis diarios o semanales.",
         "url": "https://www.datacubeai.space/es/tools/ai-report-generator",
         "images": [
           {
             "url": "/og-image.jpg",
             "width": 1200,
             "height": 630,
-            "alt": "DataCube AI Report Generator"
+            "alt": "Data Cube AI Report Generator"
           }
         ]
       },
       "twitter": {
         "card": "summary_large_image",
-        "title": "Generador de Informes IA | DataCube AI",
-        "description": "Genere informes de IA con DataCube AI: streaming, exportaciones y análisis diarios o semanales.",
+        "title": "Generador de Informes IA | Data Cube AI",
+        "description": "Genere informes de IA con Data Cube AI: streaming, exportaciones y análisis diarios o semanales.",
         "images": [
           {
             "url": "/og-image.jpg",
-            "alt": "DataCube AI Report Generator"
+            "alt": "Data Cube AI Report Generator"
           }
         ]
       }
@@ -372,7 +372,7 @@
         "follow": true
       },
       "title": {
-        "absolute": "Rastreador Acciones IA (en pausa) | DataCube AI"
+        "absolute": "Rastreador Acciones IA (en pausa) | Data Cube AI"
       },
       "description": "Los datos de mercado en vivo están en pausa durante la revisión de licencias. Los datos de financiación siguen disponibles en el AI Funding Tracker.",
       "alternates": {

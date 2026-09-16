@@ -206,9 +206,9 @@
   "tools": {
     "aggregator": {
       "title": {
-        "absolute": "KI-News-Aggregator | DataCube AI"
+        "absolute": "KI-News-Aggregator | Data Cube AI"
       },
-      "description": "DataCube AI kuratiert täglich KI-News aus 35+ Quellen: Technologie, Investments, Tipps und Videos in 8 Sprachen.",
+      "description": "Data Cube AI kuratiert täglich KI-News aus 35+ Quellen: Technologie, Investments, Tipps und Videos in 8 Sprachen.",
       "alternates": {
         "canonical": "https://www.datacubeai.space/de/tools/ai-news-aggregator",
         "languages": {
@@ -224,33 +224,33 @@
         }
       },
       "openGraph": {
-        "title": "KI-News-Aggregator | DataCube AI",
-        "description": "DataCube AI kuratiert täglich KI-News aus 35+ Quellen: Technologie, Investments, Tipps und Videos in 8 Sprachen.",
+        "title": "KI-News-Aggregator | Data Cube AI",
+        "description": "Data Cube AI kuratiert täglich KI-News aus 35+ Quellen: Technologie, Investments, Tipps und Videos in 8 Sprachen.",
         "url": "https://www.datacubeai.space/de/tools/ai-news-aggregator",
         "images": [
           {
             "url": "/og-image.jpg",
             "width": 1200,
             "height": 630,
-            "alt": "DataCube AI News Aggregator"
+            "alt": "Data Cube AI News Aggregator"
           }
         ]
       },
       "twitter": {
         "card": "summary_large_image",
-        "title": "KI-News-Aggregator | DataCube AI",
-        "description": "DataCube AI kuratiert täglich KI-News aus 35+ Quellen: Technologie, Investments, Tipps und Videos in 8 Sprachen.",
+        "title": "KI-News-Aggregator | Data Cube AI",
+        "description": "Data Cube AI kuratiert täglich KI-News aus 35+ Quellen: Technologie, Investments, Tipps und Videos in 8 Sprachen.",
         "images": [
           {
             "url": "/og-image.jpg",
-            "alt": "DataCube AI News Aggregator"
+            "alt": "Data Cube AI News Aggregator"
           }
         ]
       }
     },
     "api": {
       "title": {
-        "absolute": "KI-News-API in 8 Sprachen | DataCube AI"
+        "absolute": "KI-News-API in 8 Sprachen | Data Cube AI"
       },
       "description": "Kostenlose REST API für kuratierte KI-News aus 35+ Quellen: Technologie, Investments, Tipps und Videos in 8 Sprachen.",
       "alternates": {
@@ -268,7 +268,7 @@
         }
       },
       "openGraph": {
-        "title": "KI-News-API in 8 Sprachen | DataCube AI",
+        "title": "KI-News-API in 8 Sprachen | Data Cube AI",
         "description": "Kostenlose REST API für kuratierte KI-News aus 35+ Quellen: Technologie, Investments, Tipps und Videos in 8 Sprachen.",
         "url": "https://www.datacubeai.space/de/tools/ai-news-api",
         "images": [
@@ -276,27 +276,27 @@
             "url": "/og-image.jpg",
             "width": 1200,
             "height": 630,
-            "alt": "DataCube AI News API"
+            "alt": "Data Cube AI News API"
           }
         ]
       },
       "twitter": {
         "card": "summary_large_image",
-        "title": "KI-News-API in 8 Sprachen | DataCube AI",
+        "title": "KI-News-API in 8 Sprachen | Data Cube AI",
         "description": "Kostenlose REST API für kuratierte KI-News aus 35+ Quellen: Technologie, Investments, Tipps und Videos in 8 Sprachen.",
         "images": [
           {
             "url": "/og-image.jpg",
-            "alt": "DataCube AI News API"
+            "alt": "Data Cube AI News API"
           }
         ]
       }
     },
     "index": {
       "title": {
-        "absolute": "Kostenlose KI-Tools | DataCube AI"
+        "absolute": "Kostenlose KI-Tools | Data Cube AI"
       },
-      "description": "Alle kostenlosen KI-Tools von DataCube AI: News-Aggregator, Bericht-Generator und offene News-API. Ohne Konto nutzbar.",
+      "description": "Alle kostenlosen KI-Tools von Data Cube AI: News-Aggregator, Bericht-Generator und offene News-API. Ohne Konto nutzbar.",
       "alternates": {
         "canonical": "https://www.datacubeai.space/de/tools",
         "languages": {
@@ -312,17 +312,17 @@
         }
       },
       "openGraph": {
-        "title": "Kostenlose KI-Tools | DataCube AI",
-        "description": "Alle kostenlosen KI-Tools von DataCube AI: News-Aggregator, Bericht-Generator und offene News-API. Ohne Konto nutzbar.",
+        "title": "Kostenlose KI-Tools | Data Cube AI",
+        "description": "Alle kostenlosen KI-Tools von Data Cube AI: News-Aggregator, Bericht-Generator und offene News-API. Ohne Konto nutzbar.",
         "url": "https://www.datacubeai.space/de/tools",
         "type": "website"
       }
     },
     "report": {
       "title": {
-        "absolute": "KI-Bericht-Generator | DataCube AI"
+        "absolute": "KI-Bericht-Generator | Data Cube AI"
       },
-      "description": "Erstellen Sie KI-Berichte mit DataCube AI: Streaming-Generierung, Exportformate und tägliche oder wöchentliche Analysen.",
+      "description": "Erstellen Sie KI-Berichte mit Data Cube AI: Streaming-Generierung, Exportformate und tägliche oder wöchentliche Analysen.",
       "alternates": {
         "canonical": "https://www.datacubeai.space/de/tools/ai-report-generator",
         "languages": {
@@ -338,26 +338,26 @@
         }
       },
       "openGraph": {
-        "title": "KI-Bericht-Generator | DataCube AI",
-        "description": "Erstellen Sie KI-Berichte mit DataCube AI: Streaming-Generierung, Exportformate und tägliche oder wöchentliche Analysen.",
+        "title": "KI-Bericht-Generator | Data Cube AI",
+        "description": "Erstellen Sie KI-Berichte mit Data Cube AI: Streaming-Generierung, Exportformate und tägliche oder wöchentliche Analysen.",
         "url": "https://www.datacubeai.space/de/tools/ai-report-generator",
         "images": [
           {
             "url": "/og-image.jpg",
             "width": 1200,
             "height": 630,
-            "alt": "DataCube AI Report Generator"
+            "alt": "Data Cube AI Report Generator"
           }
         ]
       },
       "twitter": {
         "card": "summary_large_image",
-        "title": "KI-Bericht-Generator | DataCube AI",
-        "description": "Erstellen Sie KI-Berichte mit DataCube AI: Streaming-Generierung, Exportformate und tägliche oder wöchentliche Analysen.",
+        "title": "KI-Bericht-Generator | Data Cube AI",
+        "description": "Erstellen Sie KI-Berichte mit Data Cube AI: Streaming-Generierung, Exportformate und tägliche oder wöchentliche Analysen.",
         "images": [
           {
             "url": "/og-image.jpg",
-            "alt": "DataCube AI Report Generator"
+            "alt": "Data Cube AI Report Generator"
           }
         ]
       }
@@ -368,7 +368,7 @@
         "follow": true
       },
       "title": {
-        "absolute": "KI-Aktien-Tracker (pausiert) | DataCube AI"
+        "absolute": "KI-Aktien-Tracker (pausiert) | Data Cube AI"
       },
       "description": "Die Live-Marktdaten sind pausiert, während wir die Datenlizenzierung prüfen. Deal- und Finanzierungsdaten bleiben im AI Funding Tracker verfügbar.",
       "alternates": {

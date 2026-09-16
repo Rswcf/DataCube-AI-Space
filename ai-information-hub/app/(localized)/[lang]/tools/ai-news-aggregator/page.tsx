@@ -2,11 +2,12 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { SUPPORTED_LANGUAGES, isSupportedLanguage, toBcp47 } from '@/lib/i18n'
+import { BRAND, fillBrand } from '@/lib/brand'
 import { Rss, Globe, Calendar, TrendingUp, Lightbulb, Play, ArrowRight, Check, X } from 'lucide-react'
 
 export const revalidate = 3600
 
-const BASE_URL = 'https://www.datacubeai.space'
+const BASE_URL = BRAND.siteUrl
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api-production-3ee5.up.railway.app/api'
 
 type Props = {
@@ -14,32 +15,32 @@ type Props = {
 }
 
 type L = Record<string, string>
-const t = (map: L, lang: string) => map[lang] || map.en
+const t = (map: L, lang: string) => fillBrand(map[lang] || map.en)
 
 // ---------------------------------------------------------------------------
 // Metadata
 // ---------------------------------------------------------------------------
 
 const META_TITLES: L = {
-  de: 'KI-News-Aggregator | DataCube AI',
-  en: 'AI News Aggregator | DataCube AI',
-  zh: '\u514d\u8d39AI\u65b0\u95fb\u805a\u5408\u5668 \u2014 35+\u4fe1\u606f\u6e90, 8\u79cd\u8bed\u8a00, \u6bcf\u65e5\u66f4\u65b0 | DataCube AI',
-  fr: 'Agr\u00e9gateur Actualit\u00e9s IA | DataCube AI',
-  es: 'Agregador de Noticias IA | DataCube AI',
-  pt: 'Agregador de Not\u00edcias IA | DataCube AI',
-  ja: '\u7121\u6599AI\u30cb\u30e5\u30fc\u30b9\u30a2\u30b0\u30ea\u30b2\u30fc\u30bf\u30fc \u2014 35\u4ee5\u4e0a\u306e\u30bd\u30fc\u30b9\u30018\u8a00\u8a9e\u3001\u6bce\u65e5\u66f4\u65b0 | DataCube AI',
-  ko: '\ubb34\ub8cc AI \ub274\uc2a4 \uc9d1\ud569\uae30 \u2014 35\uac1c+ \uc18c\uc2a4, 8\uac1c \uc5b8\uc5b4, \ub9e4\uc77c \uc5c5\ub370\uc774\ud2b8 | DataCube AI',
+  de: 'KI-News-Aggregator | {brand}',
+  en: 'AI News Aggregator | {brand}',
+  zh: '\u514d\u8d39AI\u65b0\u95fb\u805a\u5408\u5668 \u2014 35+\u4fe1\u606f\u6e90, 8\u79cd\u8bed\u8a00, \u6bcf\u65e5\u66f4\u65b0 | {brand}',
+  fr: 'Agr\u00e9gateur Actualit\u00e9s IA | {brand}',
+  es: 'Agregador de Noticias IA | {brand}',
+  pt: 'Agregador de Not\u00edcias IA | {brand}',
+  ja: '\u7121\u6599AI\u30cb\u30e5\u30fc\u30b9\u30a2\u30b0\u30ea\u30b2\u30fc\u30bf\u30fc \u2014 35\u4ee5\u4e0a\u306e\u30bd\u30fc\u30b9\u30018\u8a00\u8a9e\u3001\u6bce\u65e5\u66f4\u65b0 | {brand}',
+  ko: '\ubb34\ub8cc AI \ub274\uc2a4 \uc9d1\ud569\uae30 \u2014 35\uac1c+ \uc18c\uc2a4, 8\uac1c \uc5b8\uc5b4, \ub9e4\uc77c \uc5c5\ub370\uc774\ud2b8 | {brand}',
 }
 
 const META_DESCRIPTIONS: L = {
-  de: 'DataCube AI kuratiert t\u00e4glich KI-News aus 35+ Quellen: Technologie, Investments, Tipps und Videos in 8 Sprachen.',
-  en: "DataCube AI's free AI news aggregator curates daily news from 35+ sources. Technology breakthroughs, investments, tips & videos in 8 languages.",
-  zh: 'DataCube AI\u514d\u8d39AI\u65b0\u95fb\u805a\u5408\u5668\uff0c\u6bcf\u65e5\u4ece35+\u4fe1\u606f\u6e90\u7cbe\u9009\u65b0\u95fb\u3002\u6db5\u76d6\u6280\u672f\u7a81\u7834\u3001\u6295\u8d44\u52a8\u6001\u3001\u5b9e\u7528\u6280\u5de7\u548c\u89c6\u9891\uff0c\u652f\u6301\u0038\u79cd\u8bed\u8a00\u3002',
-  fr: "DataCube AI s\u00e9lectionne chaque jour des actualit\u00e9s IA de 35+ sources: technologie, investissements et conseils.",
-  es: 'El agregador de noticias IA gratuito de DataCube AI selecciona noticias diarias de 35+ fuentes. Tecnolog\u00eda, inversiones, consejos y videos en 8 idiomas.',
-  pt: 'DataCube AI seleciona not\u00edcias IA di\u00e1rias de 35+ fontes: tecnologia, investimentos, dicas e v\u00eddeos.',
-  ja: 'DataCube AI\u306e\u7121\u6599AI\u30cb\u30e5\u30fc\u30b9\u30a2\u30b0\u30ea\u30b2\u30fc\u30bf\u30fc\u306f35\u4ee5\u4e0a\u306e\u30bd\u30fc\u30b9\u304b\u3089\u6bce\u65e5\u30cb\u30e5\u30fc\u30b9\u3092\u53b3\u9078\u3002\u30c6\u30af\u30ce\u30ed\u30b8\u30fc\u3001\u6295\u8cc7\u3001\u30d2\u30f3\u30c8\u3001\u52d5\u753b\u30928\u8a00\u8a9e\u3067\u63d0\u4f9b\u3002',
-  ko: 'DataCube AI\uc758 \ubb34\ub8cc AI \ub274\uc2a4 \uc9d1\ud569\uae30\ub294 35\uac1c \uc774\uc0c1 \uc18c\uc2a4\uc5d0\uc11c \ub9e4\uc77c \ub274\uc2a4\ub97c \uc120\ubcc4\ud569\ub2c8\ub2e4. \uae30\uc220, \ud22c\uc790, \ud301, \ub3d9\uc601\uc0c1\uc744 8\uac1c \uc5b8\uc5b4\ub85c \uc81c\uacf5\ud569\ub2c8\ub2e4.',
+  de: '{brand} kuratiert t\u00e4glich KI-News aus 35+ Quellen: Technologie, Investments, Tipps und Videos in 8 Sprachen.',
+  en: "{brand}'s free AI news aggregator curates daily news from 35+ sources. Technology breakthroughs, investments, tips & videos in 8 languages.",
+  zh: '{brand}\u514d\u8d39AI\u65b0\u95fb\u805a\u5408\u5668\uff0c\u6bcf\u65e5\u4ece35+\u4fe1\u606f\u6e90\u7cbe\u9009\u65b0\u95fb\u3002\u6db5\u76d6\u6280\u672f\u7a81\u7834\u3001\u6295\u8d44\u52a8\u6001\u3001\u5b9e\u7528\u6280\u5de7\u548c\u89c6\u9891\uff0c\u652f\u6301\u0038\u79cd\u8bed\u8a00\u3002',
+  fr: "{brand} s\u00e9lectionne chaque jour des actualit\u00e9s IA de 35+ sources: technologie, investissements et conseils.",
+  es: 'El agregador de noticias IA gratuito de {brand} selecciona noticias diarias de 35+ fuentes. Tecnolog\u00eda, inversiones, consejos y videos en 8 idiomas.',
+  pt: '{brand} seleciona not\u00edcias IA di\u00e1rias de 35+ fontes: tecnologia, investimentos, dicas e v\u00eddeos.',
+  ja: '{brand}\u306e\u7121\u6599AI\u30cb\u30e5\u30fc\u30b9\u30a2\u30b0\u30ea\u30b2\u30fc\u30bf\u30fc\u306f35\u4ee5\u4e0a\u306e\u30bd\u30fc\u30b9\u304b\u3089\u6bce\u65e5\u30cb\u30e5\u30fc\u30b9\u3092\u53b3\u9078\u3002\u30c6\u30af\u30ce\u30ed\u30b8\u30fc\u3001\u6295\u8cc7\u3001\u30d2\u30f3\u30c8\u3001\u52d5\u753b\u30928\u8a00\u8a9e\u3067\u63d0\u4f9b\u3002',
+  ko: '{brand}\uc758 \ubb34\ub8cc AI \ub274\uc2a4 \uc9d1\ud569\uae30\ub294 35\uac1c \uc774\uc0c1 \uc18c\uc2a4\uc5d0\uc11c \ub9e4\uc77c \ub274\uc2a4\ub97c \uc120\ubcc4\ud569\ub2c8\ub2e4. \uae30\uc220, \ud22c\uc790, \ud301, \ub3d9\uc601\uc0c1\uc744 8\uac1c \uc5b8\uc5b4\ub85c \uc81c\uacf5\ud569\ub2c8\ub2e4.',
 }
 
 export async function generateStaticParams() {
@@ -75,7 +76,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
           url: '/og-image.jpg',
           width: 1200,
           height: 630,
-          alt: 'DataCube AI News Aggregator',
+          alt: `${BRAND.name} News Aggregator`,
         },
       ],
     },
@@ -86,7 +87,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       images: [
         {
           url: '/og-image.jpg',
-          alt: 'DataCube AI News Aggregator',
+          alt: `${BRAND.name} News Aggregator`,
         },
       ],
     },
@@ -109,14 +110,14 @@ const H1: L = {
 }
 
 const SUBTITLE: L = {
-  de: 'DataCube AI kuratiert t\u00e4glich die wichtigsten KI-Nachrichten aus 35+ Quellen \u2014 Technologie-Durchbr\u00fcche, Investment-Signale, praktische Tipps und YouTube-Videos. Alles kostenlos, in 8 Sprachen, automatisch per KI-Pipeline aufbereitet.',
-  en: 'DataCube AI curates the most important AI news daily from 35+ sources \u2014 technology breakthroughs, investment signals, practical tips, and YouTube videos. Completely free, in 8 languages, processed automatically by our AI pipeline.',
-  zh: 'DataCube AI \u6bcf\u65e5\u4ece 35+ \u4fe1\u606f\u6e90\u7cbe\u9009\u6700\u91cd\u8981\u7684 AI \u65b0\u95fb \u2014 \u6280\u672f\u7a81\u7834\u3001\u6295\u8d44\u4fe1\u53f7\u3001\u5b9e\u7528\u6280\u5de7\u548c YouTube \u89c6\u9891\u3002\u5b8c\u5168\u514d\u8d39\uff0c\u652f\u6301 8 \u79cd\u8bed\u8a00\uff0c\u7531 AI \u7ba1\u9053\u81ea\u52a8\u5904\u7406\u3002',
-  fr: "DataCube AI s\u00e9lectionne chaque jour les actualit\u00e9s IA les plus importantes de 35+ sources \u2014 perc\u00e9es technologiques, signaux d'investissement, conseils pratiques et vid\u00e9os YouTube. Enti\u00e8rement gratuit, en 8 langues.",
-  es: 'DataCube AI selecciona diariamente las noticias de IA m\u00e1s importantes de 35+ fuentes \u2014 avances tecnol\u00f3gicos, se\u00f1ales de inversi\u00f3n, consejos pr\u00e1cticos y videos de YouTube. Completamente gratuito, en 8 idiomas.',
-  pt: 'DataCube AI seleciona diariamente as not\u00edcias de IA mais importantes de 35+ fontes \u2014 avan\u00e7os tecnol\u00f3gicos, sinais de investimento, dicas pr\u00e1ticas e v\u00eddeos do YouTube. Totalmente gratuito, em 8 idiomas.',
-  ja: 'DataCube AI \u306f 35 \u4ee5\u4e0a\u306e\u30bd\u30fc\u30b9\u304b\u3089\u6bce\u65e5\u6700\u3082\u91cd\u8981\u306a AI \u30cb\u30e5\u30fc\u30b9\u3092\u53b3\u9078 \u2014 \u6280\u8853\u7684\u30d6\u30ec\u30fc\u30af\u30b9\u30eb\u30fc\u3001\u6295\u8cc7\u30b7\u30b0\u30ca\u30eb\u3001\u5b9f\u8df5\u30d2\u30f3\u30c8\u3001YouTube \u52d5\u753b\u3002\u5b8c\u5168\u7121\u6599\u30018 \u8a00\u8a9e\u5bfe\u5fdc\u3002',
-  ko: 'DataCube AI\ub294 35\uac1c \uc774\uc0c1\uc758 \uc18c\uc2a4\uc5d0\uc11c \ub9e4\uc77c \uac00\uc7a5 \uc911\uc694\ud55c AI \ub274\uc2a4\ub97c \uc120\ubcc4\ud569\ub2c8\ub2e4 \u2014 \uae30\uc220 \ub3cc\ud30c\uad6c, \ud22c\uc790 \uc2e0\ud638, \uc2e4\uc6a9 \ud301, YouTube \ub3d9\uc601\uc0c1. \uc644\uc804 \ubb34\ub8cc, 8\uac1c \uc5b8\uc5b4 \uc9c0\uc6d0.',
+  de: '{brand} kuratiert t\u00e4glich die wichtigsten KI-Nachrichten aus 35+ Quellen \u2014 Technologie-Durchbr\u00fcche, Investment-Signale, praktische Tipps und YouTube-Videos. Alles kostenlos, in 8 Sprachen, automatisch per KI-Pipeline aufbereitet.',
+  en: '{brand} curates the most important AI news daily from 35+ sources \u2014 technology breakthroughs, investment signals, practical tips, and YouTube videos. Completely free, in 8 languages, processed automatically by our AI pipeline.',
+  zh: '{brand} \u6bcf\u65e5\u4ece 35+ \u4fe1\u606f\u6e90\u7cbe\u9009\u6700\u91cd\u8981\u7684 AI \u65b0\u95fb \u2014 \u6280\u672f\u7a81\u7834\u3001\u6295\u8d44\u4fe1\u53f7\u3001\u5b9e\u7528\u6280\u5de7\u548c YouTube \u89c6\u9891\u3002\u5b8c\u5168\u514d\u8d39\uff0c\u652f\u6301 8 \u79cd\u8bed\u8a00\uff0c\u7531 AI \u7ba1\u9053\u81ea\u52a8\u5904\u7406\u3002',
+  fr: "{brand} s\u00e9lectionne chaque jour les actualit\u00e9s IA les plus importantes de 35+ sources \u2014 perc\u00e9es technologiques, signaux d'investissement, conseils pratiques et vid\u00e9os YouTube. Enti\u00e8rement gratuit, en 8 langues.",
+  es: '{brand} selecciona diariamente las noticias de IA m\u00e1s importantes de 35+ fuentes \u2014 avances tecnol\u00f3gicos, se\u00f1ales de inversi\u00f3n, consejos pr\u00e1cticos y videos de YouTube. Completamente gratuito, en 8 idiomas.',
+  pt: '{brand} seleciona diariamente as not\u00edcias de IA mais importantes de 35+ fontes \u2014 avan\u00e7os tecnol\u00f3gicos, sinais de investimento, dicas pr\u00e1ticas e v\u00eddeos do YouTube. Totalmente gratuito, em 8 idiomas.',
+  ja: '{brand} \u306f 35 \u4ee5\u4e0a\u306e\u30bd\u30fc\u30b9\u304b\u3089\u6bce\u65e5\u6700\u3082\u91cd\u8981\u306a AI \u30cb\u30e5\u30fc\u30b9\u3092\u53b3\u9078 \u2014 \u6280\u8853\u7684\u30d6\u30ec\u30fc\u30af\u30b9\u30eb\u30fc\u3001\u6295\u8cc7\u30b7\u30b0\u30ca\u30eb\u3001\u5b9f\u8df5\u30d2\u30f3\u30c8\u3001YouTube \u52d5\u753b\u3002\u5b8c\u5168\u7121\u6599\u30018 \u8a00\u8a9e\u5bfe\u5fdc\u3002',
+  ko: '{brand}\ub294 35\uac1c \uc774\uc0c1\uc758 \uc18c\uc2a4\uc5d0\uc11c \ub9e4\uc77c \uac00\uc7a5 \uc911\uc694\ud55c AI \ub274\uc2a4\ub97c \uc120\ubcc4\ud569\ub2c8\ub2e4 \u2014 \uae30\uc220 \ub3cc\ud30c\uad6c, \ud22c\uc790 \uc2e0\ud638, \uc2e4\uc6a9 \ud301, YouTube \ub3d9\uc601\uc0c1. \uc644\uc804 \ubb34\ub8cc, 8\uac1c \uc5b8\uc5b4 \uc9c0\uc6d0.',
 }
 
 const CTA_START: L = {
@@ -193,14 +194,14 @@ const VIEW_ALL: L = {
 
 // Section C
 const H2_FEATURES: L = {
-  de: 'Warum DataCube AI w\u00e4hlen?',
-  en: 'Why choose DataCube AI?',
-  zh: '\u4e3a\u4ec0\u4e48\u9009\u62e9 DataCube AI\uff1f',
-  fr: 'Pourquoi choisir DataCube AI ?',
-  es: '\u00bfPor qu\u00e9 elegir DataCube AI?',
-  pt: 'Por que escolher DataCube AI?',
-  ja: '\u306a\u305cDataCube AI\u3092\u9078\u3076\u306e\u304b\uff1f',
-  ko: '\uc65c DataCube AI\ub97c \uc120\ud0dd\ud574\uc57c \ud558\ub098\uc694?',
+  de: 'Warum {brand} w\u00e4hlen?',
+  en: 'Why choose {brand}?',
+  zh: '\u4e3a\u4ec0\u4e48\u9009\u62e9 {brand}\uff1f',
+  fr: 'Pourquoi choisir {brand} ?',
+  es: '\u00bfPor qu\u00e9 elegir {brand}?',
+  pt: 'Por que escolher {brand}?',
+  ja: '\u306a\u305c{brand}\u3092\u9078\u3076\u306e\u304b\uff1f',
+  ko: '\uc65c {brand}\ub97c \uc120\ud0dd\ud574\uc57c \ud558\ub098\uc694?',
 }
 
 const FEATURE_TITLES: Record<string, L> = {
@@ -339,48 +340,48 @@ const STEP_DESCRIPTIONS: L[] = [
 
 // Section E
 const H2_COMPARE: L = {
-  de: 'Wie schneidet DataCube AI ab?',
-  en: 'How does DataCube AI compare?',
-  zh: 'DataCube AI \u4e0e\u5176\u4ed6\u5e73\u53f0\u6bd4\u8f83\u5982\u4f55\uff1f',
-  fr: 'Comment DataCube AI se compare-t-il ?',
-  es: '\u00bfC\u00f3mo se compara DataCube AI?',
-  pt: 'Como o DataCube AI se compara?',
-  ja: 'DataCube AI\u306f\u4ed6\u3068\u3069\u3046\u6bd4\u8f03\u3055\u308c\u307e\u3059\u304b\uff1f',
-  ko: 'DataCube AI\ub294 \uc5b4\ub5bb\uac8c \ube44\uad50\ub418\ub098\uc694?',
+  de: 'Wie schneidet {brand} ab?',
+  en: 'How does {brand} compare?',
+  zh: '{brand} \u4e0e\u5176\u4ed6\u5e73\u53f0\u6bd4\u8f83\u5982\u4f55\uff1f',
+  fr: 'Comment {brand} se compare-t-il ?',
+  es: '\u00bfC\u00f3mo se compara {brand}?',
+  pt: 'Como o {brand} se compara?',
+  ja: '{brand}\u306f\u4ed6\u3068\u3069\u3046\u6bd4\u8f03\u3055\u308c\u307e\u3059\u304b\uff1f',
+  ko: '{brand}\ub294 \uc5b4\ub5bb\uac8c \ube44\uad50\ub418\ub098\uc694?',
 }
 
-const COMPARE_ROWS: { label: L; datacube: boolean; techcrunch: boolean; decoder: boolean; tldr: boolean; thebatch: boolean }[] = [
+const COMPARE_ROWS: { label: L; ours: boolean; techcrunch: boolean; decoder: boolean; tldr: boolean; thebatch: boolean }[] = [
   {
     label: { de: 'Mehrsprachig (8+)', en: 'Multilingual (8+)', zh: '\u591a\u8bed\u8a00 (8+)', fr: 'Multilingue (8+)', es: 'Multiling\u00fce (8+)', pt: 'Multilingual (8+)', ja: '\u591a\u8a00\u8a9e (8+)', ko: '\ub2e4\uad6d\uc5b4 (8+)' },
-    datacube: true, techcrunch: false, decoder: false, tldr: false, thebatch: false,
+    ours: true, techcrunch: false, decoder: false, tldr: false, thebatch: false,
   },
   {
     label: { de: 'T\u00e4gliche Updates', en: 'Daily Updates', zh: '\u6bcf\u65e5\u66f4\u65b0', fr: 'Mises \u00e0 jour quotidiennes', es: 'Actualizaciones diarias', pt: 'Atualiza\u00e7\u00f5es di\u00e1rias', ja: '\u6bce\u65e5\u66f4\u65b0', ko: '\ub9e4\uc77c \uc5c5\ub370\uc774\ud2b8' },
-    datacube: true, techcrunch: true, decoder: true, tldr: true, thebatch: false,
+    ours: true, techcrunch: true, decoder: true, tldr: true, thebatch: false,
   },
   {
     label: { de: 'W\u00f6chentlicher Digest', en: 'Weekly Digest', zh: '\u6bcf\u5468\u6458\u8981', fr: 'Digest hebdomadaire', es: 'Resumen semanal', pt: 'Resumo semanal', ja: '\u9031\u9593\u30c0\u30a4\u30b8\u30a7\u30b9\u30c8', ko: '\uc8fc\uac04 \ub2e4\uc774\uc81c\uc2a4\ud2b8' },
-    datacube: true, techcrunch: false, decoder: false, tldr: true, thebatch: true,
+    ours: true, techcrunch: false, decoder: false, tldr: true, thebatch: true,
   },
   {
     label: { de: 'Investment-News', en: 'Investment News', zh: '\u6295\u8d44\u65b0\u95fb', fr: "Actualit\u00e9s d'investissement", es: 'Noticias de inversi\u00f3n', pt: 'Not\u00edcias de investimento', ja: '\u6295\u8cc7\u30cb\u30e5\u30fc\u30b9', ko: '\ud22c\uc790 \ub274\uc2a4' },
-    datacube: true, techcrunch: true, decoder: false, tldr: false, thebatch: false,
+    ours: true, techcrunch: true, decoder: false, tldr: false, thebatch: false,
   },
   {
     label: { de: 'Praktische Tipps', en: 'Practical Tips', zh: '\u5b9e\u7528\u6280\u5de7', fr: 'Conseils pratiques', es: 'Consejos pr\u00e1cticos', pt: 'Dicas pr\u00e1ticas', ja: '\u5b9f\u8df5\u30d2\u30f3\u30c8', ko: '\uc2e4\uc6a9 \ud301' },
-    datacube: true, techcrunch: false, decoder: false, tldr: false, thebatch: false,
+    ours: true, techcrunch: false, decoder: false, tldr: false, thebatch: false,
   },
   {
     label: { de: 'Video-Kuratierung', en: 'Video Curation', zh: '\u89c6\u9891\u7cbe\u9009', fr: 'Curation vid\u00e9o', es: 'Curaci\u00f3n de videos', pt: 'Cura\u00e7\u00e3o de v\u00eddeos', ja: '\u52d5\u753b\u30ad\u30e5\u30ec\u30fc\u30b7\u30e7\u30f3', ko: '\ub3d9\uc601\uc0c1 \ud050\ub808\uc774\uc158' },
-    datacube: true, techcrunch: false, decoder: false, tldr: false, thebatch: false,
+    ours: true, techcrunch: false, decoder: false, tldr: false, thebatch: false,
   },
   {
     label: { de: 'Kostenloser Zugang', en: 'Free Access', zh: '\u514d\u8d39\u8bbf\u95ee', fr: 'Acc\u00e8s gratuit', es: 'Acceso gratuito', pt: 'Acesso gratuito', ja: '\u7121\u6599\u30a2\u30af\u30bb\u30b9', ko: '\ubb34\ub8cc \uc561\uc138\uc2a4' },
-    datacube: true, techcrunch: false, decoder: true, tldr: true, thebatch: true,
+    ours: true, techcrunch: false, decoder: true, tldr: true, thebatch: true,
   },
   {
     label: { de: 'API-Zugang', en: 'API Access', zh: 'API \u8bbf\u95ee', fr: 'Acc\u00e8s API', es: 'Acceso API', pt: 'Acesso API', ja: 'API\u30a2\u30af\u30bb\u30b9', ko: 'API \uc561\uc138\uc2a4' },
-    datacube: true, techcrunch: false, decoder: false, tldr: false, thebatch: false,
+    ours: true, techcrunch: false, decoder: false, tldr: false, thebatch: false,
   },
 ]
 
@@ -409,58 +410,58 @@ const FAQ_ITEMS: Array<{ q: L; a: L }> = [
       ko: 'AI \ub274\uc2a4 \uc9d1\ud569\uae30\ub780 \ubb34\uc5c7\uc778\uac00\uc694?',
     },
     a: {
-      de: 'Ein KI-News-Aggregator sammelt automatisch Nachrichten aus verschiedenen Quellen, klassifiziert sie mithilfe k\u00fcnstlicher Intelligenz und stellt sie \u00fcbersichtlich zusammen. DataCube AI kuratiert t\u00e4glich Inhalte aus 35+ Quellen und liefert Zusammenfassungen in 8 Sprachen.',
-      en: 'An AI news aggregator automatically collects news from multiple sources, classifies them using artificial intelligence, and presents them in a structured format. DataCube AI curates daily content from 35+ sources and delivers summaries in 8 languages.',
-      zh: 'AI\u65b0\u95fb\u805a\u5408\u5668\u81ea\u52a8\u4ece\u591a\u4e2a\u6765\u6e90\u6536\u96c6\u65b0\u95fb\uff0c\u4f7f\u7528\u4eba\u5de5\u667a\u80fd\u8fdb\u884c\u5206\u7c7b\uff0c\u5e76\u4ee5\u7ed3\u6784\u5316\u683c\u5f0f\u5448\u73b0\u3002DataCube AI \u6bcf\u65e5\u4ece 35+ \u4fe1\u606f\u6e90\u7cbe\u9009\u5185\u5bb9\uff0c\u63d0\u4f9b 8 \u79cd\u8bed\u8a00\u7684\u6458\u8981\u3002',
-      fr: "Un agr\u00e9gateur d'actualit\u00e9s IA collecte automatiquement les nouvelles de multiples sources, les classe \u00e0 l'aide de l'intelligence artificielle et les pr\u00e9sente de mani\u00e8re structur\u00e9e. DataCube AI s\u00e9lectionne quotidiennement le contenu de 35+ sources en 8 langues.",
-      es: 'Un agregador de noticias de IA recopila autom\u00e1ticamente noticias de m\u00faltiples fuentes, las clasifica mediante inteligencia artificial y las presenta de forma estructurada. DataCube AI selecciona diariamente contenido de 35+ fuentes en 8 idiomas.',
-      pt: 'Um agregador de not\u00edcias de IA coleta automaticamente not\u00edcias de m\u00faltiplas fontes, classifica-as usando intelig\u00eancia artificial e as apresenta de forma estruturada. DataCube AI seleciona diariamente conte\u00fado de 35+ fontes em 8 idiomas.',
-      ja: 'AI\u30cb\u30e5\u30fc\u30b9\u30a2\u30b0\u30ea\u30b2\u30fc\u30bf\u30fc\u306f\u3001\u8907\u6570\u306e\u30bd\u30fc\u30b9\u304b\u3089\u81ea\u52d5\u7684\u306b\u30cb\u30e5\u30fc\u30b9\u3092\u53ce\u96c6\u3057\u3001\u4eba\u5de5\u77e5\u80fd\u3067\u5206\u985e\u3057\u3001\u69cb\u9020\u5316\u3055\u308c\u305f\u5f62\u5f0f\u3067\u63d0\u4f9b\u3057\u307e\u3059\u3002DataCube AI\u306f35\u4ee5\u4e0a\u306e\u30bd\u30fc\u30b9\u304b\u3089\u6bce\u65e5\u30b3\u30f3\u30c6\u30f3\u30c4\u3092\u53b3\u9078\u3057\u30018\u8a00\u8a9e\u3067\u8981\u7d04\u3092\u63d0\u4f9b\u3002',
-      ko: 'AI \ub274\uc2a4 \uc9d1\ud569\uae30\ub294 \uc5ec\ub7ec \uc18c\uc2a4\uc5d0\uc11c \uc790\ub3d9\uc73c\ub85c \ub274\uc2a4\ub97c \uc218\uc9d1\ud558\uace0, \uc778\uacf5\uc9c0\ub2a5\uc744 \uc0ac\uc6a9\ud558\uc5ec \ubd84\ub958\ud558\uba70, \uad6c\uc870\ud654\ub41c \ud615\uc2dd\uc73c\ub85c \uc81c\uacf5\ud569\ub2c8\ub2e4. DataCube AI\ub294 35\uac1c \uc774\uc0c1\uc758 \uc18c\uc2a4\uc5d0\uc11c \ub9e4\uc77c \ucf58\ud150\uce20\ub97c \uc120\ubcc4\ud558\uc5ec 8\uac1c \uc5b8\uc5b4\ub85c \uc694\uc57d\uc744 \uc81c\uacf5\ud569\ub2c8\ub2e4.',
+      de: 'Ein KI-News-Aggregator sammelt automatisch Nachrichten aus verschiedenen Quellen, klassifiziert sie mithilfe k\u00fcnstlicher Intelligenz und stellt sie \u00fcbersichtlich zusammen. {brand} kuratiert t\u00e4glich Inhalte aus 35+ Quellen und liefert Zusammenfassungen in 8 Sprachen.',
+      en: 'An AI news aggregator automatically collects news from multiple sources, classifies them using artificial intelligence, and presents them in a structured format. {brand} curates daily content from 35+ sources and delivers summaries in 8 languages.',
+      zh: 'AI\u65b0\u95fb\u805a\u5408\u5668\u81ea\u52a8\u4ece\u591a\u4e2a\u6765\u6e90\u6536\u96c6\u65b0\u95fb\uff0c\u4f7f\u7528\u4eba\u5de5\u667a\u80fd\u8fdb\u884c\u5206\u7c7b\uff0c\u5e76\u4ee5\u7ed3\u6784\u5316\u683c\u5f0f\u5448\u73b0\u3002{brand} \u6bcf\u65e5\u4ece 35+ \u4fe1\u606f\u6e90\u7cbe\u9009\u5185\u5bb9\uff0c\u63d0\u4f9b 8 \u79cd\u8bed\u8a00\u7684\u6458\u8981\u3002',
+      fr: "Un agr\u00e9gateur d'actualit\u00e9s IA collecte automatiquement les nouvelles de multiples sources, les classe \u00e0 l'aide de l'intelligence artificielle et les pr\u00e9sente de mani\u00e8re structur\u00e9e. {brand} s\u00e9lectionne quotidiennement le contenu de 35+ sources en 8 langues.",
+      es: 'Un agregador de noticias de IA recopila autom\u00e1ticamente noticias de m\u00faltiples fuentes, las clasifica mediante inteligencia artificial y las presenta de forma estructurada. {brand} selecciona diariamente contenido de 35+ fuentes en 8 idiomas.',
+      pt: 'Um agregador de not\u00edcias de IA coleta automaticamente not\u00edcias de m\u00faltiplas fontes, classifica-as usando intelig\u00eancia artificial e as apresenta de forma estruturada. {brand} seleciona diariamente conte\u00fado de 35+ fontes em 8 idiomas.',
+      ja: 'AI\u30cb\u30e5\u30fc\u30b9\u30a2\u30b0\u30ea\u30b2\u30fc\u30bf\u30fc\u306f\u3001\u8907\u6570\u306e\u30bd\u30fc\u30b9\u304b\u3089\u81ea\u52d5\u7684\u306b\u30cb\u30e5\u30fc\u30b9\u3092\u53ce\u96c6\u3057\u3001\u4eba\u5de5\u77e5\u80fd\u3067\u5206\u985e\u3057\u3001\u69cb\u9020\u5316\u3055\u308c\u305f\u5f62\u5f0f\u3067\u63d0\u4f9b\u3057\u307e\u3059\u3002{brand}\u306f35\u4ee5\u4e0a\u306e\u30bd\u30fc\u30b9\u304b\u3089\u6bce\u65e5\u30b3\u30f3\u30c6\u30f3\u30c4\u3092\u53b3\u9078\u3057\u30018\u8a00\u8a9e\u3067\u8981\u7d04\u3092\u63d0\u4f9b\u3002',
+      ko: 'AI \ub274\uc2a4 \uc9d1\ud569\uae30\ub294 \uc5ec\ub7ec \uc18c\uc2a4\uc5d0\uc11c \uc790\ub3d9\uc73c\ub85c \ub274\uc2a4\ub97c \uc218\uc9d1\ud558\uace0, \uc778\uacf5\uc9c0\ub2a5\uc744 \uc0ac\uc6a9\ud558\uc5ec \ubd84\ub958\ud558\uba70, \uad6c\uc870\ud654\ub41c \ud615\uc2dd\uc73c\ub85c \uc81c\uacf5\ud569\ub2c8\ub2e4. {brand}\ub294 35\uac1c \uc774\uc0c1\uc758 \uc18c\uc2a4\uc5d0\uc11c \ub9e4\uc77c \ucf58\ud150\uce20\ub97c \uc120\ubcc4\ud558\uc5ec 8\uac1c \uc5b8\uc5b4\ub85c \uc694\uc57d\uc744 \uc81c\uacf5\ud569\ub2c8\ub2e4.',
     },
   },
   {
     q: {
-      de: 'Ist DataCube AI kostenlos?',
-      en: 'Is DataCube AI free?',
-      zh: 'DataCube AI \u514d\u8d39\u5417\uff1f',
-      fr: 'DataCube AI est-il gratuit ?',
-      es: '\u00bfEs DataCube AI gratuito?',
-      pt: 'O DataCube AI \u00e9 gratuito?',
-      ja: 'DataCube AI\u306f\u7121\u6599\u3067\u3059\u304b\uff1f',
-      ko: 'DataCube AI\ub294 \ubb34\ub8cc\uc778\uac00\uc694?',
+      de: 'Ist {brand} kostenlos?',
+      en: 'Is {brand} free?',
+      zh: '{brand} \u514d\u8d39\u5417\uff1f',
+      fr: '{brand} est-il gratuit ?',
+      es: '\u00bfEs {brand} gratuito?',
+      pt: 'O {brand} \u00e9 gratuito?',
+      ja: '{brand}\u306f\u7121\u6599\u3067\u3059\u304b\uff1f',
+      ko: '{brand}\ub294 \ubb34\ub8cc\uc778\uac00\uc694?',
     },
     a: {
-      de: 'Ja, DataCube AI ist vollst\u00e4ndig kostenlos nutzbar. Alle Nachrichtenfeeds, die mehrsprachigen Inhalte und der Newsletter sind ohne Registrierung oder Bezahlung zug\u00e4nglich.',
-      en: 'Yes, DataCube AI is completely free to use. All news feeds, multilingual content, and the newsletter are accessible without registration or payment.',
-      zh: '\u662f\u7684\uff0cDataCube AI \u5b8c\u5168\u514d\u8d39\u4f7f\u7528\u3002\u6240\u6709\u65b0\u95fb\u6d41\u3001\u591a\u8bed\u8a00\u5185\u5bb9\u548c\u901a\u8baf\u5747\u65e0\u9700\u6ce8\u518c\u6216\u4ed8\u8d39\u5373\u53ef\u8bbf\u95ee\u3002',
-      fr: "Oui, DataCube AI est enti\u00e8rement gratuit. Tous les flux d'actualit\u00e9s, le contenu multilingue et la newsletter sont accessibles sans inscription ni paiement.",
-      es: 'S\u00ed, DataCube AI es completamente gratuito. Todos los feeds de noticias, el contenido multiling\u00fce y el bolet\u00edn son accesibles sin registro ni pago.',
-      pt: 'Sim, DataCube AI \u00e9 completamente gratuito. Todos os feeds de not\u00edcias, conte\u00fado multilingual e newsletter s\u00e3o acess\u00edveis sem registro ou pagamento.',
-      ja: '\u306f\u3044\u3001DataCube AI\u306f\u5b8c\u5168\u7121\u6599\u3067\u3059\u3002\u3059\u3079\u3066\u306e\u30cb\u30e5\u30fc\u30b9\u30d5\u30a3\u30fc\u30c9\u3001\u591a\u8a00\u8a9e\u30b3\u30f3\u30c6\u30f3\u30c4\u3001\u30cb\u30e5\u30fc\u30b9\u30ec\u30bf\u30fc\u306f\u767b\u9332\u3084\u652f\u6255\u3044\u306a\u3057\u3067\u30a2\u30af\u30bb\u30b9\u53ef\u80fd\u3067\u3059\u3002',
-      ko: '\ub124, DataCube AI\ub294 \uc644\uc804\ud788 \ubb34\ub8cc\uc785\ub2c8\ub2e4. \ubaa8\ub4e0 \ub274\uc2a4 \ud53c\ub4dc, \ub2e4\uad6d\uc5b4 \ucf58\ud150\uce20, \ub274\uc2a4\ub808\ud130\ub294 \ub4f1\ub85d\uc774\ub098 \uacb0\uc81c \uc5c6\uc774 \uc811\uadfc\ud560 \uc218 \uc788\uc2b5\ub2c8\ub2e4.',
+      de: 'Ja, {brand} ist vollst\u00e4ndig kostenlos nutzbar. Alle Nachrichtenfeeds, die mehrsprachigen Inhalte und der Newsletter sind ohne Registrierung oder Bezahlung zug\u00e4nglich.',
+      en: 'Yes, {brand} is completely free to use. All news feeds, multilingual content, and the newsletter are accessible without registration or payment.',
+      zh: '\u662f\u7684\uff0c{brand} \u5b8c\u5168\u514d\u8d39\u4f7f\u7528\u3002\u6240\u6709\u65b0\u95fb\u6d41\u3001\u591a\u8bed\u8a00\u5185\u5bb9\u548c\u901a\u8baf\u5747\u65e0\u9700\u6ce8\u518c\u6216\u4ed8\u8d39\u5373\u53ef\u8bbf\u95ee\u3002',
+      fr: "Oui, {brand} est enti\u00e8rement gratuit. Tous les flux d'actualit\u00e9s, le contenu multilingue et la newsletter sont accessibles sans inscription ni paiement.",
+      es: 'S\u00ed, {brand} es completamente gratuito. Todos los feeds de noticias, el contenido multiling\u00fce y el bolet\u00edn son accesibles sin registro ni pago.',
+      pt: 'Sim, {brand} \u00e9 completamente gratuito. Todos os feeds de not\u00edcias, conte\u00fado multilingual e newsletter s\u00e3o acess\u00edveis sem registro ou pagamento.',
+      ja: '\u306f\u3044\u3001{brand}\u306f\u5b8c\u5168\u7121\u6599\u3067\u3059\u3002\u3059\u3079\u3066\u306e\u30cb\u30e5\u30fc\u30b9\u30d5\u30a3\u30fc\u30c9\u3001\u591a\u8a00\u8a9e\u30b3\u30f3\u30c6\u30f3\u30c4\u3001\u30cb\u30e5\u30fc\u30b9\u30ec\u30bf\u30fc\u306f\u767b\u9332\u3084\u652f\u6255\u3044\u306a\u3057\u3067\u30a2\u30af\u30bb\u30b9\u53ef\u80fd\u3067\u3059\u3002',
+      ko: '\ub124, {brand}\ub294 \uc644\uc804\ud788 \ubb34\ub8cc\uc785\ub2c8\ub2e4. \ubaa8\ub4e0 \ub274\uc2a4 \ud53c\ub4dc, \ub2e4\uad6d\uc5b4 \ucf58\ud150\uce20, \ub274\uc2a4\ub808\ud130\ub294 \ub4f1\ub85d\uc774\ub098 \uacb0\uc81c \uc5c6\uc774 \uc811\uadfc\ud560 \uc218 \uc788\uc2b5\ub2c8\ub2e4.',
     },
   },
   {
     q: {
-      de: 'Wie viele Quellen aggregiert DataCube AI?',
+      de: 'Wie viele Quellen aggregiert {brand}?',
       en: 'How many sources does it aggregate?',
-      zh: 'DataCube AI \u805a\u5408\u4e86\u591a\u5c11\u4e2a\u6e90\uff1f',
-      fr: 'Combien de sources agr\u00e8ge DataCube AI ?',
-      es: '\u00bfCu\u00e1ntas fuentes agrega DataCube AI?',
-      pt: 'Quantas fontes o DataCube AI agrega?',
-      ja: 'DataCube AI\u306f\u3044\u304f\u3064\u306e\u30bd\u30fc\u30b9\u3092\u96c6\u7d04\u3057\u307e\u3059\u304b\uff1f',
-      ko: 'DataCube AI\ub294 \uba87 \uac1c\uc758 \uc18c\uc2a4\ub97c \uc9d1\uacc4\ud558\ub098\uc694?',
+      zh: '{brand} \u805a\u5408\u4e86\u591a\u5c11\u4e2a\u6e90\uff1f',
+      fr: 'Combien de sources agr\u00e8ge {brand} ?',
+      es: '\u00bfCu\u00e1ntas fuentes agrega {brand}?',
+      pt: 'Quantas fontes o {brand} agrega?',
+      ja: '{brand}\u306f\u3044\u304f\u3064\u306e\u30bd\u30fc\u30b9\u3092\u96c6\u7d04\u3057\u307e\u3059\u304b\uff1f',
+      ko: '{brand}\ub294 \uba87 \uac1c\uc758 \uc18c\uc2a4\ub97c \uc9d1\uacc4\ud558\ub098\uc694?',
     },
     a: {
-      de: 'DataCube AI aggregiert \u00fcber 30 RSS-Feeds von f\u00fchrenden Tech-Publikationen wie TechCrunch, MIT Technology Review und Ars Technica, dazu Hacker-News-Frontpage-Beitr\u00e4ge und YouTube-Kan\u00e4le. Insgesamt werden \u00fcber 40 Quellen \u00fcberwacht.',
-      en: 'DataCube AI aggregates 30+ RSS feeds from leading tech publications like TechCrunch, MIT Technology Review, and Ars Technica, plus Hacker News front-page stories and YouTube channels. Over 40 sources are monitored in total.',
-      zh: 'DataCube AI \u805a\u5408\u6765\u81ea TechCrunch\u3001MIT Technology Review\u3001Ars Technica \u7b49\u9886\u5148\u79d1\u6280\u51fa\u7248\u7269\u7684 30+ RSS \u8ba2\u9605\u6e90\uff0c\u52a0\u4e0a Hacker News \u5934\u6761\u548c YouTube \u9891\u9053\u3002\u603b\u5171\u76d1\u63a7\u8d85\u8fc7 40 \u4e2a\u6e90\u3002',
-      fr: "DataCube AI agr\u00e8ge 30+ flux RSS de publications tech de r\u00e9f\u00e9rence comme TechCrunch, MIT Technology Review et Ars Technica, plus les articles en une de Hacker News et des cha\u00eenes YouTube. Plus de 40 sources sont surveill\u00e9es.",
-      es: 'DataCube AI agrega 30+ feeds RSS de publicaciones tech l\u00edderes como TechCrunch, MIT Technology Review y Ars Technica, adem\u00e1s de historias de portada de Hacker News y canales de YouTube. M\u00e1s de 40 fuentes monitoreadas en total.',
-      pt: 'DataCube AI agrega 30+ feeds RSS de publica\u00e7\u00f5es tech l\u00edderes como TechCrunch, MIT Technology Review e Ars Technica, al\u00e9m de hist\u00f3rias da p\u00e1gina inicial do Hacker News e canais do YouTube. Mais de 40 fontes monitoradas no total.',
-      ja: 'DataCube AI\u306fTechCrunch\u3001MIT Technology Review\u3001Ars Technica\u306a\u3069\u306e\u4e3b\u8981\u30c6\u30c3\u30af\u51fa\u7248\u7269\u304b\u3089\u306e30\u4ee5\u4e0a\u306eRSS\u30d5\u30a3\u30fc\u30c9\u306b\u52a0\u3048\u3001Hacker News\u306e\u30c8\u30c3\u30d7\u8a18\u4e8b\u3084YouTube\u30c1\u30e3\u30f3\u30cd\u30eb\u3092\u96c6\u7d04\u3002\u5408\u8a0840\u4ee5\u4e0a\u306e\u30bd\u30fc\u30b9\u3092\u76e3\u8996\u3002',
-      ko: 'DataCube AI\ub294 TechCrunch, MIT Technology Review, Ars Technica \ub4f1 \uc8fc\uc694 \ud14c\ud06c \ucd9c\ud310\ubb3c\uc758 30\uac1c \uc774\uc0c1 RSS \ud53c\ub4dc\uc640 Hacker News \ud1b1\uae30\uc0ac, YouTube \ucc44\ub110\uc744 \uc9d1\uacc4\ud569\ub2c8\ub2e4. \ucd1d 40\uac1c \uc774\uc0c1\uc758 \uc18c\uc2a4\ub97c \ubaa8\ub2c8\ud130\ub9c1\ud569\ub2c8\ub2e4.',
+      de: '{brand} aggregiert \u00fcber 30 RSS-Feeds von f\u00fchrenden Tech-Publikationen wie TechCrunch, MIT Technology Review und Ars Technica, dazu Hacker-News-Frontpage-Beitr\u00e4ge und YouTube-Kan\u00e4le. Insgesamt werden \u00fcber 40 Quellen \u00fcberwacht.',
+      en: '{brand} aggregates 30+ RSS feeds from leading tech publications like TechCrunch, MIT Technology Review, and Ars Technica, plus Hacker News front-page stories and YouTube channels. Over 40 sources are monitored in total.',
+      zh: '{brand} \u805a\u5408\u6765\u81ea TechCrunch\u3001MIT Technology Review\u3001Ars Technica \u7b49\u9886\u5148\u79d1\u6280\u51fa\u7248\u7269\u7684 30+ RSS \u8ba2\u9605\u6e90\uff0c\u52a0\u4e0a Hacker News \u5934\u6761\u548c YouTube \u9891\u9053\u3002\u603b\u5171\u76d1\u63a7\u8d85\u8fc7 40 \u4e2a\u6e90\u3002',
+      fr: "{brand} agr\u00e8ge 30+ flux RSS de publications tech de r\u00e9f\u00e9rence comme TechCrunch, MIT Technology Review et Ars Technica, plus les articles en une de Hacker News et des cha\u00eenes YouTube. Plus de 40 sources sont surveill\u00e9es.",
+      es: '{brand} agrega 30+ feeds RSS de publicaciones tech l\u00edderes como TechCrunch, MIT Technology Review y Ars Technica, adem\u00e1s de historias de portada de Hacker News y canales de YouTube. M\u00e1s de 40 fuentes monitoreadas en total.',
+      pt: '{brand} agrega 30+ feeds RSS de publica\u00e7\u00f5es tech l\u00edderes como TechCrunch, MIT Technology Review e Ars Technica, al\u00e9m de hist\u00f3rias da p\u00e1gina inicial do Hacker News e canais do YouTube. Mais de 40 fontes monitoradas no total.',
+      ja: '{brand}\u306fTechCrunch\u3001MIT Technology Review\u3001Ars Technica\u306a\u3069\u306e\u4e3b\u8981\u30c6\u30c3\u30af\u51fa\u7248\u7269\u304b\u3089\u306e30\u4ee5\u4e0a\u306eRSS\u30d5\u30a3\u30fc\u30c9\u306b\u52a0\u3048\u3001Hacker News\u306e\u30c8\u30c3\u30d7\u8a18\u4e8b\u3084YouTube\u30c1\u30e3\u30f3\u30cd\u30eb\u3092\u96c6\u7d04\u3002\u5408\u8a0840\u4ee5\u4e0a\u306e\u30bd\u30fc\u30b9\u3092\u76e3\u8996\u3002',
+      ko: '{brand}\ub294 TechCrunch, MIT Technology Review, Ars Technica \ub4f1 \uc8fc\uc694 \ud14c\ud06c \ucd9c\ud310\ubb3c\uc758 30\uac1c \uc774\uc0c1 RSS \ud53c\ub4dc\uc640 Hacker News \ud1b1\uae30\uc0ac, YouTube \ucc44\ub110\uc744 \uc9d1\uacc4\ud569\ub2c8\ub2e4. \ucd1d 40\uac1c \uc774\uc0c1\uc758 \uc18c\uc2a4\ub97c \ubaa8\ub2c8\ud130\ub9c1\ud569\ub2c8\ub2e4.',
     },
   },
   {
@@ -475,14 +476,14 @@ const FAQ_ITEMS: Array<{ q: L; a: L }> = [
       ko: '\uc5b4\ub5a4 \uc5b8\uc5b4\uac00 \uc9c0\uc6d0\ub418\ub098\uc694?',
     },
     a: {
-      de: 'DataCube AI unterst\u00fctzt 8 Sprachen: Deutsch, Englisch, Chinesisch (vereinfacht), Franz\u00f6sisch, Spanisch, Portugiesisch, Japanisch und Koreanisch. Englisch wird nativ generiert, die \u00fcbrigen 7 Sprachen werden automatisch \u00fcbersetzt.',
-      en: 'DataCube AI supports 8 languages: German, English, Chinese (Simplified), French, Spanish, Portuguese, Japanese, and Korean. English is natively generated; the other 7 languages are automatically translated.',
-      zh: 'DataCube AI \u652f\u6301 8 \u79cd\u8bed\u8a00\uff1a\u5fb7\u8bed\u3001\u82f1\u8bed\u3001\u4e2d\u6587\uff08\u7b80\u4f53\uff09\u3001\u6cd5\u8bed\u3001\u897f\u73ed\u7259\u8bed\u3001\u8461\u8404\u7259\u8bed\u3001\u65e5\u8bed\u548c\u97e9\u8bed\u3002\u82f1\u8bed\u539f\u751f\u751f\u6210\uff0c\u5176\u4ed6 7 \u79cd\u8bed\u8a00\u81ea\u52a8\u7ffb\u8bd1\u3002',
-      fr: 'DataCube AI prend en charge 8 langues : allemand, anglais, chinois (simplifi\u00e9), fran\u00e7ais, espagnol, portugais, japonais et cor\u00e9en. L\'anglais est g\u00e9n\u00e9r\u00e9 nativement ; les 7 autres langues sont traduites automatiquement.',
-      es: 'DataCube AI admite 8 idiomas: alem\u00e1n, ingl\u00e9s, chino (simplificado), franc\u00e9s, espa\u00f1ol, portugu\u00e9s, japon\u00e9s y coreano. El ingl\u00e9s se genera nativamente; los otros 7 idiomas se traducen autom\u00e1ticamente.',
-      pt: 'DataCube AI suporta 8 idiomas: alem\u00e3o, ingl\u00eas, chin\u00eas (simplificado), franc\u00eas, espanhol, portugu\u00eas, japon\u00eas e coreano. O ingl\u00eas \u00e9 gerado nativamente; os outros 7 idiomas s\u00e3o traduzidos automaticamente.',
-      ja: 'DataCube AI\u306f8\u8a00\u8a9e\u3092\u30b5\u30dd\u30fc\u30c8\uff1a\u30c9\u30a4\u30c4\u8a9e\u3001\u82f1\u8a9e\u3001\u4e2d\u56fd\u8a9e\uff08\u7c21\u4f53\u5b57\uff09\u3001\u30d5\u30e9\u30f3\u30b9\u8a9e\u3001\u30b9\u30da\u30a4\u30f3\u8a9e\u3001\u30dd\u30eb\u30c8\u30ac\u30eb\u8a9e\u3001\u65e5\u672c\u8a9e\u3001\u97d3\u56fd\u8a9e\u3002\u82f1\u8a9e\u306f\u30cd\u30a4\u30c6\u30a3\u30d6\u751f\u6210\u3001\u4ed6\u306e7\u8a00\u8a9e\u306f\u81ea\u52d5\u7ffb\u8a33\u3002',
-      ko: 'DataCube AI\ub294 8\uac1c \uc5b8\uc5b4\ub97c \uc9c0\uc6d0\ud569\ub2c8\ub2e4: \ub3c5\uc77c\uc5b4, \uc601\uc5b4, \uc911\uad6d\uc5b4(\uac04\uccb4), \ud504\ub791\uc2a4\uc5b4, \uc2a4\ud398\uc778\uc5b4, \ud3ec\ub974\ud22c\uac08\uc5b4, \uc77c\ubcf8\uc5b4, \ud55c\uad6d\uc5b4. \uc601\uc5b4\ub294 \ub124\uc774\ud2f0\ube0c \uc0dd\uc131, \ub098\uba38\uc9c0 7\uac1c \uc5b8\uc5b4\ub294 \uc790\ub3d9 \ubc88\uc5ed\ub429\ub2c8\ub2e4.',
+      de: '{brand} unterst\u00fctzt 8 Sprachen: Deutsch, Englisch, Chinesisch (vereinfacht), Franz\u00f6sisch, Spanisch, Portugiesisch, Japanisch und Koreanisch. Englisch wird nativ generiert, die \u00fcbrigen 7 Sprachen werden automatisch \u00fcbersetzt.',
+      en: '{brand} supports 8 languages: German, English, Chinese (Simplified), French, Spanish, Portuguese, Japanese, and Korean. English is natively generated; the other 7 languages are automatically translated.',
+      zh: '{brand} \u652f\u6301 8 \u79cd\u8bed\u8a00\uff1a\u5fb7\u8bed\u3001\u82f1\u8bed\u3001\u4e2d\u6587\uff08\u7b80\u4f53\uff09\u3001\u6cd5\u8bed\u3001\u897f\u73ed\u7259\u8bed\u3001\u8461\u8404\u7259\u8bed\u3001\u65e5\u8bed\u548c\u97e9\u8bed\u3002\u82f1\u8bed\u539f\u751f\u751f\u6210\uff0c\u5176\u4ed6 7 \u79cd\u8bed\u8a00\u81ea\u52a8\u7ffb\u8bd1\u3002',
+      fr: '{brand} prend en charge 8 langues : allemand, anglais, chinois (simplifi\u00e9), fran\u00e7ais, espagnol, portugais, japonais et cor\u00e9en. L\'anglais est g\u00e9n\u00e9r\u00e9 nativement ; les 7 autres langues sont traduites automatiquement.',
+      es: '{brand} admite 8 idiomas: alem\u00e1n, ingl\u00e9s, chino (simplificado), franc\u00e9s, espa\u00f1ol, portugu\u00e9s, japon\u00e9s y coreano. El ingl\u00e9s se genera nativamente; los otros 7 idiomas se traducen autom\u00e1ticamente.',
+      pt: '{brand} suporta 8 idiomas: alem\u00e3o, ingl\u00eas, chin\u00eas (simplificado), franc\u00eas, espanhol, portugu\u00eas, japon\u00eas e coreano. O ingl\u00eas \u00e9 gerado nativamente; os outros 7 idiomas s\u00e3o traduzidos automaticamente.',
+      ja: '{brand}\u306f8\u8a00\u8a9e\u3092\u30b5\u30dd\u30fc\u30c8\uff1a\u30c9\u30a4\u30c4\u8a9e\u3001\u82f1\u8a9e\u3001\u4e2d\u56fd\u8a9e\uff08\u7c21\u4f53\u5b57\uff09\u3001\u30d5\u30e9\u30f3\u30b9\u8a9e\u3001\u30b9\u30da\u30a4\u30f3\u8a9e\u3001\u30dd\u30eb\u30c8\u30ac\u30eb\u8a9e\u3001\u65e5\u672c\u8a9e\u3001\u97d3\u56fd\u8a9e\u3002\u82f1\u8a9e\u306f\u30cd\u30a4\u30c6\u30a3\u30d6\u751f\u6210\u3001\u4ed6\u306e7\u8a00\u8a9e\u306f\u81ea\u52d5\u7ffb\u8a33\u3002',
+      ko: '{brand}\ub294 8\uac1c \uc5b8\uc5b4\ub97c \uc9c0\uc6d0\ud569\ub2c8\ub2e4: \ub3c5\uc77c\uc5b4, \uc601\uc5b4, \uc911\uad6d\uc5b4(\uac04\uccb4), \ud504\ub791\uc2a4\uc5b4, \uc2a4\ud398\uc778\uc5b4, \ud3ec\ub974\ud22c\uac08\uc5b4, \uc77c\ubcf8\uc5b4, \ud55c\uad6d\uc5b4. \uc601\uc5b4\ub294 \ub124\uc774\ud2f0\ube0c \uc0dd\uc131, \ub098\uba38\uc9c0 7\uac1c \uc5b8\uc5b4\ub294 \uc790\ub3d9 \ubc88\uc5ed\ub429\ub2c8\ub2e4.',
     },
   },
   {
@@ -497,14 +498,14 @@ const FAQ_ITEMS: Array<{ q: L; a: L }> = [
       ko: 'API\ub97c \ud1b5\ud574 AI \ub274\uc2a4\ub97c \ubc1b\uc744 \uc218 \uc788\ub098\uc694?',
     },
     a: {
-      de: 'Ja! DataCube AI bietet eine kostenlose REST-API \u2014 die \u00f6ffentlichen Endpunkte ben\u00f6tigen keinen API-Schl\u00fcssel. Tech-, Investment- und Tips-Daten sind direkt programmatisch abrufbar.',
-      en: 'Yes! DataCube AI offers a free REST API \u2014 the public endpoints require no API key. Tech, investment, and tips data can be accessed programmatically right away.',
-      zh: '\u662f\u7684\uff01DataCube AI \u63d0\u4f9b\u514d\u8d39 REST API \u2014 \u516c\u5f00\u7aef\u70b9\u65e0\u9700 API \u5bc6\u94a5\uff0c\u53ef\u76f4\u63a5\u7a0b\u5e8f\u5316\u8bbf\u95ee\u6280\u672f\u3001\u6295\u8d44\u548c\u6280\u5de7\u6570\u636e\u3002',
-      fr: "Oui ! DataCube AI propose une API REST gratuite \u2014 les endpoints publics ne n\u00e9cessitent aucune cl\u00e9 API. Les donn\u00e9es tech, investissement et conseils sont accessibles directement.",
-      es: '\u00a1S\u00ed! DataCube AI ofrece una API REST gratuita \u2014 los endpoints p\u00fablicos no requieren clave API. Los datos de tecnolog\u00eda, inversi\u00f3n y consejos son accesibles directamente.',
-      pt: 'Sim! DataCube AI oferece uma API REST gratuita \u2014 os endpoints p\u00fablicos n\u00e3o exigem chave API. Os dados de tecnologia, investimento e dicas s\u00e3o acess\u00edveis diretamente.',
-      ja: '\u306f\u3044\uff01DataCube AI\u306f\u7121\u6599\u306eREST API\u3092\u63d0\u4f9b\u3057\u3066\u3044\u307e\u3059\u3002\u516c\u958b\u30a8\u30f3\u30c9\u30dd\u30a4\u30f3\u30c8\u306bAPI\u30ad\u30fc\u306f\u4e0d\u8981 \u2014 \u30c6\u30c3\u30af\u3001\u6295\u8cc7\u3001\u30d2\u30f3\u30c8\u306e\u30c7\u30fc\u30bf\u306b\u76f4\u63a5\u30a2\u30af\u30bb\u30b9\u3067\u304d\u307e\u3059\u3002',
-      ko: '\ub124! DataCube AI\ub294 \ubb34\ub8cc REST API\ub97c \uc81c\uacf5\ud569\ub2c8\ub2e4. \uacf5\uac1c \uc5d4\ub4dc\ud3ec\uc778\ud2b8\ub294 API \ud0a4\uac00 \ud544\uc694 \uc5c6\uc2b5\ub2c8\ub2e4 \u2014 \uae30\uc220, \ud22c\uc790, \ud301 \ub370\uc774\ud130\uc5d0 \ubc14\ub85c \uc561\uc138\uc2a4\ud560 \uc218 \uc788\uc2b5\ub2c8\ub2e4.',
+      de: 'Ja! {brand} bietet eine kostenlose REST-API \u2014 die \u00f6ffentlichen Endpunkte ben\u00f6tigen keinen API-Schl\u00fcssel. Tech-, Investment- und Tips-Daten sind direkt programmatisch abrufbar.',
+      en: 'Yes! {brand} offers a free REST API \u2014 the public endpoints require no API key. Tech, investment, and tips data can be accessed programmatically right away.',
+      zh: '\u662f\u7684\uff01{brand} \u63d0\u4f9b\u514d\u8d39 REST API \u2014 \u516c\u5f00\u7aef\u70b9\u65e0\u9700 API \u5bc6\u94a5\uff0c\u53ef\u76f4\u63a5\u7a0b\u5e8f\u5316\u8bbf\u95ee\u6280\u672f\u3001\u6295\u8d44\u548c\u6280\u5de7\u6570\u636e\u3002',
+      fr: "Oui ! {brand} propose une API REST gratuite \u2014 les endpoints publics ne n\u00e9cessitent aucune cl\u00e9 API. Les donn\u00e9es tech, investissement et conseils sont accessibles directement.",
+      es: '\u00a1S\u00ed! {brand} ofrece una API REST gratuita \u2014 los endpoints p\u00fablicos no requieren clave API. Los datos de tecnolog\u00eda, inversi\u00f3n y consejos son accesibles directamente.',
+      pt: 'Sim! {brand} oferece uma API REST gratuita \u2014 os endpoints p\u00fablicos n\u00e3o exigem chave API. Os dados de tecnologia, investimento e dicas s\u00e3o acess\u00edveis diretamente.',
+      ja: '\u306f\u3044\uff01{brand}\u306f\u7121\u6599\u306eREST API\u3092\u63d0\u4f9b\u3057\u3066\u3044\u307e\u3059\u3002\u516c\u958b\u30a8\u30f3\u30c9\u30dd\u30a4\u30f3\u30c8\u306bAPI\u30ad\u30fc\u306f\u4e0d\u8981 \u2014 \u30c6\u30c3\u30af\u3001\u6295\u8cc7\u3001\u30d2\u30f3\u30c8\u306e\u30c7\u30fc\u30bf\u306b\u76f4\u63a5\u30a2\u30af\u30bb\u30b9\u3067\u304d\u307e\u3059\u3002',
+      ko: '\ub124! {brand}\ub294 \ubb34\ub8cc REST API\ub97c \uc81c\uacf5\ud569\ub2c8\ub2e4. \uacf5\uac1c \uc5d4\ub4dc\ud3ec\uc778\ud2b8\ub294 API \ud0a4\uac00 \ud544\uc694 \uc5c6\uc2b5\ub2c8\ub2e4 \u2014 \uae30\uc220, \ud22c\uc790, \ud301 \ub370\uc774\ud130\uc5d0 \ubc14\ub85c \uc561\uc138\uc2a4\ud560 \uc218 \uc788\uc2b5\ub2c8\ub2e4.',
     },
   },
 ]
@@ -609,7 +610,7 @@ export default async function AINewsAggregatorToolPage({ params }: Props) {
   const softwareAppSchema = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
-    name: 'DataCube AI News Aggregator',
+    name: `${BRAND.name} News Aggregator`,
     description: t(META_DESCRIPTIONS, lang),
     url: pageUrl,
     applicationCategory: 'NewsApplication',
@@ -621,7 +622,7 @@ export default async function AINewsAggregatorToolPage({ params }: Props) {
     },
     author: {
       '@type': 'Organization',
-      name: 'DataCube AI',
+      name: BRAND.name,
       url: BASE_URL,
     },
     inLanguage: ['de', 'en', 'zh-Hans', 'fr', 'es', 'pt', 'ja', 'ko'],
@@ -845,7 +846,7 @@ export default async function AINewsAggregatorToolPage({ params }: Props) {
                 <tr>
                   <th className="border border-border/50 px-3 py-3 text-left font-semibold" />
                   <th className="border border-border/50 px-3 py-3 text-center font-semibold text-primary">
-                    DataCube AI
+                    {BRAND.name}
                   </th>
                   <th className="border border-border/50 px-3 py-3 text-center font-semibold">TechCrunch</th>
                   <th className="border border-border/50 px-3 py-3 text-center font-semibold">The Decoder</th>
@@ -859,7 +860,7 @@ export default async function AINewsAggregatorToolPage({ params }: Props) {
                     <td className="border border-border/50 px-3 py-3 font-medium">
                       {t(row.label, lang)}
                     </td>
-                    {[row.datacube, row.techcrunch, row.decoder, row.tldr, row.thebatch].map((val, ci) => (
+                    {[row.ours, row.techcrunch, row.decoder, row.tldr, row.thebatch].map((val, ci) => (
                       <td key={ci} className="border border-border/50 px-3 py-3 text-center">
                         {val ? (
                           <Check className="inline-block h-5 w-5 text-green-500" aria-label="Yes" />

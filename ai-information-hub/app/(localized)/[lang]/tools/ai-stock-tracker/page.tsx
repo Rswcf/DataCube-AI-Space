@@ -2,17 +2,18 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { SUPPORTED_LANGUAGES, isSupportedLanguage, toBcp47 } from '@/lib/i18n'
+import { BRAND, fillBrand } from '@/lib/brand'
 
 export const revalidate = 86400
 
-const BASE_URL = 'https://www.datacubeai.space'
+const BASE_URL = BRAND.siteUrl
 
 type Props = {
   params: Promise<{ lang: string }>
 }
 
 type L = Record<string, string>
-const t = (map: L, lang: string) => map[lang] || map.en
+const t = (map: L, lang: string) => fillBrand(map[lang] || map.en)
 
 // ---------------------------------------------------------------------------
 // 2026-08-01: this tool is PAUSED. The previous page marketed real-time
@@ -25,14 +26,14 @@ const t = (map: L, lang: string) => map[lang] || map.en
 // ---------------------------------------------------------------------------
 
 const META_TITLES: L = {
-  de: 'KI-Aktien-Tracker (pausiert) | DataCube AI',
-  en: 'AI Stock Tracker (paused) | DataCube AI',
-  zh: 'AI 股票追踪器(暂停中)| DataCube AI',
-  fr: 'Tracker Actions IA (en pause) | DataCube AI',
-  es: 'Rastreador Acciones IA (en pausa) | DataCube AI',
-  pt: 'Rastreador Ações IA (em pausa) | DataCube AI',
-  ja: 'AI株式トラッカー(一時停止中)| DataCube AI',
-  ko: 'AI 주식 추적기(일시 중지)| DataCube AI',
+  de: 'KI-Aktien-Tracker (pausiert) | {brand}',
+  en: 'AI Stock Tracker (paused) | {brand}',
+  zh: 'AI 股票追踪器(暂停中)| {brand}',
+  fr: 'Tracker Actions IA (en pause) | {brand}',
+  es: 'Rastreador Acciones IA (en pausa) | {brand}',
+  pt: 'Rastreador Ações IA (em pausa) | {brand}',
+  ja: 'AI株式トラッカー(一時停止中)| {brand}',
+  ko: 'AI 주식 추적기(일시 중지)| {brand}',
 }
 
 const META_DESCRIPTIONS: L = {
@@ -125,7 +126,7 @@ export default async function AIStockTrackerToolPage({ params }: Props) {
   return (
     <main id="main-content" className="mx-auto max-w-2xl px-4 py-16">
       <p className="mb-1 font-sans text-[10px] font-extrabold uppercase tracking-[0.18em] text-muted-foreground">
-        Data Cube AI · Tools
+        {BRAND.name} · Tools
       </p>
       <h1 className="font-display text-3xl font-normal leading-tight text-foreground">
         {t(HEADINGS, lang)}

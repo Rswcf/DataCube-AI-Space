@@ -206,9 +206,9 @@
   "tools": {
     "aggregator": {
       "title": {
-        "absolute": "AI News Aggregator | DataCube AI"
+        "absolute": "AI News Aggregator | Data Cube AI"
       },
-      "description": "DataCube AI's free AI news aggregator curates daily news from 35+ sources. Technology breakthroughs, investments, tips & videos in 8 languages.",
+      "description": "Data Cube AI's free AI news aggregator curates daily news from 35+ sources. Technology breakthroughs, investments, tips & videos in 8 languages.",
       "alternates": {
         "canonical": "https://www.datacubeai.space/en/tools/ai-news-aggregator",
         "languages": {
@@ -224,33 +224,33 @@
         }
       },
       "openGraph": {
-        "title": "AI News Aggregator | DataCube AI",
-        "description": "DataCube AI's free AI news aggregator curates daily news from 35+ sources. Technology breakthroughs, investments, tips & videos in 8 languages.",
+        "title": "AI News Aggregator | Data Cube AI",
+        "description": "Data Cube AI's free AI news aggregator curates daily news from 35+ sources. Technology breakthroughs, investments, tips & videos in 8 languages.",
         "url": "https://www.datacubeai.space/en/tools/ai-news-aggregator",
         "images": [
           {
             "url": "/og-image.jpg",
             "width": 1200,
             "height": 630,
-            "alt": "DataCube AI News Aggregator"
+            "alt": "Data Cube AI News Aggregator"
           }
         ]
       },
       "twitter": {
         "card": "summary_large_image",
-        "title": "AI News Aggregator | DataCube AI",
-        "description": "DataCube AI's free AI news aggregator curates daily news from 35+ sources. Technology breakthroughs, investments, tips & videos in 8 languages.",
+        "title": "AI News Aggregator | Data Cube AI",
+        "description": "Data Cube AI's free AI news aggregator curates daily news from 35+ sources. Technology breakthroughs, investments, tips & videos in 8 languages.",
         "images": [
           {
             "url": "/og-image.jpg",
-            "alt": "DataCube AI News Aggregator"
+            "alt": "Data Cube AI News Aggregator"
           }
         ]
       }
     },
     "api": {
       "title": {
-        "absolute": "Free AI News API | DataCube AI"
+        "absolute": "Free AI News API | Data Cube AI"
       },
       "description": "Free REST API for curated AI news from 35+ sources. Technology, investments, tips, videos in 8 languages. JSON responses, no authentication required.",
       "alternates": {
@@ -268,7 +268,7 @@
         }
       },
       "openGraph": {
-        "title": "Free AI News API | DataCube AI",
+        "title": "Free AI News API | Data Cube AI",
         "description": "Free REST API for curated AI news from 35+ sources. Technology, investments, tips, videos in 8 languages. JSON responses, no authentication required.",
         "url": "https://www.datacubeai.space/en/tools/ai-news-api",
         "images": [
@@ -276,27 +276,27 @@
             "url": "/og-image.jpg",
             "width": 1200,
             "height": 630,
-            "alt": "DataCube AI News API"
+            "alt": "Data Cube AI News API"
           }
         ]
       },
       "twitter": {
         "card": "summary_large_image",
-        "title": "Free AI News API | DataCube AI",
+        "title": "Free AI News API | Data Cube AI",
         "description": "Free REST API for curated AI news from 35+ sources. Technology, investments, tips, videos in 8 languages. JSON responses, no authentication required.",
         "images": [
           {
             "url": "/og-image.jpg",
-            "alt": "DataCube AI News API"
+            "alt": "Data Cube AI News API"
           }
         ]
       }
     },
     "index": {
       "title": {
-        "absolute": "Free AI Tools | DataCube AI"
+        "absolute": "Free AI Tools | Data Cube AI"
       },
-      "description": "Every free AI tool from DataCube AI: news aggregator, report generator, and the open news API. No account required.",
+      "description": "Every free AI tool from Data Cube AI: news aggregator, report generator, and the open news API. No account required.",
       "alternates": {
         "canonical": "https://www.datacubeai.space/en/tools",
         "languages": {
@@ -312,17 +312,17 @@
         }
       },
       "openGraph": {
-        "title": "Free AI Tools | DataCube AI",
-        "description": "Every free AI tool from DataCube AI: news aggregator, report generator, and the open news API. No account required.",
+        "title": "Free AI Tools | Data Cube AI",
+        "description": "Every free AI tool from Data Cube AI: news aggregator, report generator, and the open news API. No account required.",
         "url": "https://www.datacubeai.space/en/tools",
         "type": "website"
       }
     },
     "report": {
       "title": {
-        "absolute": "AI Report Generator | DataCube AI"
+        "absolute": "AI Report Generator | Data Cube AI"
       },
-      "description": "Generate free AI reports with DataCube AI. Streaming generation, 5 export formats (DOCX, HTML, Markdown, TXT, JSON). Weekly and daily AI news analysis.",
+      "description": "Generate free AI reports with Data Cube AI. Streaming generation, 5 export formats (DOCX, HTML, Markdown, TXT, JSON). Weekly and daily AI news analysis.",
       "alternates": {
         "canonical": "https://www.datacubeai.space/en/tools/ai-report-generator",
         "languages": {
@@ -338,26 +338,26 @@
         }
       },
       "openGraph": {
-        "title": "AI Report Generator | DataCube AI",
-        "description": "Generate free AI reports with DataCube AI. Streaming generation, 5 export formats (DOCX, HTML, Markdown, TXT, JSON). Weekly and daily AI news analysis.",
+        "title": "AI Report Generator | Data Cube AI",
+        "description": "Generate free AI reports with Data Cube AI. Streaming generation, 5 export formats (DOCX, HTML, Markdown, TXT, JSON). Weekly and daily AI news analysis.",
         "url": "https://www.datacubeai.space/en/tools/ai-report-generator",
         "images": [
           {
             "url": "/og-image.jpg",
             "width": 1200,
             "height": 630,
-            "alt": "DataCube AI Report Generator"
+            "alt": "Data Cube AI Report Generator"
           }
         ]
       },
       "twitter": {
         "card": "summary_large_image",
-        "title": "AI Report Generator | DataCube AI",
-        "description": "Generate free AI reports with DataCube AI. Streaming generation, 5 export formats (DOCX, HTML, Markdown, TXT, JSON). Weekly and daily AI news analysis.",
+        "title": "AI Report Generator | Data Cube AI",
+        "description": "Generate free AI reports with Data Cube AI. Streaming generation, 5 export formats (DOCX, HTML, Markdown, TXT, JSON). Weekly and daily AI news analysis.",
         "images": [
           {
             "url": "/og-image.jpg",
-            "alt": "DataCube AI Report Generator"
+            "alt": "Data Cube AI Report Generator"
           }
         ]
       }
@@ -368,7 +368,7 @@
         "follow": true
       },
       "title": {
-        "absolute": "AI Stock Tracker (paused) | DataCube AI"
+        "absolute": "AI Stock Tracker (paused) | Data Cube AI"
       },
       "description": "Live market data is paused while we review data licensing. Deal and funding data remains available in the AI Funding Tracker.",
       "alternates": {

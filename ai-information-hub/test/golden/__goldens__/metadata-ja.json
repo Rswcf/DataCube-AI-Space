@@ -210,9 +210,9 @@
   "tools": {
     "aggregator": {
       "title": {
-        "absolute": "無料AIニュースアグリゲーター — 35以上のソース、8言語、毎日更新 | DataCube AI"
+        "absolute": "無料AIニュースアグリゲーター — 35以上のソース、8言語、毎日更新 | Data Cube AI"
       },
-      "description": "DataCube AIの無料AIニュースアグリゲーターは35以上のソースから毎日ニュースを厳選。テクノロジー、投資、ヒント、動画を8言語で提供。",
+      "description": "Data Cube AIの無料AIニュースアグリゲーターは35以上のソースから毎日ニュースを厳選。テクノロジー、投資、ヒント、動画を8言語で提供。",
       "alternates": {
         "canonical": "https://www.datacubeai.space/ja/tools/ai-news-aggregator",
         "languages": {
@@ -228,33 +228,33 @@
         }
       },
       "openGraph": {
-        "title": "無料AIニュースアグリゲーター — 35以上のソース、8言語、毎日更新 | DataCube AI",
-        "description": "DataCube AIの無料AIニュースアグリゲーターは35以上のソースから毎日ニュースを厳選。テクノロジー、投資、ヒント、動画を8言語で提供。",
+        "title": "無料AIニュースアグリゲーター — 35以上のソース、8言語、毎日更新 | Data Cube AI",
+        "description": "Data Cube AIの無料AIニュースアグリゲーターは35以上のソースから毎日ニュースを厳選。テクノロジー、投資、ヒント、動画を8言語で提供。",
         "url": "https://www.datacubeai.space/ja/tools/ai-news-aggregator",
         "images": [
           {
             "url": "/og-image.jpg",
             "width": 1200,
             "height": 630,
-            "alt": "DataCube AI News Aggregator"
+            "alt": "Data Cube AI News Aggregator"
           }
         ]
       },
       "twitter": {
         "card": "summary_large_image",
-        "title": "無料AIニュースアグリゲーター — 35以上のソース、8言語、毎日更新 | DataCube AI",
-        "description": "DataCube AIの無料AIニュースアグリゲーターは35以上のソースから毎日ニュースを厳選。テクノロジー、投資、ヒント、動画を8言語で提供。",
+        "title": "無料AIニュースアグリゲーター — 35以上のソース、8言語、毎日更新 | Data Cube AI",
+        "description": "Data Cube AIの無料AIニュースアグリゲーターは35以上のソースから毎日ニュースを厳選。テクノロジー、投資、ヒント、動画を8言語で提供。",
         "images": [
           {
             "url": "/og-image.jpg",
-            "alt": "DataCube AI News Aggregator"
+            "alt": "Data Cube AI News Aggregator"
           }
         ]
       }
     },
     "api": {
       "title": {
-        "absolute": "無料AIニュースAPI — 8言語のキュレーションAIニュースデータ | DataCube AI"
+        "absolute": "無料AIニュースAPI — 8言語のキュレーションAIニュースデータ | Data Cube AI"
       },
       "description": "35以上のソースからのAIニュース用無料REST API。テクノロジー、投資、ヒント、動画を8言語で。JSON応答、認証不要。",
       "alternates": {
@@ -272,7 +272,7 @@
         }
       },
       "openGraph": {
-        "title": "無料AIニュースAPI — 8言語のキュレーションAIニュースデータ | DataCube AI",
+        "title": "無料AIニュースAPI — 8言語のキュレーションAIニュースデータ | Data Cube AI",
         "description": "35以上のソースからのAIニュース用無料REST API。テクノロジー、投資、ヒント、動画を8言語で。JSON応答、認証不要。",
         "url": "https://www.datacubeai.space/ja/tools/ai-news-api",
         "images": [
@@ -280,27 +280,27 @@
             "url": "/og-image.jpg",
             "width": 1200,
             "height": 630,
-            "alt": "DataCube AI News API"
+            "alt": "Data Cube AI News API"
           }
         ]
       },
       "twitter": {
         "card": "summary_large_image",
-        "title": "無料AIニュースAPI — 8言語のキュレーションAIニュースデータ | DataCube AI",
+        "title": "無料AIニュースAPI — 8言語のキュレーションAIニュースデータ | Data Cube AI",
         "description": "35以上のソースからのAIニュース用無料REST API。テクノロジー、投資、ヒント、動画を8言語で。JSON応答、認証不要。",
         "images": [
           {
             "url": "/og-image.jpg",
-            "alt": "DataCube AI News API"
+            "alt": "Data Cube AI News API"
           }
         ]
       }
     },
     "index": {
       "title": {
-        "absolute": "無料AIツール | DataCube AI"
+        "absolute": "無料AIツール | Data Cube AI"
       },
-      "description": "DataCube AI の無料AIツール一覧：ニュースアグリゲーター、レポートジェネレーター、オープンAPI。アカウント不要。",
+      "description": "Data Cube AI の無料AIツール一覧：ニュースアグリゲーター、レポートジェネレーター、オープンAPI。アカウント不要。",
       "alternates": {
         "canonical": "https://www.datacubeai.space/ja/tools",
         "languages": {
@@ -316,17 +316,17 @@
         }
       },
       "openGraph": {
-        "title": "無料AIツール | DataCube AI",
-        "description": "DataCube AI の無料AIツール一覧：ニュースアグリゲーター、レポートジェネレーター、オープンAPI。アカウント不要。",
+        "title": "無料AIツール | Data Cube AI",
+        "description": "Data Cube AI の無料AIツール一覧：ニュースアグリゲーター、レポートジェネレーター、オープンAPI。アカウント不要。",
         "url": "https://www.datacubeai.space/ja/tools",
         "type": "website"
       }
     },
     "report": {
       "title": {
-        "absolute": "無料AIレポートジェネレーター — AIレポートを数秒で作成 | DataCube AI"
+        "absolute": "無料AIレポートジェネレーター — AIレポートを数秒で作成 | Data Cube AI"
       },
-      "description": "DataCube AIで無料AIレポートを生成。ストリーミング生成、5つのエクスポート形式（DOCX、HTML、Markdown、TXT、JSON）。週刊・日刊AI分析。",
+      "description": "Data Cube AIで無料AIレポートを生成。ストリーミング生成、5つのエクスポート形式（DOCX、HTML、Markdown、TXT、JSON）。週刊・日刊AI分析。",
       "alternates": {
         "canonical": "https://www.datacubeai.space/ja/tools/ai-report-generator",
         "languages": {
@@ -342,26 +342,26 @@
         }
       },
       "openGraph": {
-        "title": "無料AIレポートジェネレーター — AIレポートを数秒で作成 | DataCube AI",
-        "description": "DataCube AIで無料AIレポートを生成。ストリーミング生成、5つのエクスポート形式（DOCX、HTML、Markdown、TXT、JSON）。週刊・日刊AI分析。",
+        "title": "無料AIレポートジェネレーター — AIレポートを数秒で作成 | Data Cube AI",
+        "description": "Data Cube AIで無料AIレポートを生成。ストリーミング生成、5つのエクスポート形式（DOCX、HTML、Markdown、TXT、JSON）。週刊・日刊AI分析。",
         "url": "https://www.datacubeai.space/ja/tools/ai-report-generator",
         "images": [
           {
             "url": "/og-image.jpg",
             "width": 1200,
             "height": 630,
-            "alt": "DataCube AI Report Generator"
+            "alt": "Data Cube AI Report Generator"
           }
         ]
       },
       "twitter": {
         "card": "summary_large_image",
-        "title": "無料AIレポートジェネレーター — AIレポートを数秒で作成 | DataCube AI",
-        "description": "DataCube AIで無料AIレポートを生成。ストリーミング生成、5つのエクスポート形式（DOCX、HTML、Markdown、TXT、JSON）。週刊・日刊AI分析。",
+        "title": "無料AIレポートジェネレーター — AIレポートを数秒で作成 | Data Cube AI",
+        "description": "Data Cube AIで無料AIレポートを生成。ストリーミング生成、5つのエクスポート形式（DOCX、HTML、Markdown、TXT、JSON）。週刊・日刊AI分析。",
         "images": [
           {
             "url": "/og-image.jpg",
-            "alt": "DataCube AI Report Generator"
+            "alt": "Data Cube AI Report Generator"
           }
         ]
       }
@@ -372,7 +372,7 @@
         "follow": true
       },
       "title": {
-        "absolute": "AI株式トラッカー(一時停止中)| DataCube AI"
+        "absolute": "AI株式トラッカー(一時停止中)| Data Cube AI"
       },
       "description": "ライブ市場データはライセンス審査のため一時停止中です。ディールと資金調達データは AI Funding Tracker でご覧いただけます。",
       "alternates": {

@@ -210,9 +210,9 @@
   "tools": {
     "aggregator": {
       "title": {
-        "absolute": "Agrégateur Actualités IA | DataCube AI"
+        "absolute": "Agrégateur Actualités IA | Data Cube AI"
       },
-      "description": "DataCube AI sélectionne chaque jour des actualités IA de 35+ sources: technologie, investissements et conseils.",
+      "description": "Data Cube AI sélectionne chaque jour des actualités IA de 35+ sources: technologie, investissements et conseils.",
       "alternates": {
         "canonical": "https://www.datacubeai.space/fr/tools/ai-news-aggregator",
         "languages": {
@@ -228,33 +228,33 @@
         }
       },
       "openGraph": {
-        "title": "Agrégateur Actualités IA | DataCube AI",
-        "description": "DataCube AI sélectionne chaque jour des actualités IA de 35+ sources: technologie, investissements et conseils.",
+        "title": "Agrégateur Actualités IA | Data Cube AI",
+        "description": "Data Cube AI sélectionne chaque jour des actualités IA de 35+ sources: technologie, investissements et conseils.",
         "url": "https://www.datacubeai.space/fr/tools/ai-news-aggregator",
         "images": [
           {
             "url": "/og-image.jpg",
             "width": 1200,
             "height": 630,
-            "alt": "DataCube AI News Aggregator"
+            "alt": "Data Cube AI News Aggregator"
           }
         ]
       },
       "twitter": {
         "card": "summary_large_image",
-        "title": "Agrégateur Actualités IA | DataCube AI",
-        "description": "DataCube AI sélectionne chaque jour des actualités IA de 35+ sources: technologie, investissements et conseils.",
+        "title": "Agrégateur Actualités IA | Data Cube AI",
+        "description": "Data Cube AI sélectionne chaque jour des actualités IA de 35+ sources: technologie, investissements et conseils.",
         "images": [
           {
             "url": "/og-image.jpg",
-            "alt": "DataCube AI News Aggregator"
+            "alt": "Data Cube AI News Aggregator"
           }
         ]
       }
     },
     "api": {
       "title": {
-        "absolute": "API Actualités IA | DataCube AI"
+        "absolute": "API Actualités IA | Data Cube AI"
       },
       "description": "API REST gratuite pour actualités IA de 35+ sources: technologie, investissements, conseils et vidéos en 8 langues.",
       "alternates": {
@@ -272,7 +272,7 @@
         }
       },
       "openGraph": {
-        "title": "API Actualités IA | DataCube AI",
+        "title": "API Actualités IA | Data Cube AI",
         "description": "API REST gratuite pour actualités IA de 35+ sources: technologie, investissements, conseils et vidéos en 8 langues.",
         "url": "https://www.datacubeai.space/fr/tools/ai-news-api",
         "images": [
@@ -280,27 +280,27 @@
             "url": "/og-image.jpg",
             "width": 1200,
             "height": 630,
-            "alt": "DataCube AI News API"
+            "alt": "Data Cube AI News API"
           }
         ]
       },
       "twitter": {
         "card": "summary_large_image",
-        "title": "API Actualités IA | DataCube AI",
+        "title": "API Actualités IA | Data Cube AI",
         "description": "API REST gratuite pour actualités IA de 35+ sources: technologie, investissements, conseils et vidéos en 8 langues.",
         "images": [
           {
             "url": "/og-image.jpg",
-            "alt": "DataCube AI News API"
+            "alt": "Data Cube AI News API"
           }
         ]
       }
     },
     "index": {
       "title": {
-        "absolute": "Outils IA gratuits | DataCube AI"
+        "absolute": "Outils IA gratuits | Data Cube AI"
       },
-      "description": "Tous les outils IA gratuits de DataCube AI : agrégateur d'actualités, générateur de rapports et API ouverte. Sans compte.",
+      "description": "Tous les outils IA gratuits de Data Cube AI : agrégateur d'actualités, générateur de rapports et API ouverte. Sans compte.",
       "alternates": {
         "canonical": "https://www.datacubeai.space/fr/tools",
         "languages": {
@@ -316,17 +316,17 @@
         }
       },
       "openGraph": {
-        "title": "Outils IA gratuits | DataCube AI",
-        "description": "Tous les outils IA gratuits de DataCube AI : agrégateur d'actualités, générateur de rapports et API ouverte. Sans compte.",
+        "title": "Outils IA gratuits | Data Cube AI",
+        "description": "Tous les outils IA gratuits de Data Cube AI : agrégateur d'actualités, générateur de rapports et API ouverte. Sans compte.",
         "url": "https://www.datacubeai.space/fr/tools",
         "type": "website"
       }
     },
     "report": {
       "title": {
-        "absolute": "Générateur de Rapports IA | DataCube AI"
+        "absolute": "Générateur de Rapports IA | Data Cube AI"
       },
-      "description": "Générez des rapports IA avec DataCube AI: streaming, exports et analyses IA quotidiennes ou hebdomadaires.",
+      "description": "Générez des rapports IA avec Data Cube AI: streaming, exports et analyses IA quotidiennes ou hebdomadaires.",
       "alternates": {
         "canonical": "https://www.datacubeai.space/fr/tools/ai-report-generator",
         "languages": {
@@ -342,26 +342,26 @@
         }
       },
       "openGraph": {
-        "title": "Générateur de Rapports IA | DataCube AI",
-        "description": "Générez des rapports IA avec DataCube AI: streaming, exports et analyses IA quotidiennes ou hebdomadaires.",
+        "title": "Générateur de Rapports IA | Data Cube AI",
+        "description": "Générez des rapports IA avec Data Cube AI: streaming, exports et analyses IA quotidiennes ou hebdomadaires.",
         "url": "https://www.datacubeai.space/fr/tools/ai-report-generator",
         "images": [
           {
             "url": "/og-image.jpg",
             "width": 1200,
             "height": 630,
-            "alt": "DataCube AI Report Generator"
+            "alt": "Data Cube AI Report Generator"
           }
         ]
       },
       "twitter": {
         "card": "summary_large_image",
-        "title": "Générateur de Rapports IA | DataCube AI",
-        "description": "Générez des rapports IA avec DataCube AI: streaming, exports et analyses IA quotidiennes ou hebdomadaires.",
+        "title": "Générateur de Rapports IA | Data Cube AI",
+        "description": "Générez des rapports IA avec Data Cube AI: streaming, exports et analyses IA quotidiennes ou hebdomadaires.",
         "images": [
           {
             "url": "/og-image.jpg",
-            "alt": "DataCube AI Report Generator"
+            "alt": "Data Cube AI Report Generator"
           }
         ]
       }
@@ -372,7 +372,7 @@
         "follow": true
       },
       "title": {
-        "absolute": "Tracker Actions IA (en pause) | DataCube AI"
+        "absolute": "Tracker Actions IA (en pause) | Data Cube AI"
       },
       "description": "Les données de marché en direct sont en pause pendant la revue de licence. Les données de financement restent disponibles dans le AI Funding Tracker.",
       "alternates": {
