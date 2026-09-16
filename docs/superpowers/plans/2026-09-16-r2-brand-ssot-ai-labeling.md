@@ -3313,21 +3313,42 @@ Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
 
 ### Task 9: Tool pages
 
-The four tool pages hold about 170 brand strings, most of them in per-page translation maps stored with `\u` escapes.
+The four tool pages plus the tools index hold about 190 brand strings, most of them in per-page translation maps stored with `\u` escapes. The index (`tools/page.tsx`) arrived on main after Task 1 captured its goldens (PR #12), so this task captures its baseline first (Step 0) and only then changes it.
 - Map values get the `{brand}` placeholder, and each page's `t()` helper fills it.
 - Everything else reads `BRAND`.
 - The only intended golden change is B1.
 
 **Files:**
+- Modify: `ai-information-hub/app/(localized)/[lang]/tools/page.tsx`
 - Modify: `ai-information-hub/app/(localized)/[lang]/tools/ai-news-aggregator/page.tsx`
 - Modify: `ai-information-hub/app/(localized)/[lang]/tools/ai-news-api/page.tsx`
 - Modify: `ai-information-hub/app/(localized)/[lang]/tools/ai-report-generator/page.tsx`
 - Modify: `ai-information-hub/app/(localized)/[lang]/tools/ai-stock-tracker/page.tsx`
+- Modify: `ai-information-hub/test/golden/metadata.test.ts`, `ai-information-hub/test/golden/pages.test.ts` (Step 0 only)
 - Modify (regenerated): `ai-information-hub/test/golden/__goldens__/metadata-*.json`, `ai-information-hub/test/golden/__goldens__/pages/tool-*.html`
 
 **Interfaces:**
 - **Consumes:** `BRAND`, `fillBrand` from `@/lib/brand` (Task 5); the goldens from Task 1.
 - **Produces:** nothing new.
+
+- [ ] **Step 0: Cover the tools index in the harness, before changing it**
+
+`app/(localized)/[lang]/tools/page.tsx` is a localized index page that main gained in PR #12; Task 1 never captured it, so a brand change there would be unverified. Capture it first, exactly the way Task 1 captures the other tool pages:
+
+- in `test/golden/metadata.test.ts`, add the index to the tool-page metadata cases, keyed `tools-index-{lang}` for `en` and `de`;
+- in `test/golden/pages.test.ts`, render it for `en` and write `pages/tool-index-en.html`;
+- capture with `UPDATE_GOLDENS=1`, then run the suite again with the variable unset and confirm it passes unchanged.
+
+Commit this on its own, before any brand edit:
+
+```bash
+git -C <repo-root> add ai-information-hub/test/golden
+git -C <repo-root> commit -m "test(frontend): pin the tools index output before the brand change
+
+The page arrived on main in PR #12, after Task 1's capture.
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
+```
 
 - [ ] **Step 1: Placeholders in translation-map lines**
 
@@ -3339,8 +3360,9 @@ import re
 from pathlib import Path
 
 LANG_LINE = re.compile(r"^\s+(de|en|zh|fr|es|pt|ja|ko): ")
-for slug in ("ai-news-aggregator", "ai-news-api", "ai-report-generator", "ai-stock-tracker"):
-    path = Path(f"ai-information-hub/app/(localized)/[lang]/tools/{slug}/page.tsx")
+for slug in ("", "ai-news-aggregator", "ai-news-api", "ai-report-generator", "ai-stock-tracker"):
+    # "" is the tools index itself: app/(localized)/[lang]/tools/page.tsx
+    path = Path("ai-information-hub/app/(localized)/[lang]/tools/" + (f"{slug}/page.tsx" if slug else "page.tsx"))
     lines = path.read_text(encoding="utf-8").split("\n")
     changed = 0
     for index, line in enumerate(lines):
@@ -3354,7 +3376,7 @@ EOF
 
 - [ ] **Step 2: Fill the placeholder in each page's helper**
 
-In each of the four files:
+In each of the five files (the four tool pages and the index):
 - add `import { BRAND, fillBrand } from '@/lib/brand'`;
 - change `const BASE_URL = 'https://www.datacubeai.space'` to `const BASE_URL = BRAND.siteUrl`;
 - change the helper to:
@@ -3422,7 +3444,7 @@ If a golden shows `{brand}` or `OTHER CHANGES`, a map value reaches the output w
 - [ ] **Step 6: Guard, type check, suite**
 
 ```bash
-cd <repo-root> && python3 scripts/brand_guard.py 'ai-information-hub/app/(localized)/[lang]/tools/ai-news-aggregator/page.tsx' 'ai-information-hub/app/(localized)/[lang]/tools/ai-news-api/page.tsx' 'ai-information-hub/app/(localized)/[lang]/tools/ai-report-generator/page.tsx' 'ai-information-hub/app/(localized)/[lang]/tools/ai-stock-tracker/page.tsx'
+cd <repo-root> && python3 scripts/brand_guard.py 'ai-information-hub/app/(localized)/[lang]/tools/page.tsx' 'ai-information-hub/app/(localized)/[lang]/tools/ai-news-aggregator/page.tsx' 'ai-information-hub/app/(localized)/[lang]/tools/ai-news-api/page.tsx' 'ai-information-hub/app/(localized)/[lang]/tools/ai-report-generator/page.tsx' 'ai-information-hub/app/(localized)/[lang]/tools/ai-stock-tracker/page.tsx'
 cd <repo-root>/ai-information-hub && npm run lint && npm test
 ```
 
