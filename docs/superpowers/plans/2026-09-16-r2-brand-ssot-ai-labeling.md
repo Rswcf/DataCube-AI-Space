@@ -3337,7 +3337,7 @@ The four tool pages plus the tools index hold about 190 brand strings, most of t
 
 - in `test/golden/metadata.test.ts`, import the page (`await import('@/app/(localized)/[lang]/tools/page')`) and add `index: await index.generateMetadata(params({ lang }))` to the `tools` section, next to `aggregator`, `api`, `report` and `stock`, so all eight `metadata-{lang}.json` goldens capture it;
 - in `test/golden/pages.test.ts`, add `index: () => import('@/app/(localized)/[lang]/tools/page')` to the tool-page loader map, so the existing `it.each(['en', 'zh'])` loop writes `pages/tool-index-en.html` and `pages/tool-index-zh.html` — names the Step 5 filter (`pages/tool-*.html`) already accepts;
-- capture with `UPDATE_GOLDENS=1`, then run the suite again with the variable unset and confirm it passes unchanged.
+- capture with `npx vitest run test/golden -u` (the frontend harness uses Vitest's update flag; `UPDATE_GOLDENS=1` is the backend's convention), then run the suite again without `-u` and confirm it passes unchanged.
 
 Commit this on its own, before any brand edit:
 
