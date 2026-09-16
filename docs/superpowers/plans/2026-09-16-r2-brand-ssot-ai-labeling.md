@@ -40,7 +40,7 @@
 - Spec §6.2, AD1 and AD7 only.
 - Brand values stay the legacy ones (spec §3.4).
 - The following stay unchanged until R4 (spec §6.6): brand text in documentation, READMEs, translated READMEs, `LICENSE`, `CONTRIBUTING.md`, and `promo-video/`.
-- The `middleware.ts` → `proxy.ts` rename is deferred, pending founder confirmation (Ruling R-1).
+- The `middleware.ts` → `proxy.ts` rename is deferred (Ruling R-1; the founder confirmed the deferral on 2026-09-16).
 
 **Output neutrality (AD1)**
 - Every task keeps output byte-identical to the goldens captured in Tasks 1–2, except the changes listed under "Intended output changes".
@@ -68,7 +68,7 @@
 - Labels use the exact strings in "AI label copy".
 - Never write "Edited by …".
 - No person-like byline: "Editorial", "Redaktion", "编辑部", "Team".
-- The founder appears only as `Organization.founder` and as "Made by <founder>", and only when the founder name is set. The founder chose a real-name byline but not its wording (pending on 2026-09-16), so no name is written into code; Release step 0 sets it (Ruling R-10).
+- The founder appears only as `Organization.founder` and as "Made by <founder>", and only when the founder name is set. The founder chose the byline on 2026-09-16: `Deepviews`, rendering "Made by Deepviews". The name still never appears in code — Release step 0 sets the variables (Ruling R-10).
 
 **Authorization (spec §3.6)**
 - Pre-approved:
@@ -144,7 +144,7 @@
 | L4 | **AI disclosure page.** Its metadata no longer claims human review. A new first section says content is AI-generated and published without human review. |
 | L5 | **Content-summary footer** says "AI-generated" instead of "AI-assisted". |
 
-Nothing changes while `NEXT_PUBLIC_FOUNDER_NAME` (frontend) and `FOUNDER_NAME` (backend) are unset; Release step 0 sets them once the founder picks the wording.
+Nothing changes while `NEXT_PUBLIC_FOUNDER_NAME` (frontend) and `FOUNDER_NAME` (backend) are unset; Release step 0 sets both to `Deepviews` (founder decision, 2026-09-16).
 
 ## AI label copy
 
@@ -273,7 +273,7 @@ Each ruling states what was decided, why, and what it costs if wrong.
   - The cost is small but unmeasured, and R2's before/after comparison should not also carry a runtime change.
   - The spec wants the codemod so that R4's URL work lands in `proxy.ts`. Nothing in R2 or R3 needs it.
 - Trigger: once the cost work has been live for 7 days, and before R4's URL work starts, run the codemod in its own PR and compare middleware/proxy invocations and latency over 24 hours.
-- Status: raised with the founder on 2026-09-16. If the founder wants it in R2, it becomes a Phase B task after Task 12.
+- Status: the founder confirmed the deferral on 2026-09-16. It stays out of R2; the trigger above governs when it runs.
 - Cost if wrong: one small PR later, and a deprecation warning in build logs until then.
 
 **R-2 — One brand spelling (B1).**
@@ -316,8 +316,8 @@ Each ruling states what was decided, why, and what it costs if wrong.
 - Why: `developer.py` looks stored keys up by exact value, so existing `dcai_` keys keep working after any prefix change.
 
 **R-10 — "Made by <founder>" is English on the site and in emails, and renders only when a founder name is set.**
-- Why: spec §3.2 and AD7 require attribution under the founder's real name. The founder chose a real-name byline but not its wording (pending on 2026-09-16), so no name is written into code.
-- Release step 0 sets `NEXT_PUBLIC_FOUNDER_NAME` (Vercel) and `FOUNDER_NAME` (Railway) once the founder gives the wording; each variable needs founder approval. If the founder has not decided by the release, R2 ships without the line and the item stays open in the ledger.
+- Why: spec §3.2 and AD7 require attribution under the founder's real name. The founder chose `Deepviews` as the byline on 2026-09-16 — it is a brand the founder owns, not a person-like editorial byline, so it satisfies the AD7 rule against "Editorial"/"Redaktion"-style names. The value still never appears in code; it is configuration.
+- Release step 0 sets `NEXT_PUBLIC_FOUNDER_NAME` (Vercel) and `FOUNDER_NAME` (Railway) to `Deepviews`; each variable still needs the founder's approval at the time it is set, because both are production configuration changes.
 - Cost if wrong: the footer line and `Organization.founder` appear later than the spec intended.
 
 **R-11 — The Vercel cost work lands first, and R2's frontend tasks follow its tree.**
