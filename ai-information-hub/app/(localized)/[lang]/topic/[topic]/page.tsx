@@ -214,7 +214,12 @@ async function getTopicBuckets(terms: string[], language: AppLanguage, preferred
         fetch(`${API_BASE}/tips/${periodId}`, { next: { revalidate: 3600 } }).catch(() => null),
       ])
 
-      const reachable = Boolean(techRes?.ok || investmentRes?.ok || tipsRes?.ok)
+      // A 404 means the API answered and that period simply holds nothing, which is
+      // a normal answer — only a network error or a 5xx means upstream is down. The
+      // distinction matters because `?period=` narrows the candidate set to one id,
+      // so treating 404 as unreachable turned any unknown period into a 500.
+      const answered = (res: Response | null) => Boolean(res && (res.ok || res.status === 404))
+      const reachable = answered(techRes) || answered(investmentRes) || answered(tipsRes)
 
       const techData = techRes?.ok ? await techRes.json() : null
       const investmentData = investmentRes?.ok ? await investmentRes.json() : null
@@ -429,7 +434,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   return {
     title: metaTitle,
     description: metaDescription,
-    robots: isFilteredVariant ? { index: false, follow: false } : undefined,
+    ...(isFilteredVariant ? { robots: { index: false, follow: false } } : {}),
     alternates: {
       canonical: canonicalUrl,
       languages: {
