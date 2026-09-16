@@ -7,6 +7,12 @@ import { toTopicSlug, topicSlugToQuery, topicSlugToTitle } from '@/lib/topic-uti
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api-production-3ee5.up.railway.app/api'
 
+// Note: this route reads `searchParams` (section / period / page / q), which
+// opts the whole page into dynamic rendering — the `revalidate` below only
+// governs the data cache behind the upstream fetches, not the HTML. Making
+// the canonical page ISR would mean moving the filters client-side; the
+// 2026-09 cost work chose to cut request volume instead (404 for empty
+// topics, noindex/nofollow + robots Disallow on filtered variants, WAF).
 export const revalidate = 3600
 
 const PAGE_SIZE = 3

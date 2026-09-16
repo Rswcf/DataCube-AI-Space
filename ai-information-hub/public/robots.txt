@@ -5,10 +5,11 @@ Allow: /
 Disallow: /api/
 Allow: /api/content-summary
 Disallow: /login
-# Topic filter variants (?section= / ?period= / ?page= / ?q=) are uncached
-# dynamic renders; a crawler enumerating them turns /topic into a compute
-# trap. Only the canonical, filter-free topic page is crawlable. Repeated in
-# every group below because robots.txt groups do not inherit rules.
+# Topic pages render on demand (they read the query string), so every filter
+# combination (?section= / ?period= / ?page= / ?q=) is another full render; a
+# crawler enumerating them turns /topic into a compute trap. Only the
+# canonical, filter-free topic page is crawlable. Repeated in every group
+# below because robots.txt groups do not inherit rules.
 Disallow: /*/topic/*?
 
 # LLM content description
