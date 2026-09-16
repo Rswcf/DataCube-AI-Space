@@ -11,6 +11,7 @@ import { useSettings } from "@/lib/settings-context";
 import { getPeriodLabel } from "@/lib/period-utils";
 import { API_BASE, USE_API } from "@/lib/api-base";
 import { ARTICLE_CTA_LABELS, articleHref, tipStoryId } from "@/lib/article-routes";
+import { FEED_HEADLINE, splitHeadlineDeck } from "@/lib/text-split";
 
 interface TipsFeedProps {
   weekId: string;
@@ -33,31 +34,6 @@ interface TipPost {
 function isCodeLikeTip(value: string): boolean {
   const text = value.trim();
   return /```|^\s*(curl|npm|pnpm|yarn|pip|python|git|docker|kubectl|const|let|var|function|import|from|def|class|select|with)\b|[{};]/im.test(text);
-}
-
-function sentenceCaseFragment(text: string) {
-  if (!text) return "";
-  return /^[a-z]/.test(text) ? `${text[0].toUpperCase()}${text.slice(1)}` : text;
-}
-
-function splitHeadlineDeck(content: string): [string, string] {
-  const clean = content.replace(/\s+/g, " ").trim();
-  if (!clean) return ["", ""];
-  for (const separator of [": ", " — ", " – ", " - "]) {
-    const position = clean.indexOf(separator);
-    if (position >= 20 && position <= 80) {
-      return [clean.slice(0, position).replace(/[ .,-;:]+$/, ""), clean.slice(position + separator.length).trim()];
-    }
-  }
-  for (const separator of [". ", "? ", "! "]) {
-    const position = clean.indexOf(separator);
-    if (position >= 28 && position <= 86 && position + separator.length < clean.length) {
-      return [clean.slice(0, position + 1), clean.slice(position + separator.length).trim()];
-    }
-  }
-  if (clean.length <= 86) return [clean, ""];
-  const cut = clean.lastIndexOf(" ", 86);
-  return [clean.slice(0, cut).replace(/[ .,-;:]+$/, ""), sentenceCaseFragment(clean.slice(cut).trim())];
 }
 
 export function TipsFeed({ weekId, searchQuery }: TipsFeedProps) {
@@ -166,7 +142,7 @@ export function TipsFeed({ weekId, searchQuery }: TipsFeedProps) {
       {/* Tips Posts */}
       {filteredPosts.map((post, index) => {
         const tipIsCodeLike = isCodeLikeTip(post.tip);
-        const [headline, deck] = splitHeadlineDeck(post.content);
+        const [headline, deck] = splitHeadlineDeck(post.content, FEED_HEADLINE);
         const storyHref = articleHref(language, weekId, tipStoryId(post));
         const articleLabel = ARTICLE_CTA_LABELS[language] || ARTICLE_CTA_LABELS.en;
 

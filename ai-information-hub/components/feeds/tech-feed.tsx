@@ -11,6 +11,7 @@ import { useSettings } from "@/lib/settings-context";
 import { getPeriodLabel } from "@/lib/period-utils";
 import { API_BASE, USE_API } from "@/lib/api-base";
 import { ARTICLE_CTA_LABELS, articleHref, techStoryId } from "@/lib/article-routes";
+import { FEED_HEADLINE, splitHeadlineDeck } from "@/lib/text-split";
 import type { TechPost } from "@/lib/types";
 
 interface TechFeedProps {
@@ -22,46 +23,6 @@ const impactLabels: Record<string, Record<string, string>> = {
   de: { critical: "Kritisch", high: "Hoch", medium: "Mittel", low: "Niedrig" },
   en: { critical: "Critical", high: "High", medium: "Medium", low: "Low" },
 };
-
-function sentenceCaseFragment(text: string) {
-  if (!text) return "";
-  return /^[a-z]/.test(text) ? `${text[0].toUpperCase()}${text.slice(1)}` : text;
-}
-
-function splitHeadlineDeck(content: string): [string, string] {
-  const clean = content.replace(/\s+/g, " ").trim();
-  if (!clean) return ["", ""];
-
-  for (const separator of [": ", " — ", " – ", " - "]) {
-    const position = clean.indexOf(separator);
-    if (position >= 24 && position <= 82) {
-      return [clean.slice(0, position).replace(/[ .,-;:]+$/, ""), clean.slice(position + separator.length).trim()];
-    }
-  }
-
-  for (const separator of [" that ", " to "]) {
-    const position = clean.indexOf(separator, 30);
-    if (position > 0 && position <= 86) {
-      const headline = clean.slice(0, position).replace(/[ .,-;:]+$/, "");
-      let deck = separator === " to " ? clean.slice(position + 1).trim() : clean.slice(position + separator.length).trim();
-      if (separator === " to " && clean.slice(0, position).toLowerCase().includes(" from ")) {
-        deck = `toward ${clean.slice(position + separator.length).trim()}`;
-      }
-      return [headline, sentenceCaseFragment(deck)];
-    }
-  }
-
-  for (const separator of [". ", "? ", "! "]) {
-    const position = clean.indexOf(separator);
-    if (position >= 32 && position <= 90 && position + separator.length < clean.length) {
-      return [clean.slice(0, position + 1), clean.slice(position + separator.length).trim()];
-    }
-  }
-
-  if (clean.length <= 92) return [clean, ""];
-  const cut = clean.lastIndexOf(" ", 92);
-  return [clean.slice(0, cut).replace(/[ .,-;:]+$/, ""), clean.slice(cut).trim()];
-}
 
 /**
  * Displays AI technology news posts for a given week.
@@ -181,7 +142,7 @@ export function TechFeed({ weekId, searchQuery }: TechFeedProps) {
       {/* Posts */}
       {filteredPosts.map((post, index) => {
         const isVideoPost = post.isVideo && post.videoId;
-        const [headline, deck] = splitHeadlineDeck(post.content);
+        const [headline, deck] = splitHeadlineDeck(post.content, FEED_HEADLINE);
         const impactLabel = impacts[post.impact as keyof typeof impacts] || post.impact;
         const storyHref = articleHref(language, weekId, techStoryId(post));
         const articleLabel = ARTICLE_CTA_LABELS[language] || ARTICLE_CTA_LABELS.en;
