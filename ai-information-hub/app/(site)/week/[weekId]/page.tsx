@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { ArticleSchema, VideoSchema, BreadcrumbListSchema, CollectionPageSchema } from '@/components/structured-data'
 import { formatPeriodTitle, periodPublishedDate } from '@/lib/period-utils'
 import type { TechPost, MultilingualData, InvestmentData, TipPost, ImpactLevel } from '@/lib/types'
-import { toTopicSlug } from '@/lib/topic-utils'
+import { tagTopicSlug } from '@/lib/topic-utils'
 import { isSupportedLanguage, SUPPORTED_LANGUAGES, toBcp47 } from '@/lib/i18n'
 import {
   ARTICLE_CTA_LABELS,
@@ -687,15 +687,27 @@ export default async function WeekPage({ params, searchParams }: Props) {
                 </div>
                 {Array.from(new Set([post.category, ...(post.tags || []).slice(0, 3)])).filter(Boolean).length > 0 ? (
                   <div className="mt-2 flex flex-wrap gap-2">
-                    {Array.from(new Set([post.category, ...(post.tags || []).slice(0, 3)])).filter(Boolean).map((topic) => (
-                      <a
-                        key={`${post.id}-${topic}`}
-                        href={`/${lang}/topic/${toTopicSlug(topic)}`}
-                        className="rounded-full border border-gray-300 px-2 py-0.5 text-xs text-gray-700 hover:border-gray-500 hover:text-gray-900"
-                      >
-                        {topic}
-                      </a>
-                    ))}
+                    {Array.from(new Set([post.category, ...(post.tags || []).slice(0, 3)])).filter(Boolean).map((topic) => {
+                      // A tag without Latin letters has no hub slug (see tagTopicSlug), so it
+                      // renders as a plain label rather than a link to /topic/topic.
+                      const slug = tagTopicSlug(topic)
+                      return slug ? (
+                        <a
+                          key={`${post.id}-${topic}`}
+                          href={`/${lang}/topic/${slug}`}
+                          className="rounded-full border border-gray-300 px-2 py-0.5 text-xs text-gray-700 hover:border-gray-500 hover:text-gray-900"
+                        >
+                          {topic}
+                        </a>
+                      ) : (
+                        <span
+                          key={`${post.id}-${topic}`}
+                          className="rounded-full border border-gray-300 px-2 py-0.5 text-xs text-gray-700"
+                        >
+                          {topic}
+                        </span>
+                      )
+                    })}
                   </div>
                 ) : null}
                 <ArticleSchema post={post} inLanguage={lang} url={`https://www.datacubeai.space${articleHref(lang, weekId, techStoryId(post))}`} />

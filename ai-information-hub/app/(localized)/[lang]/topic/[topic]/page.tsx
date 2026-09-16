@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import { isSupportedLanguage, toBcp47, SUPPORTED_LANGUAGES, type AppLanguage } from '@/lib/i18n'
-import { toTopicSlug, topicSlugToQuery, topicSlugToTitle } from '@/lib/topic-utils'
+import { indexById, matchesTopicTerms, toTopicSlug, topicSlugToQuery, topicSlugToTitle } from '@/lib/topic-utils'
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api-production-3ee5.up.railway.app/api'
 
@@ -102,12 +102,6 @@ function toSearchTerms(topicSlug: string, queryText = ''): string[] {
     .filter(Boolean)
 }
 
-function matchesTerms(fields: Array<string | undefined>, terms: string[]): boolean {
-  if (terms.length === 0) return false
-  const haystack = fields.map((field) => (field || '').toLowerCase()).join(' ')
-  return terms.every((term) => haystack.includes(term))
-}
-
 function parsePositiveInt(value: string | undefined): number {
   const parsed = Number.parseInt(value || '1', 10)
   if (!Number.isFinite(parsed) || parsed < 1) return 1
@@ -202,6 +196,30 @@ function getCandidatePeriodIds(weeks: WeekEntry[], preferredPeriodId?: string): 
 // `upstreamReachable` reports whether any period actually answered. An empty
 // hub means "no matching entries" only when the content API was reachable —
 // see the call site for why the difference matters.
+// Searchable fields per section. Each list is applied to the localized item and
+// to its English original (paired by id), and a hub matches when the terms
+// appear in either. Hub slugs are derived from English, and a translation can
+// render an entity away — the Chinese edition writes "Wharton" as 沃顿商学院 —
+// so matching the localized text alone left 4 of 64 homepage trend links
+// answering 404 in zh/ja/ko/fr (2026-09-16).
+const techFields = (post?: TechPost) => (post ? [post.content, post.category, post.source, ...(post.tags || [])] : [])
+const primaryFields = (post?: PrimaryPost) => (post ? [post.content, post.company, post.round] : [])
+const secondaryFields = (post?: SecondaryPost) => (post ? [post.content, post.ticker] : [])
+const maFields = (post?: MaPost) => (post ? [post.content, post.acquirer, post.target, post.dealType] : [])
+const tipFields = (post?: TipPost) => (post ? [post.content, post.tip, post.category] : [])
+
+function matchSection<T extends { id: number }>(
+  localized: T[] | undefined,
+  english: T[] | undefined,
+  fields: (post?: T) => Array<string | undefined>,
+  terms: string[],
+): T[] {
+  const englishById = indexById(english)
+  return (localized || []).filter((post) =>
+    matchesTopicTerms([...fields(post), ...fields(englishById.get(post.id))], terms)
+  )
+}
+
 async function getTopicBuckets(terms: string[], language: AppLanguage, preferredPeriodId?: string): Promise<{ buckets: TopicBucket[]; upstreamReachable: boolean }> {
   const weeks = await getWeeks()
   const periodIds = getCandidatePeriodIds(weeks, preferredPeriodId)
@@ -225,25 +243,11 @@ async function getTopicBuckets(terms: string[], language: AppLanguage, preferred
       const investmentData = investmentRes?.ok ? await investmentRes.json() : null
       const tipsData = tipsRes?.ok ? await tipsRes.json() : null
 
-      const tech: TechPost[] = (techData?.[language] || []).filter((post: TechPost) =>
-        matchesTerms([post.content, post.category, post.source, ...(post.tags || [])], terms)
-      )
-
-      const primary: PrimaryPost[] = (investmentData?.primaryMarket?.[language] || []).filter((post: PrimaryPost) =>
-        matchesTerms([post.content, post.company, post.round], terms)
-      )
-
-      const secondary: SecondaryPost[] = (investmentData?.secondaryMarket?.[language] || []).filter((post: SecondaryPost) =>
-        matchesTerms([post.content, post.ticker], terms)
-      )
-
-      const ma: MaPost[] = (investmentData?.ma?.[language] || []).filter((post: MaPost) =>
-        matchesTerms([post.content, post.acquirer, post.target, post.dealType], terms)
-      )
-
-      const tips: TipPost[] = (tipsData?.[language] || []).filter((post: TipPost) =>
-        matchesTerms([post.content, post.tip, post.category], terms)
-      )
+      const tech = matchSection<TechPost>(techData?.[language], techData?.en, techFields, terms)
+      const primary = matchSection<PrimaryPost>(investmentData?.primaryMarket?.[language], investmentData?.primaryMarket?.en, primaryFields, terms)
+      const secondary = matchSection<SecondaryPost>(investmentData?.secondaryMarket?.[language], investmentData?.secondaryMarket?.en, secondaryFields, terms)
+      const ma = matchSection<MaPost>(investmentData?.ma?.[language], investmentData?.ma?.en, maFields, terms)
+      const tips = matchSection<TipPost>(tipsData?.[language], tipsData?.en, tipFields, terms)
 
       const bucket: TopicBucket | null =
         tech.length || primary.length || secondary.length || ma.length || tips.length

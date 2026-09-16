@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { toTopicSlug, trendTopicSlug } from '@/lib/topic-utils'
+import { indexById, matchesTopicTerms, tagTopicSlug, toTopicSlug, trendTopicSlug } from '@/lib/topic-utils'
 
 // A topic page matches an article only when EVERY term in the slug appears in
 // it, so a whole-sentence slug never resolves. Trend chips therefore link by
@@ -57,5 +57,69 @@ describe('trendTopicSlug', () => {
 
   it('agrees with toTopicSlug on the entity it picks', () => {
     expect(trendTopicSlug('DeepSeek open-sources agent runtime Harness')).toBe(toTopicSlug('DeepSeek'))
+  })
+})
+
+// Topic slugs fold accents ("sécurité" → "securite"), so the text they are
+// matched against must be folded the same way or no accented term can ever
+// match: every French hub with an accented tag answered 404 (2026-09-16).
+describe('matchesTopicTerms', () => {
+  it.each([
+    [['La sécurité de l’IA progresse'], ['securite']],
+    [['Protection de la confidentialité'], ['confidentialite']],
+    [['Un dispositif médical approuvé'], ['dispositif', 'medical']],
+    [['Neue Regeln zur Straße'], ['strasse']],
+    [['Überwachung durch KI'], ['uberwachung']],
+    [['Réglementation européenne'], ['reglementation']],
+    [['Nvidia CEO rejects calls'], ['nvidia']],
+    [[undefined, 'OpenAI ships', undefined], ['openai']],
+  ])('matches %j on %j', (fields, terms) => {
+    expect(matchesTopicTerms(fields, terms)).toBe(true)
+  })
+
+  it('requires every term', () => {
+    expect(matchesTopicTerms(['Nvidia CEO rejects calls'], ['nvidia', 'apple'])).toBe(false)
+  })
+
+  it('never matches an empty term list', () => {
+    expect(matchesTopicTerms(['anything at all'], [])).toBe(false)
+  })
+
+  it('does not invent a match across scripts', () => {
+    expect(matchesTopicTerms(['沃顿商学院的一位金融教授'], ['wharton'])).toBe(false)
+  })
+})
+
+// Pure CJK tags have no Latin letters, so toTopicSlug falls back to the
+// placeholder "topic" and every such tag linked to /{lang}/topic/topic, a 404.
+describe('tagTopicSlug', () => {
+  it.each([
+    ['人工智能', null],
+    ['政策', null],
+    ['規制', null],
+    ['인공지능', null],
+    ['', null],
+    ['   ', null],
+  ])('returns null for %j', (label, expected) => {
+    expect(tagTopicSlug(label)).toBe(expected)
+  })
+
+  it.each([
+    ['Anthropic', 'anthropic'],
+    ['sécurité de l’IA', 'securite-de-l-ia'],
+    ['dispositif médical', 'dispositif-medical'],
+    ['AI安全', 'ai'],
+    ['Topic modeling', 'topic-modeling'],
+  ])('slugs %j', (label, expected) => {
+    expect(tagTopicSlug(label)).toBe(expected)
+  })
+})
+
+describe('indexById', () => {
+  it('maps items by id and tolerates missing input', () => {
+    const map = indexById([{ id: 1, v: 'a' }, { id: 2, v: 'b' }])
+    expect(map.get(2)?.v).toBe('b')
+    expect(indexById(undefined).size).toBe(0)
+    expect(indexById(null).size).toBe(0)
   })
 })
