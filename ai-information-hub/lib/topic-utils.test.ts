@@ -49,6 +49,18 @@ describe('trendTopicSlug', () => {
     expect(trendTopicSlug(title)).toBe(expected)
   })
 
+  // The tokenizer already splits on apostrophes, so "Microsoft's" yields
+  // "Microsoft". An extra possessive strip used to remove ANY trailing "s",
+  // turning Databricks into "databrick" and Siemens into "siemen".
+  it.each([
+    ['Databricks raises a new round', 'databricks'],
+    ['Siemens ships an industrial copilot', 'siemens'],
+    ['Genesis mission expands to ten labs', 'genesis'],
+    ["Microsoft\u2019s Copilot gets a new memory", 'microsoft'],
+  ])('keeps a trailing s that is part of the name: %j', (title, expected) => {
+    expect(trendTopicSlug(title)).toBe(expected)
+  })
+
   it('never returns a multi-word slug', () => {
     const slug = trendTopicSlug('Nvidia CEO rejects AI slowdown calls')
     expect(slug).not.toBeNull()
