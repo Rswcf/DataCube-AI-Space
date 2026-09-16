@@ -3765,6 +3765,8 @@ git -C <repo-root> log --oneline HEAD..origin/main -- ai-information-hub/public/
 
 Expected: no output.
 
+This check only sees changes on `main` that the branch has not absorbed; after a rebase it is empty even when `main` did change the files. The real guard is Step 4's snapshot test against the `llms.txt` golden, which Task 1 captured from the current file. The template in Step 5 was re-verified against the current `public/llms.txt` on 2026-09-17, after main's PR #11 replaced the `?period=` example.
+
 If there is output, stop and report `BLOCKED: static files changed on main`. The controller then:
 1. rebases the branch;
 2. re-captures the two goldens with `npx vitest run test/golden/static-files.test.ts -u`;
@@ -3968,9 +3970,10 @@ Example: ${site}/en/week/2026-05-23
 Each curated story can be cited through a stable first-party article URL.
 Article canonical format: ${site}/{lang}/news/{periodId}/{storyId}
 
-Topic hubs collect related period stories and can be scoped by period.
+Topic hubs collect related period stories.
 Topic canonical format: ${site}/{lang}/topic/{topic}
-Scoped topic example: ${site}/en/topic/openai?period=2026-05-23
+Filtered variants (?period=, ?section=, ?page=, ?q=) are views of that canonical
+page: excluded in robots.txt and marked noindex — cite the canonical URL.
 
 ## Languages
 German (de) — default | English (en) | Chinese (zh) | French (fr) | Spanish (es) | Portuguese (pt) | Japanese (ja) | Korean (ko)
