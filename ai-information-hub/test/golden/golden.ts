@@ -5,9 +5,22 @@ export function normalizeHtml(html: string): string {
   return html.replaceAll('<!-- -->', '')
 }
 
-/** Pretty JSON with a final newline, so golden diffs stay readable. */
+/**
+ * Pretty JSON with a final newline, so golden diffs stay readable.
+ *
+ * `JSON.stringify(value, null, 2)` silently drops any own key whose value is
+ * `undefined` — a page returning `{ robots: cond ? {...} : undefined }`
+ * serializes identically to one that never sets `robots` at all, so a golden
+ * built that way cannot see a metadata key appearing or disappearing (this
+ * exact shape shipped to production and stripped robots directives from
+ * every indexed article and canonical topic hub — see task-1-review.md §2 /
+ * main PR #12). The replacer below makes a present-but-undefined value
+ * serialize as the literal string "__undefined__" instead of being skipped,
+ * so that regression would show up as a golden diff.
+ */
 export function stableJson(value: unknown): string {
-  return `${JSON.stringify(value, null, 2)}\n`
+  const revealUndefined = (_key: string, v: unknown) => (v === undefined ? '__undefined__' : v)
+  return `${JSON.stringify(value, revealUndefined, 2)}\n`
 }
 
 /**
