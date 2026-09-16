@@ -16,7 +16,6 @@ export const translations = {
     // Navigation
     home: "Startseite",
     discover: "Entdecken",
-    dataCube: "Data Cube",
     settings: "Einstellungen",
     categories: "Kategorien",
 
@@ -80,7 +79,6 @@ export const translations = {
     search: "Suchen",
     whatsNew: "Was gibt's Neues?",
     posts: "Beitr\u00e4ge",
-    team: "Data Cube Team",
     follow: "Folgen",
     showMore: "Mehr anzeigen",
 
@@ -173,7 +171,6 @@ export const translations = {
     // Navigation
     home: "Home",
     discover: "Discover",
-    dataCube: "Data Cube",
     settings: "Settings",
     categories: "Categories",
 
@@ -237,7 +234,6 @@ export const translations = {
     search: "Search",
     whatsNew: "What's happening?",
     posts: "posts",
-    team: "Data Cube Team",
     follow: "Follow",
     showMore: "Show more",
 
@@ -330,7 +326,6 @@ export const translations = {
     // Navigation
     home: "\u9996\u9875",
     discover: "\u53d1\u73b0",
-    dataCube: "Data Cube",
     settings: "\u8bbe\u7f6e",
     categories: "\u5206\u7c7b",
 
@@ -394,7 +389,6 @@ export const translations = {
     search: "\u641c\u7d22",
     whatsNew: "\u6700\u65b0\u52a8\u6001",
     posts: "\u6761",
-    team: "Data Cube \u56e2\u961f",
     follow: "\u5173\u6ce8",
     showMore: "\u663e\u793a\u66f4\u591a",
 
@@ -487,7 +481,6 @@ export const translations = {
     // Navigation
     home: "Accueil",
     discover: "D\u00e9couvrir",
-    dataCube: "Data Cube",
     settings: "Param\u00e8tres",
     categories: "Cat\u00e9gories",
 
@@ -551,7 +544,6 @@ export const translations = {
     search: "Rechercher",
     whatsNew: "Quoi de neuf\u00a0?",
     posts: "publications",
-    team: "\u00c9quipe Data Cube",
     follow: "Suivre",
     showMore: "Afficher plus",
 
@@ -644,7 +636,6 @@ export const translations = {
     // Navigation
     home: "Inicio",
     discover: "Descubrir",
-    dataCube: "Data Cube",
     settings: "Ajustes",
     categories: "Categor\u00edas",
 
@@ -708,7 +699,6 @@ export const translations = {
     search: "Buscar",
     whatsNew: "\u00bfQu\u00e9 hay de nuevo?",
     posts: "publicaciones",
-    team: "Equipo Data Cube",
     follow: "Seguir",
     showMore: "Mostrar m\u00e1s",
 
@@ -801,7 +791,6 @@ export const translations = {
     // Navigation
     home: "In\u00edcio",
     discover: "Descobrir",
-    dataCube: "Data Cube",
     settings: "Configura\u00e7\u00f5es",
     categories: "Categorias",
 
@@ -865,7 +854,6 @@ export const translations = {
     search: "Pesquisar",
     whatsNew: "O que h\u00e1 de novo?",
     posts: "publica\u00e7\u00f5es",
-    team: "Equipe Data Cube",
     follow: "Seguir",
     showMore: "Mostrar mais",
 
@@ -958,7 +946,6 @@ export const translations = {
     // Navigation
     home: "\u30db\u30fc\u30e0",
     discover: "\u767a\u898b",
-    dataCube: "Data Cube",
     settings: "\u8a2d\u5b9a",
     categories: "\u30ab\u30c6\u30b4\u30ea\u30fc",
 
@@ -1022,7 +1009,6 @@ export const translations = {
     search: "\u691c\u7d22",
     whatsNew: "\u6700\u65b0\u60c5\u5831",
     posts: "\u4ef6",
-    team: "Data Cube \u30c1\u30fc\u30e0",
     follow: "\u30d5\u30a9\u30ed\u30fc",
     showMore: "\u3082\u3063\u3068\u898b\u308b",
 
@@ -1115,7 +1101,6 @@ export const translations = {
     // Navigation
     home: "\ud648",
     discover: "\ud0d0\uc0c9",
-    dataCube: "Data Cube",
     settings: "\uc124\uc815",
     categories: "\uce74\ud14c\uace0\ub9ac",
 
@@ -1179,7 +1164,6 @@ export const translations = {
     search: "\uac80\uc0c9",
     whatsNew: "\uc5b4\ub5a4 \uc18c\uc2dd\uc774 \uc788\ub098\uc694?",
     posts: "\uac1c \uac8c\uc2dc\ubb3c",
-    team: "Data Cube \ud300",
     follow: "\ud314\ub85c\uc6b0",
     showMore: "\ub354 \ubcf4\uae30",
 

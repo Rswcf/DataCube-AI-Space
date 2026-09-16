@@ -10,6 +10,7 @@ import { IssueTimeline } from "@/components/issue-timeline";
 import { useSettings } from "@/lib/settings-context";
 import { getPeriodLabel } from "@/lib/period-utils";
 import { cn } from "@/lib/utils";
+import { BRAND } from "@/lib/brand";
 
 interface FeedProps {
   activeTab: string;
@@ -90,7 +91,7 @@ export function Feed({ activeTab, selectedWeekId, onWeekChange, searchQuery }: F
         </div>
         <div className="pt-4 text-center">
           <h1 className="font-display text-5xl font-normal leading-none text-foreground sm:text-6xl">
-            Data Cube AI
+            {BRAND.name}
           </h1>
           <p className="mt-2 font-sans text-[11px] font-extrabold uppercase tracking-[0.18em] text-muted-foreground">
             The Intelligence Memo

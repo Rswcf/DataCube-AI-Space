@@ -1,22 +1,23 @@
 import type { Metadata } from 'next'
+import { BRAND, absoluteUrl, brandedTitle } from '@/lib/brand'
 import { TrustPage, type TrustPageConfig } from '../trust-page'
 
 export const metadata: Metadata = {
-  title: 'AI Disclosure | Data Cube AI',
-  description: 'AI usage disclosure for Data Cube AI content collection, summarization, categorization, translation, curation, and human review.',
-  alternates: { canonical: 'https://www.datacubeai.space/ai-disclosure' },
+  title: 'AI Disclosure',
+  description: `AI usage disclosure for ${BRAND.name} content collection, summarization, categorization, translation, curation, and human review.`,
+  alternates: { canonical: absoluteUrl('/ai-disclosure') },
   openGraph: {
-    title: 'AI Disclosure | Data Cube AI',
-    description: 'How Data Cube AI uses AI-assisted workflows for collection, summarization, categorization, translation, and review.',
-    url: 'https://www.datacubeai.space/ai-disclosure',
-    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: 'Data Cube AI' }],
+    title: brandedTitle('AI Disclosure'),
+    description: `How ${BRAND.name} uses AI-assisted workflows for collection, summarization, categorization, translation, and review.`,
+    url: absoluteUrl('/ai-disclosure'),
+    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: BRAND.name }],
   },
 }
 
 const config: TrustPageConfig = {
   label: 'AI Disclosure',
-  title: 'How Data Cube AI Uses AI',
-  description: 'Data Cube AI uses automated and AI-assisted workflows to process public source material into concise multilingual briefings.',
+  title: `How ${BRAND.name} Uses AI`,
+  description: `${BRAND.name} uses automated and AI-assisted workflows to process public source material into concise multilingual briefings.`,
   sections: [
     {
       title: 'Where AI Is Used',
@@ -36,7 +37,7 @@ const config: TrustPageConfig = {
     {
       title: 'Reader Guidance',
       body: [
-        'Use Data Cube AI as a discovery and briefing layer. For high-stakes decisions, read the cited source and validate the facts independently.',
+        `Use ${BRAND.name} as a discovery and briefing layer. For high-stakes decisions, read the cited source and validate the facts independently.`,
       ],
     },
     {

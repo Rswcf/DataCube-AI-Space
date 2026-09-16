@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { BRAND, absoluteUrl } from '@/lib/brand'
 import { ContactForm } from './contact-form'
 
 export const revalidate = 86400
@@ -7,13 +8,13 @@ export const metadata: Metadata = {
   title: 'For Teams & Enterprise',
   description:
     'AI intelligence for teams: daily briefings in 8 languages from 35+ sources, a free API, and an evidence-linked AI deal tracker (EN/ZH sources) — plus custom feeds, dashboards, and white-label options as pilot engagements.',
-  alternates: { canonical: 'https://www.datacubeai.space/for-teams' },
+  alternates: { canonical: absoluteUrl('/for-teams') },
   openGraph: {
     title: 'For Teams & Enterprise',
     description:
       'AI intelligence for teams: daily briefings in 8 languages, free API, evidence-linked AI deal tracker — custom feeds, dashboards, and white-label options as pilot engagements.',
-    url: 'https://www.datacubeai.space/for-teams',
-    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: 'Data Cube AI' }],
+    url: absoluteUrl('/for-teams'),
+    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: BRAND.name }],
   },
 }
 
@@ -103,7 +104,7 @@ export default function ForTeamsPage() {
       <section className="mb-12">
         <h1 className="text-3xl font-bold mb-4">AI Intelligence for Your Team</h1>
         <p className="text-lg leading-relaxed text-gray-700">
-          Data Cube AI delivers curated, multilingual AI news and market intelligence for corporate
+          {BRAND.name} delivers curated, multilingual AI news and market intelligence for corporate
           innovation teams, investment professionals, and technology leaders. Our automated pipeline
           processes 35+ sources daily, producing structured intelligence in 8 languages — so your
           team can focus on decisions, not discovery.

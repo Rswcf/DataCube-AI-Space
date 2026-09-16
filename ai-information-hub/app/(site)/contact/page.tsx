@@ -1,19 +1,18 @@
 import type { Metadata } from 'next'
+import { BRAND, absoluteUrl } from '@/lib/brand'
 import { ContactForm } from '../for-teams/contact-form'
 
 export const revalidate = 86400
 
 export const metadata: Metadata = {
-  title: 'Contact Data Cube AI',
-  description:
-    'Contact Data Cube AI for editorial corrections, enterprise access, source questions, partnerships, product support, and data requests.',
-  alternates: { canonical: 'https://www.datacubeai.space/contact' },
+  title: { absolute: `Contact ${BRAND.name}` },
+  description: `Contact ${BRAND.name} for editorial corrections, enterprise access, source questions, partnerships, product support, and data requests.`,
+  alternates: { canonical: absoluteUrl('/contact') },
   openGraph: {
-    title: 'Contact Data Cube AI',
-    description:
-      'Contact Data Cube AI for corrections, enterprise access, source questions, partnerships, and support.',
-    url: 'https://www.datacubeai.space/contact',
-    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: 'Data Cube AI' }],
+    title: `Contact ${BRAND.name}`,
+    description: `Contact ${BRAND.name} for corrections, enterprise access, source questions, partnerships, and support.`,
+    url: absoluteUrl('/contact'),
+    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: BRAND.name }],
   },
 }
 
@@ -26,7 +25,7 @@ export default function ContactPage() {
             Contact
           </p>
           <h1 className="mt-3 font-display text-4xl font-normal leading-tight text-foreground sm:text-5xl">
-            Contact Data Cube AI
+            Contact {BRAND.name}
           </h1>
           <p className="mt-4 text-lg leading-relaxed text-muted-foreground">
             Use this form for corrections, source questions, enterprise access,

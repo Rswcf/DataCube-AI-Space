@@ -1,22 +1,23 @@
 import type { Metadata } from 'next'
+import { BRAND, absoluteUrl, brandedTitle } from '@/lib/brand'
 import { TrustPage, type TrustPageConfig } from '../trust-page'
 
 export const metadata: Metadata = {
-  title: 'Source Methodology | Data Cube AI',
-  description: 'How Data Cube AI sources, filters, summarizes, verifies, and links AI news items across technology, capital, and workflow coverage.',
-  alternates: { canonical: 'https://www.datacubeai.space/source-methodology' },
+  title: 'Source Methodology',
+  description: `How ${BRAND.name} sources, filters, summarizes, verifies, and links AI news items across technology, capital, and workflow coverage.`,
+  alternates: { canonical: absoluteUrl('/source-methodology') },
   openGraph: {
-    title: 'Source Methodology | Data Cube AI',
-    description: 'How Data Cube AI turns source material into multilingual period pages, feeds, summaries, and AI-readable surfaces.',
-    url: 'https://www.datacubeai.space/source-methodology',
-    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: 'Data Cube AI' }],
+    title: brandedTitle('Source Methodology'),
+    description: `How ${BRAND.name} turns source material into multilingual period pages, feeds, summaries, and AI-readable surfaces.`,
+    url: absoluteUrl('/source-methodology'),
+    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: BRAND.name }],
   },
 }
 
 const config: TrustPageConfig = {
   label: 'Source Methodology',
   title: 'How Sources Become Briefing Items',
-  description: 'This page describes how Data Cube AI turns source material into period pages, feeds, and AI-readable summaries.',
+  description: `This page describes how ${BRAND.name} turns source material into period pages, feeds, and AI-readable summaries.`,
   sections: [
     {
       title: 'Source Types',
@@ -42,7 +43,7 @@ const config: TrustPageConfig = {
     {
       title: 'Source Links',
       body: [
-        'Where available, source URLs are preserved as outbound references. Feed entries use Data Cube AI URLs as the primary alternate link, while the original publisher appears as the source link.',
+        `Where available, source URLs are preserved as outbound references. Feed entries use ${BRAND.name} URLs as the primary alternate link, while the original publisher appears as the source link.`,
       ],
     },
     {

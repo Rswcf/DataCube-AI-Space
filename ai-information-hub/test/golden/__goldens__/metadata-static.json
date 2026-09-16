@@ -186,7 +186,9 @@
     }
   },
   "about": {
-    "title": "About Data Cube AI",
+    "title": {
+      "absolute": "About Data Cube AI"
+    },
     "description": "About Data Cube AI, a multilingual AI intelligence memo covering technology, capital, practical workflows, sources, and update rhythm.",
     "alternates": {
       "canonical": "https://www.datacubeai.space/about"
@@ -206,7 +208,7 @@
     }
   },
   "aiDisclosure": {
-    "title": "AI Disclosure | Data Cube AI",
+    "title": "AI Disclosure",
     "description": "AI usage disclosure for Data Cube AI content collection, summarization, categorization, translation, curation, and human review.",
     "alternates": {
       "canonical": "https://www.datacubeai.space/ai-disclosure"
@@ -226,7 +228,9 @@
     }
   },
   "contact": {
-    "title": "Contact Data Cube AI",
+    "title": {
+      "absolute": "Contact Data Cube AI"
+    },
     "description": "Contact Data Cube AI for editorial corrections, enterprise access, source questions, partnerships, product support, and data requests.",
     "alternates": {
       "canonical": "https://www.datacubeai.space/contact"
@@ -246,7 +250,7 @@
     }
   },
   "corrections": {
-    "title": "Corrections Policy | Data Cube AI",
+    "title": "Corrections Policy",
     "description": "Corrections policy for Data Cube AI summaries, sources, translations, period pages, feeds, and AI-readable discovery surfaces.",
     "alternates": {
       "canonical": "https://www.datacubeai.space/corrections"
@@ -286,7 +290,7 @@
     }
   },
   "editorialPolicy": {
-    "title": "Editorial Policy | Data Cube AI",
+    "title": "Editorial Policy",
     "description": "Editorial policy for Data Cube AI, including source attribution, curation rules, corrections, and AI-assisted processing.",
     "alternates": {
       "canonical": "https://www.datacubeai.space/editorial-policy"
@@ -358,7 +362,7 @@
     }
   },
   "login": {
-    "title": "Login | Data Cube AI",
+    "title": "Login",
     "description": "Gateway page for Data Cube AI Space.",
     "robots": {
       "index": false,
@@ -370,7 +374,7 @@
     "description": "Data Cube AI Premium is in development. Everything on the site is free today — see the planned Premium features: higher AI chat limits, keyword alerts, data export, and priority support."
   },
   "sourceMethodology": {
-    "title": "Source Methodology | Data Cube AI",
+    "title": "Source Methodology",
     "description": "How Data Cube AI sources, filters, summarizes, verifies, and links AI news items across technology, capital, and workflow coverage.",
     "alternates": {
       "canonical": "https://www.datacubeai.space/source-methodology"

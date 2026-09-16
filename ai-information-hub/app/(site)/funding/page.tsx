@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { BRAND, absoluteUrl } from '@/lib/brand'
 import { FundingTracker } from '@/components/funding-tracker'
 
 export const revalidate = 3600
@@ -7,9 +8,9 @@ export const metadata: Metadata = {
   title: 'AI Funding Tracker — Open, Evidence-Linked Deal Data',
   description:
     'Free, open tracker of AI funding rounds and M&A deals. New rows pass a server-side evidence gate and link to their sources; legacy rows are clearly labeled. Free CSV export, no signup.',
-  alternates: { canonical: 'https://www.datacubeai.space/funding' },
+  alternates: { canonical: absoluteUrl('/funding') },
   openGraph: {
-    url: 'https://www.datacubeai.space/funding',
+    url: absoluteUrl('/funding'),
     title: 'AI Funding Tracker — Open, Evidence-Linked Deal Data',
     description:
       'Free tracker of AI funding rounds and M&A deals with per-row provenance labels. Free CSV export.',
@@ -21,7 +22,7 @@ export default function FundingPage() {
     <main id="main-content" className="mx-auto max-w-5xl px-4 py-10">
       <header className="mb-6 border-b-2 border-foreground pb-5">
         <p className="mb-1 font-sans text-[10px] font-extrabold uppercase tracking-[0.18em] text-muted-foreground">
-          Data Cube AI · Open Data
+          {BRAND.name} · Open Data
         </p>
         <h1 className="font-display text-4xl font-normal leading-tight text-foreground">
           AI Funding Tracker
@@ -56,7 +57,7 @@ export default function FundingPage() {
         <p>
           Found an error?{' '}
           <a
-            href="https://github.com/Rswcf/DataCube-AI-Space/issues"
+            href={BRAND.githubIssuesUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="font-bold text-primary hover:underline"

@@ -1,9 +1,10 @@
 import type { Metadata } from 'next'
 import type { ReactNode } from 'react'
+import { BRAND } from '@/lib/brand'
 
 export const metadata: Metadata = {
-  title: 'Login | Data Cube AI',
-  description: 'Gateway page for Data Cube AI Space.',
+  title: 'Login',
+  description: `Gateway page for ${BRAND.name} Space.`,
   robots: {
     index: false,
     follow: false,

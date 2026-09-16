@@ -1,14 +1,15 @@
 import type { Metadata } from 'next'
+import { BRAND, absoluteUrl, brandedTitle } from '@/lib/brand'
 
 export const metadata: Metadata = {
   title: 'Impressum / Legal Notice',
-  description: 'Legal notice for Data Cube AI, including operator disclosure, contact information, hosting, liability, and copyright details.',
-  alternates: { canonical: 'https://www.datacubeai.space/impressum' },
+  description: `Legal notice for ${BRAND.name}, including operator disclosure, contact information, hosting, liability, and copyright details.`,
+  alternates: { canonical: absoluteUrl('/impressum') },
   openGraph: {
-    title: 'Impressum / Legal Notice | Data Cube AI',
-    description: 'Legal notice for Data Cube AI, including operator disclosure, contact, hosting, liability, and copyright details.',
-    url: 'https://www.datacubeai.space/impressum',
-    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: 'Data Cube AI' }],
+    title: brandedTitle('Impressum / Legal Notice'),
+    description: `Legal notice for ${BRAND.name}, including operator disclosure, contact, hosting, liability, and copyright details.`,
+    url: absoluteUrl('/impressum'),
+    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: BRAND.name }],
   },
 }
 

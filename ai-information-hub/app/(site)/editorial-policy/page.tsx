@@ -1,21 +1,22 @@
 import type { Metadata } from 'next'
+import { BRAND, absoluteUrl, brandedTitle } from '@/lib/brand'
 import { TrustPage, type TrustPageConfig } from '../trust-page'
 
 export const metadata: Metadata = {
-  title: 'Editorial Policy | Data Cube AI',
-  description: 'Editorial policy for Data Cube AI, including source attribution, curation rules, corrections, and AI-assisted processing.',
-  alternates: { canonical: 'https://www.datacubeai.space/editorial-policy' },
+  title: 'Editorial Policy',
+  description: `Editorial policy for ${BRAND.name}, including source attribution, curation rules, corrections, and AI-assisted processing.`,
+  alternates: { canonical: absoluteUrl('/editorial-policy') },
   openGraph: {
-    title: 'Editorial Policy | Data Cube AI',
-    description: 'How Data Cube AI selects sources, summarizes AI news, labels AI-assisted processing, and handles corrections.',
-    url: 'https://www.datacubeai.space/editorial-policy',
-    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: 'Data Cube AI' }],
+    title: brandedTitle('Editorial Policy'),
+    description: `How ${BRAND.name} selects sources, summarizes AI news, labels AI-assisted processing, and handles corrections.`,
+    url: absoluteUrl('/editorial-policy'),
+    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: BRAND.name }],
   },
 }
 
 const config: TrustPageConfig = {
   label: 'Editorial Policy',
-  title: 'How Data Cube AI Curates Intelligence',
+  title: `How ${BRAND.name} Curates Intelligence`,
   description: 'Our editorial policy is built around attribution, clear summaries, source traceability, and conservative labeling of AI-assisted content.',
   sections: [
     {
@@ -32,7 +33,7 @@ const config: TrustPageConfig = {
     {
       title: 'Attribution',
       body: [
-        'Each news item should retain source attribution whenever the source is available. External links belong to the original publisher; Data Cube AI period pages are the canonical pages for our summaries.',
+        `Each news item should retain source attribution whenever the source is available. External links belong to the original publisher; ${BRAND.name} period pages are the canonical pages for our summaries.`,
       ],
     },
     {

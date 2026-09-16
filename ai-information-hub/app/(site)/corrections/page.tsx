@@ -1,22 +1,23 @@
 import type { Metadata } from 'next'
+import { BRAND, absoluteUrl, brandedTitle } from '@/lib/brand'
 import { TrustPage, type TrustPageConfig } from '../trust-page'
 
 export const metadata: Metadata = {
-  title: 'Corrections Policy | Data Cube AI',
-  description: 'Corrections policy for Data Cube AI summaries, sources, translations, period pages, feeds, and AI-readable discovery surfaces.',
-  alternates: { canonical: 'https://www.datacubeai.space/corrections' },
+  title: 'Corrections Policy',
+  description: `Corrections policy for ${BRAND.name} summaries, sources, translations, period pages, feeds, and AI-readable discovery surfaces.`,
+  alternates: { canonical: absoluteUrl('/corrections') },
   openGraph: {
-    title: 'Corrections Policy | Data Cube AI',
-    description: 'How Data Cube AI reviews and updates corrections for summaries, source links, translations, feeds, and period pages.',
-    url: 'https://www.datacubeai.space/corrections',
-    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: 'Data Cube AI' }],
+    title: brandedTitle('Corrections Policy'),
+    description: `How ${BRAND.name} reviews and updates corrections for summaries, source links, translations, feeds, and period pages.`,
+    url: absoluteUrl('/corrections'),
+    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: BRAND.name }],
   },
 }
 
 const config: TrustPageConfig = {
   label: 'Corrections Policy',
   title: 'Corrections And Content Updates',
-  description: 'Data Cube AI treats corrections as part of source transparency. Errors should be fixed at the affected page, feed, or summary surface.',
+  description: `${BRAND.name} treats corrections as part of source transparency. Errors should be fixed at the affected page, feed, or summary surface.`,
   sections: [
     {
       title: 'What We Correct',
