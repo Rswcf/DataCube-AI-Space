@@ -5,6 +5,7 @@ import HomePageClient from '@/components/home-page-client'
 import type { AppLanguage } from '@/lib/i18n'
 import { trendTopicSlug } from '@/lib/topic-utils'
 import { BRAND, absoluteUrl } from '@/lib/brand'
+import { aiLabel } from '@/lib/ai-label'
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api-production-3ee5.up.railway.app/api'
 
@@ -293,6 +294,7 @@ export async function HomePageContent({ language = 'de' }: HomePageContentProps 
       <section className="sr-only" aria-label={t.h1}>
         <p>{t.h1}</p>
         <p>{t.description}</p>
+        <p>{aiLabel(language)}</p>
 
         {headlines.length > 0 && (
           <section>

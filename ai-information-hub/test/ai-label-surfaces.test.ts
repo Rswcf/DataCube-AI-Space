@@ -119,6 +119,17 @@ describe('AI label on machine-readable surfaces', () => {
     expect(xml).toMatch(new RegExp(`<subtitle>[^<]* · ${escapeRegExp(aiLabel(lang))}</subtitle>`))
   })
 
+  it.each(LANGS)('feed.xml entry summaries start with the short label in %s', async (lang) => {
+    const { GET } = await import('@/app/feed.xml/route')
+    const xml = await (await GET(new NextRequest(`${SITE}/feed.xml?lang=${lang}`))).text()
+    const summaries = xml.split('<summary type="text">').slice(1)
+    expect(summaries.length).toBeGreaterThan(0)
+    for (const summary of summaries) {
+      // None of the 8 short-label strings contain XML specials, so the escaped and raw forms are identical.
+      expect(summary.startsWith(`${aiLabelShort(lang)} · `)).toBe(true)
+    }
+  })
+
   it.each(['de', 'en'])('newsletter.xml subtitle and every entry in %s', async (lang) => {
     const { GET } = await import('@/app/newsletter.xml/route')
     const xml = await (await GET(new NextRequest(`${SITE}/newsletter.xml?lang=${lang}`))).text()

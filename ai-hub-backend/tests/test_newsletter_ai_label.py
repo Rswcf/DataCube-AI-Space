@@ -38,6 +38,15 @@ def test_label_sits_above_the_first_summary_and_links_the_disclosure(lang):
     assert html.escape(EXPECTED[lang][1]) in rendered
 
 
+@pytest.mark.parametrize("lang", LANGS)
+def test_preheader_starts_with_the_short_label(lang):
+    """The inbox preview (subject + preheader) is the reader's first exposure to the AI text (I-4)."""
+    preheader = sender._build_preheader(period_data(), lang)
+    assert preheader != ""
+    prefix = html.escape(sender.EMAIL_STRINGS[lang]["ai_label_short"]) + " · "
+    assert preheader.split(">", 1)[1].startswith(prefix)
+
+
 def test_founder_line_renders_only_when_a_founder_name_is_set(monkeypatch):
     assert "Made by" not in sender._build_email_html(period_data(), "en")
 

@@ -108,6 +108,7 @@ EMAIL_STRINGS: dict[str, dict[str, str]] = {
         "promo_headline": "Die Signale, die z\u00e4hlen. Die Workflows, die helfen.",
         "footer_msg": "Du erh\u00e4ltst diese E-Mail, weil du den {brand} Newsletter abonniert hast.",
         "ai_label": "KI-generiert: Die Zusammenfassungen schreibt eine KI auf Grundlage der verlinkten Quellen.",
+        "ai_label_short": "KI-generiert",
         "ai_label_link": "So nutzen wir KI",
         "unsubscribe": "Abmelden",
         "subject_week": "KI-News KW {num}",
@@ -131,6 +132,7 @@ EMAIL_STRINGS: dict[str, dict[str, str]] = {
         "promo_headline": "The signals that matter. The workflows you need.",
         "footer_msg": "You received this email because you subscribed to the {brand} newsletter.",
         "ai_label": "AI-generated: summaries written by AI from the linked sources.",
+        "ai_label_short": "AI-generated",
         "ai_label_link": "How we use AI",
         "unsubscribe": "Unsubscribe",
         "subject_week": "AI News Week {num}",
@@ -154,6 +156,7 @@ EMAIL_STRINGS: dict[str, dict[str, str]] = {
         "promo_headline": "\u91cd\u8981\u7684 AI \u4fe1\u53f7\u3002\u53ef\u7528\u7684\u5de5\u4f5c\u6d41\u3002",
         "footer_msg": "\u60a8\u6536\u5230\u6b64\u90ae\u4ef6\u662f\u56e0\u4e3a\u60a8\u8ba2\u9605\u4e86{brand}\u901a\u8baf\u3002",
         "ai_label": "AI \u751f\u6210\uff1a\u6458\u8981\u7531 AI \u6839\u636e\u6240\u94fe\u63a5\u7684\u6765\u6e90\u64b0\u5199\u3002",
+        "ai_label_short": "AI \u751f\u6210",
         "ai_label_link": "\u6211\u4eec\u5982\u4f55\u4f7f\u7528 AI",
         "unsubscribe": "\u53d6\u6d88\u8ba2\u9605",
         "subject_week": "AI\u65b0\u95fb \u7b2c{num}\u5468",
@@ -177,6 +180,7 @@ EMAIL_STRINGS: dict[str, dict[str, str]] = {
         "promo_headline": "Les signaux qui comptent. Les workflows utiles.",
         "footer_msg": "Vous recevez cet e-mail car vous \u00eates abonn\u00e9(e) \u00e0 la newsletter {brand}.",
         "ai_label": "G\u00e9n\u00e9r\u00e9 par IA : r\u00e9sum\u00e9s r\u00e9dig\u00e9s par une IA \u00e0 partir des sources cit\u00e9es.",
+        "ai_label_short": "G\u00e9n\u00e9r\u00e9 par IA",
         "ai_label_link": "Notre usage de l'IA",
         "unsubscribe": "Se d\u00e9sabonner",
         "subject_week": "Actu IA Semaine {num}",
@@ -200,6 +204,7 @@ EMAIL_STRINGS: dict[str, dict[str, str]] = {
         "promo_headline": "Las se\u00f1ales que importan. Los flujos que necesitas.",
         "footer_msg": "Recibes este correo porque te suscribiste al bolet\u00edn de {brand}.",
         "ai_label": "Generado por IA: res\u00famenes redactados por IA a partir de las fuentes enlazadas.",
+        "ai_label_short": "Generado por IA",
         "ai_label_link": "C\u00f3mo usamos la IA",
         "unsubscribe": "Cancelar suscripci\u00f3n",
         "subject_week": "Noticias IA Semana {num}",
@@ -223,6 +228,7 @@ EMAIL_STRINGS: dict[str, dict[str, str]] = {
         "promo_headline": "Os sinais que importam. Os fluxos que ajudam.",
         "footer_msg": "Voc\u00ea recebeu este e-mail por estar inscrito na newsletter {brand}.",
         "ai_label": "Gerado por IA: resumos escritos por IA a partir das fontes indicadas.",
+        "ai_label_short": "Gerado por IA",
         "ai_label_link": "Como usamos a IA",
         "unsubscribe": "Cancelar inscri\u00e7\u00e3o",
         "subject_week": "Not\u00edcias IA Semana {num}",
@@ -246,6 +252,7 @@ EMAIL_STRINGS: dict[str, dict[str, str]] = {
         "promo_headline": "\u91cd\u8981\u306aAI\u30b7\u30b0\u30ca\u30eb\u3002\u4f7f\u3048\u308b\u30ef\u30fc\u30af\u30d5\u30ed\u30fc\u3002",
         "footer_msg": "{brand}\u30cb\u30e5\u30fc\u30b9\u30ec\u30bf\u30fc\u3092\u8cfc\u8aad\u3057\u3066\u3044\u308b\u305f\u3081\u3053\u306e\u30e1\u30fc\u30eb\u304c\u5c4a\u3044\u3066\u3044\u307e\u3059\u3002",
         "ai_label": "AI\u751f\u6210\uff1a\u8981\u7d04\u306f\u30ea\u30f3\u30af\u5148\u306e\u60c5\u5831\u6e90\u3092\u3082\u3068\u306bAI\u304c\u4f5c\u6210\u3057\u3066\u3044\u307e\u3059\u3002",
+        "ai_label_short": "AI\u751f\u6210",
         "ai_label_link": "AI\u306e\u5229\u7528\u306b\u3064\u3044\u3066",
         "unsubscribe": "\u8cfc\u8aad\u89e3\u9664",
         "subject_week": "AI\u30cb\u30e5\u30fc\u30b9 \u7b2c{num}\u9031",
@@ -269,6 +276,7 @@ EMAIL_STRINGS: dict[str, dict[str, str]] = {
         "promo_headline": "\uc911\uc694\ud55c AI \uc2e0\ud638. \ubc14\ub85c \uc4f0\ub294 \uc6cc\ud06c\ud50c\ub85c.",
         "footer_msg": "{brand} \ub274\uc2a4\ub808\ud130\ub97c \uad6c\ub3c5\ud558\uc168\uae30 \ub54c\ubb38\uc5d0 \uc774 \uc774\uba54\uc77c\uc744 \ubc1b\uc73c\uc168\uc2b5\ub2c8\ub2e4.",
         "ai_label": "AI \uc0dd\uc131: \uc694\uc57d\uc740 \ub9c1\ud06c\ub41c \ucd9c\ucc98\ub97c \ubc14\ud0d5\uc73c\ub85c AI\uac00 \uc791\uc131\ud588\uc2b5\ub2c8\ub2e4.",
+        "ai_label_short": "AI \uc0dd\uc131",
         "ai_label_link": "AI \ud65c\uc6a9 \ubc29\uc2dd",
         "unsubscribe": "\uad6c\ub3c5 \ud574\uc9c0",
         "subject_week": "AI \ub274\uc2a4 {num}\uc8fc\ucc28",
@@ -511,7 +519,7 @@ def _build_preheader(data: dict, lang: str) -> str:
             items.append(content[:60].split(".")[0])
     if not items:
         return ""
-    preview = " | ".join(items)
+    preview = f"{_s(lang, 'ai_label_short')} · {' | '.join(items)}"
     return f"""<div style="display:none;max-height:0;overflow:hidden;mso-hide:all;font-size:0;color:#f9fafb;line-height:0;">{_esc(preview)}&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;</div>"""
 
 

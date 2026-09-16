@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { absoluteArticleUrl, techStoryId } from '@/lib/article-routes';
-import { aiLabel } from '@/lib/ai-label';
+import { aiLabel, aiLabelShort } from '@/lib/ai-label';
 import { BRAND, FROZEN_IDS } from '@/lib/brand';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api-production-3ee5.up.railway.app/api';
@@ -127,7 +127,7 @@ export async function GET(request: NextRequest) {
     <link href="${escapeXml(postUrl)}" rel="alternate" />
     <id>${FROZEN_IDS.atomTagPrefix}${lang}:${post.periodId}-${storyId}</id>
     <updated>${updated}</updated>
-    <summary type="text">${escapeXml(post.content)}</summary>
+    <summary type="text">${escapeXml(`${aiLabelShort(lang)} · ${post.content}`)}</summary>
     <category term="${escapeXml(post.category)}" />
     <source>
       <title>${escapeXml(post.source)}</title>
