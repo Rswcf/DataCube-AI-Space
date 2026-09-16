@@ -227,21 +227,23 @@ DataCube-AI-Space/
 │   │   ├── api/report/          # AI report generator
 │   │   ├── api/subscribe/       # Newsletter signup (Beehiiv, 8 langs)
 │   │   ├── api/og/             # Dynamic OG images
-│   │   ├── [lang]/week/         # SSR week pages (SEO)
-│   │   ├── [lang]/news/         # SSR article pages (SEO/GEO)
-│   │   ├── [lang]/topic/        # Topic hubs with period-scoped story links
-│   │   ├── [lang]/tools/        # Localized tool landing pages
+│   │   ├── (localized)/[lang]/  # Localized routes; own root layout, lang from the URL
+│   │   │   ├── week/            # SSR week pages (SEO)
+│   │   │   ├── news/            # SSR article pages (SEO/GEO)
+│   │   │   ├── topic/           # Topic hubs with period-scoped story links
+│   │   │   └── tools/           # Localized tool landing pages
 │   │   ├── feed.xml/            # Atom 1.0 feed (8 languages)
-│   │   ├── about/              # Editorial standards
-│   │   ├── editorial-policy/   # Publishing principles
-│   │   ├── source-methodology/ # Source and curation methodology
-│   │   ├── corrections/        # Corrections policy
-│   │   ├── ai-disclosure/      # AI-use disclosure
-│   │   ├── contact/            # Publisher contact
-│   │   ├── unsubscribe/        # One-click unsubscribe confirm page
+│   │   ├── (site)/about/              # Editorial standards
+│   │   ├── (site)/editorial-policy/   # Publishing principles
+│   │   ├── (site)/source-methodology/ # Source and curation methodology
+│   │   ├── (site)/corrections/        # Corrections policy
+│   │   ├── (site)/ai-disclosure/      # AI-use disclosure
+│   │   ├── (site)/contact/            # Publisher contact
+│   │   ├── (site)/unsubscribe/        # One-click unsubscribe confirm page
 │   │   ├── news-sitemap.xml/   # Google News Sitemap
-│   │   ├── for-teams/          # Enterprise landing
-│   │   ├── premium/            # Premium upgrade
+│   │   ├── (site)/for-teams/          # Enterprise landing
+│   │   ├── (site)/premium/            # Premium upgrade
+│   │   ├── (site)/login/              # Legacy welcome page (gate removed 2026-08)
 │   │   └── api/newsletter/unsubscribe/  # RFC 8058 one-click unsubscribe
 │   ├── components/              # React components
 │   │   ├── feeds/               # Tech, Investment, Tips feeds
@@ -249,8 +251,7 @@ DataCube-AI-Space/
 │   │   └── video-embed.tsx      # YouTube player
 │   ├── lib/                     # Utils, types, API client
 │   ├── vercel.json              # Non-www → www redirect
-│   ├── login/                  # Legacy welcome page (gate removed 2026-08)
-│   └── middleware.ts            # Dynamic html lang + visited cookie + noindex policy
+│   └── middleware.ts            # Prefetch 204 + legacy/?lang= redirects (page paths only; never touches responses)
 │
 ├── ai-hub-backend/              # Backend (FastAPI)
 │   ├── app/

@@ -55,9 +55,10 @@ Example: https://www.datacubeai.space/en/week/2026-05-23
 Each curated story can be cited through a stable first-party article URL.
 Article canonical format: https://www.datacubeai.space/{lang}/news/{periodId}/{storyId}
 
-Topic hubs collect related period stories and can be scoped by period.
+Topic hubs collect related period stories.
 Topic canonical format: https://www.datacubeai.space/{lang}/topic/{topic}
-Scoped topic example: https://www.datacubeai.space/en/topic/openai?period=2026-05-23
+Filtered variants (?period=, ?section=, ?page=, ?q=) are views of that canonical
+page: excluded in robots.txt and marked noindex — cite the canonical URL.
 
 ## Languages
 German (de) — default | English (en) | Chinese (zh) | French (fr) | Spanish (es) | Portuguese (pt) | Japanese (ja) | Korean (ko)

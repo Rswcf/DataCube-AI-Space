@@ -57,9 +57,10 @@ export function enforceProtectedApiRequest(req: Request) {
     throw new ApiRouteError(403, "Forbidden origin");
   }
 
-  // The `visited` cookie is set automatically by the middleware on any page
-  // response (the login gate is gone) — this check only blocks direct API
-  // calls that never loaded a page.
+  // The `visited` cookie is set client-side by SettingsProvider on first page
+  // load (lib/settings-context.tsx; the login gate is gone and the middleware
+  // never touches responses) — this check only blocks direct API calls that
+  // never loaded a page.
   if (!hasVisitedCookie(req.headers.get("cookie"))) {
     throw new ApiRouteError(401, "Visit the site before using the API");
   }

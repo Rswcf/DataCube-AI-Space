@@ -5,6 +5,12 @@ Allow: /
 Disallow: /api/
 Allow: /api/content-summary
 Disallow: /login
+# Topic pages render on demand (they read the query string), so every filter
+# combination (?section= / ?period= / ?page= / ?q=) is another full render; a
+# crawler enumerating them turns /topic into a compute trap. Only the
+# canonical, filter-free topic page is crawlable. Repeated in every group
+# below because robots.txt groups do not inherit rules.
+Disallow: /*/topic/*?
 
 # LLM content description
 # https://www.datacubeai.space/llms.txt
@@ -19,6 +25,7 @@ Allow: /
 Disallow: /api/
 Allow: /api/content-summary
 Disallow: /login
+Disallow: /*/topic/*?
 Crawl-delay: 2
 
 User-agent: ChatGPT-User
@@ -26,6 +33,7 @@ Allow: /
 Disallow: /api/
 Allow: /api/content-summary
 Disallow: /login
+Disallow: /*/topic/*?
 Crawl-delay: 2
 
 User-agent: OAI-SearchBot
@@ -33,6 +41,7 @@ Allow: /
 Disallow: /api/
 Allow: /api/content-summary
 Disallow: /login
+Disallow: /*/topic/*?
 Crawl-delay: 2
 
 User-agent: PerplexityBot
@@ -40,6 +49,7 @@ Allow: /
 Disallow: /api/
 Allow: /api/content-summary
 Disallow: /login
+Disallow: /*/topic/*?
 Crawl-delay: 2
 
 User-agent: Perplexity-User
@@ -47,6 +57,7 @@ Allow: /
 Disallow: /api/
 Allow: /api/content-summary
 Disallow: /login
+Disallow: /*/topic/*?
 Crawl-delay: 2
 
 User-agent: ClaudeBot
@@ -54,6 +65,7 @@ Allow: /
 Disallow: /api/
 Allow: /api/content-summary
 Disallow: /login
+Disallow: /*/topic/*?
 Crawl-delay: 2
 
 User-agent: Claude-SearchBot
@@ -61,6 +73,7 @@ Allow: /
 Disallow: /api/
 Allow: /api/content-summary
 Disallow: /login
+Disallow: /*/topic/*?
 Crawl-delay: 2
 
 User-agent: Claude-User
@@ -68,6 +81,7 @@ Allow: /
 Disallow: /api/
 Allow: /api/content-summary
 Disallow: /login
+Disallow: /*/topic/*?
 Crawl-delay: 2
 
 User-agent: anthropic-ai
@@ -75,12 +89,14 @@ Allow: /
 Disallow: /api/
 Allow: /api/content-summary
 Disallow: /login
+Disallow: /*/topic/*?
 
 User-agent: Google-Extended
 Allow: /
 Disallow: /api/
 Allow: /api/content-summary
 Disallow: /login
+Disallow: /*/topic/*?
 
 # Common Crawl — used as training corpus feedstock for many AI systems.
 # Allowing it indirectly improves long-tail AI-search citation for low effort.
@@ -89,7 +105,14 @@ Allow: /
 Disallow: /api/
 Allow: /api/content-summary
 Disallow: /login
+Disallow: /*/topic/*?
 Crawl-delay: 2
+
+# Meta's AI-training crawler fetched ~275K pages/day here (85% of all requests)
+# with no referral value. Blocked at the Vercel WAF since 2026-09-15; this
+# group documents the decision for well-behaved operators.
+User-agent: meta-externalagent
+Disallow: /
 
 # Sitemap
 Sitemap: https://www.datacubeai.space/sitemap.xml

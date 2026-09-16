@@ -22,7 +22,7 @@ const SettingsContext = createContext<SettingsContextType | undefined>(undefined
  *
  * Wraps the entire app in layout.tsx. Persists preferences to localStorage.
  * Default: dark theme. Initial language comes from the URL-derived `initialLanguage`
- * prop (passed by the server layout via the x-lang header), NOT from a hard-coded
+ * prop (passed by the [lang] root layout from the URL segment), NOT from a hard-coded
  * 'de' default. Previously the strict default caused /en to SSR German content
  * until JS mounted, which search engines indexed as duplicate/wrong-language.
  *
@@ -47,6 +47,19 @@ export function SettingsProvider({
 
   useEffect(() => {
     setMounted(true);
+
+    // The chat/report API guard (lib/server/api-guard.ts) requires a `visited`
+    // cookie as a cheap must-have-loaded-the-site barrier. The middleware used
+    // to set it on every page response, which stamped a Set-Cookie header on
+    // otherwise cacheable pages; set it from the client instead so ISR output
+    // stays byte-identical for everyone.
+    try {
+      if (!/(?:^|;\s*)visited=true(?:;|$)/.test(document.cookie)) {
+        document.cookie = "visited=true; path=/; max-age=2592000; samesite=lax";
+      }
+    } catch {
+      // Cookies blocked — the guard will answer 401 and the widgets say so.
+    }
     const savedTheme = localStorage.getItem("theme") as Theme | null;
     const savedLanguage = localStorage.getItem("language") as Language | null;
 

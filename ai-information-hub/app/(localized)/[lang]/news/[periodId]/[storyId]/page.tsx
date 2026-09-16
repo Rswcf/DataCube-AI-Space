@@ -30,7 +30,26 @@ import type {
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api-production-3ee5.up.railway.app/api'
 const SITE_URL = 'https://www.datacubeai.space'
 
+// Article pages are indexed only in languages with a real audience (DE/EN/ZH).
+// The other five stay served (with hreflang) but carry a noindex robots meta —
+// 8x-ing thin article pages amplifies the "scaled content" footprint that
+// suppresses the whole site on Google (see
+// .ai-collab/context/seo-growth-ads-strategy-2026-07.md §4.2). This used to be
+// an X-Robots-Tag header set by the middleware; it lives in the page metadata
+// now so cached responses need no per-request header rewriting.
+// Revisit once domain authority is established.
+const INDEXED_ARTICLE_LANGS = new Set(['de', 'en', 'zh'])
+
 export const revalidate = 3600
+
+// No article is prerendered at build time — every story renders on its first
+// request and is then cached for `revalidate` seconds (on-demand ISR). The
+// export itself is what enables that: without generateStaticParams, Next.js
+// renders a dynamic route on every request (private, no-store), which is how
+// this route was served until 2026-09.
+export function generateStaticParams(): { lang: string; periodId: string; storyId: string }[] {
+  return []
+}
 
 type Props = {
   params: Promise<{ lang: string; periodId: string; storyId: string }>
@@ -471,6 +490,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: story.headline,
     description,
+    robots: INDEXED_ARTICLE_LANGS.has(lang) ? undefined : { index: false, follow: true },
     alternates: {
       canonical,
       languages: {

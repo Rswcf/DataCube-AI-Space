@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { HomePageContent } from '../page'
+import { HomePageContent } from '@/app/(site)/page'
 import { isSupportedLanguage, SUPPORTED_LANGUAGES, toBcp47 } from '@/lib/i18n'
 
 export const revalidate = 3600
