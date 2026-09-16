@@ -114,6 +114,54 @@
     "priority": 0.7
   },
   {
+    "url": "https://www.datacubeai.space/de/tools",
+    "lastModified": "2026-09-14T08:00:00.000Z",
+    "changeFrequency": "weekly",
+    "priority": 0.6
+  },
+  {
+    "url": "https://www.datacubeai.space/en/tools",
+    "lastModified": "2026-09-14T08:00:00.000Z",
+    "changeFrequency": "weekly",
+    "priority": 0.6
+  },
+  {
+    "url": "https://www.datacubeai.space/zh/tools",
+    "lastModified": "2026-09-14T08:00:00.000Z",
+    "changeFrequency": "weekly",
+    "priority": 0.6
+  },
+  {
+    "url": "https://www.datacubeai.space/fr/tools",
+    "lastModified": "2026-09-14T08:00:00.000Z",
+    "changeFrequency": "weekly",
+    "priority": 0.6
+  },
+  {
+    "url": "https://www.datacubeai.space/es/tools",
+    "lastModified": "2026-09-14T08:00:00.000Z",
+    "changeFrequency": "weekly",
+    "priority": 0.6
+  },
+  {
+    "url": "https://www.datacubeai.space/pt/tools",
+    "lastModified": "2026-09-14T08:00:00.000Z",
+    "changeFrequency": "weekly",
+    "priority": 0.6
+  },
+  {
+    "url": "https://www.datacubeai.space/ja/tools",
+    "lastModified": "2026-09-14T08:00:00.000Z",
+    "changeFrequency": "weekly",
+    "priority": 0.6
+  },
+  {
+    "url": "https://www.datacubeai.space/ko/tools",
+    "lastModified": "2026-09-14T08:00:00.000Z",
+    "changeFrequency": "weekly",
+    "priority": 0.6
+  },
+  {
     "url": "https://www.datacubeai.space/de/tools/ai-news-aggregator",
     "lastModified": "2026-09-14T08:00:00.000Z",
     "changeFrequency": "weekly",
