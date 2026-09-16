@@ -4103,7 +4103,7 @@ This task implements the AD7 label on the HTML surfaces that show AI-written pro
 - Modify: `ai-information-hub/app/(localized)/[lang]/topic/[topic]/page.tsx`
 - Modify: `ai-information-hub/components/feed.tsx`
 - Modify: `ai-information-hub/app/(localized)/[lang]/tools/ai-news-aggregator/page.tsx`
-- Modify (regenerated): `pages/week-{en,de,zh}.html`, `pages/article-{en,zh}.html`, `pages/topic-en.html`, `pages/tool-ai-news-aggregator-{en,zh}.html`
+- Modify (regenerated): `pages/week-{en,de,zh}.html`, `pages/article-{en,zh}.html`, `pages/topic-en.html`, `pages/tool-ai-news-aggregator-{en,zh}.html`, `pages/feed-{en,zh}.html`
 
 **Interfaces:**
 - **Consumes:**
@@ -4466,11 +4466,13 @@ git -C <repo-root> diff -- ai-information-hub/test/golden/__goldens__
 ```
 
 Expected:
-- The first run fails only in `pages/week-{en,de,zh}.html`, `pages/article-{en,zh}.html`, `pages/topic-en.html` and `pages/tool-ai-news-aggregator-{en,zh}.html`.
+- The first run fails only in `pages/week-{en,de,zh}.html`, `pages/article-{en,zh}.html`, `pages/topic-en.html`, `pages/tool-ai-news-aggregator-{en,zh}.html` and `pages/feed-{en,zh}.html`. (The two feed goldens were added after this plan was written, to cover the masthead; `FeedMasthead` reproduces the old header markup exactly, so their only change is the inserted label.)
 - The diff contains only:
   - the inserted `data-ai-label` paragraph (L1);
   - on week pages: the removed "By … Data Cube AI Editorial" span and the new editorial attribution text (L2);
-  - on article pages: the byline text replaced by the short label link (L2).
+  - on article pages: the byline text replaced by the short label link (L2);
+  - on the feed goldens: only the `data-ai-label` paragraph after the masthead tagline (L1).
+- Each `pages/*.html` golden is a single line, so read its change with a token diff (split on `<[^>]+>|[^<]+`, compare with `difflib.SequenceMatcher`) rather than a line diff.
 - No metadata or route golden changes.
 
 - [ ] **Step 8: Guard, type check, suite**
