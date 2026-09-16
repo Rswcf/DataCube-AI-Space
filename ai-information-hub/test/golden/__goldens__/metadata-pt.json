@@ -123,6 +123,38 @@
       ]
     }
   },
+  "topicCanonical": {
+    "title": "Openai Notícias IA – Últimas análises",
+    "description": "Cobertura de IA selecionada para Openai: notícias de tecnologia, sinais de investimento e dicas práticas.",
+    "alternates": {
+      "canonical": "https://www.datacubeai.space/pt/topic/openai",
+      "languages": {
+        "x-default": "https://www.datacubeai.space/en/topic/openai",
+        "de": "https://www.datacubeai.space/de/topic/openai",
+        "en": "https://www.datacubeai.space/en/topic/openai",
+        "zh-Hans": "https://www.datacubeai.space/zh/topic/openai",
+        "fr": "https://www.datacubeai.space/fr/topic/openai",
+        "es": "https://www.datacubeai.space/es/topic/openai",
+        "pt": "https://www.datacubeai.space/pt/topic/openai",
+        "ja": "https://www.datacubeai.space/ja/topic/openai",
+        "ko": "https://www.datacubeai.space/ko/topic/openai"
+      }
+    },
+    "openGraph": {
+      "title": "Openai Notícias IA – Últimas análises",
+      "description": "Cobertura de IA selecionada para Openai: notícias de tecnologia, sinais de investimento e dicas práticas.",
+      "url": "https://www.datacubeai.space/pt/topic/openai",
+      "type": "article",
+      "images": [
+        {
+          "url": "/og-image.jpg",
+          "width": 1200,
+          "height": 630,
+          "alt": "Data Cube AI – Openai"
+        }
+      ]
+    }
+  },
   "article": {
     "title": "OpenAI ships a new reasoning model for developers",
     "description": "OpenAI ships a new reasoning model for developers: the release adds tool use and a lower price (pt).",

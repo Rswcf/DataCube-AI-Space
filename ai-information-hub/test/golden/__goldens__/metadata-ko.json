@@ -123,6 +123,38 @@
       ]
     }
   },
+  "topicCanonical": {
+    "title": "Openai AI 뉴스 – 최신 보도 & 분석",
+    "description": "Openai AI 큐레이션: 기술 뉴스, 투자 신호, 실용 팁.",
+    "alternates": {
+      "canonical": "https://www.datacubeai.space/ko/topic/openai",
+      "languages": {
+        "x-default": "https://www.datacubeai.space/en/topic/openai",
+        "de": "https://www.datacubeai.space/de/topic/openai",
+        "en": "https://www.datacubeai.space/en/topic/openai",
+        "zh-Hans": "https://www.datacubeai.space/zh/topic/openai",
+        "fr": "https://www.datacubeai.space/fr/topic/openai",
+        "es": "https://www.datacubeai.space/es/topic/openai",
+        "pt": "https://www.datacubeai.space/pt/topic/openai",
+        "ja": "https://www.datacubeai.space/ja/topic/openai",
+        "ko": "https://www.datacubeai.space/ko/topic/openai"
+      }
+    },
+    "openGraph": {
+      "title": "Openai AI 뉴스 – 최신 보도 & 분석",
+      "description": "Openai AI 큐레이션: 기술 뉴스, 투자 신호, 실용 팁.",
+      "url": "https://www.datacubeai.space/ko/topic/openai",
+      "type": "article",
+      "images": [
+        {
+          "url": "/og-image.jpg",
+          "width": 1200,
+          "height": 630,
+          "alt": "Data Cube AI – Openai"
+        }
+      ]
+    }
+  },
   "article": {
     "title": "OpenAI ships a new reasoning model for developers",
     "description": "OpenAI ships a new reasoning model for developers: the release adds tool use and a lower price (ko).",

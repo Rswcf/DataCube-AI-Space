@@ -69,7 +69,13 @@ describe('metadata', () => {
     const metadata = {
       home: await home.generateMetadata(params({ lang })),
       week: await week.generateMetadata(params({ lang, weekId: PERIOD_ID })),
+      // Filtered by ?period= (isFilteredVariant): index:false, follow:false.
       topic: await topic.generateMetadata({ ...params({ lang, topic: TOPIC }), searchParams: Promise.resolve({ period: PERIOD_ID }) }),
+      // Canonical, no searchParams: the indexable variant search engines actually see
+      // at /{lang}/topic/{topic}. Filtered-only coverage never captured this case
+      // (task-1-review.md §3), so a robots regression on the indexable path — like
+      // the one main's PR #12 fixed — had no golden able to catch it.
+      topicCanonical: await topic.generateMetadata({ ...params({ lang, topic: TOPIC }), searchParams: Promise.resolve({}) }),
       article: await article.generateMetadata(params({ lang, periodId: PERIOD_ID, storyId: STORY_ID })),
       articleNotFound: await article.generateMetadata(params({ lang, periodId: PERIOD_ID, storyId: 'tech-999' })),
       tools: {
