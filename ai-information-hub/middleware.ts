@@ -3,11 +3,20 @@ import type { NextRequest } from 'next/server'
 import { isSupportedLanguage, toLocalizedPath } from './lib/i18n'
 
 // 2026-08: The former login gate ("visited" cookie wall + crawler-UA bypass)
-// has been removed — it served no auth purpose, suppressed first-visit
-// conversion, and showing bots different behavior than humans is a cloaking
-// risk. The `visited` cookie is now set automatically on page responses
-// because the chat/report API guard still requires it as a cheap
-// must-have-visited-the-site abuse barrier (see lib/server/api-guard.ts).
+// was removed — it served no auth purpose, suppressed first-visit conversion,
+// and showing bots different behavior than humans is a cloaking risk.
+//
+// 2026-09: The middleware no longer touches responses at all (no cookies, no
+// headers) so that ISR pages stay byte-identical and CDN-cacheable for every
+// visitor. What used to live here moved closer to where it belongs:
+//   - the `visited` cookie the chat/report API guard checks is set client-side
+//     (lib/settings-context.tsx);
+//   - `<html lang>` comes from the `[lang]` root layout (components/root-shell.tsx)
+//     instead of an `x-lang` request header read via headers() — reading
+//     headers() in the root layout had silently made every page dynamic;
+//   - the noindex for article pages in languages without an audience is page
+//     metadata (app/(localized)/[lang]/news/[periodId]/[storyId]/page.tsx).
+// Only redirects and the prefetch short-circuit remain.
 
 function buildTarget(pathname: string, searchParams: URLSearchParams): string {
   const query = searchParams.toString()
@@ -15,19 +24,6 @@ function buildTarget(pathname: string, searchParams: URLSearchParams): string {
 }
 
 const LANG_RE = '(?:de|en|zh|fr|es|pt|ja|ko)'
-
-// Article pages are indexed only in languages with a real audience (DE/EN/ZH).
-// The other five languages stay served (with hreflang) but send
-// `X-Robots-Tag: noindex` — 8x-ing thin article pages amplifies the
-// "scaled content" footprint that suppresses the whole site on Google
-// (see .ai-collab/context/seo-growth-ads-strategy-2026-07.md §4.2).
-// Revisit once domain authority is established.
-const INDEXED_ARTICLE_LANGS = new Set(['de', 'en', 'zh'])
-
-function isNoindexArticlePath(pathname: string): boolean {
-  const match = pathname.match(/^\/(de|en|zh|fr|es|pt|ja|ko)\/news\/[^/]+\/[^/]+$/)
-  return match !== null && !INDEXED_ARTICLE_LANGS.has(match[1])
-}
 
 function isLocalizablePath(pathname: string): boolean {
   return (
@@ -43,35 +39,11 @@ function isLocalizablePath(pathname: string): boolean {
   )
 }
 
-function nextWithLang(request: NextRequest): NextResponse {
-  const { pathname } = request.nextUrl
-  const segments = pathname.split('/')
-  const langSegment = segments[1]
-  // EN is the default language since 2026-08 (global audience).
-  const lang = isSupportedLanguage(langSegment) ? langSegment : 'en'
-
-  const requestHeaders = new Headers(request.headers)
-  if (requestHeaders.get('next-router-prefetch') && !requestHeaders.get('rsc')) {
-    requestHeaders.delete('next-router-prefetch')
-    requestHeaders.delete('next-router-segment-prefetch')
-  }
-  requestHeaders.set('x-lang', lang)
-  return NextResponse.next({ request: { headers: requestHeaders } })
-}
-
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // Skip login, API and static assets.
-  if (
-    pathname === '/login' ||
-    pathname.startsWith('/api') ||
-    pathname.startsWith('/_next') ||
-    pathname.includes('.')
-  ) {
-    return nextWithLang(request)
-  }
-
+  // Router prefetches that carry no RSC header would render a full page for
+  // nothing; answer them with an empty 204 instead.
   if (request.headers.get('next-router-prefetch') && !request.headers.get('rsc')) {
     return new NextResponse(null, {
       status: 204,
@@ -114,20 +86,14 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL(target, request.url), 308)
   }
 
-  const response = nextWithLang(request)
-  if (isNoindexArticlePath(pathname)) {
-    response.headers.set('X-Robots-Tag', 'noindex, follow')
-  }
-  if (!request.cookies.get('visited')) {
-    response.cookies.set('visited', 'true', {
-      maxAge: 60 * 60 * 24 * 30,
-      sameSite: 'lax',
-      path: '/',
-    })
-  }
-  return response
+  return NextResponse.next()
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
+  // Only page paths need the logic above. Every excluded request would
+  // otherwise pay for an Edge Middleware invocation for nothing: API routes,
+  // Next.js internals, Vercel internals (analytics beacons) and any path with
+  // a file extension (images, icons, robots/llms/sitemap/feed files).
+  // See lib/middleware-matcher.test.ts for the contract.
+  matcher: ['/((?!api/|_next/|_vercel/|.*\\.[a-zA-Z0-9]+$).*)'],
 }
