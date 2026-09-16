@@ -5149,7 +5149,7 @@ Insert this directly before the line `## Directory Structure` that follows the A
   - Copy lives in `lib/ai-label.ts` (site) and in `EMAIL_STRINGS` `ai_label`/`ai_label_link` (email).
   - `AiLabel` renders on week, article and topic pages, in the home feed masthead and above the AI News Aggregator tool page's live preview.
   - Feeds, the content summary, llms.txt and the OG image carry the label text.
-  - No person-like bylines: articles are authored by the Organization, and "Made by <founder>" renders only when a founder name is set.
+  - No person-like bylines: articles are authored by the Organization, and "Made by <founder>" renders only when a founder name is set. The configured founder ("Deepviews") is a brand, so `Organization.founder` is typed `Organization` (Ruling R-15).
 - **Goldens**: `ai-information-hub/test/golden/` and `ai-hub-backend/tests/goldens/` pin brand-bearing output. Regenerate them only for an intended change: `npx vitest run <file> -u`, or `UPDATE_GOLDENS=1` for pytest.
 - **Release comparison**: `python3 scripts/page_snapshot.py capture|compare`.
 ```
@@ -5242,7 +5242,7 @@ cd <repo-root>/ai-hub-backend && DATABASE_URL=postgresql://postgres:test@localho
 Expected:
 - `brand guard: clean`;
 - 12 script tests OK;
-- the frontend type check is clean and all tests pass: `Tests  217 passed (217)` in 16 files;
+- the frontend type check is clean and all tests pass (record the count; it was 273 in 18 files after Task 13 and grows with Tasks 14 and 16 — explain any difference by the tests those tasks added);
 - ruff is clean;
 - all backend unit and integration tests pass.
 
@@ -5271,8 +5271,9 @@ Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
 - [ ] **Step 3: Public repository scan**
 
 ```bash
-git -C <repo-root> diff main...HEAD -- . ':(exclude)docs/superpowers/plans' | grep -n -i -E -f <scratchpad>/public-scan-patterns.txt | head
-git -C <repo-root> diff --stat main...HEAD | tail -3
+git -C <repo-root> fetch origin
+git -C <repo-root> diff origin/main...HEAD -- . ':(exclude)docs/superpowers/plans' | grep -n -i -E -f <scratchpad>/public-scan-patterns.txt | head
+git -C <repo-root> diff --stat origin/main...HEAD | tail -3
 ```
 
 `<scratchpad>/public-scan-patterns.txt` stays outside the repository. It holds one extended regular expression per line for strings that must never be published: private names, the local home-directory prefix, personal email domains, and API key prefixes such as `sk-or-v1` and `re_[A-Za-z0-9]{16}`.
@@ -5294,7 +5295,8 @@ git -C <repo-root> push -u origin feat/r2-brand-ssot-ai-labels
 Open the PR against `main` with `gh pr create`. The body contains:
 - the goal, and a link to this plan and to spec §6.2, AD1 and AD7;
 - the "Intended output changes" table (B1–B4, L1–L5);
-- Rulings R-1 (proxy rename deferred, pending founder confirmation), R-10 (founder byline status) and R-11 (built on the merged cost work);
+- Rulings R-1 (proxy rename deferred — confirmed by the founder), R-10 (founder byline: "Made by Deepviews", set at release), R-11 (built on the merged cost work) and R-15 (the founder is typed as an Organization);
+- the separately labelled content correction C1 (llms.txt names English, not German, as the default language);
 - the test plan: the local suites with counts, the goldens, the guard, and CI;
 - the release checklist below, marking which steps need founder approval;
 - the footer `🤖 Generated with [Claude Code](https://claude.com/claude-code)`.
@@ -5303,9 +5305,7 @@ Open the PR against `main` with `gh pr create`. The body contains:
 
 ## Release (founder-gated)
 
-0. **Founder byline (pending since 2026-09-16, Ruling R-10).** Ask the founder for the exact byline wording.
-   - If given, and with founder approval for each variable: set `NEXT_PUBLIC_FOUNDER_NAME` for Vercel Production and `FOUNDER_NAME` on the Railway `api` service. The step 4 merge builds with the first; the step 7 deploy reads the second.
-   - If not given: release without the line, and keep the item open in the ledger and the project memory.
+0. **Founder byline (decided 2026-09-16, Ruling R-10): `Deepviews`.** With founder approval for each variable, set `NEXT_PUBLIC_FOUNDER_NAME=Deepviews` for Vercel Production and `FOUNDER_NAME=Deepviews` on the Railway `api` service. The step 4 merge builds with the first; the step 7 deploy reads the second. If the founder withholds approval, release without the line and keep the item open in the ledger and the project memory.
 1. **Variables (read-only, names only).**
    - **Vercel:** in the project's Environment Variables settings, confirm that Production defines none of `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_BRAND_NAME` and `NEXT_PUBLIC_BRAND_SHORT_NAME`, or that each equals the default. `NEXT_PUBLIC_FOUNDER_NAME` may exist only as step 0 set it. The CLI has no credentials, so use the founder's logged-in Chrome, or ask the founder. If `NEXT_PUBLIC_SITE_URL` points anywhere but the canonical site, stop: canonical URLs would move.
    - **Railway:** `cd <repo-root>/ai-hub-backend && railway variables -s api --json | python3 -c "import json,sys; print(sorted(json.load(sys.stdin)))"` prints names only. Compare with the 2026-09-16 list in Global Constraints. Any new brand variable other than step 0's `FOUNDER_NAME` must equal its default, or stop.
@@ -5330,7 +5330,9 @@ Open the PR against `main` with `gh pr create`. The body contains:
 | Article noindex | `curl -s https://www.datacubeai.space/fr/news/2026-09-13/tech-2843 \| grep -o '<meta name="robots"[^>]*>'` | a robots meta tag whose content starts with `noindex` |
 | OG image | `curl -sI "https://www.datacubeai.space/api/og?period=2026-09-13&lang=en"` | `200` and `content-type: image/png` |
 | Feed subtitle | `curl -s "https://www.datacubeai.space/feed.xml?lang=de" \| grep -o '<subtitle>[^<]*'` | ends with the German label |
-| Founder line (only if step 0 set it) | `curl -s https://www.datacubeai.space/about \| grep -o 'Made by [^<]*'` | `Made by <founder>` |
+| Founder line (only if step 0 set it) | `curl -s https://www.datacubeai.space/about \| grep -o 'Made by [^<]*'` | `Made by Deepviews` |
+| Founder schema (only if step 0 set it) | `curl -s https://www.datacubeai.space/en \| grep -o '"founder":{[^}]*}'` | `"founder":{"@type":"Organization","name":"Deepviews"}` (R-15) |
+| llms.txt default language (C1) | `curl -s https://www.datacubeai.space/llms.txt \| grep -o '[A-Za-z]* ([a-z]*) — default'` | `English (en) — default` |
 
 6. **After snapshot and comparison.**
    - `python3 scripts/page_snapshot.py capture … --out <scratchpad>/r2-after.json`
