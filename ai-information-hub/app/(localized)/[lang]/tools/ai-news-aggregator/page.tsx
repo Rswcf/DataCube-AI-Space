@@ -583,21 +583,29 @@ export default async function AINewsAggregatorToolPage({ params }: Props) {
     const weeksRes = await fetch(`${API_BASE}/weeks`, { next: { revalidate: 3600 } })
     if (weeksRes.ok) {
       const weeksData = await weeksRes.json()
-      const latestId = weeksData?.days?.[0]?.id || weeksData?.weeks?.[0]?.id
-      if (latestId) {
-        const techRes = await fetch(`${API_BASE}/tech/${latestId}`, { next: { revalidate: 3600 } })
-        if (techRes.ok) {
-          const techData = await techRes.json()
-          const posts = techData?.[lang] || techData?.en || techData?.de || []
-          previewPosts = posts
-            .filter((p: Record<string, unknown>) => !p.isVideo)
-            .slice(0, 5)
-            .map((p: Record<string, unknown>) => ({
-              content: String(p.content ?? ''),
-              source: String(p.source ?? ''),
-              timestamp: String(p.timestamp ?? ''),
-              sourceUrl: p.sourceUrl ? String(p.sourceUrl) : undefined,
-            }))
+      // Newest day first. Each week lists its days oldest-first, and a week id has held no
+      // content since collection went daily (C2); a week without days is a legacy weekly period.
+      const weeks = (weeksData?.weeks ?? []) as Array<{ id: string; days?: Array<{ id: string }> }>
+      const candidates = weeks
+        .flatMap((week) => (week.days?.length ? [...week.days].reverse().map((day) => day.id) : [week.id]))
+        .slice(0, 3)
+      for (const periodId of candidates) {
+        const techRes = await fetch(`${API_BASE}/tech/${periodId}`, { next: { revalidate: 3600 } })
+        if (!techRes.ok) continue
+        const techData = await techRes.json()
+        const posts = techData?.[lang] || techData?.en || techData?.de || []
+        const visible: PreviewPost[] = posts
+          .filter((p: Record<string, unknown>) => !p.isVideo)
+          .slice(0, 5)
+          .map((p: Record<string, unknown>) => ({
+            content: String(p.content ?? ''),
+            source: String(p.source ?? ''),
+            timestamp: String(p.timestamp ?? ''),
+            sourceUrl: p.sourceUrl ? String(p.sourceUrl) : undefined,
+          }))
+        if (visible.length > 0) {
+          previewPosts = visible
+          break
         }
       }
     }

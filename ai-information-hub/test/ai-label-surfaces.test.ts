@@ -5,7 +5,7 @@ import { NextRequest } from 'next/server'
 import { FeedMasthead } from '@/components/feed-masthead'
 import { AI_DISCLOSURE_PATH, aiLabel, aiLabelForImage, aiLabelLinkText, aiLabelShort } from '@/lib/ai-label'
 import { BRAND, absoluteUrl } from '@/lib/brand'
-import { FIXED_NOW, LANGS, PERIOD_ID, STORY_ID, TOPIC, stubApiFetch } from './fixtures/api'
+import { FIXED_NOW, LANGS, PERIOD_ID, STORY_ID, TOPIC, WEEK_ID, stubApiFetch } from './fixtures/api'
 
 vi.mock('next/link', () => ({
   default: ({ href, children, prefetch: _prefetch, ...rest }: any) =>
@@ -82,6 +82,18 @@ describe.each(LANGS)('AI label on HTML surfaces in %s', (lang) => {
 
   it('home feed masthead', async () => {
     expectLabel(await render(createElement(FeedMasthead, { issueLabel: 'Sep 13, 2026', language: lang })), lang)
+  })
+})
+
+describe('AI News Aggregator live preview', () => {
+  it('reads the newest day, because week ids hold no content since collection went daily', async () => {
+    // Production answers a week id with an empty feed; only day ids carry posts (C2).
+    const calls = stubApiFetch({ [`/tech/${WEEK_ID}`]: {} })
+    const { default: ToolPage } = await import('@/app/(localized)/[lang]/tools/ai-news-aggregator/page')
+    const html = await render(ToolPage({ params: Promise.resolve({ lang: 'en' }) }))
+    expect(html).toContain('OpenAI ships a new reasoning model')
+    expectLabel(html, 'en')
+    expect(calls.some((url) => url.endsWith(`/tech/${PERIOD_ID}`))).toBe(true)
   })
 })
 
