@@ -16,7 +16,7 @@ import {
   formatPeriodTitle,
   periodPublishedDate,
 } from '@/lib/period-utils'
-import { toTopicSlug } from '@/lib/topic-utils'
+import { tagTopicSlug } from '@/lib/topic-utils'
 import type {
   InvestmentData,
   MAPost,
@@ -679,15 +679,26 @@ export default async function ArticlePage({ params }: Props) {
                     {t(labels.relatedTopics, lang)}
                   </h2>
                   <div className="mt-4 flex flex-wrap gap-2">
-                    {story.tags.map((tag) => (
-                      <Link
-                        key={tag}
-                        href={`/${lang}/topic/${toTopicSlug(tag)}`}
-                        className="border border-border px-3 py-2 font-sans text-[11px] font-extrabold uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:border-foreground hover:text-foreground"
-                      >
-                        {tag}
-                      </Link>
-                    ))}
+                    {story.tags.map((tag) => {
+                      // Tags without Latin letters have no hub (see tagTopicSlug): label, not link.
+                      const slug = tagTopicSlug(tag)
+                      return slug ? (
+                        <Link
+                          key={tag}
+                          href={`/${lang}/topic/${slug}`}
+                          className="border border-border px-3 py-2 font-sans text-[11px] font-extrabold uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:border-foreground hover:text-foreground"
+                        >
+                          {tag}
+                        </Link>
+                      ) : (
+                        <span
+                          key={tag}
+                          className="border border-border px-3 py-2 font-sans text-[11px] font-extrabold uppercase tracking-[0.12em] text-muted-foreground"
+                        >
+                          {tag}
+                        </span>
+                      )
+                    })}
                     <Link
                       href={`/${lang}/week/${periodId}`}
                       className="border border-foreground bg-foreground px-3 py-2 font-sans text-[11px] font-extrabold uppercase tracking-[0.12em] text-background transition-colors hover:bg-primary hover:text-primary-foreground"
