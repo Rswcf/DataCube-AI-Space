@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import HomePageClient from '@/components/home-page-client'
 import type { AppLanguage } from '@/lib/i18n'
-import { toTopicSlug } from '@/lib/topic-utils'
+import { trendTopicSlug } from '@/lib/topic-utils'
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api-production-3ee5.up.railway.app/api'
 
@@ -139,23 +139,43 @@ function getRecentPeriodIds(weeks: WeekEntry[], limit = 10): string[] {
   return Array.from(new Set(ids)).slice(0, limit)
 }
 
-function extractTrendTitles(data: TrendsResponse, language: AppLanguage): string[] {
+/**
+ * Trending topics for the crawler-facing section, each paired with the hub it
+ * links to. The hub slug comes from the English title even when the label is
+ * localized, because capitalisation only marks a proper noun in English (see
+ * `trendTopicSlug`). A title with no entity is dropped rather than linked: the
+ * whole-headline slugs this used to emit could never resolve, so the homepage
+ * was pointing crawlers at six 404s (2026-09-16).
+ */
+function extractTrendTopics(data: TrendsResponse, language: AppLanguage): { label: string; slug: string }[] {
   const languageTrends = data.trends?.[language] || data.trends?.de || []
-  return languageTrends
-    .map((item) => item.title || '')
-    .map((title) => title.trim())
-    .filter(Boolean)
+  const englishTrends = data.trends?.en
+  const aligned = englishTrends && englishTrends.length === languageTrends.length
+
+  const seen = new Set<string>()
+  const topics: { label: string; slug: string }[] = []
+  languageTrends.forEach((item, index) => {
+    const label = (item.title || '').trim()
+    if (!label) return
+    const slug = trendTopicSlug((aligned ? englishTrends[index]?.title : undefined) || label)
+    if (!slug || seen.has(slug)) return
+    seen.add(slug)
+    topics.push({ label, slug })
+  })
+  return topics
 }
 
-async function getTrendingTopicTitles(periodId: string, language: AppLanguage): Promise<string[]> {
+type TrendTopic = { label: string; slug: string }
+
+async function getTrendingTopics(periodId: string, language: AppLanguage): Promise<TrendTopic[]> {
   if (!periodId) return []
 
   try {
     const res = await fetch(`${API_BASE}/trends/${periodId}`, { next: { revalidate: 3600 } })
     if (res.ok) {
       const data = (await res.json()) as TrendsResponse
-      const titles = extractTrendTitles(data, language)
-      if (titles.length > 0) return titles
+      const topics = extractTrendTopics(data, language)
+      if (topics.length > 0) return topics
     }
   } catch {
     // Handled by static fallback below.
@@ -165,7 +185,7 @@ async function getTrendingTopicTitles(periodId: string, language: AppLanguage): 
     const filePath = path.join(process.cwd(), 'public', 'data', periodId, 'trends.json')
     const raw = await readFile(filePath, 'utf-8')
     const data = JSON.parse(raw) as TrendsResponse
-    return extractTrendTitles(data, language)
+    return extractTrendTopics(data, language)
   } catch {
     return []
   }
@@ -261,9 +281,7 @@ export async function HomePageContent({ language = 'de' }: HomePageContentProps 
   const initialWeekId = getInitialPeriodId(weeks)
   const [recentPeriodIds, trendingTopics, headlines] = await Promise.all([
     Promise.resolve(getRecentPeriodIds(weeks)),
-    getTrendingTopicTitles(initialWeekId, language).then((t) =>
-      Array.from(new Set(t)).slice(0, 8)
-    ),
+    getTrendingTopics(initialWeekId, language).then((topics) => topics.slice(0, 8)),
     getLatestHeadlines(initialWeekId, language),
   ])
 
@@ -308,11 +326,11 @@ export async function HomePageContent({ language = 'de' }: HomePageContentProps 
             <p>{t.trendingTopics}</p>
             {trendingTopics.map((topic) => (
               <a
-                key={topic}
-                href={`/${language}/topic/${toTopicSlug(topic)}`}
+                key={topic.slug}
+                href={`/${language}/topic/${topic.slug}`}
                 className="mr-2 inline-block"
               >
-                {topic}
+                {topic.label}
               </a>
             ))}
           </nav>

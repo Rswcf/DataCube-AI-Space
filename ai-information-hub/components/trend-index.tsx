@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useId } from "react";
 import { ArrowUpRight, Search } from "lucide-react";
-import { toTopicSlug } from "@/lib/topic-utils";
+import { trendTopicSlug } from "@/lib/topic-utils";
 import type { TrendItem } from "@/lib/types";
 
 type TrendLabels = {
@@ -100,6 +100,16 @@ const labels: Record<string, TrendLabels> = {
   },
 };
 
+/**
+ * The momentum badge stays hidden until the backend computes the signal from
+ * entities instead of whole trend headlines. Headlines never repeat across
+ * days, so every item scored "new" on each of the six days checked
+ * (2026-09-16): a badge whose whole purpose is to separate rising from new has
+ * never once separated anything. Flip this back to true when
+ * `_compute_momentum` keys on entities.
+ */
+const SHOW_MOMENTUM_BADGE: boolean = false;
+
 function getLabels(language: string): TrendLabels {
   return labels[language] || labels.en;
 }
@@ -121,24 +131,25 @@ function trendCategory(trend: TrendItem): string {
   return cleaned || fallbackCategory(trend.title || "");
 }
 
-function trendHref(language: string, title: string, periodId?: string): string {
-  const slug = toTopicSlug(title);
-  const baseHref = `/${language}/topic/${slug}`;
-  const params = new URLSearchParams();
-  const meaningfulSlugTerms = slug.split("-").filter((term) => term && term !== "ai");
-
-  if (periodId) params.set("period", periodId);
-  if (meaningfulSlugTerms.length > 0) params.set("q", title);
-
-  const query = params.toString();
-  return query ? `${baseHref}?${query}` : baseHref;
+/**
+ * Where a trend chip links, or null when it should render as plain text.
+ *
+ * The hub is the entity the headline is about, never the headline itself: a
+ * topic page needs every term of its slug to appear in one article, so
+ * "/topic/nvidia-ceo-rejects-ai-slowdown-calls" could never resolve and 6 of
+ * the 8 homepage chips answered 404 (2026-09-16). No `q` and no `period`
+ * either — `q` overrides the slug as the match terms, and pinning the period
+ * narrows the hub to a single day for no gain.
+ */
+function trendHref(language: string, trend: TrendItem): string | null {
+  const slug = trendTopicSlug(trend.titleEn || trend.title || "");
+  return slug ? `/${language}/topic/${slug}` : null;
 }
 
 type TrendIndexProps = {
   trends: TrendItem[];
   heading: string;
   language: string;
-  periodId?: string;
   limit?: number;
   loading?: boolean;
   compact?: boolean;
@@ -149,7 +160,6 @@ export function TrendIndex({
   trends,
   heading,
   language,
-  periodId,
   limit = 6,
   loading = false,
   compact = false,
@@ -185,7 +195,7 @@ export function TrendIndex({
         <ol className={compact ? "space-y-1" : "mt-1"}>
           {visibleTrends.map((trend, index) => {
             const title = trend.title || "";
-            const href = trendHref(language, title, periodId);
+            const href = trendHref(language, trend);
             const isLead = index === 0 && !compact;
             const category = trendCategory(trend);
             const posts = typeof trend.posts === "number" && trend.posts > 0 ? trend.posts : null;
@@ -213,33 +223,52 @@ export function TrendIndex({
                           {posts} {copy.posts}
                         </span>
                       ) : null}
-                      {trend.momentum === "rising" ? (
+                      {SHOW_MOMENTUM_BADGE && trend.momentum === "rising" ? (
                         <span className="shrink-0 border border-primary/50 px-1.5 py-0.5 font-sans text-[9px] font-bold uppercase tracking-[0.08em] text-primary">
                           ↑ {copy.momentumRising}
                           {typeof trend.streak === "number" && trend.streak > 1 ? ` ·${trend.streak}` : ""}
                         </span>
-                      ) : trend.momentum === "new" ? (
+                      ) : SHOW_MOMENTUM_BADGE && trend.momentum === "new" ? (
                         <span className="shrink-0 border border-tips-accent/50 px-1.5 py-0.5 font-sans text-[9px] font-bold uppercase tracking-[0.08em] text-tips-accent">
                           {copy.momentumNew}
                         </span>
-                      ) : trend.momentum === "returning" ? (
+                      ) : SHOW_MOMENTUM_BADGE && trend.momentum === "returning" ? (
                         <span className="shrink-0 border border-border px-1.5 py-0.5 font-sans text-[9px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
                           ↩ {copy.momentumReturning}
                         </span>
                       ) : null}
                     </div>
-                    <Link
-                      href={href}
-                      className={[
-                        "block break-words font-display font-normal leading-[1.08] text-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card",
-                        compact ? "text-lg" : "text-[1.35rem]",
-                      ].join(" ")}
-                      aria-label={`${copy.open}: ${title}`}
-                    >
-                      <span className="overflow-hidden [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2]">
-                        {title}
-                      </span>
-                    </Link>
+                    {/*
+                      Without a resolvable hub the headline is plain text. A
+                      chip that reliably answers 404 is worse for a reader than
+                      one that simply does not navigate, and the filter button
+                      beside it still works.
+                    */}
+                    {href ? (
+                      <Link
+                        href={href}
+                        className={[
+                          "block break-words font-display font-normal leading-[1.08] text-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card",
+                          compact ? "text-lg" : "text-[1.35rem]",
+                        ].join(" ")}
+                        aria-label={`${copy.open}: ${title}`}
+                      >
+                        <span className="overflow-hidden [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2]">
+                          {title}
+                        </span>
+                      </Link>
+                    ) : (
+                      <p
+                        className={[
+                          "block break-words font-display font-normal leading-[1.08] text-foreground",
+                          compact ? "text-lg" : "text-[1.35rem]",
+                        ].join(" ")}
+                      >
+                        <span className="overflow-hidden [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2]">
+                          {title}
+                        </span>
+                      </p>
+                    )}
                   </div>
 
                   <button

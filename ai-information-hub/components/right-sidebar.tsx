@@ -222,7 +222,6 @@ export function RightSidebar({ weekId, onSearchChange }: RightSidebarProps) {
           trends={trends}
           heading={t("whatsNew")}
           language={language}
-          periodId={weekId}
           loading={trendsLoading}
           onFilter={handleTrendFilter}
         />

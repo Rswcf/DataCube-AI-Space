@@ -306,7 +306,6 @@ function MobileSearchDrawer({
                 trends={trends}
                 heading={t("whatsNew")}
                 language={language}
-                periodId={weekId}
                 limit={8}
                 loading={trendsLoading}
                 compact
