@@ -4,6 +4,8 @@ import { notFound } from 'next/navigation'
 import { cache } from 'react'
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
+import { AiLabel } from '@/components/ai-label'
+import { AI_DISCLOSURE_PATH, aiLabelShort } from '@/lib/ai-label'
 import type {
   AppLanguage,
 } from '@/lib/i18n'
@@ -27,9 +29,10 @@ import type {
   TechPost,
   TipPost,
 } from '@/lib/types'
+import { BRAND, fillBrand } from '@/lib/brand'
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api-production-3ee5.up.railway.app/api'
-const SITE_URL = 'https://www.datacubeai.space'
+const SITE_URL = BRAND.siteUrl
 
 // Article pages are indexed only in languages with a real audience (DE/EN/ZH).
 // The other five stay served (with hreflang) but carry a noindex robots meta —
@@ -160,14 +163,14 @@ const labels = {
     ko: '원문 출처',
   },
   sourceNote: {
-    de: 'Diese Seite fasst den vorhandenen Data Cube AI Eintrag zusammen und verweist auf die Originalquelle.',
-    en: 'This page summarizes the existing Data Cube AI entry and links back to the original source.',
-    zh: '本页汇总 Data Cube AI 现有条目，并保留原始来源链接。',
-    fr: "Cette page resume l'entree Data Cube AI existante et renvoie a la source originale.",
-    es: 'Esta pagina resume la entrada existente de Data Cube AI y enlaza con la fuente original.',
-    pt: 'Esta pagina resume a entrada existente do Data Cube AI e aponta para a fonte original.',
-    ja: 'このページは既存の Data Cube AI 項目を要約し、原典へリンクします。',
-    ko: '이 페이지는 기존 Data Cube AI 항목을 요약하고 원문 출처로 연결합니다.',
+    de: 'Diese Seite fasst den vorhandenen {brand} Eintrag zusammen und verweist auf die Originalquelle.',
+    en: 'This page summarizes the existing {brand} entry and links back to the original source.',
+    zh: '本页汇总 {brand} 现有条目，并保留原始来源链接。',
+    fr: "Cette page resume l'entree {brand} existante et renvoie a la source originale.",
+    es: 'Esta pagina resume la entrada existente de {brand} y enlaza con la fuente original.',
+    pt: 'Esta pagina resume a entrada existente do {brand} e aponta para a fonte original.',
+    ja: 'このページは既存の {brand} 項目を要約し、原典へリンクします。',
+    ko: '이 페이지는 기존 {brand} 항목을 요약하고 원문 출처로 연결합니다.',
   },
   practicalTip: {
     de: 'Praktischer Tipp',
@@ -189,20 +192,10 @@ const labels = {
     ja: '関連トピック',
     ko: '관련 주제',
   },
-  byline: {
-    de: 'Data Cube AI Redaktion',
-    en: 'Data Cube AI Editorial',
-    zh: 'Data Cube AI 编辑部',
-    fr: 'Redaction Data Cube AI',
-    es: 'Redaccion Data Cube AI',
-    pt: 'Editorial Data Cube AI',
-    ja: 'Data Cube AI 編集部',
-    ko: 'Data Cube AI 편집팀',
-  },
 } satisfies Record<string, Dictionary>
 
 function t(label: Dictionary, lang: AppLanguage): string {
-  return label[lang] || label.en
+  return fillBrand(label[lang] || label.en)
 }
 
 type ArticleStory = {
@@ -440,7 +433,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const story = await getArticleStory(periodId, storyId, lang)
   if (!story) {
     return {
-      title: 'Article not found | Data Cube AI',
+      title: 'Article not found',
       robots: { index: false, follow: true },
     }
   }
@@ -477,7 +470,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
           url: '/og-image.jpg',
           width: 1200,
           height: 630,
-          alt: 'Data Cube AI',
+          alt: BRAND.name,
         },
       ],
     },
@@ -507,11 +500,12 @@ function jsonLdFor(story: ArticleStory, lang: AppLanguage, periodId: string, sto
       mainEntityOfPage: url,
       author: {
         '@type': 'Organization',
-        name: 'Data Cube AI Editorial',
+        name: BRAND.name,
+        url: BRAND.siteUrl,
       },
       publisher: {
         '@type': 'Organization',
-        name: 'Data Cube AI',
+        name: BRAND.name,
         logo: {
           '@type': 'ImageObject',
           url: `${SITE_URL}/icon.svg`,
@@ -527,7 +521,7 @@ function jsonLdFor(story: ArticleStory, lang: AppLanguage, periodId: string, sto
         {
           '@type': 'ListItem',
           position: 1,
-          name: 'Data Cube AI',
+          name: BRAND.name,
           item: `${SITE_URL}/${lang}`,
         },
         {
@@ -590,10 +584,11 @@ export default async function ArticlePage({ params }: Props) {
                 {story.deck}
               </p>
             ) : null}
+            <AiLabel lang={lang} className="mx-auto mt-4 max-w-3xl text-sm text-muted-foreground" />
           </div>
 
           <div className="grid gap-3 border-t border-foreground pt-4 font-sans text-[11px] font-bold uppercase tracking-[0.16em] text-muted-foreground sm:grid-cols-3">
-            <span>{t(labels.byline, lang)}</span>
+            <a href={AI_DISCLOSURE_PATH} className="underline hover:no-underline">{aiLabelShort(lang)}</a>
             <time className="sm:text-center" dateTime={publishedIso}>
               {dateLabel(publishedIso, lang)}
             </time>

@@ -3,17 +3,18 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { SUPPORTED_LANGUAGES, isSupportedLanguage, toBcp47 } from '@/lib/i18n'
+import { BRAND, fillBrand } from '@/lib/brand'
 
 export const revalidate = 86400
 
-const BASE_URL = 'https://www.datacubeai.space'
+const BASE_URL = BRAND.siteUrl
 
 type Props = {
   params: Promise<{ lang: string }>
 }
 
 type L = Record<string, string>
-const t = (map: L, lang: string) => map[lang] || map.en
+const t = (map: L, lang: string) => fillBrand(map[lang] || map.en)
 
 // Every tool page ends with a "View all tools" link to this route. It had no
 // page until 2026-09-16, so those links 404ed into Next's bare fallback shell
@@ -38,25 +39,25 @@ const CROSS_API_NAME: L = { de: 'KI-News-API', en: 'AI News API', zh: 'AI\u65b0\
 const CROSS_API_DESC: L = { de: 'REST API, JSON, keine Authentifizierung.', en: 'REST API, JSON, no authentication required.', zh: 'REST API\u3001JSON\u3001\u65e0\u9700\u8ba4\u8bc1\u3002', fr: 'API REST, JSON, sans authentification.', es: 'API REST, JSON, sin autenticaci\u00f3n.', pt: 'API REST, JSON, sem autentica\u00e7\u00e3o.', ja: 'REST API\u3001JSON\u3001\u8a8d\u8a3c\u4e0d\u8981\u3002', ko: 'REST API, JSON, \uc778\uc99d \ubd88\ud544\uc694.' }
 
 const META_TITLES: L = {
-  de: 'Kostenlose KI-Tools | DataCube AI',
-  en: 'Free AI Tools | DataCube AI',
-  zh: '免费 AI 工具 | DataCube AI',
-  fr: 'Outils IA gratuits | DataCube AI',
-  es: 'Herramientas de IA gratuitas | DataCube AI',
-  pt: 'Ferramentas de IA gratuitas | DataCube AI',
-  ja: '無料AIツール | DataCube AI',
-  ko: '무료 AI 도구 | DataCube AI',
+  de: 'Kostenlose KI-Tools | {brand}',
+  en: 'Free AI Tools | {brand}',
+  zh: '免费 AI 工具 | {brand}',
+  fr: 'Outils IA gratuits | {brand}',
+  es: 'Herramientas de IA gratuitas | {brand}',
+  pt: 'Ferramentas de IA gratuitas | {brand}',
+  ja: '無料AIツール | {brand}',
+  ko: '무료 AI 도구 | {brand}',
 }
 
 const META_DESCRIPTIONS: L = {
-  de: 'Alle kostenlosen KI-Tools von DataCube AI: News-Aggregator, Bericht-Generator und offene News-API. Ohne Konto nutzbar.',
-  en: 'Every free AI tool from DataCube AI: news aggregator, report generator, and the open news API. No account required.',
-  zh: 'DataCube AI 的全部免费 AI 工具：新闻聚合器、报告生成器和开放新闻 API。无需注册。',
-  fr: "Tous les outils IA gratuits de DataCube AI : agrégateur d'actualités, générateur de rapports et API ouverte. Sans compte.",
-  es: 'Todas las herramientas de IA gratuitas de DataCube AI: agregador de noticias, generador de informes y API abierta. Sin cuenta.',
-  pt: 'Todas as ferramentas de IA gratuitas da DataCube AI: agregador de notícias, gerador de relatórios e API aberta. Sem conta.',
-  ja: 'DataCube AI の無料AIツール一覧：ニュースアグリゲーター、レポートジェネレーター、オープンAPI。アカウント不要。',
-  ko: 'DataCube AI의 모든 무료 AI 도구: 뉴스 집합기, 보고서 생성기, 오픈 뉴스 API. 계정 불필요.',
+  de: 'Alle kostenlosen KI-Tools von {brand}: News-Aggregator, Bericht-Generator und offene News-API. Ohne Konto nutzbar.',
+  en: 'Every free AI tool from {brand}: news aggregator, report generator, and the open news API. No account required.',
+  zh: '{brand} 的全部免费 AI 工具：新闻聚合器、报告生成器和开放新闻 API。无需注册。',
+  fr: "Tous les outils IA gratuits de {brand} : agrégateur d'actualités, générateur de rapports et API ouverte. Sans compte.",
+  es: 'Todas las herramientas de IA gratuitas de {brand}: agregador de noticias, generador de informes y API abierta. Sin cuenta.',
+  pt: 'Todas as ferramentas de IA gratuitas da {brand}: agregador de notícias, gerador de relatórios e API aberta. Sem conta.',
+  ja: '{brand} の無料AIツール一覧：ニュースアグリゲーター、レポートジェネレーター、オープンAPI。アカウント不要。',
+  ko: '{brand}의 모든 무료 AI 도구: 뉴스 집합기, 보고서 생성기, 오픈 뉴스 API. 계정 불필요.',
 }
 
 const PAGE_TITLE: L = {

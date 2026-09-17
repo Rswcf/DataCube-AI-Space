@@ -11,6 +11,7 @@ import {
   Zap,
 } from "lucide-react";
 import { LogoCube } from "@/components/logo-cube";
+import { BRAND } from "@/lib/brand";
 
 const LANG_OPTIONS = [
   { code: "de", nativeName: "DE" },
@@ -42,7 +43,7 @@ const translations: Record<LoginLanguage, {
 }> = {
   de: {
     badge: "KI-gest\u00fctzte Intelligenz",
-    title1: "Data Cube",
+    title1: BRAND.shortName,
     title2: "AI Hub",
     tagline:
       "Ihr intelligentes Gateway zu kuratierten KI-Nachrichten, Investment-Insights und praktischen Tipps \u2013 t\u00e4glich von KI analysiert und kuratiert.",
@@ -70,7 +71,7 @@ const translations: Record<LoginLanguage, {
   },
   en: {
     badge: "AI-Powered Intelligence",
-    title1: "Data Cube",
+    title1: BRAND.shortName,
     title2: "AI Hub",
     tagline:
       "Your intelligent gateway to curated AI news, investment insights, and practical tips \u2013 analyzed daily by AI.",
@@ -98,7 +99,7 @@ const translations: Record<LoginLanguage, {
   },
   zh: {
     badge: "AI \u667a\u80fd\u9a71\u52a8",
-    title1: "Data Cube",
+    title1: BRAND.shortName,
     title2: "AI Hub",
     tagline:
       "\u60a8\u7684\u667a\u80fd\u5165\u53e3\uff0c\u83b7\u53d6\u7cbe\u9009 AI \u65b0\u95fb\u3001\u6295\u8d44\u6d1e\u5bdf\u548c\u5b9e\u7528\u6280\u5de7 \u2013 \u6bcf\u65e5\u7531 AI \u5206\u6790\u548c\u7b5b\u9009\u3002",
@@ -121,7 +122,7 @@ const translations: Record<LoginLanguage, {
   },
   fr: {
     badge: "Intelligence aliment\u00e9e par l\u2019IA",
-    title1: "Data Cube",
+    title1: BRAND.shortName,
     title2: "AI Hub",
     tagline:
       "Votre passerelle intelligente vers l\u2019actu IA, les investissements et les astuces pratiques \u2013 analys\u00e9e quotidiennement par l\u2019IA.",
@@ -149,7 +150,7 @@ const translations: Record<LoginLanguage, {
   },
   es: {
     badge: "Inteligencia impulsada por IA",
-    title1: "Data Cube",
+    title1: BRAND.shortName,
     title2: "AI Hub",
     tagline:
       "Tu puerta inteligente a noticias de IA curadas, insights de inversi\u00f3n y consejos pr\u00e1cticos \u2013 analizado diariamente por IA.",
@@ -177,7 +178,7 @@ const translations: Record<LoginLanguage, {
   },
   pt: {
     badge: "Intelig\u00eancia impulsionada por IA",
-    title1: "Data Cube",
+    title1: BRAND.shortName,
     title2: "AI Hub",
     tagline:
       "Seu portal inteligente para not\u00edcias de IA curadas, insights de investimento e dicas pr\u00e1ticas \u2013 analisado diariamente por IA.",
@@ -205,7 +206,7 @@ const translations: Record<LoginLanguage, {
   },
   ja: {
     badge: "AI\u99c6\u52d5\u306e\u30a4\u30f3\u30c6\u30ea\u30b8\u30a7\u30f3\u30b9",
-    title1: "Data Cube",
+    title1: BRAND.shortName,
     title2: "AI Hub",
     tagline:
       "\u53b3\u9078\u3055\u308c\u305fAI\u30cb\u30e5\u30fc\u30b9\u3001\u6295\u8cc7\u30a4\u30f3\u30b5\u30a4\u30c8\u3001\u5b9f\u8df5\u7684\u306a\u30c6\u30a3\u30c3\u30d7\u30b9\u3078\u306e\u30b9\u30de\u30fc\u30c8\u306a\u30b2\u30fc\u30c8\u30a6\u30a7\u30a4 \u2013 AI\u304c\u6bce\u65e5\u5206\u6790\u30fb\u53b3\u9078\u3002",
@@ -228,7 +229,7 @@ const translations: Record<LoginLanguage, {
   },
   ko: {
     badge: "AI \uae30\ubc18 \uc778\ud154\ub9ac\uc804\uc2a4",
-    title1: "Data Cube",
+    title1: BRAND.shortName,
     title2: "AI Hub",
     tagline:
       "\uc5c4\uc120\ub41c AI \ub274\uc2a4, \ud22c\uc790 \uc778\uc0ac\uc774\ud2b8, \uc2e4\uc6a9\uc801\uc778 \ud301\uc73c\ub85c \uac00\ub294 \uc2a4\ub9c8\ud2b8 \uac8c\uc774\ud2b8\uc6e8\uc774 \u2013 \ub9e4\uc77c AI\uac00 \ubd84\uc11d\u00b7\uc5c4\uc120.",

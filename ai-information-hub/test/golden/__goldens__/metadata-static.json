@@ -1,0 +1,404 @@
+{
+  "siteMetadata": {
+    "metadataBase": "https://www.datacubeai.space/",
+    "title": {
+      "default": "Data Cube AI | Daily AI News, Investment Signals & Practical Tips",
+      "template": "%s | Data Cube AI"
+    },
+    "description": "Free multilingual AI news aggregator covering generative AI breakthroughs, LLM updates, AI investment signals, and practical tips — curated daily from 35+ sources in 8 languages.",
+    "keywords": [
+      "AI news",
+      "artificial intelligence",
+      "machine learning",
+      "AI investment",
+      "AI tips",
+      "generative AI",
+      "LLM news",
+      "ChatGPT updates",
+      "AI weekly digest",
+      "AI newsletter",
+      "AI stocks",
+      "AI funding",
+      "AI tools",
+      "deep learning",
+      "AI breakthroughs",
+      "prompt engineering",
+      "AI startups",
+      "AI daily digest",
+      "künstliche Intelligenz",
+      "KI-Nachrichten",
+      "KI-Investitionen",
+      "KI News",
+      "KI Tipps",
+      "人工智能",
+      "大模型",
+      "AI投资",
+      "AI新闻",
+      "AI工具推荐",
+      "actualités IA",
+      "intelligence artificielle",
+      "investissement IA",
+      "noticias IA",
+      "inteligencia artificial",
+      "inversiones IA",
+      "notícias IA",
+      "inteligência artificial",
+      "AIニュース",
+      "人工知能ニュース",
+      "機械学習",
+      "AI 뉴스",
+      "인공지능 뉴스",
+      "AI 투자"
+    ],
+    "authors": [
+      {
+        "name": "Data Cube AI",
+        "url": "https://www.datacubeai.space"
+      }
+    ],
+    "creator": "Data Cube AI",
+    "publisher": "Data Cube AI",
+    "generator": "Next.js",
+    "icons": {
+      "icon": [
+        {
+          "url": "/icon-light-32x32.png",
+          "media": "(prefers-color-scheme: light)"
+        },
+        {
+          "url": "/icon-dark-32x32.png",
+          "media": "(prefers-color-scheme: dark)"
+        },
+        {
+          "url": "/icon.svg",
+          "type": "image/svg+xml"
+        }
+      ],
+      "apple": "/apple-icon.png"
+    },
+    "openGraph": {
+      "type": "website",
+      "locale": "en_US",
+      "alternateLocale": [
+        "de_DE",
+        "zh_CN",
+        "fr_FR",
+        "es_ES",
+        "pt_BR",
+        "ja_JP",
+        "ko_KR"
+      ],
+      "url": "https://www.datacubeai.space",
+      "siteName": "Data Cube AI",
+      "title": "Data Cube AI | Daily AI News & Insights",
+      "description": "Free AI news aggregator: generative AI breakthroughs, investment signals, and practical tips – curated daily from 35+ sources in 8 languages.",
+      "images": [
+        {
+          "url": "/og-image.jpg",
+          "width": 1200,
+          "height": 630,
+          "alt": "Data Cube AI",
+          "type": "image/jpeg"
+        }
+      ]
+    },
+    "twitter": {
+      "card": "summary_large_image",
+      "title": "Data Cube AI | Daily AI News",
+      "description": "Daily AI news digest: tech breakthroughs, investment signals, and practical tips – free in 8 languages.",
+      "images": [
+        {
+          "url": "/og-image.jpg",
+          "alt": "Data Cube AI"
+        }
+      ]
+    },
+    "robots": {
+      "index": true,
+      "follow": true,
+      "googleBot": {
+        "index": true,
+        "follow": true,
+        "max-video-preview": -1,
+        "max-image-preview": "large",
+        "max-snippet": -1
+      }
+    },
+    "alternates": {
+      "canonical": "https://www.datacubeai.space",
+      "languages": {
+        "de": "https://www.datacubeai.space/de",
+        "en": "https://www.datacubeai.space/en",
+        "zh-Hans": "https://www.datacubeai.space/zh",
+        "fr": "https://www.datacubeai.space/fr",
+        "es": "https://www.datacubeai.space/es",
+        "pt": "https://www.datacubeai.space/pt",
+        "ja": "https://www.datacubeai.space/ja",
+        "ko": "https://www.datacubeai.space/ko",
+        "x-default": "https://www.datacubeai.space"
+      }
+    },
+    "verification": {
+      "google": "tpfZ2qy_2c2rvsuf2_rOrsq5yiBxyLfazfnhdrzZ_Zg"
+    }
+  },
+  "home": {
+    "title": {
+      "absolute": "Data Cube AI | Daily AI News"
+    },
+    "description": "Curated AI news, investment signals, source links and practical workflows — updated daily from 35+ sources in 8 languages.",
+    "alternates": {
+      "canonical": "https://www.datacubeai.space/en",
+      "languages": {
+        "de": "https://www.datacubeai.space/de",
+        "en": "https://www.datacubeai.space/en",
+        "zh-Hans": "https://www.datacubeai.space/zh",
+        "fr": "https://www.datacubeai.space/fr",
+        "es": "https://www.datacubeai.space/es",
+        "pt": "https://www.datacubeai.space/pt",
+        "ja": "https://www.datacubeai.space/ja",
+        "ko": "https://www.datacubeai.space/ko",
+        "x-default": "https://www.datacubeai.space/"
+      }
+    },
+    "openGraph": {
+      "url": "https://www.datacubeai.space/en",
+      "title": "Data Cube AI | Daily AI News",
+      "description": "Curated AI news, investments and workflows, updated daily.",
+      "images": [
+        {
+          "url": "/og-image.jpg",
+          "width": 1200,
+          "height": 630,
+          "alt": "Data Cube AI"
+        }
+      ]
+    },
+    "twitter": {
+      "card": "summary_large_image",
+      "title": "Data Cube AI | Daily AI News",
+      "description": "Curated AI news, investments and workflows, updated daily.",
+      "images": [
+        {
+          "url": "/og-image.jpg",
+          "alt": "Data Cube AI"
+        }
+      ]
+    }
+  },
+  "about": {
+    "title": {
+      "absolute": "About Data Cube AI"
+    },
+    "description": "About Data Cube AI, a multilingual AI intelligence memo covering technology, capital, practical workflows, sources, and update rhythm.",
+    "alternates": {
+      "canonical": "https://www.datacubeai.space/about"
+    },
+    "openGraph": {
+      "title": "About Data Cube AI",
+      "description": "Publisher information for Data Cube AI, a multilingual intelligence memo for AI technology and capital signals.",
+      "url": "https://www.datacubeai.space/about",
+      "images": [
+        {
+          "url": "/og-image.jpg",
+          "width": 1200,
+          "height": 630,
+          "alt": "Data Cube AI"
+        }
+      ]
+    }
+  },
+  "aiDisclosure": {
+    "title": "AI Disclosure",
+    "description": "AI usage disclosure for Data Cube AI content collection, summarization, categorization, translation, and curation.",
+    "alternates": {
+      "canonical": "https://www.datacubeai.space/ai-disclosure"
+    },
+    "openGraph": {
+      "title": "AI Disclosure | Data Cube AI",
+      "description": "How Data Cube AI uses AI for collection, summarization, categorization, and translation.",
+      "url": "https://www.datacubeai.space/ai-disclosure",
+      "images": [
+        {
+          "url": "/og-image.jpg",
+          "width": 1200,
+          "height": 630,
+          "alt": "Data Cube AI"
+        }
+      ]
+    }
+  },
+  "contact": {
+    "title": {
+      "absolute": "Contact Data Cube AI"
+    },
+    "description": "Contact Data Cube AI for editorial corrections, enterprise access, source questions, partnerships, product support, and data requests.",
+    "alternates": {
+      "canonical": "https://www.datacubeai.space/contact"
+    },
+    "openGraph": {
+      "title": "Contact Data Cube AI",
+      "description": "Contact Data Cube AI for corrections, enterprise access, source questions, partnerships, and support.",
+      "url": "https://www.datacubeai.space/contact",
+      "images": [
+        {
+          "url": "/og-image.jpg",
+          "width": 1200,
+          "height": 630,
+          "alt": "Data Cube AI"
+        }
+      ]
+    }
+  },
+  "corrections": {
+    "title": "Corrections Policy",
+    "description": "Corrections policy for Data Cube AI summaries, sources, translations, period pages, feeds, and AI-readable discovery surfaces.",
+    "alternates": {
+      "canonical": "https://www.datacubeai.space/corrections"
+    },
+    "openGraph": {
+      "title": "Corrections Policy | Data Cube AI",
+      "description": "How Data Cube AI reviews and updates corrections for summaries, source links, translations, feeds, and period pages.",
+      "url": "https://www.datacubeai.space/corrections",
+      "images": [
+        {
+          "url": "/og-image.jpg",
+          "width": 1200,
+          "height": 630,
+          "alt": "Data Cube AI"
+        }
+      ]
+    }
+  },
+  "datenschutz": {
+    "title": "Datenschutzerklärung / Privacy Policy",
+    "description": "Privacy policy for Data Cube AI, covering hosting, functional cookies, analytics, embedded media, backend APIs, and data rights.",
+    "alternates": {
+      "canonical": "https://www.datacubeai.space/datenschutz"
+    },
+    "openGraph": {
+      "title": "Privacy Policy | Data Cube AI",
+      "description": "Privacy policy for Data Cube AI, covering hosting, cookies, analytics, embedded media, APIs, and data rights.",
+      "url": "https://www.datacubeai.space/datenschutz",
+      "images": [
+        {
+          "url": "/og-image.jpg",
+          "width": 1200,
+          "height": 630,
+          "alt": "Data Cube AI"
+        }
+      ]
+    }
+  },
+  "editorialPolicy": {
+    "title": "Editorial Policy",
+    "description": "Editorial policy for Data Cube AI, including source attribution, curation rules, corrections, and AI-generated content.",
+    "alternates": {
+      "canonical": "https://www.datacubeai.space/editorial-policy"
+    },
+    "openGraph": {
+      "title": "Editorial Policy | Data Cube AI",
+      "description": "How Data Cube AI selects sources, summarizes AI news, labels AI-generated content, and handles corrections.",
+      "url": "https://www.datacubeai.space/editorial-policy",
+      "images": [
+        {
+          "url": "/og-image.jpg",
+          "width": 1200,
+          "height": 630,
+          "alt": "Data Cube AI"
+        }
+      ]
+    }
+  },
+  "forTeams": {
+    "title": "For Teams & Enterprise",
+    "description": "AI intelligence for teams: daily briefings in 8 languages from 35+ sources, a free API, and an evidence-linked AI deal tracker (EN/ZH sources) — plus custom feeds, dashboards, and white-label options as pilot engagements.",
+    "alternates": {
+      "canonical": "https://www.datacubeai.space/for-teams"
+    },
+    "openGraph": {
+      "title": "For Teams & Enterprise",
+      "description": "AI intelligence for teams: daily briefings in 8 languages, free API, evidence-linked AI deal tracker — custom feeds, dashboards, and white-label options as pilot engagements.",
+      "url": "https://www.datacubeai.space/for-teams",
+      "images": [
+        {
+          "url": "/og-image.jpg",
+          "width": 1200,
+          "height": 630,
+          "alt": "Data Cube AI"
+        }
+      ]
+    }
+  },
+  "funding": {
+    "title": "AI Funding Tracker — Open, Evidence-Linked Deal Data",
+    "description": "Free, open tracker of AI funding rounds and M&A deals. New rows pass a server-side evidence gate and link to their sources; legacy rows are clearly labeled. Free CSV export, no signup.",
+    "alternates": {
+      "canonical": "https://www.datacubeai.space/funding"
+    },
+    "openGraph": {
+      "url": "https://www.datacubeai.space/funding",
+      "title": "AI Funding Tracker — Open, Evidence-Linked Deal Data",
+      "description": "Free tracker of AI funding rounds and M&A deals with per-row provenance labels. Free CSV export."
+    }
+  },
+  "impressum": {
+    "title": "Impressum / Legal Notice",
+    "description": "Legal notice for Data Cube AI, including operator disclosure, contact information, hosting, liability, and copyright details.",
+    "alternates": {
+      "canonical": "https://www.datacubeai.space/impressum"
+    },
+    "openGraph": {
+      "title": "Impressum / Legal Notice | Data Cube AI",
+      "description": "Legal notice for Data Cube AI, including operator disclosure, contact, hosting, liability, and copyright details.",
+      "url": "https://www.datacubeai.space/impressum",
+      "images": [
+        {
+          "url": "/og-image.jpg",
+          "width": 1200,
+          "height": 630,
+          "alt": "Data Cube AI"
+        }
+      ]
+    }
+  },
+  "login": {
+    "title": "Login",
+    "description": "Gateway page for Data Cube AI Space.",
+    "robots": {
+      "index": false,
+      "follow": false
+    }
+  },
+  "premium": {
+    "title": "Premium",
+    "description": "Data Cube AI Premium is in development. Everything on the site is free today — see the planned Premium features: higher AI chat limits, keyword alerts, data export, and priority support."
+  },
+  "sourceMethodology": {
+    "title": "Source Methodology",
+    "description": "How Data Cube AI sources, filters, summarizes, verifies, and links AI news items across technology, capital, and workflow coverage.",
+    "alternates": {
+      "canonical": "https://www.datacubeai.space/source-methodology"
+    },
+    "openGraph": {
+      "title": "Source Methodology | Data Cube AI",
+      "description": "How Data Cube AI turns source material into multilingual period pages, feeds, summaries, and AI-readable surfaces.",
+      "url": "https://www.datacubeai.space/source-methodology",
+      "images": [
+        {
+          "url": "/og-image.jpg",
+          "width": 1200,
+          "height": 630,
+          "alt": "Data Cube AI"
+        }
+      ]
+    }
+  },
+  "unsubscribe": {
+    "title": "Unsubscribe",
+    "robots": {
+      "index": false,
+      "follow": false
+    }
+  }
+}

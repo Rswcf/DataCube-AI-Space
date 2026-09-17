@@ -13,6 +13,7 @@ import { LANGUAGE_OPTIONS } from "@/lib/translations";
 import { cn } from "@/lib/utils";
 import { useSettings } from "@/lib/settings-context";
 import { API_BASE, USE_API } from "@/lib/api-base";
+import { BRAND } from "@/lib/brand";
 
 interface HomePageClientProps {
   initialWeekId?: string;
@@ -424,7 +425,7 @@ function MobileSettingsDrawer({
           <div className="border border-[#1c1a17] bg-[#ffef7a] p-4 text-center dark:border-border dark:bg-card">
             <div>
               <div className="mb-3 font-display text-[11px] font-semibold uppercase tracking-[0.14em] text-[#1c1a17] dark:text-foreground">
-                Data Cube AI
+                {BRAND.name}
               </div>
               <h2 className="mx-auto max-w-[16rem] break-words font-display text-2xl font-normal leading-[1.05] text-[#1c1a17] dark:text-foreground">
                 {t("newsletterHeading")}

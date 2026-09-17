@@ -19,6 +19,7 @@ def _patch(monkeypatch, subscription_id, signing_secret=SECRET):
     monkeypatch.setattr(sender, "get_settings", lambda: SimpleNamespace(
         resend_api_key="re_test", beehiiv_api_key="bh_key", beehiiv_publication_id="pub_1",
         newsletter_from_email="News <news@example.com>", signing_secret=signing_secret,
+        site_url="https://www.datacubeai.space",
     ))
     monkeypatch.setattr(sender, "_fetch_period_content", lambda db, period_id: {
         "period_id": period_id, "tech": [{"content_en": "x"}], "videos": [], "funding": [], "ma": [], "tips": [],

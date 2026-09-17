@@ -250,7 +250,6 @@ DataCube-AI-Space/
 │   │   ├── trend-index.tsx      # Period trend index and topic entry points
 │   │   └── video-embed.tsx      # YouTube player
 │   ├── lib/                     # Utils, types, API client
-│   ├── vercel.json              # Non-www → www redirect
 │   └── middleware.ts            # Prefetch 204 + legacy/?lang= redirects (page paths only; never touches responses)
 │
 ├── ai-hub-backend/              # Backend (FastAPI)

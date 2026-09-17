@@ -8,6 +8,7 @@ import { LogoCube } from "@/components/logo-cube";
 import { IssueTimeline } from "@/components/issue-timeline";
 import { LANGUAGE_OPTIONS, type TranslationKey, type Language } from "@/lib/translations";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
+import { BRAND } from "@/lib/brand";
 
 interface SidebarProps {
   activeTab: string;
@@ -161,7 +162,7 @@ export function Sidebar({ activeTab, onTabChange, selectedWeekId, onWeekChange }
         <div className="mb-6 px-3">
           <div className="flex items-center gap-3 border-b-2 border-foreground pb-4">
             <LogoCube size={40} className="shrink-0" />
-            <span className="hidden font-display text-2xl font-normal leading-none text-foreground xl:block">Data Cube</span>
+            <span className="hidden font-display text-2xl font-normal leading-none text-foreground xl:block">{BRAND.shortName}</span>
           </div>
         </div>
 
@@ -216,7 +217,7 @@ export function Sidebar({ activeTab, onTabChange, selectedWeekId, onWeekChange }
             {language === "de" ? "Kontakt" : "Contact"}
           </a>
           <a href="/editorial-policy" className="text-xs text-muted-foreground hover:text-foreground transition-colors focus-visible:ring-2 focus-visible:ring-ring rounded">
-            {language === "de" ? "Redaktion" : "Editorial"}
+            {language === "de" ? "Redaktionsrichtlinien" : "Editorial Policy"}
           </a>
           <a href="/impressum" className="text-xs text-muted-foreground hover:text-foreground transition-colors focus-visible:ring-2 focus-visible:ring-ring rounded">
             {language === "de" ? "Impressum" : "Legal Notice"}

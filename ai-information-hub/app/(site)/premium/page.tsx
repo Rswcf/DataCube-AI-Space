@@ -1,11 +1,12 @@
 import type { Metadata } from 'next'
+import { BRAND } from '@/lib/brand'
 
 export const revalidate = 86400
 
 export const metadata: Metadata = {
   title: 'Premium',
   description:
-    'Data Cube AI Premium is in development. Everything on the site is free today — see the planned Premium features: higher AI chat limits, keyword alerts, data export, and priority support.',
+    `${BRAND.name} Premium is in development. Everything on the site is free today — see the planned Premium features: higher AI chat limits, keyword alerts, data export, and priority support.`,
 }
 
 /* -------------------------------------------------------------------
@@ -47,7 +48,7 @@ const FAQ: { q: string; a: string }[] = [
   },
   {
     q: 'Is there a free trial?',
-    a: 'Premium has not launched yet — everything on Data Cube AI is free today. When Premium launches, subscriptions are planned to start with a 7-day free trial.',
+    a: `Premium has not launched yet — everything on ${BRAND.name} is free today. When Premium launches, subscriptions are planned to start with a 7-day free trial.`,
   },
   {
     q: 'What happens to my data if I cancel?',
@@ -139,10 +140,10 @@ export default function PremiumPage() {
       {/* ---- Hero ---- */}
       <header className="mb-16 text-center">
         <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
-          Data Cube AI Premium — In Development
+          {BRAND.name} Premium — In Development
         </h1>
         <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
-          Everything on Data Cube AI is free today — the daily briefing, full archive,
+          Everything on {BRAND.name} is free today — the daily briefing, full archive,
           AI chat and reports, the Funding Tracker with CSV export, and the public API.
           Premium is in development and will add higher AI chat limits, keyword alerts,
           full data export, and priority support. Here is what is planned:
@@ -240,7 +241,7 @@ export default function PremiumPage() {
       {/* ---- Social Proof / Trust ---- */}
       <section className="mb-16 text-center">
         <p className="text-lg font-semibold mb-4">
-          Join data-driven professionals who trust Data Cube AI
+          Join data-driven professionals who trust {BRAND.name}
         </p>
         <div className="flex flex-wrap justify-center gap-4">
           {TRUST_BADGES.map((badge) => (

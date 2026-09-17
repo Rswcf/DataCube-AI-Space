@@ -17,6 +17,7 @@ register and the Codex review 20260801-190000):
 
 import csv
 import io
+import re
 import time
 from datetime import date
 from typing import Optional
@@ -26,6 +27,7 @@ from fastapi.responses import StreamingResponse
 from sqlalchemy import func, or_
 from sqlalchemy.orm import Session
 
+from app.config import Settings, get_settings
 from app.database import get_db
 from app.models import Deal
 from app.services.deal_utils import csv_safe
@@ -70,18 +72,30 @@ CSV_COLUMNS = [
     "status",
 ]
 
-DISCLOSURE = (
-    "Deals are AI-extracted from monitored public sources. Rows labeled "
-    "ai_extracted passed a server-side evidence gate (figures require a "
-    "verbatim excerpt found in the source corpus); legacy_unverified rows "
-    "predate that gate and carry no evidence contract. Coverage is limited "
-    "to our monitored EN/ZH sources — not a complete market picture. Dates "
-    "reflect when our sources reported the deal. Facts are free to reuse "
-    "with attribution and a link (https://www.datacubeai.space/funding); "
-    "evidence excerpts are quotations from the linked sources and are not "
-    "licensed for redistribution. Report errors: "
-    "https://github.com/Rswcf/DataCube-AI-Space/issues"
-)
+
+def _disclosure(settings: Settings) -> str:
+    """Data-use disclosure returned with deal data; links the site and the public issue tracker."""
+    return (
+        "Deals are AI-extracted from monitored public sources. Rows labeled "
+        "ai_extracted passed a server-side evidence gate (figures require a "
+        "verbatim excerpt found in the source corpus); legacy_unverified rows "
+        "predate that gate and carry no evidence contract. Coverage is limited "
+        "to our monitored EN/ZH sources — not a complete market picture. Dates "
+        "reflect when our sources reported the deal. Facts are free to reuse "
+        f"with attribution and a link ({settings.site_url}/funding); "
+        "evidence excerpts are quotations from the linked sources and are not "
+        "licensed for redistribution. Report errors: "
+        f"{settings.github_issues_url}"
+    )
+
+
+DISCLOSURE = _disclosure(get_settings())
+
+
+def _export_filename(settings: Settings) -> str:
+    """CSV download name derived from the brand, e.g. "acme-news-deals.csv" for brand "Acme News"."""
+    slug = re.sub(r"[^a-z0-9]+", "-", settings.brand_name.lower()).strip("-")
+    return f"{slug}-deals.csv"
 
 
 def _deal_dict(d: Deal, include_evidence: bool = False) -> dict:
@@ -276,8 +290,8 @@ def export_deals_csv(
         iter([buf.getvalue()]),
         media_type="text/csv",
         headers={
-            "Content-Disposition": "attachment; filename=datacube-ai-deals.csv",
-            "X-Data-Source": "datacubeai.space/funding",
+            "Content-Disposition": f"attachment; filename={_export_filename(get_settings())}",
+            "X-Data-Source": f"{get_settings().site_domain}/funding",
         },
     )
 

@@ -88,9 +88,7 @@ def fetch_feed_with_timeout(url: str, days: int = 7, timeout: int | float = 20) 
     Uses requests to download content with timeout, then parses via feedparser.
     """
     cutoff = datetime.now() - timedelta(days=days)
-    headers = {
-        "User-Agent": "Mozilla/5.0 (compatible; AI-Hub-Bot/1.0; +https://www.datacubeai.space)"
-    }
+    headers = {"User-Agent": get_settings().rss_user_agent}
     try:
         resp = requests.get(url, headers=headers, timeout=timeout)
         resp.raise_for_status()

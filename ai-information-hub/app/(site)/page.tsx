@@ -4,6 +4,8 @@ import path from 'node:path'
 import HomePageClient from '@/components/home-page-client'
 import type { AppLanguage } from '@/lib/i18n'
 import { trendTopicSlug } from '@/lib/topic-utils'
+import { BRAND, absoluteUrl } from '@/lib/brand'
+import { aiLabel } from '@/lib/ai-label'
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api-production-3ee5.up.railway.app/api'
 
@@ -19,43 +21,43 @@ export const revalidate = 3600
 // metadata shallowly — setting `alternates` at page level would otherwise blow
 // away the layout-level `alternates.languages` map.
 export const metadata: Metadata = {
-  title: { absolute: 'Data Cube AI | Daily AI News' },
+  title: { absolute: `${BRAND.name} | Daily AI News` },
   description: 'Curated AI news, investment signals, source links and practical workflows — updated daily from 35+ sources in 8 languages.',
   alternates: {
-    canonical: 'https://www.datacubeai.space/en',
+    canonical: absoluteUrl('/en'),
     languages: {
-      'de': 'https://www.datacubeai.space/de',
-      'en': 'https://www.datacubeai.space/en',
-      'zh-Hans': 'https://www.datacubeai.space/zh',
-      'fr': 'https://www.datacubeai.space/fr',
-      'es': 'https://www.datacubeai.space/es',
-      'pt': 'https://www.datacubeai.space/pt',
-      'ja': 'https://www.datacubeai.space/ja',
-      'ko': 'https://www.datacubeai.space/ko',
-      'x-default': 'https://www.datacubeai.space/',
+      'de': absoluteUrl('/de'),
+      'en': absoluteUrl('/en'),
+      'zh-Hans': absoluteUrl('/zh'),
+      'fr': absoluteUrl('/fr'),
+      'es': absoluteUrl('/es'),
+      'pt': absoluteUrl('/pt'),
+      'ja': absoluteUrl('/ja'),
+      'ko': absoluteUrl('/ko'),
+      'x-default': absoluteUrl('/'),
     },
   },
   openGraph: {
-    url: 'https://www.datacubeai.space/en',
-    title: 'Data Cube AI | Daily AI News',
+    url: absoluteUrl('/en'),
+    title: `${BRAND.name} | Daily AI News`,
     description: 'Curated AI news, investments and workflows, updated daily.',
     images: [
       {
         url: '/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'Data Cube AI – Where AI meets human insight',
+        alt: BRAND.name,
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Data Cube AI | Daily AI News',
+    title: `${BRAND.name} | Daily AI News`,
     description: 'Curated AI news, investments and workflows, updated daily.',
     images: [
       {
         url: '/og-image.jpg',
-        alt: 'Data Cube AI – Where AI meets human insight',
+        alt: BRAND.name,
       },
     ],
   },
@@ -215,56 +217,56 @@ async function getLatestHeadlines(periodId: string, language: AppLanguage): Prom
 // Localized sr-only headings for accessibility and SEO.
 const SR_ONLY_TEXT: Record<AppLanguage, { h1: string; latestNews: string; recentUpdates: string; trendingTopics: string; description: string }> = {
   de: {
-    h1: 'Data Cube AI: Tägliche KI-News, Investment-Signale und praktische Tipps',
+    h1: `${BRAND.name}: Tägliche KI-News, Investment-Signale und praktische Tipps`,
     latestNews: 'Aktuelle KI-News',
     recentUpdates: 'Letzte Aktualisierungen',
     trendingTopics: 'Trending-Themen',
     description: 'Mehrsprachiger KI-Nachrichten-Hub: Technologie-Durchbrüche, Finanzierungs- und Marktbewegungen, praktische KI-Workflows und kuratierte Videos – täglich aktualisiert in 8 Sprachen (Deutsch, Englisch, Chinesisch, Französisch, Spanisch, Portugiesisch, Japanisch, Koreanisch).',
   },
   en: {
-    h1: 'Data Cube AI: Daily AI News, Investment Signals, and Practical Tips',
+    h1: `${BRAND.name}: Daily AI News, Investment Signals, and Practical Tips`,
     latestNews: 'Latest AI News',
     recentUpdates: 'Recent Updates',
     trendingTopics: 'Trending Topics',
     description: 'Multilingual AI intelligence hub covering technology breakthroughs, funding and market movements, practical AI workflows, and curated videos — updated daily in 8 languages (German, English, Chinese, French, Spanish, Portuguese, Japanese, Korean).',
   },
   zh: {
-    h1: 'Data Cube AI：每日AI新闻、投资信号与实用技巧',
+    h1: `${BRAND.name}：每日AI新闻、投资信号与实用技巧`,
     latestNews: '最新AI新闻',
     recentUpdates: '近期更新',
     trendingTopics: '热门话题',
     description: '多语言AI情报中心，涵盖技术突破、融资与市场动态、实用AI工作流和精选视频——每日以8种语言更新。',
   },
   fr: {
-    h1: "Data Cube AI : Actualités IA quotidiennes, signaux d'investissement et conseils pratiques",
+    h1: `${BRAND.name} : Actualités IA quotidiennes, signaux d'investissement et conseils pratiques`,
     latestNews: "Dernières actualités IA",
     recentUpdates: 'Mises à jour récentes',
     trendingTopics: 'Sujets tendance',
     description: "Hub d'intelligence IA multilingue couvrant les percées technologiques, les mouvements de marché, les workflows IA pratiques et les vidéos sélectionnées — mis à jour quotidiennement en 8 langues.",
   },
   es: {
-    h1: 'Data Cube AI: Noticias diarias de IA, señales de inversión y consejos prácticos',
+    h1: `${BRAND.name}: Noticias diarias de IA, señales de inversión y consejos prácticos`,
     latestNews: 'Últimas noticias de IA',
     recentUpdates: 'Actualizaciones recientes',
     trendingTopics: 'Temas de tendencia',
     description: 'Hub de inteligencia de IA multilingüe que cubre avances tecnológicos, movimientos del mercado, flujos de trabajo prácticos de IA y videos seleccionados — actualizado diariamente en 8 idiomas.',
   },
   pt: {
-    h1: 'Data Cube AI: Notícias diárias de IA, sinais de investimento e dicas práticas',
+    h1: `${BRAND.name}: Notícias diárias de IA, sinais de investimento e dicas práticas`,
     latestNews: 'Últimas notícias de IA',
     recentUpdates: 'Atualizações recentes',
     trendingTopics: 'Tópicos em alta',
     description: 'Hub de inteligência de IA multilíngue cobrindo avanços tecnológicos, movimentos de mercado, fluxos de trabalho práticos de IA e vídeos selecionados — atualizado diariamente em 8 idiomas.',
   },
   ja: {
-    h1: 'Data Cube AI：毎日のAIニュース、投資シグナル、実践ティップス',
+    h1: `${BRAND.name}：毎日のAIニュース、投資シグナル、実践ティップス`,
     latestNews: '最新AIニュース',
     recentUpdates: '最近の更新',
     trendingTopics: 'トレンドトピック',
     description: '多言語AIインテリジェンスハブ：技術的ブレイクスルー、資金調達と市場動向、実践的AIワークフロー、厳選動画 — 8言語で毎日更新。',
   },
   ko: {
-    h1: 'Data Cube AI: 매일 AI 뉴스, 투자 신호, 실용 팁',
+    h1: `${BRAND.name}: 매일 AI 뉴스, 투자 신호, 실용 팁`,
     latestNews: '최신 AI 뉴스',
     recentUpdates: '최근 업데이트',
     trendingTopics: '트렌딩 토픽',
@@ -292,6 +294,7 @@ export async function HomePageContent({ language = 'de' }: HomePageContentProps 
       <section className="sr-only" aria-label={t.h1}>
         <p>{t.h1}</p>
         <p>{t.description}</p>
+        <p>{aiLabel(language)}</p>
 
         {headlines.length > 0 && (
           <section>

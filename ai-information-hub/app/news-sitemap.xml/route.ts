@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
 import { formatPeriodTitle, periodPublishedDate } from '@/lib/period-utils';
 import { absoluteArticleUrl, techStoryId } from '@/lib/article-routes';
+import { BRAND } from '@/lib/brand';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api-production-3ee5.up.railway.app/api';
-const SITE_URL = 'https://www.datacubeai.space';
+const SITE_URL = BRAND.siteUrl;
 // Only the indexed article languages (middleware noindexes the rest —
 // a news sitemap must not advertise URLs that carry noindex).
 const SUPPORTED_LANGS = ['de', 'en', 'zh'] as const;
@@ -86,14 +87,14 @@ function getRecentPeriodIds(weeks: Week[]): string[] {
 function newsTitle(periodId: string, lang: string): string {
   const periodLabel = formatPeriodTitle(periodId, lang);
   const labels: Record<string, string> = {
-    de: `Data Cube AI KI-News ${periodLabel}`,
-    en: `Data Cube AI AI News ${periodLabel}`,
-    zh: `Data Cube AI AI新闻 ${periodLabel}`,
-    fr: `Data Cube AI Actualités IA ${periodLabel}`,
-    es: `Data Cube AI Noticias IA ${periodLabel}`,
-    pt: `Data Cube AI Notícias IA ${periodLabel}`,
-    ja: `Data Cube AI AIニュース ${periodLabel}`,
-    ko: `Data Cube AI AI 뉴스 ${periodLabel}`,
+    de: `${BRAND.name} KI-News ${periodLabel}`,
+    en: `${BRAND.name} AI News ${periodLabel}`,
+    zh: `${BRAND.name} AI新闻 ${periodLabel}`,
+    fr: `${BRAND.name} Actualités IA ${periodLabel}`,
+    es: `${BRAND.name} Noticias IA ${periodLabel}`,
+    pt: `${BRAND.name} Notícias IA ${periodLabel}`,
+    ja: `${BRAND.name} AIニュース ${periodLabel}`,
+    ko: `${BRAND.name} AI 뉴스 ${periodLabel}`,
   };
   return labels[lang] || labels.en;
 }
@@ -138,7 +139,7 @@ export async function GET() {
     <loc>${absoluteArticleUrl(SITE_URL, lang, periodId, techStoryId(post))}</loc>
     <news:news>
       <news:publication>
-        <news:name>Data Cube AI</news:name>
+        <news:name>${escapeXml(BRAND.name)}</news:name>
         <news:language>${LANG_NAMES[lang]}</news:language>
       </news:publication>
       <news:publication_date>${toNewsDate(post.timestamp, fallbackDate)}</news:publication_date>

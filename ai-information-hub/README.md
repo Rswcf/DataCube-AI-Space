@@ -17,6 +17,15 @@ npm run dev     # localhost:3000
 vercel --prod
 ```
 
+## Brand Configuration
+
+Optional build-time variables. Their defaults, in `lib/brand-defaults.json`, are the current brand:
+
+- `NEXT_PUBLIC_BRAND_NAME`
+- `NEXT_PUBLIC_BRAND_SHORT_NAME`
+- `NEXT_PUBLIC_SITE_URL`
+- `NEXT_PUBLIC_FOUNDER_NAME` (empty by default; when set, "Made by <founder>" and `Organization.founder` appear)
+
 ## Tech Stack
 
 - **Frontend**: Next.js 16, React 19, Tailwind CSS 4, Shadcn/ui
@@ -44,8 +53,8 @@ vercel --prod
 - Keyword-optimized SEO: localized metadata, H1/H2/H3 headings, lead paragraphs, and breadcrumbs across all 8 languages
 - Login page supports all 8 languages with language selector row
 - One-click unsubscribe: RFC 8058 route `/api/newsletter/unsubscribe` and token confirm page `/unsubscribe`
-- Unit tests: Vitest for pure modules and the one-click route handler (`npm test`, `lib/**/*.test.ts`, `app/**/*.test.ts`)
-- Non-www → www permanent redirect via vercel.json
+- Unit tests: Vitest for pure modules and the one-click route handler (`npm test`, `lib/**/*.test.ts`, `app/**/*.test.ts`, `test/**/*.test.ts`)
+- Non-www → www permanent redirect via `next.config.mjs` `redirects()`
 - Mobile optimized (overflow-x-hidden, dynamic viewport height, conditional search trends, flex-wrap investment cards, touch-action on scroll containers, mobile feature parity with Support + Newsletter in settings drawer)
 - Distinctive editorial design: Isometric cube logo, Newsreader display headlines, Geist UI labels, thin rule dividers, numbered trend rankings, section-specific accents, staggered card entrance animations, shimmer loading skeletons, tabular-nums on financial data
 - Monetization surfaces: `/for-teams` (contact form → backend `POST /api/contact`), `/premium` (coming soon), and backend developer API/job-board endpoints

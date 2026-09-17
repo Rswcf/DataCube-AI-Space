@@ -1,14 +1,15 @@
 import type { Metadata } from 'next'
+import { BRAND, absoluteUrl, brandedTitle } from '@/lib/brand'
 
 export const metadata: Metadata = {
   title: 'Datenschutzerklärung / Privacy Policy',
-  description: 'Privacy policy for Data Cube AI, covering hosting, functional cookies, analytics, embedded media, backend APIs, and data rights.',
-  alternates: { canonical: 'https://www.datacubeai.space/datenschutz' },
+  description: `Privacy policy for ${BRAND.name}, covering hosting, functional cookies, analytics, embedded media, backend APIs, and data rights.`,
+  alternates: { canonical: absoluteUrl('/datenschutz') },
   openGraph: {
-    title: 'Privacy Policy | Data Cube AI',
-    description: 'Privacy policy for Data Cube AI, covering hosting, cookies, analytics, embedded media, APIs, and data rights.',
-    url: 'https://www.datacubeai.space/datenschutz',
-    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: 'Data Cube AI' }],
+    title: brandedTitle('Privacy Policy'),
+    description: `Privacy policy for ${BRAND.name}, covering hosting, cookies, analytics, embedded media, APIs, and data rights.`,
+    url: absoluteUrl('/datenschutz'),
+    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: BRAND.name }],
   },
 }
 

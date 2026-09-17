@@ -4,6 +4,7 @@ import { Analytics } from '@vercel/analytics/next'
 import { SettingsProvider } from '@/lib/settings-context'
 import { toBcp47, type AppLanguage } from '@/lib/i18n'
 import { OrganizationSchema, WebsiteSchema, FAQSchema } from '@/components/structured-data'
+import { BRAND } from '@/lib/brand'
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-geist-sans' })
 const geistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-geist-mono' })
@@ -38,7 +39,7 @@ export function RootShell({ lang, children }: { lang: AppLanguage; children: Rea
         <WebsiteSchema />
         <FAQSchema lang={lang} />
         {['de', 'en', 'zh', 'fr', 'es', 'pt', 'ja', 'ko'].map((l) => (
-          <link key={l} rel="alternate" type="application/atom+xml" title={`Data Cube AI (${l.toUpperCase()})`} href={`/feed.xml?lang=${l}`} />
+          <link key={l} rel="alternate" type="application/atom+xml" title={`${BRAND.name} (${l.toUpperCase()})`} href={`/feed.xml?lang=${l}`} />
         ))}
       </head>
       <body className={`${geist.variable} ${geistMono.variable} ${newsreader.variable} font-sans antialiased`}>

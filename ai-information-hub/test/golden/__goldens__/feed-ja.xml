@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="ja">
+  <title>Data Cube AI – 毎日のAIニュース</title>
+  <subtitle>厳選AIニュース：テクノロジー、投資、実践ヒント · AI生成：要約はリンク先の情報源をもとにAIが作成しています。</subtitle>
+  <link href="https://www.datacubeai.space/feed.xml?lang=ja" rel="self" type="application/atom+xml" />
+  <link href="https://www.datacubeai.space" rel="alternate" type="text/html" />
+  <id>tag:datacubeai.space,2026:feed:ja</id>
+  <updated>2026-09-13T12:00:00.000Z</updated>
+  <author>
+    <name>Data Cube AI</name>
+    <uri>https://www.datacubeai.space</uri>
+  </author>
+  <generator>Data Cube AI</generator>
+  <entry>
+    <title>Chip startup expands inference capacity in Europe with a new data center (ja).</title>
+    <link href="https://www.datacubeai.space/ja/news/2026-09-13/tech-102" rel="alternate" />
+    <id>tag:datacubeai.space,2026:ja:2026-09-13-tech-102</id>
+    <updated>2026-09-13T11:30:00.000Z</updated>
+    <summary type="text">AI生成 · Chip startup expands inference capacity in Europe with a new data center (ja).</summary>
+    <category term="Infrastructure" />
+    <source>
+      <title>Example Wire</title>
+      <link href="https://example.com/chips" />
+    </source>
+  </entry>
+  <entry>
+    <title>Chip startup expands inference capacity in Europe with a new data center (ja).</title>
+    <link href="https://www.datacubeai.space/ja/news/2026-09-12/tech-102" rel="alternate" />
+    <id>tag:datacubeai.space,2026:ja:2026-09-12-tech-102</id>
+    <updated>2026-09-13T11:30:00.000Z</updated>
+    <summary type="text">AI生成 · Chip startup expands inference capacity in Europe with a new data center (ja).</summary>
+    <category term="Infrastructure" />
+    <source>
+      <title>Example Wire</title>
+      <link href="https://example.com/chips" />
+    </source>
+  </entry>
+  <entry>
+    <title>Chip startup expands inference capacity in Europe with a new data center (ja).</title>
+    <link href="https://www.datacubeai.space/ja/news/2026-kw37/tech-102" rel="alternate" />
+    <id>tag:datacubeai.space,2026:ja:2026-kw37-tech-102</id>
+    <updated>2026-09-13T11:30:00.000Z</updated>
+    <summary type="text">AI生成 · Chip startup expands inference capacity in Europe with a new data center (ja).</summary>
+    <category term="Infrastructure" />
+    <source>
+      <title>Example Wire</title>
+      <link href="https://example.com/chips" />
+    </source>
+  </entry>
+  <entry>
+    <title>OpenAI ships a new reasoning model for developers: the release adds tool use and a lower price (ja).</title>
+    <link href="https://www.datacubeai.space/ja/news/2026-09-13/tech-101" rel="alternate" />
+    <id>tag:datacubeai.space,2026:ja:2026-09-13-tech-101</id>
+    <updated>2026-09-13T09:00:00.000Z</updated>
+    <summary type="text">AI生成 · OpenAI ships a new reasoning model for developers: the release adds tool use and a lower price (ja).</summary>
+    <category term="LLM" />
+    <source>
+      <title>Example News</title>
+      <link href="https://example.com/openai-model" />
+    </source>
+  </entry>
+  <entry>
+    <title>OpenAI ships a new reasoning model for developers: the release adds tool use and a lower price (ja).</title>
+    <link href="https://www.datacubeai.space/ja/news/2026-09-12/tech-101" rel="alternate" />
+    <id>tag:datacubeai.space,2026:ja:2026-09-12-tech-101</id>
+    <updated>2026-09-13T09:00:00.000Z</updated>
+    <summary type="text">AI生成 · OpenAI ships a new reasoning model for developers: the release adds tool use and a lower price (ja).</summary>
+    <category term="LLM" />
+    <source>
+      <title>Example News</title>
+      <link href="https://example.com/openai-model" />
+    </source>
+  </entry>
+  <entry>
+    <title>OpenAI ships a new reasoning model for developers: the release adds tool use and a lower price (ja).</title>
+    <link href="https://www.datacubeai.space/ja/news/2026-kw37/tech-101" rel="alternate" />
+    <id>tag:datacubeai.space,2026:ja:2026-kw37-tech-101</id>
+    <updated>2026-09-13T09:00:00.000Z</updated>
+    <summary type="text">AI生成 · OpenAI ships a new reasoning model for developers: the release adds tool use and a lower price (ja).</summary>
+    <category term="LLM" />
+    <source>
+      <title>Example News</title>
+      <link href="https://example.com/openai-model" />
+    </source>
+  </entry>
+</feed>

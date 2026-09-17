@@ -1,7 +1,9 @@
 import { NextRequest } from 'next/server';
+import { aiLabel } from '@/lib/ai-label';
+import { BRAND, FROZEN_IDS } from '@/lib/brand';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api-production-3ee5.up.railway.app/api';
-const SITE_URL = 'https://www.datacubeai.space';
+const SITE_URL = BRAND.siteUrl;
 
 function escapeXml(str: string): string {
   return str
@@ -89,6 +91,7 @@ function buildDigestHtml(
   const parts: string[] = [];
   const label = periodLabel(periodId, lang);
   const weekUrl = `${SITE_URL}/${lang}/week/${periodId}`;
+  parts.push(`<p><em>${escapeXml(aiLabel(lang))}</em></p>`);
 
   // Tech
   const techPosts: TechPost[] = (techData?.[lang] || []).filter(p => !p.isVideo);
@@ -152,7 +155,7 @@ function buildDigestHtml(
       ${lang === 'de' ? `Alle News vom ${label} lesen →` : `Read all news from ${label} →`}
     </a>
   </p>`);
-  parts.push(`<p style="color:#6b7280;font-size:13px">— Data Cube AI · <a href="${SITE_URL}">datacubeai.space</a></p>`);
+  parts.push(`<p style="color:#6b7280;font-size:13px">— ${escapeXml(BRAND.name)} · <a href="${SITE_URL}">${BRAND.apexHost}</a></p>`);
 
   return parts.join('\n');
 }
@@ -220,26 +223,27 @@ export async function GET(request: NextRequest) {
       entries.push(`  <entry>
     <title>${escapeXml(title)}</title>
     <link href="${escapeXml(weekUrl)}" rel="alternate" />
-    <id>tag:datacubeai.space,2026:digest-${periodId}-${lang}</id>
+    <id>${FROZEN_IDS.atomTagPrefix}digest-${periodId}-${lang}</id>
     <updated>${updated}</updated>
     <content type="html">${escapeXml(html)}</content>
   </entry>`);
     } catch {}
   }
 
-  const feedTitle = lang === 'de' ? 'Data Cube AI — Newsletter Digest' : 'Data Cube AI — Newsletter Digest';
+  const feedTitle = lang === 'de' ? `${BRAND.name} — Newsletter Digest` : `${BRAND.name} — Newsletter Digest`;
   const now = new Date().toISOString();
+  const subtitle = lang === 'de' ? `Täglicher KI-News Digest von ${BRAND.name}` : `Daily AI news digest from ${BRAND.name}`;
 
   const atom = `<?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="${lang}">
   <title>${escapeXml(feedTitle)}</title>
-  <subtitle>${lang === 'de' ? 'Täglicher KI-News Digest von Data Cube AI' : 'Daily AI news digest from Data Cube AI'}</subtitle>
+  <subtitle>${escapeXml(`${subtitle} · ${aiLabel(lang)}`)}</subtitle>
   <link href="${SITE_URL}/newsletter.xml?lang=${lang}" rel="self" type="application/atom+xml" />
   <link href="${SITE_URL}" rel="alternate" type="text/html" />
-  <id>tag:datacubeai.space,2026:newsletter:${lang}</id>
+  <id>${FROZEN_IDS.atomTagPrefix}newsletter:${lang}</id>
   <updated>${now}</updated>
   <author>
-    <name>Data Cube AI</name>
+    <name>${escapeXml(BRAND.name)}</name>
     <uri>${SITE_URL}</uri>
   </author>
 ${entries.join('\n')}

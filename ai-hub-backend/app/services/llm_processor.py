@@ -434,7 +434,8 @@ Output the translated JSON array with the same structure. Output ONLY the JSON a
             )
         articles_text = "\n\n".join(article_entries)
 
-        prompt = f"""You are an AI news classifier for DataCube AI, a daily AI briefing for a global audience.
+        brand = get_settings().brand_name
+        prompt = f"""You are an AI news classifier for {brand}, a daily AI briefing for a global audience.
 
 Your task: classify each article into EXACTLY ONE section.
 
@@ -521,7 +522,8 @@ Output ONLY the JSON array, no markdown fences."""
             for a in articles[:40]
         )
 
-        prompt = f"""You are an editor for DataCube AI, a daily AI news briefing read by a global
+        brand = get_settings().brand_name
+        prompt = f"""You are an editor for {brand}, a daily AI news briefing read by a global
 audience of professionals, developers, and AI enthusiasts.
 
 From the following articles, select UP TO {count} of the most important ones.
@@ -584,7 +586,8 @@ Rules:
             for v in videos[:20]
         )
 
-        prompt = f"""You are a video curator for DataCube AI, a daily AI briefing for a global
+        brand = get_settings().brand_name
+        prompt = f"""You are a video curator for {brand}, a daily AI briefing for a global
 audience of professionals, developers, and AI enthusiasts.
 
 From these YouTube videos, select the {count} most valuable and relevant ones.
@@ -633,7 +636,8 @@ Output ONLY valid JSON."""
             for a in articles[:40]
         )
 
-        prompt = f"""You are a financial news editor for DataCube AI, a daily AI briefing read by a
+        brand = get_settings().brand_name
+        prompt = f"""You are a financial news editor for {brand}, a daily AI briefing read by a
 global audience of investors, founders, and technology professionals.
 Content may be in English OR Chinese (from 36Kr) - process both languages equally.
 
@@ -771,7 +775,8 @@ Output ONLY valid JSON."""
             for a in articles  # Use all articles
         )
 
-        prompt = f"""You are a financial news editor for DataCube AI, a daily AI briefing read by a
+        brand = get_settings().brand_name
+        prompt = f"""You are a financial news editor for {brand}, a daily AI briefing read by a
 global audience of investors, founders, and technology professionals.
 Your task: extract up to {count} notable M&A and investment deals from the articles below.
 
@@ -887,8 +892,8 @@ JSON:"""
 
         This is an information-gain layer, not a summary layer: bullets must
         synthesize ACROSS stories and cite concrete numbers — things no single
-        upstream source states. The UI attributes it to "DataCube AI
-        Editorial" with an /ai-disclosure link (never to an invented human).
+        upstream source states. The UI labels it as AI-generated analysis
+        with an /ai-disclosure link (never a human byline).
 
         Returns {"en": [{"text": ..., "topic": ...}], "de": [...], "zh": [...]}
         (DE/ZH translated immediately; other languages fall back to EN).
@@ -916,7 +921,8 @@ JSON:"""
         if not tech_lines and not inv_lines:
             return {}
 
-        prompt = f"""You are the editorial layer of DataCube AI, a daily AI briefing for a global
+        brand = get_settings().brand_name
+        prompt = f"""You are the editorial layer of {brand}, a daily AI briefing for a global
 audience. Below are today's processed stories and trending topics.
 
 TECH STORIES (with impact rating):

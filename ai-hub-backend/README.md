@@ -291,6 +291,20 @@ railway variables set CONTACT_INBOX=you@example.com   # contact form destination
 railway variables set CORS_ORIGINS='["http://localhost:3000","https://www.datacubeai.space","https://ai-information-hub.vercel.app"]'
 ```
 
+**Optional brand settings.**
+
+- `BRAND_NAME`
+- `BRAND_SHORT_NAME`
+- `SITE_URL`
+- `FOUNDER_NAME`
+- `NEWSLETTER_FROM_NAME`
+- `API_KEY_PREFIX` (≤ 8, new keys only)
+- `RSS_USER_AGENT`
+- `GITHUB_ISSUES_URL`
+- `API_TITLE`
+
+The defaults in `app/config.py` are the current brand; `NEWSLETTER_FROM_EMAIL`, `RSS_USER_AGENT` and `CORS_ORIGINS` derive from `SITE_URL` when unset.
+
 **Rotating `SIGNING_SECRET`:** in one change, set `SIGNING_SECRET_PREVIOUS` to the current value and `SIGNING_SECRET` to a new random value. Links in emails signed with the old key keep working while both are set. Tokens never expire, so remove `SIGNING_SECRET_PREVIOUS` only once those older links may stop working; their readers can still use the contact form. `SIGNING_SECRET_PREVIOUS` never verifies on its own: without a usable `SIGNING_SECRET`, every one-click link fails.
 
 ### 4. Deploy

@@ -1,0 +1,38 @@
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Data Cube AI란 무엇인가요?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Data Cube AI는 다국어(8개 언어: DE, EN, ZH, FR, ES, PT, JA, KO) 일일 AI 뉴스 애그리게이터입니다. 40개 이상의 소스에서 기술 돌파구, 투자 뉴스, 실용 팁, YouTube 동영상을 엄선합니다."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "콘텐츠는 얼마나 자주 업데이트되나요?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "콘텐츠는 매일 베를린 시간 늦은 저녁에 업데이트되며, 새로운 기술 기사, 투자 뉴스, 실용 팁이 추가됩니다."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Data Cube AI는 어떤 언어를 지원하나요?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Data Cube AI는 8개 언어를 지원합니다: 독일어, 영어, 중국어, 프랑스어, 스페인어, 포르투갈어, 일본어, 한국어."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Data Cube AI는 어떤 종류의 AI 뉴스를 다루나요?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Data Cube AI는 세 가지 주요 카테고리를 다룹니다: 기술(AI 돌파구, 연구, 제품 출시), 투자(펀딩 라운드, M&A, 시장 동향), 팁(실용적인 AI 도구 및 프롬프트)."
+      }
+    }
+  ]
+}

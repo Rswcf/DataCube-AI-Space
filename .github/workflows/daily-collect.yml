@@ -298,7 +298,7 @@ jobs:
         if: steps.poll.outputs.RESULT == 'completed' || steps.retry.outputs.RETRY_OK == 'true'
         run: |
           set +e
-          SITE="https://www.datacubeai.space"
+          SITE="${{ vars.SITE_URL || 'https://www.datacubeai.space' }}"
           KEY="6abe6c46976ff8d24ca82aeb2a2dfb4c"
           PERIOD="${{ steps.period.outputs.PERIOD }}"
 
@@ -306,7 +306,7 @@ jobs:
           # day page and indexed-language homepages on top.
           curl -sS --max-time 60 "$SITE/news-sitemap.xml" -o news.xml || true
           python3 - "$SITE" "$KEY" "$PERIOD" <<'EOF'
-          import json, re, sys, urllib.request
+          import json, re, sys, urllib.parse, urllib.request
 
           site, key, period = sys.argv[1], sys.argv[2], sys.argv[3]
           urls = set()
@@ -320,7 +320,7 @@ jobs:
               urls.add(f"{site}/{lang}/week/{period}")
 
           payload = {
-              "host": "www.datacubeai.space",
+              "host": urllib.parse.urlsplit(site).hostname,
               "key": key,
               "keyLocation": f"{site}/{key}.txt",
               "urlList": sorted(urls)[:10000],

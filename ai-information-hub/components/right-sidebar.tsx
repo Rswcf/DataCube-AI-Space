@@ -9,6 +9,7 @@ import { usePeriodTrends } from "@/hooks/use-period-trends";
 import { useSettings } from "@/lib/settings-context";
 import { LANGUAGE_OPTIONS } from "@/lib/translations";
 import { cn } from "@/lib/utils";
+import { BRAND } from "@/lib/brand";
 
 
 interface RightSidebarProps {
@@ -103,7 +104,7 @@ export function RightSidebar({ weekId, onSearchChange }: RightSidebarProps) {
         >
           <div>
             <div className="mb-3 font-display text-[11px] font-semibold uppercase tracking-[0.14em] text-[#1c1a17] dark:text-foreground">
-              Data Cube AI
+              {BRAND.name}
             </div>
             <h2 className="mx-auto max-w-[15rem] break-words font-display text-2xl font-normal leading-[1.05] text-[#1c1a17] dark:text-foreground">
               {t("newsletterHeading")}
@@ -242,7 +243,8 @@ export function RightSidebar({ weekId, onSearchChange }: RightSidebarProps) {
               Editorial Policy
             </a>
           </nav>
-          <p>&copy; 2026 Data Cube, All Rights Reserved</p>
+          <p>&copy; 2026 {BRAND.shortName}, All Rights Reserved</p>
+          {BRAND.founderName ? <p>Made by {BRAND.founderName}</p> : null}
         </div>
       </div>
     </aside>

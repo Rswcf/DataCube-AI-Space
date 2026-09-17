@@ -2,11 +2,12 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { SUPPORTED_LANGUAGES, isSupportedLanguage, toBcp47 } from '@/lib/i18n'
+import { BRAND, fillBrand } from '@/lib/brand'
 import { Unlock, Globe, Rss, TrendingUp, Calendar, Braces, ArrowRight, Code } from 'lucide-react'
 
 export const revalidate = 86400
 
-const BASE_URL = 'https://www.datacubeai.space'
+const BASE_URL = BRAND.siteUrl
 const API_BASE_URL = 'https://api-production-3ee5.up.railway.app'
 
 type Props = {
@@ -14,21 +15,21 @@ type Props = {
 }
 
 type L = Record<string, string>
-const t = (map: L, lang: string) => map[lang] || map.en
+const t = (map: L, lang: string) => fillBrand(map[lang] || map.en)
 
 // ---------------------------------------------------------------------------
 // Metadata
 // ---------------------------------------------------------------------------
 
 const META_TITLES: L = {
-  de: 'KI-News-API in 8 Sprachen | DataCube AI',
-  en: 'Free AI News API | DataCube AI',
-  zh: '\u514d\u8d39AI\u65b0\u95fbAPI \u2014 8\u79cd\u8bed\u8a00\u7684\u7cbe\u9009AI\u65b0\u95fb\u6570\u636e | DataCube AI',
-  fr: 'API Actualit\u00e9s IA | DataCube AI',
-  es: 'API de Noticias IA | DataCube AI',
-  pt: 'API de Not\u00edcias IA | DataCube AI',
-  ja: '\u7121\u6599AI\u30cb\u30e5\u30fc\u30b9API \u2014 8\u8a00\u8a9e\u306e\u30ad\u30e5\u30ec\u30fc\u30b7\u30e7\u30f3AI\u30cb\u30e5\u30fc\u30b9\u30c7\u30fc\u30bf | DataCube AI',
-  ko: '\ubb34\ub8cc AI \ub274\uc2a4 API \u2014 8\uac1c \uc5b8\uc5b4 \ud050\ub808\uc774\uc158 AI \ub274\uc2a4 \ub370\uc774\ud130 | DataCube AI',
+  de: 'KI-News-API in 8 Sprachen | {brand}',
+  en: 'Free AI News API | {brand}',
+  zh: '\u514d\u8d39AI\u65b0\u95fbAPI \u2014 8\u79cd\u8bed\u8a00\u7684\u7cbe\u9009AI\u65b0\u95fb\u6570\u636e | {brand}',
+  fr: 'API Actualit\u00e9s IA | {brand}',
+  es: 'API de Noticias IA | {brand}',
+  pt: 'API de Not\u00edcias IA | {brand}',
+  ja: '\u7121\u6599AI\u30cb\u30e5\u30fc\u30b9API \u2014 8\u8a00\u8a9e\u306e\u30ad\u30e5\u30ec\u30fc\u30b7\u30e7\u30f3AI\u30cb\u30e5\u30fc\u30b9\u30c7\u30fc\u30bf | {brand}',
+  ko: '\ubb34\ub8cc AI \ub274\uc2a4 API \u2014 8\uac1c \uc5b8\uc5b4 \ud050\ub808\uc774\uc158 AI \ub274\uc2a4 \ub370\uc774\ud130 | {brand}',
 }
 
 const META_DESCRIPTIONS: L = {
@@ -75,7 +76,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
           url: '/og-image.jpg',
           width: 1200,
           height: 630,
-          alt: 'DataCube AI News API',
+          alt: `${BRAND.name} News API`,
         },
       ],
     },
@@ -86,7 +87,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       images: [
         {
           url: '/og-image.jpg',
-          alt: 'DataCube AI News API',
+          alt: `${BRAND.name} News API`,
         },
       ],
     },
@@ -226,14 +227,14 @@ const RESPONSE_LEAD: L = {
 
 // Section E: Features Grid
 const H2_FEATURES: L = {
-  de: 'Warum die DataCube AI News API nutzen?',
-  en: 'Why use the DataCube AI News API?',
-  zh: '\u4e3a\u4ec0\u4e48\u4f7f\u7528 DataCube AI \u65b0\u95fb API\uff1f',
-  fr: "Pourquoi utiliser l'API DataCube AI News ?",
-  es: '\u00bfPor qu\u00e9 usar la API DataCube AI News?',
-  pt: 'Por que usar a API DataCube AI News?',
-  ja: '\u306a\u305cDataCube AI\u30cb\u30e5\u30fc\u30b9API\u3092\u4f7f\u3046\u306e\u304b\uff1f',
-  ko: '\uc65c DataCube AI \ub274\uc2a4 API\ub97c \uc0ac\uc6a9\ud574\uc57c \ud558\ub098\uc694?',
+  de: 'Warum die {brand} News API nutzen?',
+  en: 'Why use the {brand} News API?',
+  zh: '\u4e3a\u4ec0\u4e48\u4f7f\u7528 {brand} \u65b0\u95fb API\uff1f',
+  fr: "Pourquoi utiliser l'API {brand} News ?",
+  es: '\u00bfPor qu\u00e9 usar la API {brand} News?',
+  pt: 'Por que usar a API {brand} News?',
+  ja: '\u306a\u305c{brand}\u30cb\u30e5\u30fc\u30b9API\u3092\u4f7f\u3046\u306e\u304b\uff1f',
+  ko: '\uc65c {brand} \ub274\uc2a4 API\ub97c \uc0ac\uc6a9\ud574\uc57c \ud558\ub098\uc694?',
 }
 
 const FEATURE_TITLES: Record<string, L> = {
@@ -333,14 +334,14 @@ const FAQ_ITEMS: Array<{ q: L; a: L }> = [
       ko: 'AI \ub274\uc2a4 API\ub780 \ubb34\uc5c7\uc778\uac00\uc694?',
     },
     a: {
-      de: 'Die DataCube AI News API ist eine kostenlose REST-Schnittstelle, die kuratierten Zugang zu KI-Nachrichten-Daten aus 35+ Quellen bietet. Sie liefert Technologie-News, Investments, praktische Tipps und Video-Zusammenfassungen in 8 Sprachen als JSON.',
-      en: 'The DataCube AI News API is a free REST interface that provides curated access to AI news data from 35+ sources. It delivers technology news, investment data, practical tips, and video summaries in 8 languages as JSON.',
-      zh: 'DataCube AI \u65b0\u95fb API \u662f\u4e00\u4e2a\u514d\u8d39\u7684 REST \u63a5\u53e3\uff0c\u63d0\u4f9b\u5bf9\u6765\u81ea 35+ \u6e90\u7684\u7cbe\u9009 AI \u65b0\u95fb\u6570\u636e\u7684\u8bbf\u95ee\u3002\u5b83\u4ee5 JSON \u683c\u5f0f\u63d0\u4f9b\u6280\u672f\u65b0\u95fb\u3001\u6295\u8d44\u6570\u636e\u3001\u5b9e\u7528\u6280\u5de7\u548c\u89c6\u9891\u6458\u8981\uff0c\u652f\u6301 8 \u79cd\u8bed\u8a00\u3002',
-      fr: "L'API DataCube AI News est une interface REST gratuite qui fournit un acc\u00e8s curate aux donn\u00e9es d'actualit\u00e9s IA de 35+ sources. Elle d\u00e9livre des news tech, des donn\u00e9es d'investissement, des conseils et des r\u00e9sum\u00e9s vid\u00e9o en 8 langues au format JSON.",
-      es: 'La API DataCube AI News es una interfaz REST gratuita que proporciona acceso curado a datos de noticias IA de 35+ fuentes. Entrega noticias tecnol\u00f3gicas, datos de inversi\u00f3n, consejos pr\u00e1cticos y res\u00famenes de video en 8 idiomas como JSON.',
-      pt: 'A API DataCube AI News \u00e9 uma interface REST gratuita que fornece acesso curado a dados de not\u00edcias IA de 35+ fontes. Entrega not\u00edcias tecnol\u00f3gicas, dados de investimento, dicas pr\u00e1ticas e resumos de v\u00eddeo em 8 idiomas como JSON.',
-      ja: 'DataCube AI\u30cb\u30e5\u30fc\u30b9API\u306f\u300135\u4ee5\u4e0a\u306e\u30bd\u30fc\u30b9\u304b\u3089\u306e\u53b3\u9078\u3055\u308c\u305fAI\u30cb\u30e5\u30fc\u30b9\u30c7\u30fc\u30bf\u3078\u306e\u30a2\u30af\u30bb\u30b9\u3092\u63d0\u4f9b\u3059\u308b\u7121\u6599REST\u30a4\u30f3\u30bf\u30fc\u30d5\u30a7\u30fc\u30b9\u3067\u3059\u3002\u30c6\u30c3\u30af\u30cb\u30e5\u30fc\u30b9\u3001\u6295\u8cc7\u30c7\u30fc\u30bf\u3001\u5b9f\u8df5\u30d2\u30f3\u30c8\u3001\u52d5\u753b\u8981\u7d04\u30928\u8a00\u8a9e\u306eJSON\u3067\u63d0\u4f9b\u3002',
-      ko: 'DataCube AI \ub274\uc2a4 API\ub294 35\uac1c \uc774\uc0c1\uc758 \uc18c\uc2a4\uc5d0\uc11c \ud050\ub808\uc774\uc158\ub41c AI \ub274\uc2a4 \ub370\uc774\ud130\uc5d0 \uc561\uc138\uc2a4\ub97c \uc81c\uacf5\ud558\ub294 \ubb34\ub8cc REST \uc778\ud130\ud398\uc774\uc2a4\uc785\ub2c8\ub2e4. \uae30\uc220 \ub274\uc2a4, \ud22c\uc790 \ub370\uc774\ud130, \uc2e4\uc6a9 \ud301, \ub3d9\uc601\uc0c1 \uc694\uc57d\uc744 8\uac1c \uc5b8\uc5b4\ub85c JSON\uc73c\ub85c \uc81c\uacf5\ud569\ub2c8\ub2e4.',
+      de: 'Die {brand} News API ist eine kostenlose REST-Schnittstelle, die kuratierten Zugang zu KI-Nachrichten-Daten aus 35+ Quellen bietet. Sie liefert Technologie-News, Investments, praktische Tipps und Video-Zusammenfassungen in 8 Sprachen als JSON.',
+      en: 'The {brand} News API is a free REST interface that provides curated access to AI news data from 35+ sources. It delivers technology news, investment data, practical tips, and video summaries in 8 languages as JSON.',
+      zh: '{brand} \u65b0\u95fb API \u662f\u4e00\u4e2a\u514d\u8d39\u7684 REST \u63a5\u53e3\uff0c\u63d0\u4f9b\u5bf9\u6765\u81ea 35+ \u6e90\u7684\u7cbe\u9009 AI \u65b0\u95fb\u6570\u636e\u7684\u8bbf\u95ee\u3002\u5b83\u4ee5 JSON \u683c\u5f0f\u63d0\u4f9b\u6280\u672f\u65b0\u95fb\u3001\u6295\u8d44\u6570\u636e\u3001\u5b9e\u7528\u6280\u5de7\u548c\u89c6\u9891\u6458\u8981\uff0c\u652f\u6301 8 \u79cd\u8bed\u8a00\u3002',
+      fr: "L'API {brand} News est une interface REST gratuite qui fournit un acc\u00e8s curate aux donn\u00e9es d'actualit\u00e9s IA de 35+ sources. Elle d\u00e9livre des news tech, des donn\u00e9es d'investissement, des conseils et des r\u00e9sum\u00e9s vid\u00e9o en 8 langues au format JSON.",
+      es: 'La API {brand} News es una interfaz REST gratuita que proporciona acceso curado a datos de noticias IA de 35+ fuentes. Entrega noticias tecnol\u00f3gicas, datos de inversi\u00f3n, consejos pr\u00e1cticos y res\u00famenes de video en 8 idiomas como JSON.',
+      pt: 'A API {brand} News \u00e9 uma interface REST gratuita que fornece acesso curado a dados de not\u00edcias IA de 35+ fontes. Entrega not\u00edcias tecnol\u00f3gicas, dados de investimento, dicas pr\u00e1ticas e resumos de v\u00eddeo em 8 idiomas como JSON.',
+      ja: '{brand}\u30cb\u30e5\u30fc\u30b9API\u306f\u300135\u4ee5\u4e0a\u306e\u30bd\u30fc\u30b9\u304b\u3089\u306e\u53b3\u9078\u3055\u308c\u305fAI\u30cb\u30e5\u30fc\u30b9\u30c7\u30fc\u30bf\u3078\u306e\u30a2\u30af\u30bb\u30b9\u3092\u63d0\u4f9b\u3059\u308b\u7121\u6599REST\u30a4\u30f3\u30bf\u30fc\u30d5\u30a7\u30fc\u30b9\u3067\u3059\u3002\u30c6\u30c3\u30af\u30cb\u30e5\u30fc\u30b9\u3001\u6295\u8cc7\u30c7\u30fc\u30bf\u3001\u5b9f\u8df5\u30d2\u30f3\u30c8\u3001\u52d5\u753b\u8981\u7d04\u30928\u8a00\u8a9e\u306eJSON\u3067\u63d0\u4f9b\u3002',
+      ko: '{brand} \ub274\uc2a4 API\ub294 35\uac1c \uc774\uc0c1\uc758 \uc18c\uc2a4\uc5d0\uc11c \ud050\ub808\uc774\uc158\ub41c AI \ub274\uc2a4 \ub370\uc774\ud130\uc5d0 \uc561\uc138\uc2a4\ub97c \uc81c\uacf5\ud558\ub294 \ubb34\ub8cc REST \uc778\ud130\ud398\uc774\uc2a4\uc785\ub2c8\ub2e4. \uae30\uc220 \ub274\uc2a4, \ud22c\uc790 \ub370\uc774\ud130, \uc2e4\uc6a9 \ud301, \ub3d9\uc601\uc0c1 \uc694\uc57d\uc744 8\uac1c \uc5b8\uc5b4\ub85c JSON\uc73c\ub85c \uc81c\uacf5\ud569\ub2c8\ub2e4.',
     },
   },
   {
@@ -514,7 +515,7 @@ export default async function AINewsAPIToolPage({ params }: Props) {
   const softwareAppSchema = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
-    name: 'DataCube AI News API',
+    name: `${BRAND.name} News API`,
     description: t(META_DESCRIPTIONS, lang),
     url: pageUrl,
     applicationCategory: 'DeveloperApplication',
@@ -526,7 +527,7 @@ export default async function AINewsAPIToolPage({ params }: Props) {
     },
     author: {
       '@type': 'Organization',
-      name: 'DataCube AI',
+      name: BRAND.name,
       url: BASE_URL,
     },
     inLanguage: ['de', 'en', 'zh-Hans', 'fr', 'es', 'pt', 'ja', 'ko'],

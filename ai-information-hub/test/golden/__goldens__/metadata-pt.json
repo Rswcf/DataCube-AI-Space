@@ -1,0 +1,394 @@
+{
+  "home": {
+    "title": {
+      "absolute": "Data Cube AI | Notícias diárias de IA"
+    },
+    "description": "Notícias de IA, sinais de investimento e workflows práticos, selecionados diariamente em 8 idiomas.",
+    "alternates": {
+      "canonical": "https://www.datacubeai.space/pt",
+      "languages": {
+        "x-default": "https://www.datacubeai.space",
+        "de": "https://www.datacubeai.space/de",
+        "en": "https://www.datacubeai.space/en",
+        "zh-Hans": "https://www.datacubeai.space/zh",
+        "fr": "https://www.datacubeai.space/fr",
+        "es": "https://www.datacubeai.space/es",
+        "pt": "https://www.datacubeai.space/pt",
+        "ja": "https://www.datacubeai.space/ja",
+        "ko": "https://www.datacubeai.space/ko"
+      }
+    },
+    "openGraph": {
+      "title": "Data Cube AI | Notícias diárias de IA",
+      "description": "Notícias de IA, investimentos e dicas — atualizados diariamente em 8 idiomas.",
+      "url": "https://www.datacubeai.space/pt",
+      "images": [
+        {
+          "url": "/og-image.jpg",
+          "width": 1200,
+          "height": 630,
+          "alt": "Data Cube AI"
+        }
+      ]
+    },
+    "twitter": {
+      "card": "summary_large_image",
+      "title": "Data Cube AI | Notícias diárias de IA",
+      "description": "Notícias de IA, investimentos e dicas — atualizados diariamente em 8 idiomas.",
+      "images": [
+        {
+          "url": "/og-image.jpg",
+          "alt": "Data Cube AI"
+        }
+      ]
+    }
+  },
+  "week": {
+    "title": "Notícias IA Sep 13, 2026",
+    "description": "Notícias de IA para Sep 13, 2026: tecnologia, sinais de investimento, dicas práticas e fontes no Data Cube AI.",
+    "alternates": {
+      "canonical": "https://www.datacubeai.space/pt/week/2026-09-13",
+      "languages": {
+        "x-default": "https://www.datacubeai.space/en/week/2026-09-13",
+        "de": "https://www.datacubeai.space/de/week/2026-09-13",
+        "en": "https://www.datacubeai.space/en/week/2026-09-13",
+        "zh-Hans": "https://www.datacubeai.space/zh/week/2026-09-13",
+        "fr": "https://www.datacubeai.space/fr/week/2026-09-13",
+        "es": "https://www.datacubeai.space/es/week/2026-09-13",
+        "pt": "https://www.datacubeai.space/pt/week/2026-09-13",
+        "ja": "https://www.datacubeai.space/ja/week/2026-09-13",
+        "ko": "https://www.datacubeai.space/ko/week/2026-09-13"
+      }
+    },
+    "openGraph": {
+      "title": "Notícias IA Sep 13, 2026 | Data Cube AI",
+      "description": "Notícias de IA para Sep 13, 2026: tecnologia, sinais de investimento, dicas práticas e fontes no Data Cube AI.",
+      "url": "https://www.datacubeai.space/pt/week/2026-09-13",
+      "type": "article",
+      "publishedTime": "2026-09-13T00:00:00.000Z",
+      "images": [
+        {
+          "url": "/api/og?period=2026-09-13&lang=pt",
+          "width": 1200,
+          "height": 630,
+          "alt": "Data Cube AI – Notícias IA Sep 13, 2026"
+        }
+      ]
+    },
+    "twitter": {
+      "card": "summary_large_image",
+      "title": "Notícias IA Sep 13, 2026 | Data Cube AI",
+      "description": "Notícias de IA para Sep 13, 2026: tecnologia, sinais de investimento, dicas práticas e fontes no Data Cube AI.",
+      "images": [
+        {
+          "url": "/api/og?period=2026-09-13&lang=pt",
+          "alt": "Data Cube AI – Notícias IA Sep 13, 2026"
+        }
+      ]
+    }
+  },
+  "topic": {
+    "title": "Openai Notícias IA – Últimas análises",
+    "description": "Cobertura de IA selecionada para Openai: notícias de tecnologia, sinais de investimento e dicas práticas.",
+    "robots": {
+      "index": false,
+      "follow": false
+    },
+    "alternates": {
+      "canonical": "https://www.datacubeai.space/pt/topic/openai",
+      "languages": {
+        "x-default": "https://www.datacubeai.space/en/topic/openai",
+        "de": "https://www.datacubeai.space/de/topic/openai",
+        "en": "https://www.datacubeai.space/en/topic/openai",
+        "zh-Hans": "https://www.datacubeai.space/zh/topic/openai",
+        "fr": "https://www.datacubeai.space/fr/topic/openai",
+        "es": "https://www.datacubeai.space/es/topic/openai",
+        "pt": "https://www.datacubeai.space/pt/topic/openai",
+        "ja": "https://www.datacubeai.space/ja/topic/openai",
+        "ko": "https://www.datacubeai.space/ko/topic/openai"
+      }
+    },
+    "openGraph": {
+      "title": "Openai Notícias IA – Últimas análises",
+      "description": "Cobertura de IA selecionada para Openai: notícias de tecnologia, sinais de investimento e dicas práticas.",
+      "url": "https://www.datacubeai.space/pt/topic/openai",
+      "type": "article",
+      "images": [
+        {
+          "url": "/og-image.jpg",
+          "width": 1200,
+          "height": 630,
+          "alt": "Data Cube AI – Openai"
+        }
+      ]
+    }
+  },
+  "topicCanonical": {
+    "title": "Openai Notícias IA – Últimas análises",
+    "description": "Cobertura de IA selecionada para Openai: notícias de tecnologia, sinais de investimento e dicas práticas.",
+    "alternates": {
+      "canonical": "https://www.datacubeai.space/pt/topic/openai",
+      "languages": {
+        "x-default": "https://www.datacubeai.space/en/topic/openai",
+        "de": "https://www.datacubeai.space/de/topic/openai",
+        "en": "https://www.datacubeai.space/en/topic/openai",
+        "zh-Hans": "https://www.datacubeai.space/zh/topic/openai",
+        "fr": "https://www.datacubeai.space/fr/topic/openai",
+        "es": "https://www.datacubeai.space/es/topic/openai",
+        "pt": "https://www.datacubeai.space/pt/topic/openai",
+        "ja": "https://www.datacubeai.space/ja/topic/openai",
+        "ko": "https://www.datacubeai.space/ko/topic/openai"
+      }
+    },
+    "openGraph": {
+      "title": "Openai Notícias IA – Últimas análises",
+      "description": "Cobertura de IA selecionada para Openai: notícias de tecnologia, sinais de investimento e dicas práticas.",
+      "url": "https://www.datacubeai.space/pt/topic/openai",
+      "type": "article",
+      "images": [
+        {
+          "url": "/og-image.jpg",
+          "width": 1200,
+          "height": 630,
+          "alt": "Data Cube AI – Openai"
+        }
+      ]
+    }
+  },
+  "article": {
+    "title": "OpenAI ships a new reasoning model for developers",
+    "description": "OpenAI ships a new reasoning model for developers: the release adds tool use and a lower price (pt).",
+    "robots": {
+      "index": false,
+      "follow": true
+    },
+    "alternates": {
+      "canonical": "https://www.datacubeai.space/pt/news/2026-09-13/tech-101",
+      "languages": {
+        "x-default": "https://www.datacubeai.space/en/news/2026-09-13/tech-101",
+        "de": "https://www.datacubeai.space/de/news/2026-09-13/tech-101",
+        "en": "https://www.datacubeai.space/en/news/2026-09-13/tech-101",
+        "zh-Hans": "https://www.datacubeai.space/zh/news/2026-09-13/tech-101",
+        "fr": "https://www.datacubeai.space/fr/news/2026-09-13/tech-101",
+        "es": "https://www.datacubeai.space/es/news/2026-09-13/tech-101",
+        "pt": "https://www.datacubeai.space/pt/news/2026-09-13/tech-101",
+        "ja": "https://www.datacubeai.space/ja/news/2026-09-13/tech-101",
+        "ko": "https://www.datacubeai.space/ko/news/2026-09-13/tech-101"
+      }
+    },
+    "openGraph": {
+      "title": "OpenAI ships a new reasoning model for developers",
+      "description": "OpenAI ships a new reasoning model for developers: the release adds tool use and a lower price (pt).",
+      "url": "https://www.datacubeai.space/pt/news/2026-09-13/tech-101",
+      "type": "article",
+      "publishedTime": "2026-09-13T09:00:00.000Z",
+      "images": [
+        {
+          "url": "/og-image.jpg",
+          "width": 1200,
+          "height": 630,
+          "alt": "Data Cube AI"
+        }
+      ]
+    },
+    "twitter": {
+      "card": "summary_large_image",
+      "title": "OpenAI ships a new reasoning model for developers",
+      "description": "OpenAI ships a new reasoning model for developers: the release adds tool use and a lower price (pt).",
+      "images": [
+        "/og-image.jpg"
+      ]
+    }
+  },
+  "articleNotFound": {
+    "title": "Article not found",
+    "robots": {
+      "index": false,
+      "follow": true
+    }
+  },
+  "tools": {
+    "aggregator": {
+      "title": {
+        "absolute": "Agregador de Notícias IA | Data Cube AI"
+      },
+      "description": "Data Cube AI seleciona notícias IA diárias de 35+ fontes: tecnologia, investimentos, dicas e vídeos.",
+      "alternates": {
+        "canonical": "https://www.datacubeai.space/pt/tools/ai-news-aggregator",
+        "languages": {
+          "x-default": "https://www.datacubeai.space/en/tools/ai-news-aggregator",
+          "de": "https://www.datacubeai.space/de/tools/ai-news-aggregator",
+          "en": "https://www.datacubeai.space/en/tools/ai-news-aggregator",
+          "zh-Hans": "https://www.datacubeai.space/zh/tools/ai-news-aggregator",
+          "fr": "https://www.datacubeai.space/fr/tools/ai-news-aggregator",
+          "es": "https://www.datacubeai.space/es/tools/ai-news-aggregator",
+          "pt": "https://www.datacubeai.space/pt/tools/ai-news-aggregator",
+          "ja": "https://www.datacubeai.space/ja/tools/ai-news-aggregator",
+          "ko": "https://www.datacubeai.space/ko/tools/ai-news-aggregator"
+        }
+      },
+      "openGraph": {
+        "title": "Agregador de Notícias IA | Data Cube AI",
+        "description": "Data Cube AI seleciona notícias IA diárias de 35+ fontes: tecnologia, investimentos, dicas e vídeos.",
+        "url": "https://www.datacubeai.space/pt/tools/ai-news-aggregator",
+        "images": [
+          {
+            "url": "/og-image.jpg",
+            "width": 1200,
+            "height": 630,
+            "alt": "Data Cube AI News Aggregator"
+          }
+        ]
+      },
+      "twitter": {
+        "card": "summary_large_image",
+        "title": "Agregador de Notícias IA | Data Cube AI",
+        "description": "Data Cube AI seleciona notícias IA diárias de 35+ fontes: tecnologia, investimentos, dicas e vídeos.",
+        "images": [
+          {
+            "url": "/og-image.jpg",
+            "alt": "Data Cube AI News Aggregator"
+          }
+        ]
+      }
+    },
+    "api": {
+      "title": {
+        "absolute": "API de Notícias IA | Data Cube AI"
+      },
+      "description": "API REST gratuita para notícias IA de 35+ fontes: tecnologia, investimentos, dicas e vídeos em 8 idiomas.",
+      "alternates": {
+        "canonical": "https://www.datacubeai.space/pt/tools/ai-news-api",
+        "languages": {
+          "x-default": "https://www.datacubeai.space/en/tools/ai-news-api",
+          "de": "https://www.datacubeai.space/de/tools/ai-news-api",
+          "en": "https://www.datacubeai.space/en/tools/ai-news-api",
+          "zh-Hans": "https://www.datacubeai.space/zh/tools/ai-news-api",
+          "fr": "https://www.datacubeai.space/fr/tools/ai-news-api",
+          "es": "https://www.datacubeai.space/es/tools/ai-news-api",
+          "pt": "https://www.datacubeai.space/pt/tools/ai-news-api",
+          "ja": "https://www.datacubeai.space/ja/tools/ai-news-api",
+          "ko": "https://www.datacubeai.space/ko/tools/ai-news-api"
+        }
+      },
+      "openGraph": {
+        "title": "API de Notícias IA | Data Cube AI",
+        "description": "API REST gratuita para notícias IA de 35+ fontes: tecnologia, investimentos, dicas e vídeos em 8 idiomas.",
+        "url": "https://www.datacubeai.space/pt/tools/ai-news-api",
+        "images": [
+          {
+            "url": "/og-image.jpg",
+            "width": 1200,
+            "height": 630,
+            "alt": "Data Cube AI News API"
+          }
+        ]
+      },
+      "twitter": {
+        "card": "summary_large_image",
+        "title": "API de Notícias IA | Data Cube AI",
+        "description": "API REST gratuita para notícias IA de 35+ fontes: tecnologia, investimentos, dicas e vídeos em 8 idiomas.",
+        "images": [
+          {
+            "url": "/og-image.jpg",
+            "alt": "Data Cube AI News API"
+          }
+        ]
+      }
+    },
+    "index": {
+      "title": {
+        "absolute": "Ferramentas de IA gratuitas | Data Cube AI"
+      },
+      "description": "Todas as ferramentas de IA gratuitas da Data Cube AI: agregador de notícias, gerador de relatórios e API aberta. Sem conta.",
+      "alternates": {
+        "canonical": "https://www.datacubeai.space/pt/tools",
+        "languages": {
+          "x-default": "https://www.datacubeai.space/en/tools",
+          "de": "https://www.datacubeai.space/de/tools",
+          "en": "https://www.datacubeai.space/en/tools",
+          "zh-Hans": "https://www.datacubeai.space/zh/tools",
+          "fr": "https://www.datacubeai.space/fr/tools",
+          "es": "https://www.datacubeai.space/es/tools",
+          "pt": "https://www.datacubeai.space/pt/tools",
+          "ja": "https://www.datacubeai.space/ja/tools",
+          "ko": "https://www.datacubeai.space/ko/tools"
+        }
+      },
+      "openGraph": {
+        "title": "Ferramentas de IA gratuitas | Data Cube AI",
+        "description": "Todas as ferramentas de IA gratuitas da Data Cube AI: agregador de notícias, gerador de relatórios e API aberta. Sem conta.",
+        "url": "https://www.datacubeai.space/pt/tools",
+        "type": "website"
+      }
+    },
+    "report": {
+      "title": {
+        "absolute": "Gerador de Relatórios IA | Data Cube AI"
+      },
+      "description": "Gere relatórios de IA com Data Cube AI: streaming, exportações e análises diárias ou semanais.",
+      "alternates": {
+        "canonical": "https://www.datacubeai.space/pt/tools/ai-report-generator",
+        "languages": {
+          "x-default": "https://www.datacubeai.space/en/tools/ai-report-generator",
+          "de": "https://www.datacubeai.space/de/tools/ai-report-generator",
+          "en": "https://www.datacubeai.space/en/tools/ai-report-generator",
+          "zh-Hans": "https://www.datacubeai.space/zh/tools/ai-report-generator",
+          "fr": "https://www.datacubeai.space/fr/tools/ai-report-generator",
+          "es": "https://www.datacubeai.space/es/tools/ai-report-generator",
+          "pt": "https://www.datacubeai.space/pt/tools/ai-report-generator",
+          "ja": "https://www.datacubeai.space/ja/tools/ai-report-generator",
+          "ko": "https://www.datacubeai.space/ko/tools/ai-report-generator"
+        }
+      },
+      "openGraph": {
+        "title": "Gerador de Relatórios IA | Data Cube AI",
+        "description": "Gere relatórios de IA com Data Cube AI: streaming, exportações e análises diárias ou semanais.",
+        "url": "https://www.datacubeai.space/pt/tools/ai-report-generator",
+        "images": [
+          {
+            "url": "/og-image.jpg",
+            "width": 1200,
+            "height": 630,
+            "alt": "Data Cube AI Report Generator"
+          }
+        ]
+      },
+      "twitter": {
+        "card": "summary_large_image",
+        "title": "Gerador de Relatórios IA | Data Cube AI",
+        "description": "Gere relatórios de IA com Data Cube AI: streaming, exportações e análises diárias ou semanais.",
+        "images": [
+          {
+            "url": "/og-image.jpg",
+            "alt": "Data Cube AI Report Generator"
+          }
+        ]
+      }
+    },
+    "stock": {
+      "robots": {
+        "index": false,
+        "follow": true
+      },
+      "title": {
+        "absolute": "Rastreador Ações IA (em pausa) | Data Cube AI"
+      },
+      "description": "Os dados de mercado ao vivo estão em pausa durante a revisão de licenciamento. Os dados de financiamento continuam disponíveis no AI Funding Tracker.",
+      "alternates": {
+        "canonical": "https://www.datacubeai.space/pt/tools/ai-stock-tracker",
+        "languages": {
+          "x-default": "https://www.datacubeai.space/en/tools/ai-stock-tracker",
+          "de": "https://www.datacubeai.space/de/tools/ai-stock-tracker",
+          "en": "https://www.datacubeai.space/en/tools/ai-stock-tracker",
+          "zh-Hans": "https://www.datacubeai.space/zh/tools/ai-stock-tracker",
+          "fr": "https://www.datacubeai.space/fr/tools/ai-stock-tracker",
+          "es": "https://www.datacubeai.space/es/tools/ai-stock-tracker",
+          "pt": "https://www.datacubeai.space/pt/tools/ai-stock-tracker",
+          "ja": "https://www.datacubeai.space/ja/tools/ai-stock-tracker",
+          "ko": "https://www.datacubeai.space/ko/tools/ai-stock-tracker"
+        }
+      }
+    }
+  }
+}

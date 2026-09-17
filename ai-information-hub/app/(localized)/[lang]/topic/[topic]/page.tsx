@@ -2,8 +2,10 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
+import { AiLabel } from '@/components/ai-label'
 import { isSupportedLanguage, toBcp47, SUPPORTED_LANGUAGES, type AppLanguage } from '@/lib/i18n'
 import { indexById, matchesTopicTerms, toTopicSlug, topicSlugToQuery, topicSlugToTitle } from '@/lib/topic-utils'
+import { BRAND, absoluteUrl } from '@/lib/brand'
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api-production-3ee5.up.railway.app/api'
 
@@ -284,13 +286,13 @@ function buildBreadcrumbSchema(lang: AppLanguage, topic: string, topicTitle: str
           ja: 'ホーム',
           ko: '홈',
         } as Record<string, string>)[lang] || 'Home',
-        item: `https://www.datacubeai.space/${lang}`,
+        item: absoluteUrl(`/${lang}`),
       },
       {
         '@type': 'ListItem',
         position: 2,
         name: topicTitle,
-        item: `https://www.datacubeai.space/${lang}/topic/${topic}`,
+        item: absoluteUrl(`/${lang}/topic/${topic}`),
       },
     ],
   }
@@ -381,7 +383,7 @@ function buildItemListSchema(lang: AppLanguage, topicTitle: string, buckets: Top
   const items = buckets.slice(0, 20).map((bucket, index) => ({
     '@type': 'ListItem',
     position: index + 1,
-    url: `https://www.datacubeai.space/${lang}/week/${bucket.periodId}`,
+    url: absoluteUrl(`/${lang}/week/${bucket.periodId}`),
     name: `${topicTitle} - ${bucket.periodId}`,
   }))
 
@@ -402,7 +404,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
 
   const topicQuery = normalizeTopicQuery(query.q)
   const topicTitle = topicDisplayTitle(topic, topicQuery)
-  const localizedUrl = `https://www.datacubeai.space/${lang}/topic/${topic}`
+  const localizedUrl = absoluteUrl(`/${lang}/topic/${topic}`)
   const section = parseSection(query.section)
   const period = isValidPeriodId(query.period) ? query.period : ''
 
@@ -442,11 +444,11 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
     alternates: {
       canonical: canonicalUrl,
       languages: {
-        'x-default': `https://www.datacubeai.space/en/topic/${topic}`,
+        'x-default': absoluteUrl(`/en/topic/${topic}`),
         ...Object.fromEntries(
           SUPPORTED_LANGUAGES.map((code) => [
             toBcp47(code),
-            `https://www.datacubeai.space/${code}/topic/${topic}`,
+            absoluteUrl(`/${code}/topic/${topic}`),
           ])
         ),
       },
@@ -461,7 +463,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
           url: '/og-image.jpg',
           width: 1200,
           height: 630,
-          alt: `Data Cube AI – ${topicTitle}`,
+          alt: `${BRAND.name} – ${topicTitle}`,
         },
       ],
     },
@@ -569,6 +571,7 @@ export default async function TopicPage({ params, searchParams }: Props) {
         <p className="mt-2 text-sm text-muted-foreground">
           {t({ de: 'Themen-Archiv', en: 'Topic archive', zh: '主题归档', fr: 'Archive thématique', es: 'Archivo temático', pt: 'Arquivo temático', ja: 'トピックアーカイブ', ko: '주제 아카이브' })} • {total} {t({ de: 'Treffer', en: 'matches', zh: '条结果', fr: 'résultats', es: 'resultados', pt: 'resultados', ja: '件', ko: '건' })}
         </p>
+        <AiLabel lang={lang} className="mt-2 text-sm text-muted-foreground" />
         <p className="mt-3 text-sm text-muted-foreground">
           <a className="underline" href={`/${lang}`}>{t({ de: 'Zur Startseite', en: 'Back to home', zh: '返回首页', fr: "Retour à l'accueil", es: 'Volver al inicio', pt: 'Voltar ao início', ja: 'ホームに戻る', ko: '홈으로 돌아가기' })}</a>
           <span> • </span>

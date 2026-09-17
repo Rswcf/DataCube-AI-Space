@@ -30,8 +30,8 @@ class Week(Base):
     )
     # AI editorial brief ("why it matters" bullets citing our own data),
     # keyed by language: {"en": [{"text": ..., "topic": ...}], "de": [...]}.
-    # Attributed to "DataCube AI Editorial" in the UI with an /ai-disclosure
-    # link — never to an invented human editor.
+    # Shown in the UI as AI-generated analysis with an /ai-disclosure link —
+    # never attributed to a human editor.
     editorial: Mapped[Optional[dict]] = mapped_column(JSONB, nullable=True)
 
     def __repr__(self) -> str:

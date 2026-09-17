@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { BRAND } from '@/lib/brand'
 
 export interface TrustSection {
   title: string
@@ -77,6 +78,9 @@ export function TrustPage({ config }: { config: TrustPageConfig }) {
             </Link>
           ))}
         </nav>
+        {BRAND.founderName ? (
+          <p className="mt-3 text-sm text-muted-foreground">Made by {BRAND.founderName}</p>
+        ) : null}
       </footer>
     </article>
     </main>

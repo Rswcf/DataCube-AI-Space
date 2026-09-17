@@ -1,9 +1,11 @@
 import type { Metadata } from 'next'
+import { AiLabel } from '@/components/ai-label'
 import { ArticleSchema, VideoSchema, BreadcrumbListSchema, CollectionPageSchema } from '@/components/structured-data'
 import { formatPeriodTitle, periodPublishedDate } from '@/lib/period-utils'
 import type { TechPost, MultilingualData, InvestmentData, TipPost, ImpactLevel } from '@/lib/types'
 import { tagTopicSlug } from '@/lib/topic-utils'
 import { isSupportedLanguage, SUPPORTED_LANGUAGES, toBcp47 } from '@/lib/i18n'
+import { FROZEN_IDS, absoluteUrl, brandedTitle, fillBrand } from '@/lib/brand'
 import {
   ARTICLE_CTA_LABELS,
   articleHref,
@@ -24,7 +26,7 @@ export const revalidate = 3600
 // 8-language i18n lookup helpers
 // ---------------------------------------------------------------------------
 type L = Record<string, string>
-const t = (map: L, lang: string) => map[lang] || map.en
+const t = (map: L, lang: string) => fillBrand(map[lang] || map.en)
 
 // Next.js 15+ async params/searchParams typing per request
 export type Props = {
@@ -37,12 +39,12 @@ export type Props = {
 // ---------------------------------------------------------------------------
 function metaTitles(periodLabel: string): L {
   return {
-    de: `KI-News ${periodLabel} | Data Cube AI`,
-    en: `AI News ${periodLabel} | Data Cube AI`,
+    de: `KI-News ${periodLabel}`,
+    en: `AI News ${periodLabel}`,
     zh: `AI新闻 ${periodLabel} — 科技、投资与实用技巧`,
-    fr: `Actualités IA ${periodLabel} | Data Cube AI`,
-    es: `Noticias IA ${periodLabel} | Data Cube AI`,
-    pt: `Notícias IA ${periodLabel} | Data Cube AI`,
+    fr: `Actualités IA ${periodLabel}`,
+    es: `Noticias IA ${periodLabel}`,
+    pt: `Notícias IA ${periodLabel}`,
     ja: `AIニュース ${periodLabel} — テクノロジー、投資＆実用ヒント`,
     ko: `AI 뉴스 ${periodLabel} — 기술, 투자 및 실용 팁`,
   }
@@ -50,12 +52,12 @@ function metaTitles(periodLabel: string): L {
 
 function metaDescriptions(periodLabel: string): L {
   return {
-    de: `Kuratierte KI-News der ${periodLabel}: Technologie, Investment-Signale, praktische Tipps und Quellenlinks auf Data Cube AI.`,
-    en: `Curated AI news for ${periodLabel}: technology, investment signals, practical tips, and source links on Data Cube AI.`,
-    zh: `${periodLabel} AI新闻精选：技术突破、投资信号和实用技巧 – 每日更新于 Data Cube AI。`,
-    fr: `Actualités IA pour ${periodLabel}: technologie, signaux d'investissement, conseils pratiques et sources sur Data Cube AI.`,
-    es: `Noticias de IA para ${periodLabel}: tecnología, señales de inversión, consejos prácticos y fuentes en Data Cube AI.`,
-    pt: `Notícias de IA para ${periodLabel}: tecnologia, sinais de investimento, dicas práticas e fontes no Data Cube AI.`,
+    de: `Kuratierte KI-News der ${periodLabel}: Technologie, Investment-Signale, praktische Tipps und Quellenlinks auf {brand}.`,
+    en: `Curated AI news for ${periodLabel}: technology, investment signals, practical tips, and source links on {brand}.`,
+    zh: `${periodLabel} AI新闻精选：技术突破、投资信号和实用技巧 – 每日更新于 {brand}。`,
+    fr: `Actualités IA pour ${periodLabel}: technologie, signaux d'investissement, conseils pratiques et sources sur {brand}.`,
+    es: `Noticias de IA para ${periodLabel}: tecnología, señales de inversión, consejos prácticos y fuentes en {brand}.`,
+    pt: `Notícias de IA para ${periodLabel}: tecnologia, sinais de investimento, dicas práticas e fontes no {brand}.`,
     ja: `${periodLabel}のAIニュース厳選：技術的ブレークスルー、投資シグナル、実践ヒント – 毎日更新。`,
     ko: `${periodLabel} AI 뉴스 큐레이션: 기술 돌파구, 투자 신호, 실용 팁 – 매일 업데이트.`,
   }
@@ -63,14 +65,14 @@ function metaDescriptions(periodLabel: string): L {
 
 function ogAlt(periodLabel: string): L {
   return {
-    de: `Data Cube AI – KI-News ${periodLabel}`,
-    en: `Data Cube AI – AI News ${periodLabel}`,
-    zh: `Data Cube AI – AI新闻 ${periodLabel}`,
-    fr: `Data Cube AI – Actualités IA ${periodLabel}`,
-    es: `Data Cube AI – Noticias IA ${periodLabel}`,
-    pt: `Data Cube AI – Notícias IA ${periodLabel}`,
-    ja: `Data Cube AI – AIニュース ${periodLabel}`,
-    ko: `Data Cube AI – AI 뉴스 ${periodLabel}`,
+    de: `{brand} – KI-News ${periodLabel}`,
+    en: `{brand} – AI News ${periodLabel}`,
+    zh: `{brand} – AI新闻 ${periodLabel}`,
+    fr: `{brand} – Actualités IA ${periodLabel}`,
+    es: `{brand} – Noticias IA ${periodLabel}`,
+    pt: `{brand} – Notícias IA ${periodLabel}`,
+    ja: `{brand} – AIニュース ${periodLabel}`,
+    ko: `{brand} – AI 뉴스 ${periodLabel}`,
   }
 }
 
@@ -160,14 +162,14 @@ const h2Editorial: L = {
 }
 
 const labelEditorialAttribution: L = {
-  de: 'KI-generierte Analyse von DataCube AI Editorial — mehr erfahren',
-  en: 'AI-generated analysis by DataCube AI Editorial — learn how we work',
-  zh: '由 DataCube AI Editorial 生成的 AI 分析 — 了解我们的方法',
-  fr: 'Analyse générée par IA — DataCube AI Editorial',
-  es: 'Análisis generado por IA — DataCube AI Editorial',
-  pt: 'Análise gerada por IA — DataCube AI Editorial',
-  ja: 'DataCube AI Editorial による AI 生成分析',
-  ko: 'DataCube AI Editorial의 AI 생성 분석',
+  de: 'KI-generierte Analyse — mehr erfahren',
+  en: 'AI-generated analysis — learn how we work',
+  zh: 'AI 生成的分析 — 了解我们的方法',
+  fr: 'Analyse générée par IA',
+  es: 'Análisis generado por IA',
+  pt: 'Análise gerada por IA',
+  ja: 'AI 生成分析',
+  ko: 'AI 생성 분석',
 }
 
 // periodPublishedDate is imported from lib/period-utils — shared with
@@ -283,7 +285,6 @@ const thDealType: L = { de: 'Dealtyp', en: 'Deal Type', zh: '交易类型', fr: 
 // Misc UI labels
 // ---------------------------------------------------------------------------
 const labelLanguage: L = { de: 'Sprache:', en: 'Language:', zh: '语言：', fr: 'Langue :', es: 'Idioma:', pt: 'Idioma:', ja: '言語：', ko: '언어:' }
-const labelByline: L = { de: 'Von', en: 'By', zh: '作者：', fr: 'Par', es: 'Por', pt: 'Por', ja: '著者：', ko: '작성:' }
 const labelPublished: L = { de: 'Veröffentlicht', en: 'Published', zh: '发布于', fr: 'Publié', es: 'Publicado', pt: 'Publicado', ja: '公開日', ko: '게시일' }
 const labelContact: L = { de: 'Kontakt', en: 'Contact', zh: '联系', fr: 'Contact', es: 'Contacto', pt: 'Contato', ja: 'お問い合わせ', ko: '문의' }
 const labelPrivacy: L = { de: 'Datenschutz', en: 'Privacy Policy', zh: '隐私政策', fr: 'Confidentialité', es: 'Privacidad', pt: 'Privacidade', ja: 'プライバシー', ko: '개인정보' }
@@ -320,7 +321,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   const rawLang = (await searchParams)?.lang || 'de'
   const lang = isSupportedLanguage(rawLang) ? rawLang : 'de'
   const periodLabel = formatPeriodTitle(weekId, lang)
-  const localizedUrl = `https://www.datacubeai.space/${lang}/week/${weekId}`
+  const localizedUrl = absoluteUrl(`/${lang}/week/${weekId}`)
 
   const titles = metaTitles(periodLabel)
   const descriptions = metaDescriptions(periodLabel)
@@ -332,12 +333,12 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
     alternates: {
       canonical: localizedUrl,
       languages: {
-        'x-default': `https://www.datacubeai.space/de/week/${weekId}`,
-        ...Object.fromEntries(SUPPORTED_LANGUAGES.map((code) => [toBcp47(code), `https://www.datacubeai.space/${code}/week/${weekId}`])),
+        'x-default': absoluteUrl(`/de/week/${weekId}`),
+        ...Object.fromEntries(SUPPORTED_LANGUAGES.map((code) => [toBcp47(code), absoluteUrl(`/${code}/week/${weekId}`)])),
       },
     },
     openGraph: {
-      title: t(titles, lang),
+      title: brandedTitle(t(titles, lang)),
       description: t(descriptions, lang),
       url: localizedUrl,
       type: 'article',
@@ -359,7 +360,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
     },
     twitter: {
       card: 'summary_large_image',
-      title: t(titles, lang),
+      title: brandedTitle(t(titles, lang)),
       description: t(descriptions, lang),
       images: [
         {
@@ -518,7 +519,7 @@ export default async function WeekPage({ params, searchParams }: Props) {
     takeawayBullets.push(snippetFromContent(tips[0].tip, 160))
   }
 
-  const pageUrl = `https://www.datacubeai.space/${lang}/week/${weekId}`
+  const pageUrl = absoluteUrl(`/${lang}/week/${weekId}`)
   const articleLabel = ARTICLE_CTA_LABELS[lang] || ARTICLE_CTA_LABELS.en
   const publishedIso = periodPublishedDate(weekId).toISOString()
 
@@ -547,13 +548,13 @@ export default async function WeekPage({ params, searchParams }: Props) {
       <BreadcrumbListSchema weekId={weekId} weekLabel={periodLabel} lang={lang} />
       <CollectionPageSchema
         url={pageUrl}
-        name={t(metaTitles(periodLabel), lang)}
+        name={brandedTitle(t(metaTitles(periodLabel), lang))}
         description={t(metaDescriptions(periodLabel), lang)}
         inLanguage={lang}
         datePublished={publishedIso}
         dateModified={modifiedIso}
         speakableCssSelector={
-          takeawayBullets.length > 0 ? ['#dcai-takeaways'] : undefined
+          takeawayBullets.length > 0 ? [`#${FROZEN_IDS.takeawaysAnchorId}`] : undefined
         }
       />
       <header className="mb-8">
@@ -570,10 +571,9 @@ export default async function WeekPage({ params, searchParams }: Props) {
           ))}
         </p>
         <p className="mt-2 text-sm text-gray-600">
-          <span>{t(labelByline, lang)} <span className="font-medium">Data Cube AI Editorial</span></span>
-          <span> • </span>
           <time dateTime={publishedIso}>{t(labelPublished, lang)} {publishedDateLabel}</time>
         </p>
+        <AiLabel lang={lang} className="mt-2 text-sm text-gray-600" />
       </header>
 
       {/* Key Takeaways — extractive (no LLM), localized heading.
@@ -581,13 +581,13 @@ export default async function WeekPage({ params, searchParams }: Props) {
           Bullets are sourced from existing content: top-3 impact-ranked tech
           items, then lead deal, lead M&A, lead tip.
 
-          The #dcai-takeaways id is referenced as the `speakable` cssSelector
-          on the page-level CollectionPage schema — keeps voice-read scope
-          tight (~20-30s) per Google's Speakable guidance, instead of
-          spraying across every article on the roundup. */}
+          The takeaways anchor (FROZEN_IDS.takeawaysAnchorId) is referenced as
+          the `speakable` cssSelector on the page-level CollectionPage schema
+          — keeps voice-read scope tight (~20-30s) per Google's Speakable
+          guidance, instead of spraying across every article on the roundup. */}
       {takeawayBullets.length > 0 && (
         <section
-          id="dcai-takeaways"
+          id={FROZEN_IDS.takeawaysAnchorId}
           aria-labelledby="takeaways-heading"
           className="mb-10 rounded-lg border border-gray-200 bg-gray-50 p-5 dark:bg-gray-900/40"
         >
@@ -607,8 +607,8 @@ export default async function WeekPage({ params, searchParams }: Props) {
 
       {/* AI Editorial Brief — the information-gain layer: synthesized
           "why it matters" bullets citing concrete numbers across stories.
-          Honestly attributed to DataCube AI Editorial (never an invented
-          human) with a link to /ai-disclosure. */}
+          Labeled as AI-generated with a link to /ai-disclosure (never an
+          invented human). */}
       {editorialBullets.length > 0 && (
         <section
           aria-labelledby="editorial-heading"
@@ -710,7 +710,7 @@ export default async function WeekPage({ params, searchParams }: Props) {
                     })}
                   </div>
                 ) : null}
-                <ArticleSchema post={post} inLanguage={lang} url={`https://www.datacubeai.space${articleHref(lang, weekId, techStoryId(post))}`} />
+                <ArticleSchema post={post} inLanguage={lang} url={absoluteUrl(articleHref(lang, weekId, techStoryId(post)))} />
               </article>
             ))}
           </div>
