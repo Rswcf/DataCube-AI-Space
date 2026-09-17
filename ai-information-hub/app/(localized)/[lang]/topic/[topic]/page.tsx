@@ -6,6 +6,7 @@ import { AiLabel } from '@/components/ai-label'
 import { isSupportedLanguage, toBcp47, SUPPORTED_LANGUAGES, type AppLanguage } from '@/lib/i18n'
 import { indexById, matchesTopicTerms, toTopicSlug, topicSlugToQuery, topicSlugToTitle } from '@/lib/topic-utils'
 import { BRAND, absoluteUrl } from '@/lib/brand'
+import { jsonLdScript } from '@/lib/json-ld'
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api-production-3ee5.up.railway.app/api'
 
@@ -562,9 +563,9 @@ export default async function TopicPage({ params, searchParams }: Props) {
   return (
     <main id="main-content">
     <article className="mx-auto max-w-4xl px-4 py-8">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }} />
-      {faqSchema && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdScript(breadcrumbSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdScript(itemListSchema) }} />
+      {faqSchema && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdScript(faqSchema) }} />}
 
       <header className="mb-8 border-b border-border pb-4">
         <h1 className="text-3xl font-bold">{topicTitle}</h1>

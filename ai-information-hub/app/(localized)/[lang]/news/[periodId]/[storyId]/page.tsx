@@ -30,6 +30,7 @@ import type {
   TipPost,
 } from '@/lib/types'
 import { BRAND, fillBrand } from '@/lib/brand'
+import { jsonLdScript } from '@/lib/json-ld'
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api-production-3ee5.up.railway.app/api'
 const SITE_URL = BRAND.siteUrl
@@ -561,7 +562,7 @@ export default async function ArticlePage({ params }: Props) {
     <main id="main-content" className="min-h-screen bg-background text-foreground">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(jsonLd) }}
       />
 
       <article className="mx-auto min-h-screen w-full max-w-[1180px] border-x border-border bg-content-surface">
