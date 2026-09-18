@@ -461,7 +461,9 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
       type: 'article',
       images: [
         {
-          url: '/og-image.jpg',
+          // The generated card carries the AI label (spec AD7); the static
+          // og-image.jpg does not, and this hub summarises AI-written stories.
+          url: `/api/og?topic=${encodeURIComponent(topic)}&lang=${encodeURIComponent(lang)}`,
           width: 1200,
           height: 630,
           alt: `${BRAND.name} – ${topicTitle}`,

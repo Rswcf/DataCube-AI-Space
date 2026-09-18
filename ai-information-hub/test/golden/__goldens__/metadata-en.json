@@ -115,7 +115,7 @@
       "type": "article",
       "images": [
         {
-          "url": "/og-image.jpg",
+          "url": "/api/og?topic=openai&lang=en",
           "width": 1200,
           "height": 630,
           "alt": "Data Cube AI – Openai"
@@ -147,7 +147,7 @@
       "type": "article",
       "images": [
         {
-          "url": "/og-image.jpg",
+          "url": "/api/og?topic=openai&lang=en",
           "width": 1200,
           "height": 630,
           "alt": "Data Cube AI – Openai"
@@ -180,7 +180,7 @@
       "publishedTime": "2026-09-13T09:00:00.000Z",
       "images": [
         {
-          "url": "/og-image.jpg",
+          "url": "/api/og?period=2026-09-13&story=tech-101&lang=en",
           "width": 1200,
           "height": 630,
           "alt": "Data Cube AI"
@@ -192,7 +192,7 @@
       "title": "OpenAI ships a new reasoning model for developers",
       "description": "OpenAI ships a new reasoning model for developers: the release adds tool use and a lower price (en).",
       "images": [
-        "/og-image.jpg"
+        "/api/og?period=2026-09-13&story=tech-101&lang=en"
       ]
     }
   },

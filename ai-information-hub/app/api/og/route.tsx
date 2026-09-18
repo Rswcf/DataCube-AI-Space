@@ -2,6 +2,8 @@ import { ImageResponse } from 'next/og'
 import type { NextRequest } from 'next/server'
 import { aiLabelForImage } from '@/lib/ai-label'
 import { BRAND } from '@/lib/brand'
+import { ogCard, techPostIdFromStoryId } from '@/lib/og-card'
+import { ARTICLE_HEADLINE, splitHeadlineDeck } from '@/lib/text-split'
 
 // Runs on the default Node.js runtime (Fluid Compute). It used to be an Edge
 // Function, which is billed as separate execution units and cannot share the
@@ -11,37 +13,58 @@ import { BRAND } from '@/lib/brand'
 const API_BASE = 'https://api-production-3ee5.up.railway.app/api'
 
 interface TechPost {
+  id?: number | string
   author?: { name?: string }
   content?: string
   impact?: string
+  isVideo?: boolean
 }
 
-async function getTopHeadlines(periodId: string, lang: string): Promise<string[]> {
+async function getTechPosts(periodId: string, lang: string): Promise<TechPost[]> {
   try {
     const res = await fetch(`${API_BASE}/tech/${periodId}`, { next: { revalidate: 3600 } })
     if (!res.ok) return []
     const data = await res.json() as Record<string, TechPost[]>
-    const posts = data[lang] || data.en || data.de || []
-    return posts
-      .filter((p: TechPost) => !('isVideo' in p && (p as any).isVideo))
-      .slice(0, 3)
-      .map((p: TechPost) => {
-        const name = p.author?.name || ''
-        return name.length > 60 ? name.slice(0, 57) + '...' : name
-      })
-      .filter(Boolean)
+    return data[lang] || data.en || data.de || []
   } catch {
     return []
   }
+}
+
+// The headline is the first sentence of `content` — the same split the article
+// pages use. This used to read `author.name`, which is the SOURCE name, so the
+// card listed "Google DeepMind", "Enclave AI" where it promised headlines.
+function headlineOf(post: TechPost | undefined): string {
+  if (!post?.content) return ''
+  const [headline] = splitHeadlineDeck(post.content, ARTICLE_HEADLINE)
+  return headline || ''
+}
+
+// The list sits in small type under the title, so it is cut shorter than the
+// title. The story headline is NOT cut here — `ogCard` owns that cap, and
+// cutting twice can strand an ellipsis in the middle of the title.
+function topHeadlines(posts: TechPost[], max = 60): string[] {
+  return posts
+    .filter((p) => !p.isVideo)
+    .slice(0, 3)
+    .map((p) => headlineOf(p))
+    .filter(Boolean)
+    .map((h) => (h.length > max ? `${h.slice(0, max - 3)}...` : h))
 }
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const period = searchParams.get('period') || ''
   const lang = searchParams.get('lang') || 'en'
-  const title = lang === 'de' ? `KI-News ${period}` : `AI News ${period}`
+  const topicSlug = searchParams.get('topic')
+  const postId = techPostIdFromStoryId(searchParams.get('story') || '')
 
-  const headlines = await getTopHeadlines(period, lang)
+  // A topic card names the topic and nothing else, so it never needs the feed.
+  const posts = period && !topicSlug ? await getTechPosts(period, lang) : []
+  const storyHeadline = postId ? headlineOf(posts.find((p) => String(p.id) === postId)) || null : null
+
+  const { title, showHeadlines } = ogCard({ period, lang, storyHeadline, topicSlug })
+  const headlines = showHeadlines ? topHeadlines(posts) : []
 
   return new ImageResponse(
     (

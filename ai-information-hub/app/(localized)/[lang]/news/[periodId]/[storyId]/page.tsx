@@ -441,6 +441,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const description = descriptionFor(story)
   const canonical = storyUrl(lang, periodId, storyId)
+  const ogCardUrl = `/api/og?period=${encodeURIComponent(periodId)}&story=${encodeURIComponent(storyId)}&lang=${encodeURIComponent(lang)}`
   const languages = Object.fromEntries(
     SUPPORTED_LANGUAGES.map((code) => [toBcp47(code), storyUrl(code, periodId, storyId)]),
   )
@@ -468,7 +469,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       publishedTime: validIso(story.timestamp, periodPublishedDate(periodId)),
       images: [
         {
-          url: '/og-image.jpg',
+          // The generated card carries the AI label (spec AD7); the static
+          // og-image.jpg does not, and this page's content is AI-written.
+          url: ogCardUrl,
           width: 1200,
           height: 630,
           alt: BRAND.name,
@@ -479,7 +482,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       card: 'summary_large_image',
       title: story.headline,
       description,
-      images: ['/og-image.jpg'],
+      images: [ogCardUrl],
     },
   }
 }
