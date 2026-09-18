@@ -6,10 +6,11 @@ Main entry point for the API server.
 
 import logging
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import get_settings
+from app.services.ai_disclosure import AI_DISCLOSURE_HEADER, add_ai_disclosure
 from app.routers import (
     weeks_router,
     tech_router,
@@ -58,20 +59,24 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    # Without this, browser JS on the site cannot read the AI disclosure the
+    # content endpoints attach (CORS hides every non-safelisted header).
+    expose_headers=[AI_DISCLOSURE_HEADER],
 )
 
-# Register routers
+# Register routers. The AI-content endpoints carry the spec AD7 disclosure
+# header; weeks/stock/jobs/admin/newsletter/contact do not serve AI text.
 app.include_router(weeks_router, prefix="/api")
-app.include_router(tech_router, prefix="/api")
-app.include_router(investment_router, prefix="/api")
-app.include_router(tips_router, prefix="/api")
-app.include_router(trends_router, prefix="/api")
-app.include_router(videos_router, prefix="/api")
+app.include_router(tech_router, prefix="/api", dependencies=[Depends(add_ai_disclosure)])
+app.include_router(investment_router, prefix="/api", dependencies=[Depends(add_ai_disclosure)])
+app.include_router(tips_router, prefix="/api", dependencies=[Depends(add_ai_disclosure)])
+app.include_router(trends_router, prefix="/api", dependencies=[Depends(add_ai_disclosure)])
+app.include_router(videos_router, prefix="/api", dependencies=[Depends(add_ai_disclosure)])
 app.include_router(admin_router, prefix="/api")
 app.include_router(stock_router, prefix="/api")
 app.include_router(developer_router, prefix="/api")
 app.include_router(jobs_router, prefix="/api")
-app.include_router(deals_router, prefix="/api")
+app.include_router(deals_router, prefix="/api", dependencies=[Depends(add_ai_disclosure)])
 app.include_router(newsletter_router, prefix="/api")
 app.include_router(contact_router, prefix="/api")
 
