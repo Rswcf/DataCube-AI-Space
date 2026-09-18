@@ -1,5 +1,6 @@
 import { BRAND, absoluteUrl, type Brand } from '@/lib/brand'
 import { TechPost } from '@/lib/types'
+import { jsonLdScript } from '@/lib/json-ld'
 
 export function organizationSchema(brand: Brand = BRAND): Record<string, unknown> {
   return {
@@ -34,7 +35,7 @@ export function OrganizationSchema() {
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema()) }}
+      dangerouslySetInnerHTML={{ __html: jsonLdScript(organizationSchema()) }}
     />
   )
 }
@@ -57,7 +58,7 @@ export function WebsiteSchema() {
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      dangerouslySetInnerHTML={{ __html: jsonLdScript(schema) }}
     />
   )
 }
@@ -112,7 +113,7 @@ export function ArticleSchema({ post, inLanguage = 'de', url }: { post: TechPost
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      dangerouslySetInnerHTML={{ __html: jsonLdScript(schema) }}
     />
   )
 }
@@ -144,7 +145,7 @@ export function VideoSchema({ video }: { video: TechPost }) {
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      dangerouslySetInnerHTML={{ __html: jsonLdScript(schema) }}
     />
   )
 }
@@ -219,7 +220,7 @@ export function FAQSchema({ lang = 'en' }: { lang?: string }) {
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      dangerouslySetInnerHTML={{ __html: jsonLdScript(schema) }}
     />
   )
 }
@@ -234,7 +235,7 @@ export function BreadcrumbListSchema({ weekId, weekLabel, lang = 'en' }: { weekI
       { '@type': 'ListItem', position: 2, name: weekLabel, item: absoluteUrl(`/${lang}/week/${weekId}`) },
     ],
   }
-  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
+  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdScript(schema) }} />
 }
 
 export function SoftwareApplicationSchema({
@@ -289,7 +290,7 @@ export function SoftwareApplicationSchema({
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      dangerouslySetInnerHTML={{ __html: jsonLdScript(schema) }}
     />
   )
 }
@@ -315,7 +316,7 @@ export function ItemListSchema({ items, name, lang }: { items: Array<{ url: stri
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      dangerouslySetInnerHTML={{ __html: jsonLdScript(schema) }}
     />
   )
 }
@@ -384,7 +385,7 @@ export function CollectionPageSchema({
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      dangerouslySetInnerHTML={{ __html: jsonLdScript(schema) }}
     />
   )
 }

@@ -5,6 +5,7 @@ import { AiLabel } from '@/components/ai-label'
 import { SUPPORTED_LANGUAGES, isSupportedLanguage, toBcp47 } from '@/lib/i18n'
 import { BRAND, fillBrand } from '@/lib/brand'
 import { Rss, Globe, Calendar, TrendingUp, Lightbulb, Play, ArrowRight, Check, X } from 'lucide-react'
+import { jsonLdScript } from '@/lib/json-ld'
 
 export const revalidate = 3600
 
@@ -691,9 +692,9 @@ export default async function AINewsAggregatorToolPage({ params }: Props) {
   return (
     <>
       {/* JSON-LD structured data */}
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareAppSchema) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdScript(softwareAppSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdScript(faqSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdScript(breadcrumbSchema) }} />
 
       <main id="main-content">
       <article className="max-w-5xl mx-auto px-4 sm:px-6">
