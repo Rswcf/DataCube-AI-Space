@@ -35,8 +35,9 @@ export default function DatenschutzPage() {
         className="mb-8 rounded-md border-2 border-amber-500/60 bg-amber-500/10 p-4 text-sm leading-relaxed text-amber-900 dark:text-amber-200"
       >
         <strong className="font-semibold">⚠ Draft notice — Entwurf:</strong>{' '}
-        This privacy policy is in draft form. Controller contact, DPO, and
-        retention fields in square brackets will be completed before any
+        This privacy policy is in draft form. The controller&rsquo;s name and
+        e-mail are real; the postal address and the log-retention period are
+        still placeholders in square brackets and will be completed before any
         advertising cookies are enabled on this site. Today the site sets only
         a functional &quot;visited&quot; cookie and uses Vercel Analytics
         (privacy-friendly, no cookies). — Diese Datenschutzerklärung ist ein
@@ -54,10 +55,10 @@ export default function DatenschutzPage() {
               Verantwortlich für die Datenverarbeitung auf dieser Website ist:
             </p>
             <p className="leading-relaxed mt-2">
-              [Name des Verantwortlichen]<br />
+              DeepViews<br />
               [Straße und Hausnummer]<br />
               [PLZ Ort]<br />
-              E-Mail: [E-Mail-Adresse]
+              E-Mail: deepviewsdev@gmail.com
             </p>
           </div>
 
@@ -179,8 +180,8 @@ export default function DatenschutzPage() {
             <h3 className="text-lg font-semibold mb-2">8. Kontakt für Datenschutzanfragen</h3>
             <p className="leading-relaxed text-sm">
               Für Fragen zum Datenschutz wenden Sie sich bitte an:<br />
-              [Name des Datenschutzbeauftragten oder Verantwortlichen]<br />
-              E-Mail: [E-Mail-Adresse für Datenschutzanfragen]
+              DeepViews<br />
+              E-Mail: deepviewsdev@gmail.com
             </p>
           </div>
         </div>
@@ -197,10 +198,10 @@ export default function DatenschutzPage() {
               The party responsible for data processing on this website is:
             </p>
             <p className="leading-relaxed mt-2">
-              [Controller Name]<br />
+              DeepViews<br />
               [Street and Number]<br />
               [Postal Code City]<br />
-              Email: [Email Address]
+              Email: deepviewsdev@gmail.com
             </p>
           </div>
 
@@ -319,8 +320,8 @@ export default function DatenschutzPage() {
             <h3 className="text-lg font-semibold mb-2">8. Contact for Data Protection Inquiries</h3>
             <p className="leading-relaxed text-sm">
               For questions regarding data protection, please contact:<br />
-              [Data Protection Officer or Responsible Person Name]<br />
-              Email: [Email Address for Data Protection Inquiries]
+              DeepViews<br />
+              Email: deepviewsdev@gmail.com
             </p>
           </div>
         </div>

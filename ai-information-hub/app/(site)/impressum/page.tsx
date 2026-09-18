@@ -36,9 +36,10 @@ export default function ImpressumPage() {
         className="mb-8 rounded-md border-2 border-amber-500/60 bg-amber-500/10 p-4 text-sm leading-relaxed text-amber-900 dark:text-amber-200"
       >
         <strong className="font-semibold">⚠ Draft notice — Entwurf:</strong>{' '}
-        This Impressum is currently a template. The fields in square brackets
-        ([Name], [Adresse], [E-Mail] …) have not yet been completed with the
-        operator&rsquo;s real details. The site is not yet monetised and does
+        This Impressum is partially completed. The operator name and e-mail are
+        real; the postal address, telephone number, VAT ID and the person
+        responsible for content under §18 MStV are still placeholders in
+        square brackets, so this page does not yet satisfy §5 DDG. The site is not yet monetised and does
         not yet rely on this page for regulatory disclosure. Please contact
         the operator through the channels listed on the homepage for binding
         information. — Dieses Impressum ist eine Vorlage; die Platzhalter in
@@ -54,7 +55,7 @@ export default function ImpressumPage() {
           <div>
             <h3 className="text-lg font-semibold mb-2">Betreiber der Website</h3>
             <p className="leading-relaxed">
-              [Name des Betreibers]<br />
+              DeepViews<br />
               [Straße und Hausnummer]<br />
               [PLZ Ort]<br />
               Deutschland
@@ -64,7 +65,7 @@ export default function ImpressumPage() {
           <div>
             <h3 className="text-lg font-semibold mb-2">Kontakt</h3>
             <p className="leading-relaxed">
-              E-Mail: [E-Mail-Adresse]<br />
+              E-Mail: deepviewsdev@gmail.com<br />
               Telefon: [Telefonnummer]
             </p>
           </div>
@@ -131,7 +132,7 @@ export default function ImpressumPage() {
           <div>
             <h3 className="text-lg font-semibold mb-2">Site Operator</h3>
             <p className="leading-relaxed">
-              [Operator Name]<br />
+              DeepViews<br />
               [Street and Number]<br />
               [Postal Code City]<br />
               Germany
@@ -141,7 +142,7 @@ export default function ImpressumPage() {
           <div>
             <h3 className="text-lg font-semibold mb-2">Contact</h3>
             <p className="leading-relaxed">
-              Email: [Email Address]<br />
+              Email: deepviewsdev@gmail.com<br />
               Phone: [Phone Number]
             </p>
           </div>
