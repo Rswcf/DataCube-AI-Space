@@ -34,19 +34,22 @@ async function getTechPosts(periodId: string, lang: string): Promise<TechPost[]>
 // The headline is the first sentence of `content` — the same split the article
 // pages use. This used to read `author.name`, which is the SOURCE name, so the
 // card listed "Google DeepMind", "Enclave AI" where it promised headlines.
-function headlineOf(post: TechPost | undefined, max = 60): string {
+function headlineOf(post: TechPost | undefined): string {
   if (!post?.content) return ''
   const [headline] = splitHeadlineDeck(post.content, ARTICLE_HEADLINE)
-  if (!headline) return ''
-  return headline.length > max ? `${headline.slice(0, max - 3)}...` : headline
+  return headline || ''
 }
 
-function topHeadlines(posts: TechPost[]): string[] {
+// The list sits in small type under the title, so it is cut shorter than the
+// title. The story headline is NOT cut here — `ogCard` owns that cap, and
+// cutting twice can strand an ellipsis in the middle of the title.
+function topHeadlines(posts: TechPost[], max = 60): string[] {
   return posts
     .filter((p) => !p.isVideo)
     .slice(0, 3)
     .map((p) => headlineOf(p))
     .filter(Boolean)
+    .map((h) => (h.length > max ? `${h.slice(0, max - 3)}...` : h))
 }
 
 export async function GET(request: NextRequest) {
@@ -58,9 +61,7 @@ export async function GET(request: NextRequest) {
 
   // A topic card names the topic and nothing else, so it never needs the feed.
   const posts = period && !topicSlug ? await getTechPosts(period, lang) : []
-  const storyHeadline = postId
-    ? headlineOf(posts.find((p) => String(p.id) === postId), 90) || null
-    : null
+  const storyHeadline = postId ? headlineOf(posts.find((p) => String(p.id) === postId)) || null : null
 
   const { title, showHeadlines } = ogCard({ period, lang, storyHeadline, topicSlug })
   const headlines = showHeadlines ? topHeadlines(posts) : []
