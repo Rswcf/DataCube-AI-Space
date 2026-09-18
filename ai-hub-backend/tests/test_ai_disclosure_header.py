@@ -39,8 +39,24 @@ NON_AI_CONTENT_PREFIXES = (
 )
 
 
+def _all_paths() -> list[str]:
+    return [getattr(r, "path", "") for r in app.routes]
+
+
 def _routes_under(prefix: str):
     return [r for r in app.routes if getattr(r, "path", "").startswith(prefix)]
+
+
+def test_the_app_under_test_has_its_api_routes():
+    """Guard against a vacuous suite.
+
+    Every route-introspecting test here (and `test_legacy_stripe_removed`)
+    passes trivially if `app.routes` is empty, so assert the premise once,
+    loudly, with the actual contents in the message.
+    """
+    paths = _all_paths()
+    api = [p for p in paths if p.startswith("/api/")]
+    assert api, f"app exposes no /api routes; {len(paths)} routes total: {paths[:20]}"
 
 
 def _discloses(route) -> bool:
@@ -50,13 +66,15 @@ def _discloses(route) -> bool:
 @pytest.mark.parametrize("prefix", AI_CONTENT_PREFIXES)
 def test_ai_content_routes_carry_the_disclosure(prefix):
     routes = _routes_under(prefix)
-    assert routes, f"no routes registered under {prefix}"
+    assert routes, f"no routes registered under {prefix}; got {_all_paths()[:20]}"
     assert [r.path for r in routes if not _discloses(r)] == []
 
 
 @pytest.mark.parametrize("prefix", NON_AI_CONTENT_PREFIXES)
 def test_other_routes_do_not(prefix):
-    assert [r.path for r in _routes_under(prefix) if _discloses(r)] == []
+    routes = _routes_under(prefix)
+    assert routes, f"no routes registered under {prefix}; got {_all_paths()[:20]}"
+    assert [r.path for r in routes if _discloses(r)] == []
 
 
 def test_value_reuses_the_english_label_and_links_the_disclosure_page():
