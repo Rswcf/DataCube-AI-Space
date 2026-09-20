@@ -1,0 +1,36 @@
+# The Dockerfile ends in `COPY . .`, and Railway uploads the working directory
+# as the build context — so without this file, anything sitting in the backend
+# folder ships to production. On 2026-09-19 a renamed virtualenv
+# (`venv312.pre-pin-20260918`, 304 MB of macOS binaries) rode along into the
+# image: .gitignore only covers the exact name `venv312/`, and a build context
+# does not read .gitignore anyway.
+
+# Virtualenvs — any name, not just the one .gitignore happens to list
+venv*/
+.venv/
+env/
+
+# Python build and test artefacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+*.egg-info/
+
+# Local databases and secrets (the image gets its config from Railway)
+*.db
+*.sqlite3
+.env
+.env.*
+
+# Repository and editor metadata
+.git/
+.gitignore
+.github/
+.vscode/
+.idea/
+.DS_Store
+
+# Tests do not run in the image
+tests/
