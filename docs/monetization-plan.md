@@ -105,7 +105,10 @@ Timeframe: 1 to 2 weeks.
 
 Work:
 
-- Replace all legal placeholders in Impressum and Datenschutz.
+- Replace the remaining legal placeholders in Impressum and Datenschutz. Operator name and e-mail
+  are filled in; still missing are the postal address, telephone, VAT ID, the natural person
+  responsible for content under §18 MStV, and the log-retention period — so the pages do not yet
+  satisfy §5 DDG and both still carry their draft banners.
 - Add an advertising/privacy addendum covering ad vendors, cookies, personalization, analytics, affiliate disclosure, and withdrawal of consent.
 - Pick a CMP that is Google-certified and supports IAB TCF for EEA/UK/Switzerland users.
 - Add an internal ad policy: allowed categories, blocked categories, labeling rules, placement rules, sponsor approval, and editorial independence.

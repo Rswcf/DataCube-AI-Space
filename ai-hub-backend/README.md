@@ -156,8 +156,15 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 2. Install dependencies:
 ```bash
 pip install -r requirements.txt
-# Key dependencies include: resend, requests, slowapi>=0.1.9
+# Every version is pinned; see the note below before upgrading anything
 ```
+
+Dependencies are pinned exactly (`==`), including transitive ones. The file used to carry lower bounds
+only, so CI and every `railway up` installed whatever was newest that day — which silently moved the stack
+to a new major of starlette while local checkouts stayed on the old one, and framework behaviour differed
+between them. To upgrade: relax the pins you mean to move, let CI resolve them, run both test suites, and
+write the resulting versions back.
+
 
 3. Configure environment:
 ```bash
@@ -226,6 +233,15 @@ alembic downgrade -1
 Chain: 0006 -> 0007 -> 0008 -> 0009 -> 0011 -> 0012
 
 ## API Endpoints
+
+**AI disclosure header.** Every endpoint that serves AI-written text — `/api/tech`, `/api/investment`,
+`/api/tips`, `/api/trends`, `/api/videos` and `/api/deals` — returns an `X-AI-Disclosure` response header
+stating that the summaries are AI-generated and linking `/ai-disclosure` (spec AD7). It is a header rather
+than a body field because these endpoints return an object keyed by language code, where an extra key would
+read as a ninth language to any client iterating the keys. `Access-Control-Expose-Headers` exposes it to
+browser JavaScript. Endpoints that serve no AI text — `/api/weeks`, `/api/stock`, `/api/jobs`,
+`/api/developer`, admin, newsletter and contact — deliberately do not carry it.
+
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
