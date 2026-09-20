@@ -166,6 +166,14 @@ Daily collections produce reduced counts (10 tech, 5 investment, 5 tips, 2 video
 | `/api/newsletter/unsubscribe` | POST | One-click unsubscribe with a signed per-subscriber token |
 | `/api/contact` | POST | Contact form → email to `CONTACT_INBOX` |
 
+**AI disclosure header.** Every endpoint that serves AI-written text — `/api/tech`, `/api/investment`,
+`/api/tips`, `/api/trends`, `/api/videos` and `/api/deals` — returns an `X-AI-Disclosure` response header
+stating that the summaries are AI-generated and linking `/ai-disclosure` (spec AD7). It is a header rather
+than a body field because these endpoints return an object keyed by language code, where an extra key would
+read as a ninth language to any client iterating the keys. `Access-Control-Expose-Headers` exposes it to
+browser JavaScript. Endpoints that serve no AI text — `/api/weeks`, `/api/stock`, `/api/jobs`,
+`/api/developer`, admin, newsletter and contact — deliberately do not carry it.
+
 Period IDs: daily `YYYY-MM-DD` or weekly `YYYY-kwWW`
 
 Full API docs available at `/docs` (Swagger UI) when running the backend.
