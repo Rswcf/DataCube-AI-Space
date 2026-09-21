@@ -14,6 +14,7 @@ FastAPI backend for the AI Information Hub — multilingual (8 languages) daily 
 - 4.5-stage data collection pipeline
 - Two-model LLM approach (classifier + processor)
 - Tips sources bypass classification (Reddit, Simon Willison)
+- Optional AI-news filter (TypeSafe Jev) drops articles that are not about AI before classification
 - **8-language support** (DE, EN, ZH, FR, ES, PT, JA, KO) with resilient paid-first translation pipeline
 - Period ID support: daily `YYYY-MM-DD` or weekly `YYYY-kwWW`
 - **Automated newsletter** via Resend + Beehiiv with per-subscriber language preference (idempotent send-lock per `(period_id, language)`; safe against dual-cron slots + manual re-triggers)
@@ -28,6 +29,14 @@ FastAPI backend for the AI Information Hub — multilingual (8 languages) daily 
 | **Classification** | `deepseek/deepseek-v4-flash-0731` → `qwen/qwen3.7-flash` → 3 free fallbacks | Paid-first since 2026-07-31 (5 free models were delisted from OpenRouter) |
 | **Content Processing** | `deepseek/deepseek-v4-flash-0731` → `qwen/qwen3.7-flash` → 3 free fallbacks | Generates EN base content (all other languages translated) |
 | **Translation** | `deepseek/deepseek-v4-flash-0731` → `qwen/qwen3.7-flash` → 3 free fallbacks | EN → DE, ZH, FR, ES, PT, JA, KO. Short prompts keep cost ~$0.05-0.15/day; paid-first eliminates free-tier 429-cascade wipeouts |
+| **AI-news filter** | TypeSafe Jev `jev-1.13.0` (pinned) | Stage 2, optional: probability that an article is about AI; below `AI_NEWS_FILTER_THRESHOLD` (0.35) it is dropped. Off without `TYPESAFE_API_KEY` |
+
+Call safeguards (`llm_processor.py`, since 2026-09-21): every call carries `max_tokens=OUTPUT_TOKEN_CAP`
+(32,768), and a response that is truncated (`finish_reason` "length"), empty or has no choices moves on
+to the next model instead of counting as success. Classification and translation also send
+`reasoning: {enabled: false}`: DeepSeek V4 Flash reasons at effort "high" by default, and in one month 55
+calls reasoned until the provider's 131,072-token limit (about 35 minutes each) and returned no content.
+Processing keeps the provider default.
 
 ## Data Collection Pipeline (Overview)
 
@@ -39,7 +48,9 @@ Stage 1: Fetch raw data
     ↓
 Stage 2: Classify articles
     • Tips sources → skip classification (direct to tips)
-    • Other sources → LLM classification (tech/investment)
+    • Other sources → AI-news filter (TypeSafe Jev, optional): articles
+      below the threshold become section "offtopic" and go no further
+    • The rest → LLM classification (tech/investment), reasoning off
     ↓
 Stage 3: Parallel LLM processing
     • Tech: 30 posts (weekly) / 10 posts (daily)
@@ -78,7 +89,7 @@ Stage 4: Save to PostgreSQL (translations in JSONB column)
 | Stage | What it does | Code |
 |-------|--------------|------|
 | 1. Fetch | Pull all RSS feeds (parallel pool + serial Reddit lane with 75s spacing — Reddit limits unauth RSS to ~1 req/min/IP), HN (Algolia), YouTube (channel allowlist via uploads playlists + small discovery search); filter to period boundary; store raw | `collector.stage1_fetch_and_store`, `rss_fetcher.fetch_rss_feeds_parallel`, `hn_fetcher`, `youtube_fetcher.fetch_youtube_videos` |
-| 2. Classify | LLM classifies articles into tech/investment (tips sources skip) | `collector.stage2_classify_articles`, `llm_processor.CLASSIFIER_MODELS` |
+| 2. Classify | Tips sources skip this stage. Every other article first passes the AI-news filter: when Jev's probability that it is about AI is below `AI_NEWS_FILTER_THRESHOLD`, it becomes `section="offtopic"` (its `relevance` keeps that probability) and stage 3 never sees it. Off without `TYPESAFE_API_KEY`; an article Jev cannot score is kept, and a 60 s budget bounds the filter. The LLM then classifies the rest into tech/investment | `collector._drop_articles_not_about_ai`, `ai_news_filter.AiNewsFilter`, `collector.stage2_classify_articles`, `llm_processor.CLASSIFIER_MODELS` |
 | 3. Process | Parallel LLM processing, EN-native (global-audience voice); also trends + AI editorial brief ("Why Today Matters") | `collector.stage3_parallel_processing`, `llm_processor.process_*`, `generate_trends`, `generate_editorial` |
 | 4a. Save base | Validate (EN counts; refuses to clear existing data on empty output), mirror EN→DE arrays as fallback, save with honest source attribution | `collector.stage4_save_to_database`, `_mirror_de_from_translations`, `_source_author` |
 | 3.5 Translate | EN → 7 languages (DE + ZH/FR/ES/PT/JA/KO) via paid-first chain; non-blocking after base save. Every entry is stamped with `_src` (hash of its English source text); item/language pairs that come back empty or identical to English are retried once in batches of 3 and the remainder is reported as `counts.translation_gaps` | `collector.stage3_5_translate_content`, `llm_processor.TRANSLATOR_MODELS`, `translate_batch`, `translation_integrity` |
@@ -113,6 +124,7 @@ live in `hn_fetcher.py`. Do not duplicate these lists here.
 | Dimension | Source | Purpose |
 |-----------|--------|---------|
 | Relevance Score | LLM classification (0.0-1.0) | Initial sorting + selection |
+| AI-news probability | TypeSafe Jev (stage 2) | Drops articles that are not about AI (kept in `relevance` for `offtopic` rows) |
 | Impact Level | LLM processing (critical/high/medium/low) | UI display weight |
 | HN Points | Hacker News API | Community engagement signal |
 | Trend Momentum | Own topic history (`routers/trends._compute_momentum`) | new/rising/returning badges |
@@ -304,6 +316,7 @@ railway variables set BEEHIIV_PUBLICATION_ID=pub_xxxxx
 railway variables set NEWSLETTER_FROM_EMAIL=newsletter@datacubeai.space
 railway variables set SIGNING_SECRET=xxxxx       # ≥ 32 random chars: python -c "import secrets; print(secrets.token_urlsafe(48))"
 railway variables set CONTACT_INBOX=you@example.com   # contact form destination
+railway variables set TYPESAFE_API_KEY=xxxxx    # optional: AI-news filter in stage 2 (unset = off)
 railway variables set CORS_ORIGINS='["http://localhost:3000","https://www.datacubeai.space","https://ai-information-hub.vercel.app"]'
 ```
 

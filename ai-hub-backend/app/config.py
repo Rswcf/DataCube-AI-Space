@@ -67,6 +67,11 @@ class Settings(BaseSettings):
     hn_limit: int = 50
     youtube_max_results: int = 10
 
+    # AI-news filter (stage 2): TypeSafe Jev drops articles that are not about AI before
+    # classification (app/services/ai_news_filter.py). No key = filter off.
+    typesafe_api_key: str = ""
+    ai_news_filter_threshold: float = 0.35  # measured on jev-1.13.0; re-check it before changing the model
+
     # Output counts
     tech_output_count: int = 10
     tips_output_count: int = 5

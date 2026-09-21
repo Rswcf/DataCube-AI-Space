@@ -124,6 +124,7 @@ python -m scripts.weekly_collect --week 2026-kw06  # Specific week
 | **LLM Classification** | deepseek-v4-flash-0731 → qwen3.7-flash → free fallbacks (OpenRouter, paid-first) |
 | **LLM Processing** | deepseek-v4-flash-0731 → qwen3.7-flash → free fallbacks (OpenRouter, paid-first) |
 | **Translation** | deepseek-v4-flash-0731 → qwen3.7-flash → free fallbacks (OpenRouter, paid-first) |
+| **AI-news filter** | TypeSafe Jev (optional): drops articles that are not about AI before classification |
 | **Chat & Reports** | openrouter/free (OpenRouter, smart router) |
 | **Newsletter** | Resend (sending) + Beehiiv (subscribers) |
 | **Stock Data** | Disabled (HTTP 410) pending market-data licensing — see docs/data-rights.md |
@@ -137,7 +138,7 @@ The backend processes news through a 4.5-stage pipeline:
 | Stage | What happens | Output |
 |-------|-------------|--------|
 | **1. Fetch** | Collect from RSS, Hacker News, YouTube; filter by period boundaries | ~210 raw items |
-| **2. Classify** | LLM classifies into tech/investment/tips (tips sources skip this) | Categorized pool |
+| **2. Classify** | Optional AI-news filter (TypeSafe Jev) drops articles that are not about AI; the LLM classifies the rest into tech/investment/tips (tips sources skip this) | Categorized pool |
 | **3. Process** | Parallel LLM processing: EN-native summaries (global-audience voice), trends + AI editorial brief | 30 tech + 21 investment + 15 tips + 5 videos |
 | **3.5. Translate** | Translate EN → DE, ZH, FR, ES, PT, JA, KO (paid-first chain, JSON validation + small-batch retry) | 7 languages per item |
 | **4. Save** | Store in PostgreSQL, intersperse videos into tech feed | Database records |
@@ -207,6 +208,7 @@ NEWSLETTER_FROM_EMAIL=newsletter@datacubeai.space
 CORS_ORIGINS=["http://localhost:3000"]
 SIGNING_SECRET=                  # One-click unsubscribe tokens (≥ 32 random characters)
 CONTACT_INBOX=                   # Contact form destination address
+TYPESAFE_API_KEY=                # Optional: AI-news filter before classification (unset = off)
 ```
 
 </details>
