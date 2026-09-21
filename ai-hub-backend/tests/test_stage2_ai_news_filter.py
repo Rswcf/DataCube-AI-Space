@@ -6,6 +6,8 @@ the threshold can be re-checked later. Tips sources are never scored. Articles
 Jev could not score are kept: the filter fails open.
 """
 
+import pytest
+
 import app.services.collector as collector
 from app.models import RawArticle
 
@@ -98,6 +100,27 @@ def test_everything_is_classified_when_the_filter_is_off(monkeypatch):
     _, classifier, fake = _run(monkeypatch, rows, {"promo": 0.1}, enabled=False)
     assert classifier.seen == ["promo", "model"]
     assert fake.scored == []
+
+
+@pytest.mark.parametrize("crash_in", ["init", "score_all"])
+def test_a_crashing_filter_still_classifies_every_article(monkeypatch, crash_in):
+    # Whatever goes wrong inside the filter (a key httpx cannot encode, a future
+    # edit), the day is classified exactly as it was before the filter existed.
+    class CrashingFilter:
+        def __init__(self, api_key):
+            if crash_in == "init":
+                raise UnicodeEncodeError("ascii", "é", 0, 1, "ordinal not in range(128)")
+            self.enabled = True
+
+        def score_all(self, articles):
+            raise RuntimeError("unexpected")
+
+    monkeypatch.setattr(collector, "AiNewsFilter", CrashingFilter)
+    rows = [_row("promo"), _row("model")]
+    classifier = _Classifier()
+    collector.stage2_classify_articles(_Session(rows), PERIOD, classifier)
+    assert classifier.seen == ["promo", "model"]
+    assert [r.section for r in rows] == ["investment", "investment"]
 
 
 def test_classifier_failure_keeps_the_offtopic_marks(monkeypatch):

@@ -69,6 +69,14 @@ def test_filter_is_off_without_a_key():
     assert AiNewsFilter("ts-key").enabled is True
 
 
+def test_whitespace_around_the_key_is_ignored():
+    # A key pasted with a trailing newline would otherwise fail every request.
+    assert AiNewsFilter(" \n").enabled is False
+    api = _Api(lambda body: _answer(0.9))
+    AiNewsFilter(" ts-key\n", transport=httpx.MockTransport(api)).score_all([_article()])
+    assert api.requests[0][0].headers["authorization"] == "Bearer ts-key"
+
+
 def test_request_pins_the_calibrated_model_question_and_state():
     ai_filter, api = _filter(lambda body: _answer(0.9))
     ai_filter.score_all([_article(title="T", summary="x" * 500, source="QbitAI", hint="investment")])

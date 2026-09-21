@@ -806,16 +806,20 @@ def _drop_articles_not_about_ai(articles: list) -> list:
     database. An article Jev could not score is kept: the filter fails open.
     """
     settings = get_settings()
-    ai_filter = AiNewsFilter(settings.typesafe_api_key)
-    if not ai_filter.enabled:
-        logger.info("AI-news filter off (TYPESAFE_API_KEY not set): classifying every article")
+    try:
+        ai_filter = AiNewsFilter(settings.typesafe_api_key)
+        if not ai_filter.enabled:
+            logger.info("AI-news filter off (TYPESAFE_API_KEY not set): classifying every article")
+            return articles
+        scores = ai_filter.score_all([
+            {"source": a.source, "original_section": a.original_section, "title": a.title, "summary": a.summary}
+            for a in articles
+        ])
+    except Exception as exc:  # the filter is optional; it must never cost a day's content
+        logger.error(f"AI-news filter failed, classifying every article: {exc!r}")
         return articles
 
     threshold = settings.ai_news_filter_threshold
-    scores = ai_filter.score_all([
-        {"source": a.source, "original_section": a.original_section, "title": a.title, "summary": a.summary}
-        for a in articles
-    ])
     kept = []
     for article, p in zip(articles, scores):
         if p is not None and p < threshold:

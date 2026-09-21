@@ -51,7 +51,7 @@ FATAL_STATUSES = {401, 422}
 class AiNewsFilter:
     def __init__(self, api_key: str, *, transport: httpx.BaseTransport | None = None,
                  budget_seconds: float = BUDGET_SECONDS):
-        self.api_key = api_key
+        self.api_key = (api_key or "").strip()  # a pasted key often carries a trailing newline
         self.transport = transport
         self.budget_seconds = budget_seconds
         self._warned_model = False
