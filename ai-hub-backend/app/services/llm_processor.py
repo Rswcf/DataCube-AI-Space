@@ -72,6 +72,20 @@ EPISTEMIC_RULES = """Epistemic status (faithfulness):
 
 TRANSLATION_FAITHFULNESS_RULES = """Preserve epistemic status: translate hedges ("may", "could", "reportedly", "plans to", "is expected to") with equally tentative wording, keep every attribution ("says", "according to", "claims"), and never turn a claim into a statement of fact."""
 
+# Output cap for every call. DeepSeek V4 Flash reasons at effort "high" by
+# default; in 2026-09 about 55 calls a month reasoned up to the provider's
+# 131,072-token limit (~35 minutes each) and returned no visible content.
+# 32,768 leaves room for a weekly classification of several hundred articles
+# while bounding a runaway to a few minutes. A capped call ends with
+# finish_reason "length", which both call paths treat as a failure.
+OUTPUT_TOKEN_CAP = 32768
+
+# Classification and translation gain nothing from reasoning (measured
+# 2026-09-21: same accuracy, 4–11× faster), so their chain switches it off.
+# `reasoning` is an OpenRouter parameter, not an OpenAI one, so it has to go
+# through `extra_body`; models without reasoning ignore it.
+REASONING_OFF = {"enabled": False}
+
 
 class LLMProcessor:
     """LLM processing service for content generation."""
@@ -183,11 +197,16 @@ class LLMProcessor:
                         messages=[{"role": "user", "content": prompt}],
                         temperature=temperature,
                         timeout=timeout,
+                        max_tokens=OUTPUT_TOKEN_CAP,
                     )
                     if not response.choices or not response.choices[0].message:
                         logger.warning(f"Empty response from processor model {model}")
                         last_error = RuntimeError(f"Empty response from {model}")
                         break  # try next model
+                    if getattr(response.choices[0], "finish_reason", None) == "length":
+                        logger.warning(f"Truncated output (finish_reason=length) from processor model {model}")
+                        last_error = RuntimeError(f"Truncated output from {model}")
+                        break  # another capped attempt on the same model would likely repeat it
                     content = response.choices[0].message.content or ""
                     if not content.strip():
                         logger.warning(f"Blank content from processor model {model}")
@@ -235,10 +254,13 @@ class LLMProcessor:
                             expect_json: bool = False,
                             models: "list[str] | None" = None,
                             chain_name: str = "classifier") -> str:
-        """Try a model chain in order, falling back on rate limits or bad JSON.
+        """Try a model chain in order, falling back on rate limits, bad JSON,
+        and empty, blank or truncated output.
 
         Each model gets 2 retry attempts with exponential backoff before
-        moving to the next model in the chain.
+        moving to the next model in the chain; empty, blank and truncated
+        output move to the next model at once. This chain serves
+        classification and translation, so it runs with reasoning off.
 
         Args:
             prompt: The prompt to send.
@@ -263,14 +285,25 @@ class LLMProcessor:
                         messages=[{"role": "user", "content": prompt}],
                         temperature=temperature,
                         timeout=timeout,
+                        max_tokens=OUTPUT_TOKEN_CAP,
+                        extra_body={"reasoning": REASONING_OFF},
                     )
                     if not response.choices or not response.choices[0].message:
                         logger.warning(f"Empty response from {chain_name} model {model}")
-                        return ""
+                        last_error = RuntimeError(f"Empty response from {model}")
+                        break  # try next model
+                    if getattr(response.choices[0], "finish_reason", None) == "length":
+                        logger.warning(f"Truncated output (finish_reason=length) from {chain_name} model {model}")
+                        last_error = RuntimeError(f"Truncated output from {model}")
+                        break  # another capped attempt on the same model would likely repeat it
                     content = response.choices[0].message.content or ""
+                    if not content.strip():
+                        logger.warning(f"Blank content from {chain_name} model {model}")
+                        last_error = RuntimeError(f"Blank content from {model}")
+                        break  # try next model
 
                     # Validate JSON if required
-                    if expect_json and content:
+                    if expect_json:
                         parsed = parse_llm_json(content, fallback=None)
                         if parsed is None:
                             logger.warning(
