@@ -25,8 +25,8 @@ class RawArticle(Base):
     summary: Mapped[str] = mapped_column(Text, nullable=False)
     published: Mapped[str] = mapped_column(String(30), nullable=False)
     original_section: Mapped[str] = mapped_column(String(20), nullable=False)  # "tech", "investment", "tips"
-    section: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)  # LLM classified section
-    relevance: Mapped[Optional[float]] = mapped_column(Float, nullable=True)  # LLM relevance score
+    section: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)  # LLM classified section, or "offtopic" (AI-news filter)
+    relevance: Mapped[Optional[float]] = mapped_column(Float, nullable=True)  # LLM relevance score; for "offtopic" rows, Jev's is-AI-news probability
     raw_data: Mapped[Optional[dict]] = mapped_column(JSONB, nullable=True)  # Original data (HN points, comments, etc.)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
 

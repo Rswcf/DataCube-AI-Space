@@ -24,6 +24,7 @@ from app.services.rss_fetcher import fetch_rss_feeds_parallel
 from app.services.hn_fetcher import fetch_hn_stories
 from app.services.youtube_fetcher import fetch_youtube_videos, fetch_video_transcript
 from app.services.llm_processor import LLMProcessor
+from app.services.ai_news_filter import AiNewsFilter, MODEL as AI_NEWS_MODEL
 from app.services.translation_integrity import (
     SRC_KEY, entry_is_usable, identity_key, is_blank, item_source_hash, source_hash,
 )
@@ -796,12 +797,46 @@ def stage1_fetch_and_store(db: Session, week_id: str) -> dict:
     }
 
 
+def _drop_articles_not_about_ai(articles: list) -> list:
+    """Mark the articles Jev judges not to be AI news as "offtopic"; return the rest.
+
+    Stage 3 reads only the tech, investment and tips sections, so a dropped
+    article stays in raw_articles without reaching a section. It keeps Jev's
+    probability in `relevance` so the threshold can be re-checked from the
+    database. An article Jev could not score is kept: the filter fails open.
+    """
+    settings = get_settings()
+    ai_filter = AiNewsFilter(settings.typesafe_api_key)
+    if not ai_filter.enabled:
+        logger.info("AI-news filter off (TYPESAFE_API_KEY not set): classifying every article")
+        return articles
+
+    threshold = settings.ai_news_filter_threshold
+    scores = ai_filter.score_all([
+        {"source": a.source, "original_section": a.original_section, "title": a.title, "summary": a.summary}
+        for a in articles
+    ])
+    kept = []
+    for article, p in zip(articles, scores):
+        if p is not None and p < threshold:
+            article.section = "offtopic"
+            article.relevance = p
+            logger.info(f"Not AI news (p={p:.2f}), dropped: [{article.source}] {article.title}")
+        else:
+            kept.append(article)
+    logger.info(f"AI-news filter ({AI_NEWS_MODEL}, threshold {threshold}): dropped "
+                f"{len(articles) - len(kept)} of {len(articles)}, {scores.count(None)} unscored and kept")
+    return kept
+
+
 def stage2_classify_articles(db: Session, week_id: str, processor: LLMProcessor) -> None:
     """
     Stage 2: Classify articles using LLM (skip tips sources).
 
     Tips sources (Reddit, Simon Willison) are inherently tips content,
     so they skip LLM classification and use original_section directly.
+    Every other article first passes the AI-news filter; the ones it drops
+    become "offtopic" and are neither classified nor processed.
 
     Args:
         db: Database session
@@ -832,6 +867,11 @@ def stage2_classify_articles(db: Session, week_id: str, processor: LLMProcessor)
 
     logger.info(f"Tips articles (skip classification): {len(tips_articles)}")
     logger.info(f"Articles to classify: {len(articles_to_classify)}")
+
+    # Dropped articles leave the list before the try below, so the classifier's
+    # fallback to source hints can never bring them back.
+    if articles_to_classify:
+        articles_to_classify = _drop_articles_not_about_ai(articles_to_classify)
 
     # Only classify non-tips articles
     if articles_to_classify:
