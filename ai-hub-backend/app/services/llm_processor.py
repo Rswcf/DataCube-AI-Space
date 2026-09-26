@@ -80,10 +80,14 @@ TRANSLATION_FAITHFULNESS_RULES = """Preserve epistemic status: translate hedges 
 # finish_reason "length", which both call paths treat as a failure.
 OUTPUT_TOKEN_CAP = 32768
 
-# Classification and translation gain nothing from reasoning (measured
-# 2026-09-21: same accuracy, 4–11× faster), so their chain switches it off.
-# `reasoning` is an OpenRouter parameter, not an OpenAI one, so it has to go
-# through `extra_body`; models without reasoning ignore it.
+# Every chain switches reasoning off. Classification and translation gain
+# nothing from it (measured 2026-09-21: same accuracy, 4–11× faster). Summary
+# generation kept the provider default one week longer, because without
+# reasoning it sometimes picked an off-topic story and nothing removed those;
+# the stage-2 AI-news filter now does. In that week reasoning still cost stage 3
+# up to 26 minutes a night and the occasional truncation, for no measured gain
+# in faithfulness. `reasoning` is an OpenRouter parameter, not an OpenAI one, so
+# it has to go through `extra_body`; models without reasoning ignore it.
 REASONING_OFF = {"enabled": False}
 
 
@@ -198,6 +202,7 @@ class LLMProcessor:
                         temperature=temperature,
                         timeout=timeout,
                         max_tokens=OUTPUT_TOKEN_CAP,
+                        extra_body={"reasoning": REASONING_OFF},
                     )
                     if not response.choices or not response.choices[0].message:
                         logger.warning(f"Empty response from processor model {model}")

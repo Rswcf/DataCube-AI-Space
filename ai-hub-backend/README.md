@@ -33,10 +33,11 @@ FastAPI backend for the AI Information Hub — multilingual (8 languages) daily 
 
 Call safeguards (`llm_processor.py`, since 2026-09-21): every call carries `max_tokens=OUTPUT_TOKEN_CAP`
 (32,768), and a response that is truncated (`finish_reason` "length"), empty or has no choices moves on
-to the next model instead of counting as success. Classification and translation also send
-`reasoning: {enabled: false}`: DeepSeek V4 Flash reasons at effort "high" by default, and in one month 55
-calls reasoned until the provider's 131,072-token limit (about 35 minutes each) and returned no content.
-Processing keeps the provider default.
+to the next model instead of counting as success. Every call also sends `reasoning: {enabled: false}`:
+DeepSeek V4 Flash reasons at effort "high" by default, and in one month 55 calls reasoned until the
+provider's 131,072-token limit (about 35 minutes each) and returned no content. Classification and
+translation switched it off on 2026-09-21; summary generation followed on 2026-09-26, once the stage-2
+AI-news filter removed the off-topic articles that reasoning-off selection used to pick up.
 
 ## Data Collection Pipeline (Overview)
 
