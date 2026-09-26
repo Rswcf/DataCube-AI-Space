@@ -100,7 +100,7 @@ def test_translation_runs_with_reasoning_off(monkeypatch):
     assert completions.calls[0]["extra_body"] == {"reasoning": {"enabled": False}}
 
 
-# Processor chain (_call_llm): reasoning stays at the provider default, output is capped
+# Processor chain (_call_llm): reasoning off as well, output capped
 
 def test_processor_tries_next_model_when_output_is_truncated(monkeypatch):
     monkeypatch.setattr(LLMProcessor, "PROCESSOR_MODELS", ["a", "b"])
@@ -111,10 +111,14 @@ def test_processor_tries_next_model_when_output_is_truncated(monkeypatch):
     assert _models(completions) == ["a", "b"]
 
 
-def test_processor_caps_output_and_keeps_reasoning(monkeypatch):
+def test_processor_caps_output_and_turns_reasoning_off(monkeypatch):
+    # Summary generation kept the provider default until 2026-09-26: without
+    # reasoning it sometimes picked an off-topic story, and nothing upstream
+    # removed those. The stage-2 AI-news filter now does, and reasoning was
+    # costing ~26 minutes of stage 3 a night plus the odd truncation.
     monkeypatch.setattr(LLMProcessor, "PROCESSOR_MODELS", ["a"])
     processor, completions = _processor(monkeypatch, [_response('{"en": []}')])
     processor._call_llm("p")
     call = completions.calls[0]
     assert call["max_tokens"] == CAP
-    assert "reasoning" not in (call.get("extra_body") or {})
+    assert call["extra_body"] == {"reasoning": {"enabled": False}}
