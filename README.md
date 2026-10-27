@@ -321,3 +321,7 @@ This project is licensed under the MIT License — see the [LICENSE](LICENSE) fi
 **[Live Demo](https://www.datacubeai.space)** · **[Report Bug](https://github.com/Rswcf/DataCube-AI-Space/issues)** · **[Request Feature](https://github.com/Rswcf/DataCube-AI-Space/discussions)** · **[Discussions](https://github.com/Rswcf/DataCube-AI-Space/discussions)**
 
 </div>
+
+### Daily publication verification (2026-10-27)
+
+The GitHub daily workflows use `ai-hub-backend/scripts/daily_automation.py` (Python standard library only). A collection must reach `completed` and expose nonempty English content through the public API. `empty`/`failed` editions are retried; running editions are polled without a duplicate trigger. Timeouts and unavailable status/content APIs fail rather than imply completion. Newsletter runs require completed collection and validate the response's actual send counts. No content, partial failure, held languages or invalid results fail; an already-sent edition reports an explicit idempotent skip with no new messages. Each workflow serializes its own runs. Backend authentication failures retain their error as `failed`; a fresh newsletter lock is pending, not proof of a completed send. Regression coverage: `test_daily_automation.py`, `test_collection_failure_reporting.py`, `test_newsletter_failure_reporting.py`, and `test_llm_call_resilience.py`.

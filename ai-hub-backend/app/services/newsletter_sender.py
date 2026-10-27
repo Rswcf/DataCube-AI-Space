@@ -1293,7 +1293,8 @@ def _acquire_send_lock(db: Session, period_id: str, language: str) -> bool:
     """Try to claim the send slot for (period_id, language). Race-safe.
 
     Returns True if the caller should proceed to send, False if another
-    run already owns this slot.
+    run already sent this slot. A fresh in-progress slot raises instead of
+    being reported as already delivered.
 
     Implementation:
       1. INSERT ... ON CONFLICT DO NOTHING RETURNING — atomic first-writer-wins.
@@ -1301,7 +1302,7 @@ def _acquire_send_lock(db: Session, period_id: str, language: str) -> bool:
       2. If no row was returned, a row already existed. Re-SELECT with
          FOR UPDATE to serialize concurrent readers, then inspect state:
          - 'sent': return False (duplicate protection).
-         - 'in_progress' fresh: return False (another worker holds it).
+         - 'in_progress' fresh: raise (another worker has not finished).
          - 'in_progress' stale (> _STALE_IN_PROGRESS_SECONDS): reclaim.
          - 'failed': reclaim for retry.
     """
@@ -1344,7 +1345,7 @@ def _acquire_send_lock(db: Session, period_id: str, language: str) -> bool:
         age = (now - (row.started_at or now)).total_seconds()
         if age < _STALE_IN_PROGRESS_SECONDS:
             db.commit()
-            return False
+            raise RuntimeError(f"Newsletter {period_id}/{language} is still in progress; delivery is unconfirmed")
         logger.warning(
             f"Reclaiming stale in_progress lock for {period_id}/{language} "
             f"(age={age:.0f}s)"

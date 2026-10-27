@@ -396,11 +396,10 @@ async def trigger_newsletter(
 
     Defaults to yesterday's content. Set wait=true for synchronous mode.
 
-    In wait=true mode the response includes the real send result. If
-    Resend/Beehiiv produced ZERO successful sends but at least one was
-    attempted, the endpoint returns HTTP 502 so the GitHub Actions
-    workflow turns RED — previously this case returned 200 and the
-    workflow logged success even though no email arrived.
+    In wait=true mode the response includes the real send result.
+    Any failed sends or held languages return HTTP 502. Missing content
+    returns HTTP 409. The workflow also validates the result body, so an
+    HTTP 200 without delivery evidence cannot be reported as a send.
 
     Requires X-API-Key header.
     """
@@ -415,18 +414,20 @@ async def trigger_newsletter(
             logger.exception(f"Newsletter send raised: {e}")
             raise HTTPException(status_code=500, detail=str(e))
 
-        # send_newsletter returns a dict; tolerate older behaviour just in case.
+        # A legacy/invalid response is not evidence that messages were sent.
         if not isinstance(result, dict):
-            return {"status": "completed", "period_id": period_id or "yesterday"}
+            raise HTTPException(status_code=502, detail="Newsletter sender returned no delivery result")
+
+        if result.get("status") in ("no_content", "no_period"):
+            raise HTTPException(status_code=409, detail=result)
 
         # Surface real failure to the workflow as 502.
-        total_sent = result.get("total_sent", 0)
         total_failed = result.get("total_failed", 0)
-        if total_sent == 0 and total_failed > 0:
+        if total_failed > 0:
             raise HTTPException(
                 status_code=502,
                 detail={
-                    "message": "Newsletter run produced zero successful sends",
+                    "message": "Newsletter run contains failed sends",
                     **result,
                 },
             )

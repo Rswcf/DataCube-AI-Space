@@ -23,16 +23,25 @@ on:
         description: "Period ID to send newsletter for (e.g. 2026-04-10). Default: yesterday"
         required: false
 
-# GITHUB_TOKEN only needs actions:write (self re-enable in the keepalive step);
-# no checkout happens, so no contents scope required.
+# Read the tested workflow runner and retain the self-keepalive permission.
 permissions:
+  contents: read
   actions: write
+
+concurrency:
+  group: daily-newsletter
+  cancel-in-progress: false
 
 jobs:
   send:
     name: Send daily newsletter
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
       - name: Determine period
         id: period
         run: |
@@ -62,46 +71,13 @@ jobs:
           echo "SKIP=false" >> "$GITHUB_OUTPUT"
           echo "Will send newsletter for $PERIOD"
 
-      - name: Verify content exists
-        id: verify
+      - name: Send newsletter and verify send result
         if: steps.period.outputs.SKIP != 'true'
-        run: |
-          PERIOD="${{ steps.period.outputs.PERIOD }}"
-          echo "Verifying content for $PERIOD..."
-
-          COUNTER='import json,sys;cnt=lambda v:len(v) if isinstance(v,list) else (sum(cnt(x) for x in v.values()) if isinstance(v,dict) else 0);print(cnt(json.load(sys.stdin)))'
-          T1=$(curl -sS "${{ secrets.API_BASE_URL }}/tech/${PERIOD}"       --http1.1 --max-time 30 | python3 -c "$COUNTER" 2>/dev/null || echo 0)
-          T2=$(curl -sS "${{ secrets.API_BASE_URL }}/tips/${PERIOD}"       --http1.1 --max-time 30 | python3 -c "$COUNTER" 2>/dev/null || echo 0)
-          T3=$(curl -sS "${{ secrets.API_BASE_URL }}/investment/${PERIOD}" --http1.1 --max-time 30 | python3 -c "$COUNTER" 2>/dev/null || echo 0)
-          TOTAL=$((T1 + T2 + T3))
-
-          echo "Content items found: total=$TOTAL (tech=$T1 tips=$T2 inv=$T3)"
-
-          if [ "$TOTAL" -gt 0 ]; then
-            echo "HAS_CONTENT=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "HAS_CONTENT=false" >> "$GITHUB_OUTPUT"
-            echo "WARNING: no content for $PERIOD — skipping newsletter"
-          fi
-
-      - name: Send newsletter
-        if: steps.verify.outputs.HAS_CONTENT == 'true'
-        run: |
-          set +e
-          PERIOD="${{ steps.period.outputs.PERIOD }}"
-          echo "Sending newsletter for period: $PERIOD"
-          HTTP_CODE=$(curl -sS -o nl-response.json -w "%{http_code}" \
-            -X POST "${{ secrets.API_BASE_URL }}/admin/newsletter?period_id=${PERIOD}&wait=true" \
-            -H "X-API-Key: ${{ secrets.ADMIN_API_KEY }}" \
-            --http1.1 \
-            --max-time 300)
-          if [ -f nl-response.json ]; then cat nl-response.json; echo ""; fi
-          if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
-            echo "Newsletter sent successfully (HTTP $HTTP_CODE)"
-          else
-            echo "ERROR: Newsletter API returned HTTP $HTTP_CODE"
-            exit 1
-          fi
+        env:
+          API_BASE_URL: ${{ secrets.API_BASE_URL }}
+          ADMIN_API_KEY: ${{ secrets.ADMIN_API_KEY }}
+          PERIOD: ${{ steps.period.outputs.PERIOD }}
+        run: python3 ai-hub-backend/scripts/daily_automation.py newsletter --period "$PERIOD"
 
       - name: Keepalive (reset 60-day inactivity auto-disable)
         # GitHub disables scheduled workflows 60 days after the last repo
