@@ -1891,29 +1891,15 @@ def run_process_only(db: Session, week_id: Optional[str] = None) -> dict:
     if raw_count == 0:
         raise ValueError(f"No raw data found for {week_id}. Run fetch first.")
 
-    processor = LLMProcessor()
-
-    # Stage 2: Classification
-    stage2_classify_articles(db, week_id, processor)
-
-    # Stage 3: Parallel processing
-    results = stage3_parallel_processing(db, week_id, processor)
-
-    # Stage 3.5: Translate EN content to 6 additional languages
-    stage3_5_translate_content(results)
-
-    # Load raw videos for metadata
-    raw_videos = db.query(RawVideo).filter(RawVideo.week_id == week_id).all()
-
-    # Stage 4: Save to database
-    stage4_save_to_database(db, week_id, results, raw_videos)
-
+    # Use the same status lifecycle, base-save and translation backfill as
+    # nightly collection, while preserving the historical raw source rows.
+    run_collection(db, week_id, fetch=False)
     return {
         "week_id": week_id,
-        "tech_count": len(results.get("tech", {}).get("de", [])),
-        "investment_categories": list(results.get("investment", {}).keys()),
-        "tips_count": len(results.get("tips", {}).get("de", [])),
-        "videos_count": len(results.get("videos", {}).get("de", [])),
+        "tech_count": db.query(TechPost).filter(TechPost.week_id == week_id).count(),
+        "investment_categories": ["primaryMarket", "secondaryMarket", "ma"],
+        "tips_count": db.query(TipPost).filter(TipPost.week_id == week_id).count(),
+        "videos_count": db.query(Video).filter(Video.week_id == week_id).count(),
     }
 
 
@@ -1950,7 +1936,7 @@ def _is_collection_running(period_id: str) -> bool:
         db.close()
 
 
-def run_collection(db: Session, week_id: Optional[str] = None):
+def run_collection(db: Session, week_id: Optional[str] = None, *, fetch: bool = True):
     """
     Run the full data collection pipeline (all stages).
 
@@ -1973,8 +1959,16 @@ def run_collection(db: Session, week_id: Optional[str] = None):
     finalised = False
 
     try:
-        # Stage 1: Fetch and store raw data
-        stage1_counts = stage1_fetch_and_store(db, week_id)
+        # Recovery can reuse historical raw rows after feeds have rolled over.
+        if fetch:
+            stage1_counts = stage1_fetch_and_store(db, week_id)
+        else:
+            stage1_counts = {
+                "articles": db.query(RawArticle).filter(RawArticle.week_id == week_id).count(),
+                "videos": db.query(RawVideo).filter(RawVideo.week_id == week_id).count(),
+            }
+            if not sum(stage1_counts.values()):
+                raise ValueError(f"No raw data found for {week_id}. Run fetch first.")
         set_collection_status(week_id, "running", stage="stage2", raw_counts=stage1_counts)
 
         # Initialize LLM processor
