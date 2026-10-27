@@ -26,7 +26,7 @@ class FakeTranslator:
     models_seen: list = []
 
     def translate_batch(self, items, target_lang, fields, batch_size=10, models=None):
-        FakeTranslator.models_seen.append(models)
+        FakeTranslator.models_seen.append((target_lang, models))
         out = []
         for item in items:
             entry = {}
@@ -64,6 +64,7 @@ def db():
 def misaligned_period(db, monkeypatch):
     FakeTranslator.models_seen = []
     monkeypatch.setattr(backfill, "LLMProcessor", FakeTranslator)
+    monkeypatch.setattr(backfill, "model_chains", lambda profile: {"cheap": FakeTranslator.CHEAP_TRANSLATOR_MODELS})
     db.query(TechPost).filter(TechPost.week_id == WEEK_ID).delete()
     if not db.query(Week).filter(Week.id == WEEK_ID).first():
         db.add(Week(
@@ -112,7 +113,10 @@ def test_backfill_repairs_rows_and_german_columns(db):
         for lang in TRANSLATION_LANGUAGES:
             assert translation_status(row, "tech", lang) == "ok"
     assert FakeTranslator.models_seen
-    assert all(models == ["cheap/test-model"] for models in FakeTranslator.models_seen)
+    routes = dict(FakeTranslator.models_seen)
+    assert set(routes) == set(TRANSLATION_LANGUAGES)
+    assert routes["ko"] is None  # retain the normal Korean quality chain
+    assert all(models == ["cheap/test-model"] for lang, models in routes.items() if lang != "ko")
     assert backfill.backfill_periods(db, [WEEK_ID]) == {}
 
 
