@@ -38,7 +38,9 @@ def video_to_response(video: Video, language: str) -> VideoResponse:
         likeCount=video.like_count,
         tags=video.tags,
         category=video.category,
-        evidenceLevel="transcript_excerpt" if video.transcript else "description",
+        # Old processors could store captions without passing them to the
+        # model. The new server prefix records actual excerpt consumption.
+        evidenceLevel="transcript_excerpt" if video.transcript and video.summary_en.startswith("Based on a transcript excerpt: ") else "description",
     )
 
 

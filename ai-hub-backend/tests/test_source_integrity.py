@@ -49,6 +49,17 @@ def test_older_unrepaired_tip_api_uses_edition_date_until_input_is_verified():
     assert tip_to_response(row, "en").timestamp == "2026-09-30"
 
 
+def test_legacy_stored_captions_are_not_evidence_that_old_summary_used_them():
+    from app.models import Video
+    from app.routers.videos import video_to_response
+    row = Video(id=1, video_id="fixture", title_en="AI video", summary_en="A legacy description summary.",
+        channel_name="Publisher", thumbnail_url="https://example.com/thumb", published_at="2026-10-26",
+        duration_seconds=60, duration_formatted="1:00", view_count=1000, like_count=10, transcript="Stored captions")
+    assert video_to_response(row, "en").evidenceLevel == "description"
+    row.summary_en = "Based on a transcript excerpt: An attributed claim."
+    assert video_to_response(row, "en").evidenceLevel == "transcript_excerpt"
+
+
 def test_high_relevance_tail_is_ranked_before_cap_and_families_are_balanced():
     items = [article(i) for i in range(45)] + [article(99, "research.example", .99)]
     selected = select_inputs(items, 15)
