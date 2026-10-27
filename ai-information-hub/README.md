@@ -30,7 +30,7 @@ Optional build-time variables. Their defaults, in `lib/brand-defaults.json`, are
 
 - **Frontend**: Next.js 16, React 19, Tailwind CSS 4, Shadcn/ui
 - **Backend**: FastAPI + PostgreSQL on Railway
-- **LLM**: OpenRouter (openrouter/free for chat, deepseek-v4-flash-0731 for processing with qwen3.7-flash fallback)
+- **LLM**: OpenRouter (qwen3.7-flash for chat, deepseek-v4.1-flash-1017 for processing with qwen3.7-flash fallback)
 - **Data**: RSS feeds, Hacker News, YouTube
 
 ## Features
@@ -60,3 +60,9 @@ Optional build-time variables. Their defaults, in `lib/brand-defaults.json`, are
 - Monetization surfaces: `/for-teams` (contact form → backend `POST /api/contact`), `/premium` (coming soon), and backend developer API/job-board endpoints
 - Subscription badge component for tier display
 - No authentication required
+
+**Model policy (2026-10-27):** generation/reports use DeepSeek V4.1 Flash 1017; six-language translation/chat use Qwen3.7 Flash; classification uses DeepSeek 1017. Public news chains end with NVIDIA Nemotron 3.5 Super VL Free and Gemma 4 31B Free; chat/report only use the two paid models. Reasoning stays off, provider prices and output are bounded. Set `LLM_MODEL_PROFILE=legacy` and redeploy to restore the prior paid routing (frontend restores its prior free router). See [model routing and rollback](../docs/model-routing.md).
+
+Korean translation exception: the live financial sample exposed Qwen translating private-company valuation as market capitalization. Korean uses the generation chain (DeepSeek first), including cheap repairs; the other six languages remain Qwen-first.
+
+Classification QA exception: Qwen misclassified an IPO discussion in an independent holdout, so classification uses the DeepSeek generation chain; Qwen remains the paid fallback.

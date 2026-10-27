@@ -4,6 +4,7 @@ Application configuration loaded from environment variables.
 
 from email.utils import formataddr
 from functools import lru_cache
+from typing import Literal
 from urllib.parse import urlsplit
 
 from pydantic import Field, model_validator
@@ -83,6 +84,8 @@ class Settings(BaseSettings):
     hn_max_workers: int = 8
     hn_enhance_max_workers: int = 6
     llm_max_workers: int = 2
+    # Set legacy to restore the pre-refresh paid models without changing code.
+    llm_model_profile: Literal["balanced", "legacy"] = "balanced"
 
     # HTTP timeouts (seconds)
     rss_request_timeout_seconds: int = 20
