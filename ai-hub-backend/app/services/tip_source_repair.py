@@ -37,6 +37,7 @@ def plan_repair(db, start: str, end: str):
         # accurately describes that story. Keep that uncertainty explicit.
         after["timestamp"] = weeks[row.week_id].sort_date.isoformat()
         after["source_url"] = source.link if source else None
+        after["platform"] = ("Reddit" if "reddit.com/" in canonical_url(source.link) else "Blog") if source else "Unknown"
         after["author"] = ({"name": source.source, "handle": "", "avatar": "", "verified": False}
                            if source else {"name": "Unverified legacy source", "handle": "", "avatar": "", "verified": False})
         after["metrics"] = {**(row.metrics or {}), "sourceStatus": "unverified_legacy", "dateBasis": "edition",

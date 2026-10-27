@@ -91,6 +91,7 @@ def test_historical_repair_and_restore_preserve_ids_content_translations_and_gua
     assert apply_manifest(db, plan)["rows"] == 2
     assert [r.timestamp for r in rows] == [date(2026, 10, 26).isoformat()] * 2
     assert rows[1].source_url is None
+    assert [row.platform for row in rows] == ["Blog", "Unknown"]
     assert [(r.id, content_digest(r)) for r in rows] == [(i, h) for i, h, _ in original]
     assert plan_repair(db, PERIOD, PERIOD)["rows"] == []
     rows[0].timestamp = "2026-10-25"
