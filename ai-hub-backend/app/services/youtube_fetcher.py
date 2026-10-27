@@ -4,7 +4,7 @@ YouTube video fetching service using YouTube Data API v3.
 
 import re
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
@@ -113,6 +113,7 @@ def fetch_youtube_videos(
     max_results: int = 10,
     days: int = 7,
     min_view_count: int = 10000,
+    *, window_start=None, window_end=None,
 ) -> list[dict]:
     """
     Fetch AI-related YouTube videos using YouTube Data API v3.
@@ -141,9 +142,11 @@ def fetch_youtube_videos(
         logger.error(f"Failed to initialize YouTube client: {e}")
         return []
 
-    published_after = (datetime.utcnow() - timedelta(days=days)).isoformat() + "Z"
+    published_after = (window_start or (datetime.utcnow() - timedelta(days=days))).isoformat() + "Z"
     all_videos = []
     seen_ids = set()
+
+    curated_channel_ids = set()
 
     def process_video_ids(video_ids: list[str]) -> None:
         """Fetch details for IDs and append those passing quality filters."""
@@ -169,14 +172,18 @@ def fetch_youtube_videos(
                 statistics = video.get("statistics", {})
 
                 view_count = int(statistics.get("viewCount", 0))
-                if view_count < min_view_count:
+                is_curated = snippet.get("channelId") in curated_channel_ids
+                if view_count < (1000 if is_curated else min_view_count):
+                    continue
+                published = datetime.fromisoformat(snippet["publishedAt"].replace("Z", "+00:00")).astimezone(timezone.utc).replace(tzinfo=None)
+                if (window_start and published < window_start) or (window_end and published >= window_end):
                     continue
 
                 duration_seconds, duration_formatted = parse_duration(
                     content_details.get("duration", "PT0S")
                 )
                 # Skip very short videos (< 1 min) or very long ones (> 1 hour)
-                if duration_seconds < 60 or duration_seconds > 3600:
+                if duration_seconds < 60 or duration_seconds > (10800 if is_curated else 3600):
                     continue
 
                 seen_ids.add(video_id)
@@ -203,15 +210,16 @@ def fetch_youtube_videos(
         playlist_id = _uploads_playlist_id(youtube, handle)
         if not playlist_id:
             continue
+        curated_channel_ids.add("UC" + playlist_id[2:])
         try:
             resp = youtube.playlistItems().list(
-                playlistId=playlist_id, part="contentDetails", maxResults=5
+                playlistId=playlist_id, part="contentDetails", maxResults=50
             ).execute()
             for item in resp.get("items", []):
                 details = item.get("contentDetails", {})
                 vid = details.get("videoId")
                 published = details.get("videoPublishedAt", "")
-                if vid and published and published >= published_after:
+                if vid and published and published >= published_after and (not window_end or published < window_end.isoformat() + "Z"):
                     allowlist_ids.append(vid)
         except HttpError as e:
             logger.warning(f"playlistItems failed for @{handle}: {e}")
@@ -230,6 +238,7 @@ def fetch_youtube_videos(
                 type="video",
                 order="viewCount",
                 publishedAfter=published_after,
+                **({"publishedBefore": window_end.isoformat() + "Z"} if window_end else {}),
                 maxResults=max_results,
                 relevanceLanguage="en",
             ).execute()
@@ -245,7 +254,7 @@ def fetch_youtube_videos(
             logger.error(f"Error searching YouTube for '{query}': {e}")
 
     # Sort by view count and deduplicate
-    all_videos.sort(key=lambda x: x["view_count"], reverse=True)
+    all_videos.sort(key=lambda x: (x.get("channel_id") not in curated_channel_ids, -x["view_count"], x["video_id"]))
 
     logger.info(f"Found {len(all_videos)} YouTube videos total")
     return all_videos
@@ -267,29 +276,23 @@ def fetch_video_transcript(video_id: str) -> Optional[str]:
         logger.warning("youtube-transcript-api not installed")
         return None
 
-    # Try different language combinations
-    language_preferences = [
-        ['en', 'de'],  # English or German manual
-        ['en-US', 'en-GB'],  # English variants
-        ['de-DE', 'de-AT'],  # German variants
-    ]
-
-    for languages in language_preferences:
-        try:
-            # Use the new API: get_transcript directly
-            transcript_entries = YouTubeTranscriptApi.get_transcript(video_id, languages=languages)
-            text = " ".join(entry["text"] for entry in transcript_entries)
-            logger.debug(f"Got transcript for {video_id} ({len(text)} chars)")
-            return text[:10000]  # Limit length
-        except Exception:
-            continue
-
-    # Try to get any available transcript (auto-generated included)
     try:
-        transcript_entries = YouTubeTranscriptApi.get_transcript(video_id)
-        text = " ".join(entry["text"] for entry in transcript_entries)
-        logger.debug(f"Got auto transcript for {video_id} ({len(text)} chars)")
-        return text[:10000]
-    except Exception as e:
-        logger.debug(f"No transcript available for {video_id}: {e}")
+        from requests import Session
+        class CaptionSession(Session):
+            def request(self, method, url, **kwargs):
+                kwargs.setdefault("timeout", 15)
+                return super().request(method, url, **kwargs)
+        api = YouTubeTranscriptApi(http_client=CaptionSession())
+        available = api.list(video_id)
+        preferences = ["en", "en-US", "en-GB", "de", "zh-Hans", "zh", "fr", "es", "pt", "ja", "ko"]
+        try:
+            transcript = available.find_transcript(preferences)
+        except Exception:
+            transcript = next(iter(available))
+        data = transcript.fetch()
+        text = " ".join(item["text"] for item in data.to_raw_data())
+        return text[:10000] or None
+    except Exception as exc:
+        # Captions can be disabled or blocked by the provider. No proxies or bypass.
+        logger.info("Transcript unavailable for %s (%s)", video_id, type(exc).__name__)
         return None

@@ -29,6 +29,7 @@ interface TipPost {
   timestamp: string;
   metrics: { comments: number; retweets: number; likes: number; views: string };
   sourceUrl?: string;
+  sourceStatus?: string;
 }
 
 function isCodeLikeTip(value: string): boolean {
@@ -160,6 +161,9 @@ export function TipsFeed({ weekId, searchQuery }: TipsFeedProps) {
                 <div className="font-sans text-[11px] font-extrabold uppercase tracking-[0.14em] text-primary">
                   {post.category} · {post.difficulty} · {post.platform} · {post.timestamp}
                 </div>
+                {post.sourceStatus === "unverified_legacy" && (
+                  <p className="mt-2 text-xs text-muted-foreground">{t("sourceUnverified")}</p>
+                )}
                 <h2 className="mt-2 border-b border-border pb-3 font-display text-2xl font-normal leading-[1.1] text-foreground sm:text-[1.75rem]">
                   <Link href={storyHref} className="transition-colors hover:text-primary">
                     {headline}

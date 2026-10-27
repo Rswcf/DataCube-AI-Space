@@ -17,7 +17,7 @@ def auth_error():
 
 def test_classification_does_not_swallow_invalid_credentials(monkeypatch):
     db = MagicMock()
-    db.query.return_value.filter.return_value.all.return_value = [SimpleNamespace(
+    db.query.return_value.filter.return_value.order_by.return_value.all.return_value = [SimpleNamespace(
         original_section="tech", source="test", title="AI news", summary="text",
         link="https://example.test", published="2026-10-26",
     )]

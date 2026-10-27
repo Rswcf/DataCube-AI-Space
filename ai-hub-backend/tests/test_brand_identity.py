@@ -54,17 +54,22 @@ def test_rss_requests_send_the_configured_user_agent(monkeypatch):
     seen = {}
 
     class FakeResponse:
-        content = b"<rss></rss>"
+        content = b'<rss version="2.0"><channel/></rss>'
+        text = "User-agent: *\nAllow: /"
+        status_code = 200
 
         def raise_for_status(self):
             return None
 
-    def fake_get(url, headers=None, timeout=None):
+    def fake_get(url, headers=None, timeout=None, **kwargs):
         seen["user_agent"] = headers["User-Agent"]
         return FakeResponse()
 
     monkeypatch.setattr(rss_fetcher, "get_settings", lambda: ACME)
-    monkeypatch.setattr(rss_fetcher.requests, "get", fake_get)
+    from app.services import source_http
+    monkeypatch.setattr(source_http, "get_settings", lambda: ACME)
+    monkeypatch.setattr(source_http.requests, "get", fake_get)
+    source_http._cache.clear()
 
     rss_fetcher.fetch_feed_with_timeout("https://example.com/feed.xml")
 

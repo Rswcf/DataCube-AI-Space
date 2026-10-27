@@ -38,6 +38,7 @@ def db_post_to_response(post: TechPost, language: str) -> TechPostResponse:
         metrics=Metrics(**post.metrics) if post.metrics else Metrics(),
         source=post.source,
         sourceUrl=post.source_url,
+        evidenceLevel=(post.metrics or {}).get("evidenceLevel", "description") if post.is_video else None,
         isVideo=post.is_video,
         videoId=post.video_id,
         videoDuration=post.video_duration,

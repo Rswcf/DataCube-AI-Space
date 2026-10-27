@@ -26,6 +26,7 @@ from app.services.hn_fetcher import fetch_hn_stories
 from app.services.youtube_fetcher import fetch_youtube_videos, fetch_video_transcript
 from app.services.llm_processor import LLMProcessor
 from app.services.ai_news_filter import AiNewsFilter, MODEL as AI_NEWS_MODEL
+from app.services.source_integrity import canonical_url, source_date, select_inputs
 from app.services.translation_integrity import (
     SRC_KEY, entry_is_usable, identity_key, is_blank, item_source_hash, source_hash,
 )
@@ -331,10 +332,8 @@ def get_week_boundaries(week_id: str) -> tuple[datetime, datetime]:
     """
     Return the start and end datetime for a given period.
 
-    For daily periods, returns UTC boundaries that cover the full Berlin-time
-    day plus a 6-hour buffer before midnight to account for timezone differences
-    in article publish dates.  The collection runs at ~22:00 UTC (23:00 Berlin),
-    so articles from the previous ~30 hours should be eligible.
+    Both daily and weekly periods use exact local calendar boundaries, then
+    convert them to UTC. DST days can contain 23 or 25 hours.
 
     Args:
         week_id: Period ID — '2026-kw06' (weekly) or '2026-03-04' (daily)
@@ -356,24 +355,13 @@ def get_week_boundaries(week_id: str) -> tuple[datetime, datetime]:
         utc_start = berlin_midnight.astimezone(ZoneInfo("UTC")).replace(tzinfo=None)
         utc_end = (berlin_midnight + timedelta(days=1)).astimezone(ZoneInfo("UTC")).replace(tzinfo=None)
 
-        # Widen the window by 6 hours before start to catch articles whose
-        # timezone was stripped (e.g. +02:00 → naive looks 2 h earlier) and
-        # articles published late the previous UTC day that belong to today
-        # in Berlin.
-        utc_start -= timedelta(hours=6)
-
         return utc_start, utc_end
 
-    parts = week_id.split("-kw")
-    year = int(parts[0])
-    week_num = int(parts[1])
-
-    # ISO week: Jan 4 is always in week 1
-    jan4 = datetime(year, 1, 4)
-    start = jan4 + timedelta(weeks=week_num - 1, days=-jan4.weekday())
-    end = start + timedelta(days=7)  # Next Monday 00:00
-
-    return start, end
+    year, week_num = week_id.split("-kw")
+    start = datetime.fromisocalendar(int(year), int(week_num), 1).replace(tzinfo=ZoneInfo(get_settings().app_timezone))
+    end = start + timedelta(days=7)
+    return (start.astimezone(ZoneInfo("UTC")).replace(tzinfo=None),
+            end.astimezone(ZoneInfo("UTC")).replace(tzinfo=None))
 
 
 def parse_article_date(date_str: Optional[str]) -> Optional[datetime]:
@@ -490,10 +478,9 @@ def load_sources() -> dict:
             # so the acquisition layer is not clear. See docs/data-rights.md.
         ],
         "tips": [
-            # 2026-08-01 refresh: Reddit now rate-limits unauthenticated .rss
-            # to ~1 req/min per IP — the fetcher serializes Reddit requests
-            # (see rss_fetcher). Subreddits cut 12 -> 4 (highest tip density);
-            # four quality practical-AI publications added as the stable base.
+            # Expert publications are the stable base. The legacy Reddit
+            # entries below are disabled by the acquisition policy applied
+            # after configuration loading; approved API access is required.
             {"url": "https://simonwillison.net/atom/everything/", "name": "Simon Willison"},
             {"url": "https://www.oneusefulthing.org/feed", "name": "One Useful Thing (Ethan Mollick)"},
             {"url": "https://www.theneuron.ai/feed", "name": "The Neuron"},
@@ -512,10 +499,29 @@ def load_sources() -> dict:
         sources_path = os.path.join(os.path.dirname(__file__), "..", "..", "sources.yaml")
         if os.path.exists(sources_path):
             with open(sources_path, "r") as f:
-                return yaml.safe_load(f)
+                default_sources = yaml.safe_load(f)
     except Exception as e:
         logger.warning(f"Could not load sources.yaml: {e}")
 
+    disabled = {
+        "VentureBeat": "HTTP 429 on local and Railway probes; pause until access recovers",
+        "36Kr": "HTTP 200 returns HTML, not an RSS feed",
+        "GlobeNewswire M&A": "HTTP 403 on local and Railway probes",
+        "The Register AI": "robots disallows automated acquisition",
+        **{f"Reddit r/{name}": "robots disallows automated acquisition; approved API required"
+           for name in ("ChatGPT", "ChatGPTPro", "ClaudeAI", "PromptEngineering")},
+    }
+    for rows in default_sources.values():
+        for source in rows:
+            if source["name"] in disabled:
+                source.update(enabled=False, disabled_reason=disabled[source["name"]])
+    if get_settings().extra_sources_enabled:
+        default_sources["tech"].extend([
+            {"url": "https://rss.arxiv.org/rss/cs.AI+cs.CL", "name": "arXiv AI/CL (preprints)",
+             "max_items": 8, "preprint": True},
+            {"url": "https://digital-strategy.ec.europa.eu/en/news",
+             "name": "European Commission Digital Strategy", "format": "ec_news", "max_items": 20, "ai_only": True},
+        ])
     return default_sources
 
 
@@ -658,9 +664,11 @@ def stage1_fetch_and_store(db: Session, week_id: str) -> dict:
     week_start, week_end = get_week_boundaries(week_id)
     logger.info(f"Week boundaries: {week_start.strftime('%Y-%m-%d')} to {week_end.strftime('%Y-%m-%d')} (exclusive)")
 
-    # Ensure week exists and clear old raw data
+    # Preserve previous polls/retries. Published rows are changed only by stage 4.
     ensure_week(db, week_id)
-    clear_raw_data(db, week_id)
+    from app.services.source_prefetch import cached_articles
+    retained = cached_articles(db, week_start, week_end)
+    source_reports = {}
 
     # Load sources
     sources = load_sources()
@@ -680,6 +688,7 @@ def stage1_fetch_and_store(db: Session, week_id: str) -> dict:
                 limit=settings.hn_limit,
                 enhance=True,
                 max_enhance=30,
+                window_start=week_start, window_end=week_end,
             )
             for article in items:
                 article["original_section"] = "tech"
@@ -692,7 +701,8 @@ def stage1_fetch_and_store(db: Session, week_id: str) -> dict:
         try:
             # Exclude HN since we use enhanced version
             logger.info("Fetching RSS feeds (parallel)...")
-            return fetch_rss_feeds_parallel(sources, exclude_names={"Hacker News"})
+            return fetch_rss_feeds_parallel(sources, exclude_names={"Hacker News"},
+                                            window_start=week_start, window_end=week_end, reports=source_reports)
         except Exception as e:
             logger.error(f"Failed to fetch RSS feeds: {e}")
             return []
@@ -703,6 +713,7 @@ def stage1_fetch_and_store(db: Session, week_id: str) -> dict:
             return fetch_youtube_videos(
                 max_results=settings.youtube_max_results,
                 days=settings.hn_days,
+                window_start=week_start, window_end=week_end,
             )
         except Exception as e:
             logger.error(f"Failed to fetch YouTube videos: {e}")
@@ -728,10 +739,13 @@ def stage1_fetch_and_store(db: Session, week_id: str) -> dict:
             else:
                 youtube_videos = data
 
+    youtube_videos = [v for v in youtube_videos if is_article_in_week(
+        {"published": v.get("published_at")}, week_start, week_end) and v.get("published_at")]
+
     # Fetch transcripts for top videos
     # BUG-H1: Add video_id existence check before accessing
     logger.info("Fetching video transcripts...")
-    for video in youtube_videos[:15]:
+    for video in youtube_videos[:5]:
         video_id = video.get("video_id")
         if not video_id:
             logger.warning(f"Video missing video_id, skipping transcript fetch: {video.get('original_title', 'Unknown')}")
@@ -744,15 +758,29 @@ def stage1_fetch_and_store(db: Session, week_id: str) -> dict:
             video["transcript"] = None
 
     # Filter articles by week boundary
-    all_articles_raw = hn_articles + rss_articles
-    all_articles = [a for a in all_articles_raw if is_article_in_week(a, week_start, week_end)]
+    all_articles_raw = rss_articles + retained + hn_articles
+    all_articles = [a for a in all_articles_raw if a.get("published") and is_article_in_week(a, week_start, week_end)]
     filtered_count = len(all_articles_raw) - len(all_articles)
     if filtered_count > 0:
         logger.info(f"Filtered out {filtered_count} articles outside week boundary")
     logger.info(f"Total articles after filtering: {len(all_articles)}, YouTube videos: {len(youtube_videos)}")
 
-    # Store raw articles
+    # Serialize upserts per edition; retries never discard earlier cached news.
+    db.query(Week).filter(Week.id == week_id).with_for_update().one()
+    existing_rows = {canonical_url(a.link): a for a in db.query(RawArticle).filter(RawArticle.week_id == week_id).all()}
+    existing_links = set(existing_rows)
     for article in all_articles:
+        key = canonical_url(article.get("link", ""))
+        if not key:
+            continue
+        if key in existing_links:
+            previous = existing_rows.get(key)
+            if (previous and previous.source == "Hacker News" and article.get("source") != "Hacker News"
+                    and len(article.get("summary", "")) >= 20):
+                for field in ("source", "title", "summary", "published", "original_section"):
+                    setattr(previous, field, article.get(field, getattr(previous, field)))
+            continue
+        existing_links.add(key)
         raw_article = RawArticle(
             week_id=week_id,
             source=article.get("source", "Unknown"),
@@ -769,8 +797,11 @@ def stage1_fetch_and_store(db: Session, week_id: str) -> dict:
         )
         db.add(raw_article)
 
-    # Store raw videos
+    existing_videos = {v.video_id for v in db.query(RawVideo).filter(RawVideo.week_id == week_id).all()}
     for video in youtube_videos:
+        if video.get("video_id") in existing_videos:
+            continue
+        existing_videos.add(video.get("video_id"))
         raw_video = RawVideo(
             week_id=week_id,
             video_id=video.get("video_id", ""),
@@ -793,8 +824,9 @@ def stage1_fetch_and_store(db: Session, week_id: str) -> dict:
     logger.info(f"Stored {len(all_articles)} raw articles and {len(youtube_videos)} raw videos")
 
     return {
-        "articles": len(all_articles),
-        "videos": len(youtube_videos),
+        "articles": db.query(RawArticle).filter(RawArticle.week_id == week_id).count(),
+        "videos": db.query(RawVideo).filter(RawVideo.week_id == week_id).count(),
+        "sources": source_reports,
     }
 
 
@@ -851,7 +883,7 @@ def stage2_classify_articles(db: Session, week_id: str, processor: LLMProcessor)
     logger.info("=== Stage 2: LLM Classification ===")
 
     # Load raw articles
-    raw_articles = db.query(RawArticle).filter(RawArticle.week_id == week_id).all()
+    raw_articles = db.query(RawArticle).filter(RawArticle.week_id == week_id).order_by(RawArticle.id).all()
 
     if not raw_articles:
         logger.warning("No raw articles found for classification")
@@ -868,10 +900,26 @@ def stage2_classify_articles(db: Session, week_id: str, processor: LLMProcessor)
             a.relevance = 0.8  # Default high relevance for tips sources
             tips_articles.append(a)
         else:
+            # Remove stale labels before reclassification so omitted duplicates
+            # cannot survive a process-only retry with their previous section.
+            a.section = None
+            a.relevance = None
             articles_to_classify.append(a)
 
     logger.info(f"Tips articles (skip classification): {len(tips_articles)}")
     logger.info(f"Articles to classify: {len(articles_to_classify)}")
+
+    # Keep every raw row, but bound classification cost when frequent polls
+    # recover more news. Freshness and source diversity decide admission.
+    cap = max(1, min(get_settings().classification_input_limit, 120))
+    if len(articles_to_classify) > cap:
+        ranked = select_inputs([{"link": a.link, "published": a.published, "title": a.title, "row": a}
+                                for a in articles_to_classify], cap)
+        admitted = {id(item["row"]) for item in ranked}
+        for article in articles_to_classify:
+            if id(article) not in admitted:
+                article.section = "deferred"
+        articles_to_classify = [item["row"] for item in ranked]
 
     # Dropped articles leave the list before the try below, so the classifier's
     # fallback to source hints can never bring them back.
@@ -935,12 +983,13 @@ def stage3_parallel_processing(db: Session, week_id: str, processor: LLMProcesso
     settings = get_settings()
 
     # Load classified articles
-    raw_articles = db.query(RawArticle).filter(RawArticle.week_id == week_id).all()
+    raw_articles = db.query(RawArticle).filter(RawArticle.week_id == week_id).order_by(RawArticle.id).all()
 
     # Group by section
     tech_articles = [
         {
             "source": a.source,
+            "relevance": a.relevance,
             "title": a.title,
             "summary": a.summary,
             "link": a.link,
@@ -951,6 +1000,7 @@ def stage3_parallel_processing(db: Session, week_id: str, processor: LLMProcesso
     investment_articles = [
         {
             "source": a.source,
+            "relevance": a.relevance,
             "title": a.title,
             "summary": a.summary,
             "link": a.link,
@@ -961,6 +1011,7 @@ def stage3_parallel_processing(db: Session, week_id: str, processor: LLMProcesso
     tips_articles = [
         {
             "source": a.source,
+            "relevance": a.relevance,
             "title": a.title,
             "summary": a.summary,
             "link": a.link,
@@ -1607,10 +1658,11 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
             tags_en=["Video", "YouTube"],
             icon_type="Zap",
             impact="medium",
-            timestamp=(meta.get("published_at") or "")[:10],
+            timestamp=source_date(meta.get("published_at"), get_settings().app_timezone) or week_id,
             source=_nn(meta.get("channel_name"), "YouTube"),
             source_url=f"https://www.youtube.com/watch?v={vid}",
-            metrics={"comments": 0, "retweets": 0, "likes": meta.get("like_count", 0), "views": meta.get("view_count_formatted", "0")},
+            metrics={"comments": 0, "retweets": 0, "likes": meta.get("like_count", 0), "views": meta.get("view_count_formatted", "0"),
+                     "evidenceLevel": en_v.get("evidenceLevel", "description")},
             is_video=True,
             video_id=vid,
             video_duration=meta.get("duration_formatted"),
@@ -1780,13 +1832,13 @@ def stage4_save_to_database(db: Session, week_id: str, results: dict, raw_videos
             tip_en=_nn(en_p.get("tip"), ""),
             category_de=_nn(de_p.get("category"), ""),
             category_en=_nn(en_p.get("category"), ""),
-            platform=_nn(de_p.get("platform"), "X"),
+            platform=_nn(en_p.get("platform"), "Blog"),
             difficulty_de=_nn(de_p.get("difficulty"), "Mittel"),
             difficulty_en=_nn(en_p.get("difficulty"), "Intermediate"),
             author=_source_author(en_p),
-            timestamp=_nn(de_p.get("timestamp"), ""),
-            source_url=de_p.get("sourceUrl"),
-            metrics=_nn(de_p.get("metrics"), {}),
+            timestamp=_nn(en_p.get("timestamp"), ""),
+            source_url=en_p.get("sourceUrl"),
+            metrics=_nn(en_p.get("metrics"), {}),
             translations=_jsonb_translations(en_p),
         )
         db.add(post)
@@ -1913,7 +1965,7 @@ def _is_collection_running(period_id: str) -> bool:
     """Return True iff there is a fresh `running` row for this period.
 
     Used as a lightweight per-period reentry lock: prevents the dual-cron
-    slots (21:07 + 22:07 UTC) and a manual workflow_dispatch from firing
+    slots (00:17 + 01:17 UTC) and a manual workflow_dispatch from firing
     two pipelines for the same period concurrently. There is no strong
     DB-level lock — this is best-effort and racy by design, but it
     eliminates the common case of two parallel workers stomping on each

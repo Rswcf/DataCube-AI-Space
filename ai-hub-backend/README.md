@@ -103,15 +103,12 @@ before 4. Any logic that depends on translations must respect both orders.
 
 ### Sources
 
-All feed sources (tech / investment / ma / tips) are defined in
-`collector.load_sources()` — 34 configured feed entries as of 2026-08-02
-(tech 16, investment 6, M&A 2, tips 10). Tech Funding News, Crunchbase
-News, Sifted and PR Newswire were removed on data-rights grounds (their
-terms bar automated retrieval — see docs/data-rights.md), including
-first-party lab blogs, funding verticals, ZH ecosystem sources and four
-Reddit communities. YouTube uses a 15-channel allowlist
-(`youtube_fetcher.CHANNEL_ALLOWLIST`) plus two discovery queries. HN queries
-live in `hn_fetcher.py`. Do not duplicate these lists here.
+All source policies live in `collector.load_sources()`. Disabled entries carry
+reasons; additions carry bounded metadata policies. Do not count disabled or
+unconsumed feeds as coverage. The two-hour metadata cache, exact local-calendar
+windows, source binding and rollback are documented in
+[Source integrity](../docs/source-integrity.md). YouTube channel/query lists
+live in `youtube_fetcher.py`; HN queries live in `hn_fetcher.py`.
 
 ### Data volume (approximate)
 
@@ -394,10 +391,9 @@ python -m scripts.weekly_collect --week 2026-kw05
 
 ## Tips Processing
 
-Tips sources bypass LLM classification in Stage 2. The current list lives
-in the `tips` section of `collector.load_sources()` (10 entries as of
-2026-08-02: 4 Reddit communities + 6 expert blogs/newsletters — do not
-duplicate the list here; code is truth).
+Enabled tips sources bypass LLM classification in Stage 2. The current policy
+lives in the `tips` section of `collector.load_sources()`. Generation binds each
+tip to an actual dated input; unsupported tips may be omitted.
 
 These sources:
 - Are inherently tips/practical content
@@ -408,11 +404,8 @@ These sources:
 
 ### M&A Data Sources
 
-M&A feeds are the `ma` section of `collector.load_sources()` (2 feeds as of
-2026-08-02: TechCrunch M&A + GlobeNewswire — SEC EDGAR 8-K was dropped for
-noise; FT, Google News and PR Newswire were removed on data-rights grounds,
-see docs/data-rights.md). They are fetched with the investment collection
-but processed separately for M&A extraction.
+M&A feeds are the `ma` section of `collector.load_sources()`. Failed feeds are
+explicitly paused; rights exclusions remain in force. See `docs/data-rights.md`.
 
 ### M&A Processing Flow
 
@@ -544,3 +537,5 @@ Historical recovery via `POST /api/admin/collect/process` reuses saved raw artic
 Korean translation exception: the live financial sample exposed Qwen translating private-company valuation as market capitalization. Korean uses the generation chain (DeepSeek first), including cheap repairs; the other six languages remain Qwen-first.
 
 Classification QA exception: Qwen misclassified an IPO discussion in an independent holdout, so classification uses the DeepSeek generation chain; Qwen remains the paid fallback.
+
+Authenticated source operations: `POST /api/admin/sources/prefetch` and `GET /api/admin/sources/health`. Cache/schema and metadata repair rollback: [source integrity](../docs/source-integrity.md).

@@ -175,6 +175,7 @@ export function TechFeed({ weekId, searchQuery }: TechFeedProps) {
                 {/* Video Embed */}
                 {isVideoPost && post.videoId && (
                   <div className="mt-3">
+                    <p className="mb-2 text-xs text-muted-foreground">{post.evidenceLevel === "transcript_excerpt" ? t("videoTranscriptEvidence") : t("videoDescriptionEvidence")}</p>
                     <VideoEmbed
                       videoId={post.videoId}
                       thumbnailUrl={post.videoThumbnailUrl}

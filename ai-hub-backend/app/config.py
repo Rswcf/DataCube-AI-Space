@@ -67,6 +67,9 @@ class Settings(BaseSettings):
     hn_days: int = 1
     hn_limit: int = 50
     youtube_max_results: int = 10
+    source_prefetch_enabled: bool = True
+    extra_sources_enabled: bool = True
+    classification_input_limit: int = 120
 
     # AI-news filter (stage 2): TypeSafe Jev drops articles that are not about AI before
     # classification (app/services/ai_news_filter.py). No key = filter off.

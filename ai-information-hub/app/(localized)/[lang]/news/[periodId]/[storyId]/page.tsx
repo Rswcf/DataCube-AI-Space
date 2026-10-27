@@ -31,6 +31,7 @@ import type {
 } from '@/lib/types'
 import { BRAND, fillBrand } from '@/lib/brand'
 import { jsonLdScript } from '@/lib/json-ld'
+import { translations } from '@/lib/translations'
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://api-production-3ee5.up.railway.app/api'
 const SITE_URL = BRAND.siteUrl
@@ -214,6 +215,8 @@ type ArticleStory = {
   tags: string[]
   facts: { label: string; value: string }[]
   tip?: string
+  sourceStatus?: string
+  evidenceLevel?: string
 }
 
 function compact<T>(items: (T | null | undefined | false)[]): T[] {
@@ -264,6 +267,7 @@ function techToStory(post: TechPost, lang: AppLanguage): ArticleStory {
     headline,
     deck,
     body: post.content,
+    evidenceLevel: post.isVideo ? (post.evidenceLevel || "description") : undefined,
     sourceName: post.source || post.author?.name,
     sourceUrl: post.sourceUrl,
     timestamp: post.timestamp,
@@ -283,6 +287,7 @@ function tipToStory(post: TipPost, lang: AppLanguage): ArticleStory {
   return {
     id: `tip-${post.id}`,
     kind: 'tip',
+    sourceStatus: post.sourceStatus || 'unverified_legacy',
     label: t(labels.practicalTip, lang),
     headline,
     deck,
@@ -695,7 +700,7 @@ export default async function ArticlePage({ params }: Props) {
                   {t(labels.originalSource, lang)}
                 </h2>
                 <p className="mt-3 text-sm leading-relaxed text-foreground">
-                  {t(labels.sourceNote, lang)}
+                  {story.evidenceLevel ? (story.evidenceLevel === "transcript_excerpt" ? translations[lang].videoTranscriptEvidence : translations[lang].videoDescriptionEvidence) : story.sourceStatus?.startsWith('unverified') ? translations[lang].sourceUnverified : t(labels.sourceNote, lang)}
                 </p>
                 {story.sourceUrl ? (
                   <a
