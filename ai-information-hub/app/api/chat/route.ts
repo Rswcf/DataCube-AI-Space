@@ -1,4 +1,4 @@
-import { createOpenAI } from "@ai-sdk/openai";
+import { taskModel } from "@/lib/server/llm";
 import { streamText } from "ai";
 import {
   ApiRouteError,
@@ -16,10 +16,7 @@ import {
 } from "@/lib/server/period-context";
 import { BRAND } from "@/lib/brand";
 
-const openrouter = createOpenAI({
-  baseURL: "https://openrouter.ai/api/v1",
-  apiKey: process.env.OPENROUTER_API_KEY,
-});
+
 
 // SEC-H3: Allowed message roles - filter out any other roles (e.g., "system")
 const ALLOWED_ROLES = new Set(["user", "assistant"]);
@@ -78,7 +75,9 @@ ${weekContext || "No data available for this week."}`;
       }));
 
     const result = streamText({
-      model: openrouter.chat("openrouter/free"),
+      model: taskModel("chat"),
+      maxRetries: 0, // OpenRouter owns model/provider failover
+      onFinish: (result) => { console.info("LLM usage", "chat", result.response.modelId, result.totalUsage); },
       system: systemPrompt,
       messages: coreMessages,
       maxOutputTokens: 500,

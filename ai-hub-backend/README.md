@@ -26,9 +26,9 @@ FastAPI backend for the AI Information Hub — multilingual (8 languages) daily 
 
 | Purpose | Model | Notes |
 |---------|-------|-------|
-| **Classification** | `deepseek/deepseek-v4-flash-0731` → `qwen/qwen3.7-flash` → 3 free fallbacks | Paid-first since 2026-07-31 (5 free models were delisted from OpenRouter) |
-| **Content Processing** | `deepseek/deepseek-v4-flash-0731` → `qwen/qwen3.7-flash` → 3 free fallbacks | Generates EN base content (all other languages translated) |
-| **Translation** | `deepseek/deepseek-v4-flash-0731` → `qwen/qwen3.7-flash` → 3 free fallbacks | EN → DE, ZH, FR, ES, PT, JA, KO. Short prompts keep cost ~$0.05-0.15/day; paid-first eliminates free-tier 429-cascade wipeouts |
+| **Classification** | `deepseek/deepseek-v4.1-flash-1017` → `qwen/qwen3.7-flash` → 2 free fallbacks | Paid-first since 2026-07-31 (5 free models were delisted from OpenRouter) |
+| **Content Processing** | `deepseek/deepseek-v4.1-flash-1017` → `qwen/qwen3.7-flash` → 2 free fallbacks | Generates EN base content (all other languages translated) |
+| **Translation** | `qwen/qwen3.7-flash` → `deepseek/deepseek-v4.1-flash-1017` → 2 free fallbacks | EN → DE, ZH, FR, ES, PT, JA, KO. Paid-first avoids relying on free-tier capacity; actual usage/cost is logged |
 | **AI-news filter** | TypeSafe Jev `jev-1.13.0` (pinned) | Stage 2, optional: probability that an article is about AI; below `AI_NEWS_FILTER_THRESHOLD` (0.35) it is dropped. Off without `TYPESAFE_API_KEY` |
 
 Call safeguards (`llm_processor.py`, since 2026-09-21): every call carries `max_tokens=OUTPUT_TOKEN_CAP`
@@ -538,3 +538,9 @@ The frontend will automatically use the API when configured, with fallback to st
 The GitHub daily workflows use `ai-hub-backend/scripts/daily_automation.py` (Python standard library only). A collection must reach `completed` and expose nonempty English content through the public API. `empty`/`failed` editions are retried; running editions are polled without a duplicate trigger. Timeouts and unavailable status/content APIs fail rather than imply completion. Newsletter runs require completed collection and validate the response's actual send counts. No content, partial failure, held languages or invalid results fail; an already-sent edition reports an explicit idempotent skip with no new messages. Each workflow serializes its own runs. Backend authentication failures retain their error as `failed`; a fresh newsletter lock is pending, not proof of a completed send. Regression coverage: `test_daily_automation.py`, `test_collection_failure_reporting.py`, `test_newsletter_failure_reporting.py`, and `test_llm_call_resilience.py`.
 
 Historical recovery via `POST /api/admin/collect/process` reuses saved raw articles and videos with the same running/completed/failed status lifecycle as nightly collection. It saves base content before translation and updates translations afterward; it does not refetch or clear raw source rows.
+
+**Model policy (2026-10-27):** generation/reports use DeepSeek V4.1 Flash 1017; six-language translation/chat use Qwen3.7 Flash; classification uses DeepSeek 1017. Public news chains end with NVIDIA Nemotron 3.5 Super VL Free and Gemma 4 31B Free; chat/report only use the two paid models. Reasoning stays off, provider prices and output are bounded. Set `LLM_MODEL_PROFILE=legacy` and redeploy to restore the prior paid routing (frontend restores its prior free router). See [model routing and rollback](../docs/model-routing.md).
+
+Korean translation exception: the live financial sample exposed Qwen translating private-company valuation as market capitalization. Korean uses the generation chain (DeepSeek first), including cheap repairs; the other six languages remain Qwen-first.
+
+Classification QA exception: Qwen misclassified an IPO discussion in an independent holdout, so classification uses the DeepSeek generation chain; Qwen remains the paid fallback.

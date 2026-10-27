@@ -97,14 +97,14 @@ def test_classification_runs_with_reasoning_off(monkeypatch):
                "published": "2026-09-20", "original_section": "tech"}
     classified = processor.classify_articles([article])
     assert classified[0]["section"] == "tech"
-    assert completions.calls[0]["extra_body"] == {"reasoning": {"enabled": False}}
+    assert completions.calls[0]["extra_body"]["reasoning"] == {"enabled": False}
 
 
 def test_translation_runs_with_reasoning_off(monkeypatch):
     processor, completions = _processor(monkeypatch, [_response('[{"_idx": 0, "content": "内容"}]')])
     translated = processor.translate_batch([{"content": "text"}], "zh", ["content"])
     assert translated[0]["content"] == "内容"
-    assert completions.calls[0]["extra_body"] == {"reasoning": {"enabled": False}}
+    assert completions.calls[0]["extra_body"]["reasoning"] == {"enabled": False}
 
 
 # Processor chain (_call_llm): reasoning off as well, output capped

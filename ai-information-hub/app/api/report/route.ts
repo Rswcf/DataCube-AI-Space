@@ -1,4 +1,4 @@
-import { createOpenAI } from "@ai-sdk/openai";
+import { taskModel } from "@/lib/server/llm";
 import { streamText } from "ai";
 import { isDailyId, getParentWeekId } from "@/lib/period-utils";
 import {
@@ -13,10 +13,7 @@ import {
   isValidPeriodId,
 } from "@/lib/server/period-context";
 
-const openrouter = createOpenAI({
-  baseURL: "https://openrouter.ai/api/v1",
-  apiKey: process.env.OPENROUTER_API_KEY,
-});
+
 
 const LANGUAGE_NAMES: Record<string, string> = {
   de: "German",
@@ -254,7 +251,9 @@ DATA:
 ${context}`;
 
     const result = streamText({
-      model: openrouter.chat("openrouter/free"),
+      model: taskModel("report"),
+      maxRetries: 0, // OpenRouter owns model/provider failover
+      onFinish: (result) => { console.info("LLM usage", "report", result.response.modelId, result.totalUsage); },
       system: systemPrompt,
       messages: [
         {

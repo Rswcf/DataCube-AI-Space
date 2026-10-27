@@ -12,12 +12,14 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from sqlalchemy.orm import Session
 
+from app.config import get_settings
 from app.models import (
     MAPost, PrimaryMarketPost, SecondaryMarketPost, TechPost, TipPost, Trend, Video, Week,
 )
 from app.services.collector import _apply_translations_to_record
 from app.services.i18n_utils import TRANSLATION_LANGUAGES
 from app.services.llm_processor import LLMProcessor
+from app.services.model_policy import model_chains
 from app.services.translation_integrity import (
     SRC_KEY, entry_is_complete, record_source_hash, translation_status,
 )
@@ -104,7 +106,8 @@ def translate_groups(groups: dict, models: list[str] | None = None, workers: int
     def work(key, rows):
         kind, lang, fields = key
         items = [_english_item(row, list(fields)) for row in rows]
-        output = LLMProcessor().translate_batch(items, lang, list(fields), models=models)
+        # Preserve the Korean quality exception even on cheap bulk repairs.
+        output = LLMProcessor().translate_batch(items, lang, list(fields), models=None if lang == "ko" else models)
         with lock:
             for row, item, entry in zip(rows, items, output):
                 # Never write partial output over existing translations: an
@@ -129,7 +132,7 @@ def translate_groups(groups: dict, models: list[str] | None = None, workers: int
 
 def backfill_periods(db: Session, period_ids: list[str], force: bool = False, cheap: bool = False) -> dict:
     """Plan, translate and write back each period. Returns {period: rows updated}."""
-    models = LLMProcessor.CHEAP_TRANSLATOR_MODELS if cheap else None
+    models = model_chains(get_settings().llm_model_profile)["cheap"] if cheap else None
     report = {}
     for period_id in period_ids:
         groups = plan_period(db, period_id, force)
