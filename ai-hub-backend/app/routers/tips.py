@@ -3,6 +3,7 @@ Tips feed endpoints.
 """
 
 from fastapi import APIRouter, Depends, HTTPException
+from datetime import datetime
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -25,6 +26,18 @@ def _langs_with_data(posts: list[TipPost]) -> list[str]:
 
 def tip_to_response(post: TipPost, language: str) -> TipPostResponse:
     """Convert tip post to API response."""
+    timestamp = post.timestamp
+    if (post.metrics or {}).get("sourceStatus") != "input_verified":
+        # The UI labels unverified legacy dates as edition dates. This also
+        # protects older editions outside the audited database repair range.
+        try:
+            if "-kw" in post.week_id:
+                year, week = post.week_id.split("-kw")
+                timestamp = datetime.fromisocalendar(int(year), int(week), 1).date().isoformat()
+            else:
+                timestamp = datetime.strptime(post.week_id, "%Y-%m-%d").date().isoformat()
+        except ValueError:
+            pass
     return TipPostResponse(
         id=post.id,
         author=Author(**post.author),
@@ -33,7 +46,7 @@ def tip_to_response(post: TipPost, language: str) -> TipPostResponse:
         tip=get_field(post, "tip", language) or "",
         category=get_field(post, "category", language) or "",
         difficulty=get_field(post, "difficulty", language) or "",
-        timestamp=post.timestamp,
+        timestamp=timestamp,
         metrics=Metrics(**post.metrics) if post.metrics else Metrics(),
         sourceUrl=post.source_url,
         sourceStatus=(post.metrics or {}).get("sourceStatus", "unverified_legacy"),

@@ -13,23 +13,17 @@ from app.services.source_integrity import canonical_url
 logger = logging.getLogger(__name__)
 
 
-def fetch_feed_with_timeout(url, days=7, timeout=20, *, window_start=None, window_end=None, report=None, max_items=200, format="rss"):
+def fetch_feed_with_timeout(url, days=7, timeout=20, *, window_start=None, window_end=None, report=None, max_items=200):
     report = report if report is not None else {}
     report.update(url=url, status="failed", fetched=0)
     try:
         resp = fetch_source(url, timeout)
         report["http"] = resp.status_code
-        if format == "ec_news":
-            from app.services.ec_news import parse_ec_news
-            from app.services.source_integrity import source_datetime
-            entries = parse_ec_news(resp.content[:3000000], url)
-            entries = [{**e, "published_parsed": source_datetime(e["published"]).utctimetuple()} for e in entries]
-        else:
-            feed = feedparser.parse(resp.content[:3000000])
-            if not feed.version:
-                report["status"] = "not_feed"
-                return []
-            entries = feed.entries
+        feed = feedparser.parse(resp.content[:3000000])
+        if not feed.version:
+            report["status"] = "not_feed"
+            return []
+        entries = feed.entries
         cutoff = window_start if window_start is not None else datetime.utcnow() - timedelta(days=days)
         articles = []
         for entry in entries:
@@ -70,7 +64,7 @@ def fetch_rss_feeds_parallel(sources, exclude_names=None, *, window_start=None, 
         report = {}
         rows = fetch_feed_with_timeout(source["url"], 7, settings.rss_request_timeout_seconds,
                                        window_start=window_start, window_end=window_end, report=report,
-                                       max_items=source.get("max_items", 200), format=source.get("format", "rss"))
+                                       max_items=source.get("max_items", 200))
         return section, source, rows, report
     combined = []
     with ThreadPoolExecutor(max_workers=settings.rss_max_workers) as executor:

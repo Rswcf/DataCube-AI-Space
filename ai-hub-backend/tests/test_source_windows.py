@@ -72,17 +72,15 @@ def test_source_configuration_disables_failed_sources_and_bounds_additions():
         assert by_name[name]["enabled"] is False
         assert by_name[name]["disabled_reason"]
     assert by_name["arXiv AI/CL (preprints)"]["max_items"] == 8
-    assert by_name["European Commission Digital Strategy"]["ai_only"]
+    assert by_name["European Commission News"]["ai_only"]
 
 
-def test_commission_index_dates_links_and_structure_guard():
-    from app.services.ec_news import parse_ec_news
-    html = b'''<article class="ecl-content-item"><li class="ecl-content-block__primary-meta-item">News article</li>
-    <li class="ecl-content-block__primary-meta-item">26 October 2026</li><a data-ecl-title-link href="/en/news/raise">AI in science</a>
-    <div class="ecl-content-block__description">Research support</div></article>'''
-    row = parse_ec_news(html, "https://digital-strategy.ec.europa.eu/en/news")[0]
-    assert row["link"] == "https://digital-strategy.ec.europa.eu/en/news/raise"
-    assert row["published"] == "2026-10-25T23:00:00"
-    assert row["summary"] == "Research support"
-    with pytest.raises(ValueError, match="structure changed"):
-        parse_ec_news(b"<html>blocked</html>", "https://digital-strategy.ec.europa.eu/en/news")
+def test_official_commission_rss_is_filtered_for_ai_before_generation(monkeypatch):
+    def fetch(*args, **kwargs):
+        kwargs["report"].update(status="ok")
+        return [{"title": title, "summary": "", "published": "2026-10-26", "link": f"https://commission.europa.eu/{i}"}
+                for i, title in enumerate(("New AI science policy", "Fisheries update"))]
+    monkeypatch.setattr(rss_fetcher, "fetch_feed_with_timeout", fetch)
+    rows = rss_fetcher.fetch_rss_feeds_parallel({"tech": [{"name": "European Commission News",
+        "url": "https://commission.europa.eu/node/33506/rss_en", "ai_only": True}]})
+    assert [r["title"] for r in rows] == ["New AI science policy"]

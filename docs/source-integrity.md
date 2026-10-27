@@ -1,7 +1,7 @@
 # Source integrity and recovery
 
 Source configuration lives in `collector.load_sources()`. Its `enabled`,
-`disabled_reason`, `format`, `max_items`, `ai_only` and `preprint` fields
+`disabled_reason`, `max_items`, `ai_only` and `preprint` fields
 describe acquisition policy. A valid HTTP response alone is not evidence of
 permission, freshness or factual accuracy.
 
@@ -69,7 +69,9 @@ input in the same edition. It clears unmatched outbound URLs, replaces the
 known erroneous date with the edition date and marks every repaired item
 `unverified_legacy` / `dateBasis=edition`. Matching an input URL does not
 prove that the historical prose accurately describes that input. Article
-IDs, English/German prose and all translations remain unchanged.
+IDs, English/German prose and all translations remain unchanged. For older
+unrepaired legacy rows outside this scope, the API also derives the displayed
+edition date from the period ID, so the edition-date label remains truthful.
 
 After independently saving and hashing the manifest:
 
@@ -90,15 +92,21 @@ acquisitions explicitly; these are not claims that their publishers have
 permanently closed. Re-enable only after a fresh acquisition check.
 
 The initial expansion adds bounded arXiv AI/CL metadata, labelled as
-preprints, and the European Commission Digital Strategy news index,
-filtered for AI-related announcements. The latter is a public HTML index
-adapter, not an invented RSS endpoint. Both were tested through the same
-identified, robots-aware acquisition code. The index adapter fails visibly
-if the expected card structure disappears. It reads listing metadata, not
-article bodies. See `data-rights.md` for primary terms and exclusions.
+preprints, and the European Commission's centrally published news RSS,
+filtered for AI-related announcements. The RSS link comes directly from
+`https://commission.europa.eu/news-and-media/news_en` and was verified from
+Railway with the same identified, robots-aware client. It reads feed
+metadata, not article bodies. See `data-rights.md` for primary terms and
+exclusions.
 
-The Commission index does not cover all EU institutions, and this expansion
-does not solve every geographic or capital-data gap. First-page metadata
+The earlier Digital Strategy index candidate worked locally but Railway
+could not retrieve its robots.txt (HTTP 403). It was replaced with the
+Commission's officially distributed RSS; no blocked resource or identity
+was bypassed. Retired source-health rows are removed on the next prefetch
+so old blocked checks are not presented as current configuration.
+
+The Commission feed does not cover all EU institutions, and this expansion
+does not solve every geographic or capital-data gap. Feed metadata
 and input caps still limit coverage. New-cache behavior needs cross-day
 production observation; one successful acquisition does not establish
 schedule reliability.
@@ -117,7 +125,7 @@ schedule reliability.
   application rollback. Keep the manifest outside the repository.
 
 Tests cover DST, target-day HN filters, robots/redirects, HTML masquerading
-as RSS, Commission parsing, input binding, input ranking, caption API shape,
+as RSS, Commission AI filtering, input binding, input ranking, caption API shape,
 PostgreSQL cache idempotency, raw-row preservation, and guarded metadata
 repair/restore. Live model evaluation must use a frozen input and a stated
 budget; it must not publish an edition or send email.
