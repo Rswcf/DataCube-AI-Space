@@ -27,6 +27,7 @@ def cache_sources(db, sources):
         stmt = insert(SourceHealth).values(name=name, checked_at=now, report=report)
         db.execute(stmt.on_conflict_do_update(index_elements=[SourceHealth.name],
                                              set_={"checked_at": now, "report": report}))
+    db.query(SourceHealth).filter(~SourceHealth.name.in_(list(reports))).delete(synchronize_session=False)
     db.query(SourceCache).filter(SourceCache.published_at < now - timedelta(days=7)).delete()
     db.commit()
     issues = {name: r["status"] for name, r in reports.items() if r["status"] not in {"ok", "quiet", "disabled"}}

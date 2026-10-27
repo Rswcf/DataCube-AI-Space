@@ -519,8 +519,8 @@ def load_sources() -> dict:
         default_sources["tech"].extend([
             {"url": "https://rss.arxiv.org/rss/cs.AI+cs.CL", "name": "arXiv AI/CL (preprints)",
              "max_items": 8, "preprint": True},
-            {"url": "https://digital-strategy.ec.europa.eu/en/news",
-             "name": "European Commission Digital Strategy", "format": "ec_news", "max_items": 20, "ai_only": True},
+            {"url": "https://commission.europa.eu/node/33506/rss_en",
+             "name": "European Commission News", "max_items": 100, "ai_only": True},
         ])
     return default_sources
 

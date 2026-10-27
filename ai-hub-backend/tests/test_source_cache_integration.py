@@ -32,6 +32,9 @@ def input_article(number=1):
 
 def test_prefetch_is_idempotent_and_never_creates_public_editions(db, monkeypatch):
     before = db.query(Week).count()
+    from datetime import datetime
+    db.add(SourceHealth(name="Retired source", checked_at=datetime.utcnow(), report={"status": "failed"}))
+    db.commit()
     def fetch(*args, reports, **kwargs):
         reports.update(Expert={"status": "ok"}, Broken={"status": "not_feed"})
         return [input_article()]

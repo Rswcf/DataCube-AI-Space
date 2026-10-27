@@ -35,6 +35,31 @@ def test_feed_markup_does_not_consume_evidence_budget_or_remove_code_text():
     assert evidence_text('<p>Run <code>tool --path &lt;copy&gt;</code></p>') == "Run\ntool --path <copy>"
 
 
+def test_older_unrepaired_tip_api_uses_edition_date_until_input_is_verified():
+    from app.models import TipPost
+    from app.routers.tips import tip_to_response
+    row = TipPost(id=1, week_id="2026-08-01", content_en="Example", tip_en="Use a copy", category_en="Tools",
+        platform="Blog", difficulty_en="Beginner", author={"name": "Expert", "handle": "", "avatar": "", "verified": False},
+        timestamp="2026-02-01", metrics={})
+    assert tip_to_response(row, "en").timestamp == "2026-08-01"
+    row.week_id = "2026-kw40"
+    assert tip_to_response(row, "en").timestamp == "2026-09-28"
+    row.metrics = {"sourceStatus": "input_verified"}
+    row.timestamp = "2026-09-30"
+    assert tip_to_response(row, "en").timestamp == "2026-09-30"
+
+
+def test_legacy_stored_captions_are_not_evidence_that_old_summary_used_them():
+    from app.models import Video
+    from app.routers.videos import video_to_response
+    row = Video(id=1, video_id="fixture", title_en="AI video", summary_en="A legacy description summary.",
+        channel_name="Publisher", thumbnail_url="https://example.com/thumb", published_at="2026-10-26",
+        duration_seconds=60, duration_formatted="1:00", view_count=1000, like_count=10, transcript="Stored captions")
+    assert video_to_response(row, "en").evidenceLevel == "description"
+    row.summary_en = "Based on a transcript excerpt: An attributed claim."
+    assert video_to_response(row, "en").evidenceLevel == "transcript_excerpt"
+
+
 def test_high_relevance_tail_is_ranked_before_cap_and_families_are_balanced():
     items = [article(i) for i in range(45)] + [article(99, "research.example", .99)]
     selected = select_inputs(items, 15)
