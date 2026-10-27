@@ -12,6 +12,10 @@ finish_reason "length" as a failure.
 
 from types import SimpleNamespace
 
+import httpx
+import pytest
+from openai import AuthenticationError
+
 from app.services import llm_processor as lp
 from app.services.llm_processor import LLMProcessor
 
@@ -34,7 +38,10 @@ class _FakeCompletions:
 
     def create(self, **kwargs):
         self.calls.append(kwargs)
-        return self.script.pop(0)
+        result = self.script.pop(0)
+        if isinstance(result, Exception):
+            raise result
+        return result
 
 
 def _processor(monkeypatch, script):
@@ -122,3 +129,13 @@ def test_processor_caps_output_and_turns_reasoning_off(monkeypatch):
     call = completions.calls[0]
     assert call["max_tokens"] == CAP
     assert call["extra_body"] == {"reasoning": {"enabled": False}}
+
+
+@pytest.mark.parametrize("classifier", [True, False])
+def test_invalid_credentials_fail_once_without_trying_other_models(monkeypatch, classifier):
+    response = httpx.Response(401, request=httpx.Request("POST", "https://example.test"))
+    error = AuthenticationError("User not found", response=response, body={})
+    processor, completions = _processor(monkeypatch, [error])
+    with pytest.raises(AuthenticationError, match="User not found"):
+        processor._call_llm("p", use_classifier=classifier)
+    assert len(completions.calls) == 1

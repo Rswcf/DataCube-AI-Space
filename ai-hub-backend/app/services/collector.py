@@ -9,6 +9,7 @@ from typing import Optional
 from zoneinfo import ZoneInfo
 
 import yaml
+from openai import AuthenticationError
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
@@ -903,6 +904,9 @@ def stage2_classify_articles(db: Session, week_id: str, processor: LLMProcessor)
                 if classification:
                     raw_article.section = classification.get("section", raw_article.original_section)
                     raw_article.relevance = classification.get("relevance", 0.5)
+        except AuthenticationError:
+            # Source hints cannot repair a provider credential rejected with 401.
+            raise
         except Exception as e:
             logger.error(f"Classification failed, falling back to original_section hints: {e}")
             for raw_article in articles_to_classify:
@@ -973,6 +977,7 @@ def stage3_parallel_processing(db: Session, week_id: str, processor: LLMProcesso
                 f"tips={len(tips_articles)}, videos={len(videos_for_llm)}")
 
     results = {}
+    processing_errors = {}
 
     # BUG-H3: Create per-thread LLMProcessor instances to avoid thread-safety issues
     # The OpenAI client may not be thread-safe, so each thread gets its own instance
@@ -1012,8 +1017,11 @@ def stage3_parallel_processing(db: Session, week_id: str, processor: LLMProcesso
             try:
                 results[task_name] = future.result()
                 logger.info(f"Completed: {task_name}")
+            except AuthenticationError:
+                raise
             except Exception as e:
                 logger.error(f"Error processing {task_name}: {e}")
+                processing_errors[task_name] = str(e)
                 # Provide fallback empty results
                 if task_name == "investment":
                     results[task_name] = {
@@ -1023,6 +1031,16 @@ def stage3_parallel_processing(db: Session, week_id: str, processor: LLMProcesso
                     }
                 else:
                     results[task_name] = {"de": [], "en": []}
+
+    # An exhausted provider chain is a failed run, not a legitimately empty day.
+    # Raise before stage 4 so existing published data stays intact and the
+    # collection status retains the underlying error for the workflow to report.
+    if processing_errors:
+        investment = results.get("investment", {})
+        output_count = sum(len(results.get(name, {}).get("en", [])) for name in ("tech", "tips", "videos"))
+        output_count += sum(len(investment.get(name, {}).get("en", [])) for name in ("primaryMarket", "secondaryMarket", "ma"))
+        if output_count == 0:
+            raise RuntimeError(f"Content generation failed without publishing any items: {processing_errors}")
 
     # Generate trends (depends on tech and investment results)
     logger.info("Generating trends...")

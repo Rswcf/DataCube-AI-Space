@@ -6,7 +6,7 @@ import json
 import re
 import time
 import logging
-from openai import OpenAI, RateLimitError
+from openai import AuthenticationError, OpenAI, RateLimitError
 
 from app.config import get_settings
 
@@ -238,6 +238,10 @@ class LLMProcessor:
 
                     logger.info(f"Processor succeeded with model: {model}")
                     return content
+                except AuthenticationError:
+                    # Every model uses the same credential. Trying other models
+                    # cannot fix a 401 and must not conceal an account failure.
+                    raise
                 except RateLimitError as e:
                     last_error = e
                     delay = base_delay * (2 ** attempt)
@@ -324,6 +328,8 @@ class LLMProcessor:
 
                     logger.info(f"{chain_name.capitalize()} succeeded with model: {model}")
                     return content
+                except AuthenticationError:
+                    raise
                 except RateLimitError as e:
                     last_error = e
                     delay = base_delay * (2 ** attempt)
