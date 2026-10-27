@@ -72,6 +72,7 @@ def fetch_rss_feeds_parallel(sources, exclude_names=None, *, window_start=None, 
         for f in as_completed(futures):
             section, source, rows, report = f.result()
             reports[source["name"]] = report
+            retained = 0
             for row in rows:
                 if source.get("ai_only") and not re.search(r"\b(artificial intelligence|AI|machine learning|semiconductor|chips? act)\b", row["title"] + " " + row["summary"], re.I):
                     continue
@@ -79,6 +80,10 @@ def fetch_rss_feeds_parallel(sources, exclude_names=None, *, window_start=None, 
                     row["summary"] = "PREPRINT: research claims are not independently validated. " + row["summary"]
                 row.update(source=source["name"], original_section=section)
                 combined.append(row)
+                retained += 1
+            # Count items actually admitted after topic filtering, rather
+            # than all dated feed entries (important for broad policy feeds).
+            report["retained"] = retained
     # Completion speed must not determine source ownership or input order.
     combined.sort(key=lambda a: (a["published"], a["source"], a["link"]))
     seen, result = set(), []

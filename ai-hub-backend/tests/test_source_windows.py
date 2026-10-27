@@ -81,6 +81,8 @@ def test_official_commission_rss_is_filtered_for_ai_before_generation(monkeypatc
         return [{"title": title, "summary": "", "published": "2026-10-26", "link": f"https://commission.europa.eu/{i}"}
                 for i, title in enumerate(("New AI science policy", "Fisheries update"))]
     monkeypatch.setattr(rss_fetcher, "fetch_feed_with_timeout", fetch)
+    reports = {}
     rows = rss_fetcher.fetch_rss_feeds_parallel({"tech": [{"name": "European Commission News",
-        "url": "https://commission.europa.eu/node/33506/rss_en", "ai_only": True}]})
+        "url": "https://commission.europa.eu/node/33506/rss_en", "ai_only": True}]}, reports=reports)
     assert [r["title"] for r in rows] == ["New AI science policy"]
+    assert reports["European Commission News"]["retained"] == 1
