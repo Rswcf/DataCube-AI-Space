@@ -22,6 +22,7 @@ class VideoResponse(BaseModel):
     likeCount: int
     tags: Optional[str] = None
     category: Optional[str] = None
+    evidenceLevel: str = "description"
 
     class Config:
         from_attributes = True

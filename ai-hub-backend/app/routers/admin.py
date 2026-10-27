@@ -254,6 +254,23 @@ async def trigger_fetch_only(
     }
 
 
+@router.post("/sources/prefetch")
+def prefetch_sources(db: Session = Depends(get_db), _: bool = Depends(verify_api_key)):
+    """Cache RSS metadata without creating editions, calling models or sending mail."""
+    from app.services.source_prefetch import run_prefetch
+    try:
+        return run_prefetch(db)
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+
+
+@router.get("/sources/health")
+def source_health(db: Session = Depends(get_db), _: bool = Depends(verify_api_key)):
+    from app.models.source_cache import SourceHealth
+    return [{"name": r.name, "checked_at": r.checked_at, **r.report}
+            for r in db.query(SourceHealth).order_by(SourceHealth.name).all()]
+
+
 def _run_process_only_with_new_session(week_id: Optional[str] = None):
     """Background task wrapper that creates its own database session."""
     from app.services.collector import run_process_only

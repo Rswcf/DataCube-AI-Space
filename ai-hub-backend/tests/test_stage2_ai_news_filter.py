@@ -29,6 +29,9 @@ class _Session:
     def filter(self, *conditions):
         return self
 
+    def order_by(self, *columns):
+        return self
+
     def all(self):
         return self.rows
 
@@ -131,3 +134,11 @@ def test_classifier_failure_keeps_the_offtopic_marks(monkeypatch):
     assert by_title["promo"].section == "offtopic"
     assert by_title["model"].section == "investment"
     assert by_title["model"].relevance == 0.5
+
+
+def test_large_acquisitions_keep_raw_rows_but_bound_classification_inputs(monkeypatch):
+    rows = [_row(f"model-{i}") for i in range(140)]
+    _, classifier, _ = _run(monkeypatch, rows, {}, enabled=False)
+    assert len(classifier.seen) == 120
+    assert sum(r.section == "deferred" for r in rows) == 20
+    assert len(rows) == 140

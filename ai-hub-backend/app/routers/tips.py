@@ -36,6 +36,7 @@ def tip_to_response(post: TipPost, language: str) -> TipPostResponse:
         timestamp=post.timestamp,
         metrics=Metrics(**post.metrics) if post.metrics else Metrics(),
         sourceUrl=post.source_url,
+        sourceStatus=(post.metrics or {}).get("sourceStatus", "unverified_legacy"),
     )
 
 

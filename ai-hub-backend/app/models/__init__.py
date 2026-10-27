@@ -35,3 +35,5 @@ __all__ = [
     "CollectionRun",
     "NewsletterSend",
 ]
+
+from app.models.source_cache import SourceCache, SourceHealth  # noqa: F401

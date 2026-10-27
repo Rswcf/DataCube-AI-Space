@@ -80,12 +80,12 @@ def _run_determine_period(tmp_path, workflow, now_utc, event="schedule", schedul
 @pytest.mark.parametrize(
     "now_utc, schedule, expected_period",
     [
-        ("2026-09-13T21:30:00", "7 21 * * *", "2026-09-13"),  # 23:30 Berlin (CEST), on time
+        ("2026-09-14T00:17:00", "17 0 * * *", "2026-09-13"),  # 23:30 Berlin (CEST), on time
         ("2026-09-13T22:58:00", "7 21 * * *", "2026-09-13"),  # 00:58 Berlin, after midnight
         ("2026-08-07T01:01:00", "7 21 * * *", "2026-08-06"),  # 03:01 Berlin: 2026-08-06 was never collected
         ("2026-08-28T05:18:00", "7 21 * * *", "2026-08-27"),  # 07:18 Berlin: 2026-08-27 was never collected
         ("2026-08-29T03:37:00", "7 22 * * *", "2026-08-28"),  # 05:37 Berlin: 2026-08-28 was never collected
-        ("2026-12-01T22:07:00", "7 22 * * *", "2026-12-01"),  # 23:07 Berlin (CET), on time
+        ("2026-12-02T00:17:00", "17 0 * * *", "2026-12-01"),  # 23:07 Berlin (CET), on time
         ("2026-12-02T03:00:00", "7 22 * * *", "2026-12-01"),  # 04:00 Berlin (CET), late
     ],
 )

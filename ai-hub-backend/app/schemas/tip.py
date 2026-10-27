@@ -21,6 +21,7 @@ class TipPostResponse(BaseModel):
     timestamp: str
     metrics: Metrics
     sourceUrl: Optional[str] = None
+    sourceStatus: str = "unverified_legacy"
 
     class Config:
         from_attributes = True

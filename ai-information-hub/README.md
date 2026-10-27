@@ -66,3 +66,5 @@ Optional build-time variables. Their defaults, in `lib/brand-defaults.json`, are
 Korean translation exception: the live financial sample exposed Qwen translating private-company valuation as market capitalization. Korean uses the generation chain (DeepSeek first), including cheap repairs; the other six languages remain Qwen-first.
 
 Classification QA exception: Qwen misclassified an IPO discussion in an independent holdout, so classification uses the DeepSeek generation chain; Qwen remains the paid fallback.
+
+**Source integrity (2026-10-27):** exact calendar windows, two-hour metadata prefetch, bounded deterministic selection, immutable tip source metadata, explicit video evidence labels and reversible legacy metadata repair. See [source integrity and rollback](../docs/source-integrity.md). Source policies live in `collector.load_sources()`; disabled entries are not working coverage.

@@ -33,7 +33,7 @@ https://github.com/user-attachments/assets/9dddaaed-e473-4350-97de-0346cacb6660
 
 | Problem | Solution |
 |---------|----------|
-| 500+ AI articles published daily — you read 3 | **40+ sources scanned automatically**, top stories surface |
+| 500+ AI articles published daily — you read 3 | **Curated sources scanned automatically**, top stories surface |
 | Scattered across Hacker News, Reddit, ArXiv, RSS | **One unified dashboard** with tech, investment, tips |
 | English-only or single-language tools | **8 languages** (EN, DE, ZH, FR, ES, PT, JA, KO) — resilient LLM translation |
 | Paid tools (Feedly AI $18/mo, etc.) | **Free & open source**, MIT licensed, self-hostable |
@@ -221,7 +221,7 @@ TYPESAFE_API_KEY=                # Optional: AI-news filter before classificatio
 cd ai-information-hub && vercel --prod
 ```
 
-**Backend → Railway** — Auto-applies Alembic migrations on startup. Daily collection and the morning newsletter run via GitHub Actions (collection nominally 23:07 Berlin; runs that GitHub starts late still collect and send the intended day).
+**Backend → Railway** — Auto-applies Alembic migrations on startup. Daily collection and the morning newsletter run via GitHub Actions (collection after Berlin day-end at 00:17/01:17 UTC; two-hour metadata prefetch reduces short-feed losses).
 
 ```bash
 cd ai-hub-backend && railway up
@@ -333,3 +333,5 @@ Historical recovery via `POST /api/admin/collect/process` reuses saved raw artic
 Korean translation exception: the live financial sample exposed Qwen translating private-company valuation as market capitalization. Korean uses the generation chain (DeepSeek first), including cheap repairs; the other six languages remain Qwen-first.
 
 Classification QA exception: Qwen misclassified an IPO discussion in an independent holdout, so classification uses the DeepSeek generation chain; Qwen remains the paid fallback.
+
+Source acquisition, evidence labels, bounded selection, historical metadata repair and rollback: [source integrity](docs/source-integrity.md).

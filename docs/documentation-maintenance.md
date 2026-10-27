@@ -52,3 +52,5 @@ When a change touches one of these areas, update all matching docs in the same c
 - For docs-only changes, run `git diff --check` at minimum.
 
 Model routing is defined by `ai-hub-backend/app/services/model_policy.py` and `ai-information-hub/lib/server/llm.ts`. Keep task order, price ceilings, reasoning controls and `LLM_MODEL_PROFILE` rollback in sync with `docs/model-routing.md` and the main project documents.
+
+Source acquisition/evidence behavior and rollback are owned by [source-integrity.md](source-integrity.md). Source policy lists remain in `collector.load_sources()`.

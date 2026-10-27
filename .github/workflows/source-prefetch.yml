@@ -1,0 +1,40 @@
+name: Source Prefetch
+on:
+  schedule:
+    - cron: '37 */2 * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: write
+concurrency:
+  group: source-prefetch
+  cancel-in-progress: false
+jobs:
+  prefetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Cache source metadata (no model calls)
+        env:
+          API_BASE_URL: ${{ secrets.API_BASE_URL }}
+          ADMIN_API_KEY: ${{ secrets.ADMIN_API_KEY }}
+        run: |
+          python3 - <<'PY'
+          import os,json,urllib.request
+          base=os.environ['API_BASE_URL'].rstrip('/')
+          if not base.endswith('/api'): base+='/api'
+          request=urllib.request.Request(base+'/admin/sources/prefetch',method='POST',
+              headers={'X-API-Key':os.environ['ADMIN_API_KEY']})
+          with urllib.request.urlopen(request,timeout=240) as response:
+              result=json.load(response)
+          if result.get('status') not in {'prefetched','degraded','disabled'}:
+              raise SystemExit('Invalid source prefetch response')
+          print(json.dumps(result))
+          if result['status']=='degraded':
+              print('::warning::Source cache updated with explicitly reported degraded sources; inspect source health.')
+          PY
+      - name: Keep schedule active
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X PUT repos/${{ github.repository }}/actions/workflows/source-prefetch.yml/enable

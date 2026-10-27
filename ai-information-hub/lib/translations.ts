@@ -13,6 +13,9 @@ export const LANGUAGE_OPTIONS: { code: Language; name: string; nativeName: strin
 
 export const translations = {
   de: {
+    videoTranscriptEvidence: "Zusammenfassung anhand eines Untertitelauszugs",
+    videoDescriptionEvidence: "Zusammenfassung anhand der Beschreibung des Herausgebers",
+    sourceUnverified: "Quelle nicht verifiziert · Datum der Ausgabe",
     // Navigation
     home: "Startseite",
     discover: "Entdecken",
@@ -168,6 +171,9 @@ export const translations = {
     reportRegenerate: "Neu generieren",
   },
   en: {
+    videoTranscriptEvidence: "Summary based on a transcript excerpt",
+    videoDescriptionEvidence: "Summary based on the publisher’s description",
+    sourceUnverified: "Source not verified · edition date",
     // Navigation
     home: "Home",
     discover: "Discover",
@@ -323,6 +329,9 @@ export const translations = {
     reportRegenerate: "Regenerate",
   },
   zh: {
+    videoTranscriptEvidence: "摘要依据：字幕片段",
+    videoDescriptionEvidence: "摘要依据：发布者描述",
+    sourceUnverified: "来源未核实 · 显示期刊日期",
     // Navigation
     home: "\u9996\u9875",
     discover: "\u53d1\u73b0",
@@ -478,6 +487,9 @@ export const translations = {
     reportRegenerate: "\u91cd\u65b0\u751f\u6210",
   },
   fr: {
+    videoTranscriptEvidence: "Résumé fondé sur un extrait de transcription",
+    videoDescriptionEvidence: "Résumé fondé sur la description de l’éditeur",
+    sourceUnverified: "Source non vérifiée · date de l’édition",
     // Navigation
     home: "Accueil",
     discover: "D\u00e9couvrir",
@@ -633,6 +645,9 @@ export const translations = {
     reportRegenerate: "Reg\u00e9n\u00e9rer",
   },
   es: {
+    videoTranscriptEvidence: "Resumen basado en un fragmento de transcripción",
+    videoDescriptionEvidence: "Resumen basado en la descripción del editor",
+    sourceUnverified: "Fuente no verificada · fecha de la edición",
     // Navigation
     home: "Inicio",
     discover: "Descubrir",
@@ -788,6 +803,9 @@ export const translations = {
     reportRegenerate: "Regenerar",
   },
   pt: {
+    videoTranscriptEvidence: "Resumo baseado num excerto da transcrição",
+    videoDescriptionEvidence: "Resumo baseado na descrição do editor",
+    sourceUnverified: "Fonte não verificada · data da edição",
     // Navigation
     home: "In\u00edcio",
     discover: "Descobrir",
@@ -943,6 +961,9 @@ export const translations = {
     reportRegenerate: "Regenerar",
   },
   ja: {
+    videoTranscriptEvidence: "字幕の一部に基づく要約",
+    videoDescriptionEvidence: "投稿者の説明に基づく要約",
+    sourceUnverified: "出典未確認・日付は配信号の日付",
     // Navigation
     home: "\u30db\u30fc\u30e0",
     discover: "\u767a\u898b",
@@ -1098,6 +1119,9 @@ export const translations = {
     reportRegenerate: "\u518d\u751f\u6210",
   },
   ko: {
+    videoTranscriptEvidence: "자막 일부를 바탕으로 한 요약",
+    videoDescriptionEvidence: "게시자 설명을 바탕으로 한 요약",
+    sourceUnverified: "출처 미확인 · 발행일 기준",
     // Navigation
     home: "\ud648",
     discover: "\ud0d0\uc0c9",

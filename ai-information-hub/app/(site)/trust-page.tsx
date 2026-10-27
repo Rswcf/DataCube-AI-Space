@@ -9,6 +9,7 @@ export interface TrustSection {
 
 export interface TrustPageConfig {
   label: string
+  updated?: string
   title: string
   description: string
   sections: TrustSection[]
@@ -39,7 +40,7 @@ export function TrustPage({ config }: { config: TrustPageConfig }) {
           {config.description}
         </p>
         <p className="mt-4 font-sans text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">
-          Last reviewed: May 24, 2026
+          Last reviewed: {config.updated || 'May 24, 2026'}
         </p>
       </header>
 

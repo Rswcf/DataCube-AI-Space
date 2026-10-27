@@ -49,6 +49,7 @@ export interface TechPost {
   source: string;
   sourceUrl?: string;
   // Video fields (optional - only present for video posts)
+  evidenceLevel?: string;
   isVideo?: boolean;
   videoId?: string;
   videoDuration?: string;
@@ -156,6 +157,7 @@ export interface TipPost {
   timestamp: string;
   metrics: Metrics;
   sourceUrl?: string;
+  sourceStatus?: string;
 }
 
 // =============================================================================

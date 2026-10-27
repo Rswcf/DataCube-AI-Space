@@ -3,7 +3,7 @@ Hacker News fetching service using Algolia API.
 """
 
 import requests
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 from bs4 import BeautifulSoup
 import logging
@@ -53,6 +53,7 @@ def _fetch_single_query(
     min_points: int,
     days: int,
     limit: int,
+    window_start=None, window_end=None,
 ) -> list[dict]:
     """
     Fetch HN stories for a single query from Algolia API.
@@ -74,6 +75,10 @@ def _fetch_single_query(
         "hitsPerPage": limit * 2,
     }
 
+    if window_start is not None and window_end is not None:
+        start_ts = int(window_start.replace(tzinfo=timezone.utc).timestamp())
+        end_ts = int(window_end.replace(tzinfo=timezone.utc).timestamp())
+        params["numericFilters"] += f",created_at_i>={start_ts},created_at_i<{end_ts}"
     settings = get_settings()
     try:
         resp = requests.get(
@@ -87,14 +92,14 @@ def _fetch_single_query(
         logger.error(f"Error fetching HN stories for query '{query}': {e}")
         return []
 
-    cutoff = datetime.now() - timedelta(days=days)
+    cutoff = window_start if window_start is not None else datetime.utcnow() - timedelta(days=days)
     stories = []
 
     for hit in data.get("hits", []):
         created_at_i = hit.get("created_at_i", 0)
-        created_at = datetime.fromtimestamp(created_at_i) if created_at_i else None
+        created_at = datetime.fromtimestamp(created_at_i, timezone.utc).replace(tzinfo=None) if created_at_i else None
 
-        if created_at and created_at < cutoff:
+        if not created_at or created_at < cutoff or (window_end is not None and created_at >= window_end):
             continue
 
         stories.append({
@@ -120,6 +125,7 @@ def fetch_hn_top_stories(
     min_points: int = 100,
     days: int = 7,
     limit: int = 50,
+    *, window_start=None, window_end=None,
 ) -> list[dict]:
     """
     Fetch top HN stories from Algolia API using multiple queries.
@@ -147,7 +153,7 @@ def fetch_hn_top_stories(
     logger.info(f"HN parallel query fetch: {len(queries)} queries, workers={settings.hn_max_workers}")
     with ThreadPoolExecutor(max_workers=settings.hn_max_workers) as executor:
         futures = {
-            executor.submit(_fetch_single_query, query, min_points, days, limit): query
+            executor.submit(_fetch_single_query, query, min_points, days, limit, window_start, window_end): query
             for query in queries
         }
 
@@ -220,63 +226,17 @@ def detect_content_type(url: str) -> str:
 
 def fetch_youtube_transcript(url: str) -> Optional[str]:
     """Fetch YouTube video transcript."""
-    try:
-        from youtube_transcript_api import YouTubeTranscriptApi
-        from youtube_transcript_api._errors import TranscriptsDisabled, NoTranscriptFound
-    except ImportError:
-        logger.warning("youtube-transcript-api not installed")
-        return None
-
-    patterns = [
-        r"(?:v=|/v/|youtu\.be/)([a-zA-Z0-9_-]{11})",
-        r"(?:embed/)([a-zA-Z0-9_-]{11})",
-    ]
-
-    video_id = None
-    for pattern in patterns:
-        match = re.search(pattern, url)
-        if match:
-            video_id = match.group(1)
-            break
-
-    if not video_id:
-        return None
-
-    try:
-        transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
-
-        for lang in ["en", "de"]:
-            try:
-                transcript = transcript_list.find_transcript([lang])
-                entries = transcript.fetch()
-                text = " ".join(e["text"] for e in entries)
-                return text[:5000]
-            except Exception:
-                continue
-
-        for transcript in transcript_list:
-            if transcript.is_generated:
-                entries = transcript.fetch()
-                text = " ".join(e["text"] for e in entries)
-                return text[:5000]
-
-        return None
-
-    except (TranscriptsDisabled, NoTranscriptFound):
-        return None
-    except Exception as e:
-        logger.error(f"YouTube transcript error: {e}")
-        return None
+    from app.services.youtube_fetcher import fetch_video_transcript
+    match = re.search(r"(?:v=|/v/|youtu\.be/|embed/)([a-zA-Z0-9_-]{11})", url)
+    return fetch_video_transcript(match[1]) if match else None
 
 
 def fetch_webpage_content(url: str) -> Optional[str]:
     """Fetch webpage main content."""
     try:
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
-        }
         settings = get_settings()
-        resp = requests.get(url, headers=headers, timeout=min(15, settings.hn_request_timeout_seconds))
+        from app.services.source_http import fetch_source
+        resp = fetch_source(url, timeout=min(15, settings.hn_request_timeout_seconds))
         resp.raise_for_status()
 
         soup = BeautifulSoup(resp.text, "lxml")
@@ -402,6 +362,7 @@ def fetch_hn_stories(
     limit: int = 50,
     enhance: bool = True,
     max_enhance: int = 30,
+    *, window_start=None, window_end=None,
 ) -> list[dict]:
     """
     Main entry point for fetching HN stories.
@@ -418,7 +379,7 @@ def fetch_hn_stories(
         List of HN stories with optional full content
     """
     logger.info("Fetching HN stories...")
-    stories = fetch_hn_top_stories(queries, min_points, days, limit)
+    stories = fetch_hn_top_stories(queries, min_points, days, limit, window_start=window_start, window_end=window_end)
     logger.info(f"Found {len(stories)} HN stories")
 
     if enhance and stories:

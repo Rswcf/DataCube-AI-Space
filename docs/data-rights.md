@@ -88,3 +88,22 @@ HTTP 410) pending market-data licensing review; see `/[lang]/tools/ai-stock-trac
   at a time via `GET /api/deals/{id}` (rate-limited).
 - Takedown propagation: period deletion removes all Deal rows of that period,
   including manually verified/corrected ones.
+
+## 2026-10-27 acquisition update
+
+The current configuration explicitly pauses feeds that failed the audit or
+were robots-disallowed. A 200 response or published feed is not itself a
+commercial reuse licence. Existing rights exclusions remain in force.
+
+| Addition/candidate | Decision and primary evidence |
+|---|---|
+| arXiv AI/CL | Descriptive metadata only, including abstracts; no paper downloads or hosted PDFs. [arXiv API terms](https://info.arxiv.org/help/api/tou.html) include RSS, permit descriptive metadata reuse under CC0 and require a single connection and >=3 seconds between requests. Input says preprint; no peer-review claim. Bounded per acquisition. |
+| European Commission Digital Strategy | Read public news-index titles, dates, summaries and links; no article crawling. [Commission legal notice](https://commission.europa.eu/legal-notice_en) permits reuse of EU-owned content under CC BY 4.0 unless otherwise indicated. Retain attribution/link and identify our summaries as AI adaptations. Third-party content and images are excluded. |
+| NVIDIA RSS | Not enabled: [official RSS terms](https://www.nvidia.com/en-us/about-nvidia/rss/) restrict use to non-commercial purposes. Successful XML probing does not clear acquisition for this product. |
+| Microsoft Research / AWS ML | Remain candidates, not additions in this release; a working feed is insufficient to resolve reuse terms. |
+| Council of the EU RSS | Not enabled after the identified client's robots request returned 403. No bypass. The Commission adapter supplies an accessible policy source instead. |
+
+Robots-aware access now applies in code to RSS, the Commission index and HN
+article enrichment. A robots check is an access control check, not a substitute
+for the publisher's terms. Per-source operational health is separate from the
+rights register. See [source integrity](source-integrity.md).

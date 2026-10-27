@@ -24,6 +24,7 @@ class TechPostResponse(BaseModel):
     sourceUrl: Optional[str] = None
 
     # Video fields (only present for video posts)
+    evidenceLevel: Optional[str] = None
     isVideo: bool = False
     videoId: Optional[str] = None
     videoDuration: Optional[str] = None

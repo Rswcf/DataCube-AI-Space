@@ -38,6 +38,7 @@ def video_to_response(video: Video, language: str) -> VideoResponse:
         likeCount=video.like_count,
         tags=video.tags,
         category=video.category,
+        evidenceLevel="transcript_excerpt" if video.transcript else "description",
     )
 
 

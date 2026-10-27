@@ -2,11 +2,9 @@ name: Daily Collection
 
 on:
   schedule:
-    # 23:07 Berlin in summer (21:07 UTC) and winter (22:07 UTC). GitHub often
-    # starts scheduled runs hours late (4-12 h in 2026-08/09), so the step below
-    # derives the period from the Berlin hour at run time, not from the slot.
-    - cron: "7 21 * * *"
-    - cron: "7 22 * * *"
+    # Both slots are after midnight Berlin in winter and summer.
+    - cron: "17 0 * * *"
+    - cron: "17 1 * * *"
   workflow_dispatch:
     inputs:
       period_id:
@@ -50,18 +48,10 @@ jobs:
             exit 0
           fi
 
-          # Scheduled run: 23:xx Berlin collects today; any other hour collects
-          # yesterday, however late GitHub started the run. The old slot gates
-          # skipped late runs and lost 2026-08-06, 08-27 and 08-28. The next
-          # step skips a period that is already running or collected, so every
-          # slot is safe to act on.
+          # Publish only a closed Berlin day. Source prefetch runs separately.
           SCHEDULE="${{ github.event.schedule }}"
           BERLIN_HOUR=$(TZ=Europe/Berlin date +%H)
-          if [ "$BERLIN_HOUR" = "23" ]; then
-            PERIOD=$(TZ=Europe/Berlin date +%F)
-          else
-            PERIOD=$(TZ=Europe/Berlin date -d "yesterday" +%F)
-          fi
+          PERIOD=$(TZ=Europe/Berlin date -d "yesterday" +%F)
 
           echo "PERIOD=$PERIOD" >> "$GITHUB_OUTPUT"
           echo "SKIP=false" >> "$GITHUB_OUTPUT"
@@ -77,7 +67,7 @@ jobs:
         run: python3 ai-hub-backend/scripts/daily_automation.py collect --period "$PERIOD"
 
       # Newsletter is sent by a separate workflow (daily-newsletter.yml) at
-      # 08:xx Berlin the next morning, not right after collection at 23:xx.
+      # morning Berlin slots, after collection of the closed target day.
 
       - name: Ping IndexNow (Bing / ChatGPT Search / Copilot fast indexing)
         # Bing is our top search referrer and its index powers ChatGPT Search

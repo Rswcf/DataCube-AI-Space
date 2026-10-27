@@ -25,6 +25,7 @@ jobs:
             backend:
               - 'ai-hub-backend/**'
               - '.github/workflows/daily-*.yml'
+              - '.github/workflows/source-prefetch.yml'
 
   frontend:
     name: Frontend (Next.js)
