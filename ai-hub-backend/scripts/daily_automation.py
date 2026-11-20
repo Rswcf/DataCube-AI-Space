@@ -3,6 +3,8 @@
 Standard library only: GitHub runners need no backend dependencies or database.
 Never retry a newsletter POST: a lost response may still have sent messages.
 The backend's per-language send ledger handles later scheduled invocations.
+Read-only GETs do retry transient failures (timeouts, connection errors, 5xx):
+on 2026-11-20 a traffic burst exhausted the API's database pool for ~17 minutes.
 """
 
 import argparse
@@ -16,28 +18,57 @@ from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
 
+GET_TIMEOUT_SECONDS = 60
+NEWSLETTER_TIMEOUT_SECONDS = 300
+# Waits between GET attempts: 5 attempts spread over ~7.5 minutes of backoff.
+GET_RETRY_DELAYS = (30, 60, 120, 240)
+
+
 class AutomationError(RuntimeError):
     pass
 
 
+class TransientError(AutomationError):
+    """A failure a later identical GET may not repeat."""
+
+
 class DailyAutomation:
-    def __init__(self, base_url, api_key, *, poll_seconds=60, timeout_seconds=3600):
+    def __init__(self, base_url, api_key, *, poll_seconds=60, timeout_seconds=3600,
+                 retry_delays=GET_RETRY_DELAYS, sleep=time.sleep):
         self.base_url = base_url.rstrip("/")
         self.api_key = api_key
         self.poll_seconds = poll_seconds
         self.timeout_seconds = timeout_seconds
+        self.retry_delays = tuple(retry_delays)
+        self.sleep = sleep
 
     def request(self, method, path, **params):
+        if method != "GET":
+            return self._request_once(method, path, params)
+        for attempt, delay in enumerate(self.retry_delays + (None,), start=1):
+            try:
+                return self._request_once(method, path, params)
+            except TransientError as exc:
+                if delay is None:
+                    raise AutomationError(f"{exc} (after {attempt} attempts)") from exc
+                print(f"{exc}; retrying in {delay}s (attempt {attempt + 1})", flush=True)
+                self.sleep(delay)
+
+    def _request_once(self, method, path, params):
         url = f"{self.base_url}/{path}?{urlencode(params)}"
         headers = {"X-API-Key": self.api_key} if path.startswith("admin/") else {}
         request = Request(url, method=method, headers=headers)
+        timeout = NEWSLETTER_TIMEOUT_SECONDS if path == "admin/newsletter" else GET_TIMEOUT_SECONDS
         try:
-            with urlopen(request, timeout=300 if path == "admin/newsletter" else 60) as response:
+            with urlopen(request, timeout=timeout) as response:
                 result = json.load(response)
         except HTTPError as exc:
             detail = exc.read().decode("utf-8", errors="replace")[:2000]
-            raise AutomationError(f"{method} {path}: HTTP {exc.code}: {detail}") from exc
-        except (URLError, TimeoutError, ValueError) as exc:
+            error = TransientError if exc.code >= 500 else AutomationError
+            raise error(f"{method} {path}: HTTP {exc.code}: {detail}") from exc
+        except (URLError, TimeoutError) as exc:
+            raise TransientError(f"{method} {path}: {exc}") from exc
+        except ValueError as exc:
             raise AutomationError(f"{method} {path}: {exc}") from exc
         if not isinstance(result, dict):
             raise AutomationError(f"{method} {path}: expected a JSON object")
