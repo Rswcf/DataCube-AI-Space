@@ -90,10 +90,23 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  // Only page paths need the logic above. Every excluded request would
-  // otherwise pay for an Edge Middleware invocation for nothing: API routes,
-  // Next.js internals, Vercel internals (analytics beacons) and any path with
-  // a file extension (images, icons, robots/llms/sitemap/feed files).
+  // Each entry is one branch of `middleware()` above, so the function only
+  // runs when it can act. Until 2026-11 the matcher was the page-path pattern alone and
+  // ~29k of every 12 h of invocations ended in `NextResponse.next()` — about
+  // half of the project's billed Function Invocations, for nothing.
+  // The source in the first two entries is every page path: everything except
+  // API routes, Next.js internals, Vercel internals (analytics beacons) and any
+  // path with a file extension. Next.js reads the matcher statically at build
+  // time, so it must stay literal (no shared constant).
   // See lib/middleware-matcher.test.ts for the contract.
-  matcher: ['/((?!api/|_next/|_vercel/|.*\\.[a-zA-Z0-9]+$).*)'],
+  matcher: [
+    // Router prefetch without an RSC header → empty 204.
+    { source: '/((?!api/|_next/|_vercel/|.*\\.[a-zA-Z0-9]+$).*)', has: [{ type: 'header', key: 'next-router-prefetch' }], missing: [{ type: 'header', key: 'rsc' }] },
+    // ?lang= on a localizable path → 308 to the localized path.
+    { source: '/((?!api/|_next/|_vercel/|.*\\.[a-zA-Z0-9]+$).*)', has: [{ type: 'query', key: 'lang' }] },
+    // Legacy unprefixed paths → 308 to /en/….
+    '/week/:weekId',
+    '/topic/:topic',
+    '/news/:periodId/:storyId',
+  ],
 }
