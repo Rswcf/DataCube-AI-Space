@@ -197,3 +197,85 @@ def test_invalid_json_http_response_is_failure(monkeypatch):
 def test_valid_json_http_response(monkeypatch):
     monkeypatch.setattr(module, "urlopen", lambda *a, **kw: io.BytesIO(json.dumps({"status": "empty"}).encode()))
     assert DailyAutomation("https://example.test/api", "secret").status(PERIOD)["status"] == "empty"
+
+
+# 2026-11-20 17:43 UTC: a traffic burst exhausted the API's database pool for
+# ~17 minutes and one read timed out after the newsletter had already been
+# sent. Read-only GETs retry transient failures; POSTs never retry.
+
+def flaky_urlopen(monkeypatch, failures, *, body=None):
+    """Raise each item of `failures` in turn, then return `body` as JSON."""
+    calls = []
+    pending = list(failures)
+
+    def urlopen(request, **kwargs):
+        calls.append(request)
+        if pending:
+            failure = pending.pop(0)
+            if isinstance(failure, int):
+                raise HTTPError(request.full_url, failure, "error", {}, io.BytesIO(b"server error"))
+            raise failure
+        return io.BytesIO(json.dumps(body or {"status": "completed"}).encode())
+
+    monkeypatch.setattr(module, "urlopen", urlopen)
+    return calls
+
+
+def automation_with_sleeps():
+    sleeps = []
+    automation = DailyAutomation("https://example.test/api", "secret", sleep=sleeps.append)
+    return automation, sleeps
+
+
+@pytest.mark.parametrize("failure", [
+    TimeoutError("The read operation timed out"),
+    module.URLError("connection refused"),
+    500, 502, 503, 504,
+])
+def test_transient_get_failure_is_retried_until_success(monkeypatch, failure):
+    calls = flaky_urlopen(monkeypatch, [failure, failure])
+    automation, sleeps = automation_with_sleeps()
+    assert automation.status(PERIOD)["status"] == "completed"
+    assert len(calls) == 3
+    assert sleeps == list(module.GET_RETRY_DELAYS[:2])
+
+
+def test_get_failure_after_all_retries_is_red_and_names_the_attempts(monkeypatch):
+    failures = [TimeoutError("The read operation timed out")] * (len(module.GET_RETRY_DELAYS) + 1)
+    calls = flaky_urlopen(monkeypatch, failures)
+    automation, sleeps = automation_with_sleeps()
+    with pytest.raises(AutomationError, match=r"timed out.*after 5 attempts"):
+        automation.status(PERIOD)
+    assert len(calls) == len(module.GET_RETRY_DELAYS) + 1
+    assert sleeps == list(module.GET_RETRY_DELAYS)
+
+
+@pytest.mark.parametrize("code", [400, 401, 403, 404, 422])
+def test_client_errors_are_not_retried(monkeypatch, code):
+    calls = flaky_urlopen(monkeypatch, [code])
+    automation, sleeps = automation_with_sleeps()
+    with pytest.raises(AutomationError, match=f"HTTP {code}"):
+        automation.status(PERIOD)
+    assert len(calls) == 1 and sleeps == []
+
+
+@pytest.mark.parametrize("path", ["admin/newsletter", "admin/collect"])
+def test_post_timeout_is_never_retried(monkeypatch, path):
+    calls = flaky_urlopen(monkeypatch, [TimeoutError("The read operation timed out")])
+    automation, sleeps = automation_with_sleeps()
+    with pytest.raises(AutomationError, match="timed out"):
+        automation.request("POST", path)
+    assert len(calls) == 1 and sleeps == []
+
+
+def test_newsletter_job_timeout_covers_worst_case_retries():
+    from pathlib import Path
+    import yaml
+
+    workflows = Path(__file__).resolve().parents[2] / ".github" / "workflows"
+    config = yaml.safe_load((workflows / "daily-newsletter.yml").read_text())
+    job_seconds = next(iter(config["jobs"].values()))["timeout-minutes"] * 60
+    # One status read and one content read can each exhaust their retries
+    # before the single POST, which may take its full 300 s timeout.
+    worst_get = sum(module.GET_RETRY_DELAYS) + (len(module.GET_RETRY_DELAYS) + 1) * module.GET_TIMEOUT_SECONDS
+    assert 2 * worst_get + module.NEWSLETTER_TIMEOUT_SECONDS + 120 <= job_seconds

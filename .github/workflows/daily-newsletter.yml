@@ -36,7 +36,7 @@ jobs:
   send:
     name: Send daily newsletter
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
         with:
