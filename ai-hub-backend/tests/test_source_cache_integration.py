@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 
 import pytest
 
@@ -10,6 +10,14 @@ from app.services.tip_source_repair import apply_manifest, content_digest, metad
 
 pytestmark = pytest.mark.integration
 PERIOD = "2026-10-26"
+
+
+class FrozenClock(datetime):
+    """The morning after PERIOD, inside the 7-day cache window for its articles."""
+
+    @classmethod
+    def utcnow(cls):
+        return datetime(2026, 10, 27, 6, 0)
 
 
 @pytest.fixture
@@ -31,9 +39,11 @@ def input_article(number=1):
 
 
 def test_prefetch_is_idempotent_and_never_creates_public_editions(db, monkeypatch):
+    # cache_sources drops articles older than 7 days, so pin its clock to the
+    # test period; with the real clock this test broke on 2026-11-02.
+    monkeypatch.setattr(source_prefetch, "datetime", FrozenClock)
     before = db.query(Week).count()
-    from datetime import datetime
-    db.add(SourceHealth(name="Retired source", checked_at=datetime.utcnow(), report={"status": "failed"}))
+    db.add(SourceHealth(name="Retired source", checked_at=FrozenClock.utcnow(), report={"status": "failed"}))
     db.commit()
     def fetch(*args, reports, **kwargs):
         reports.update(Expert={"status": "ok"}, Broken={"status": "not_feed"})
