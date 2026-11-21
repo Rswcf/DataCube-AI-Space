@@ -85,6 +85,23 @@ never overwrites intervening edits silently. Do not regenerate historical
 editions just to repair these fields: regeneration changes IDs and costs
 money, and does not send a correction to already delivered emails.
 
+### Reading collection source reports
+
+`raw_counts.sources` describes the one live fetch at collection time. It
+does not show what reached the edition. Each source report also has
+`cached`: rows that the same source contributed from `source_cache`.
+`raw_counts.pool` counts the edition's raw rows per source and section
+label: `unclassified` after stage 1, then a section, `deferred` (over the
+120-input cap) or `offtopic` (AI filter) after stage 2.
+
+arXiv is the clearest case. Its RSS holds only the latest announcement
+batch, every item is dated 00:00 US Eastern, and the feed rebuilds at
+05:00 UTC. Scheduled collection usually starts after 05:00 UTC because of
+GitHub delays, so the live fetch reports `quiet` with `fetched: 0`. The
+batch reaches the edition through the prefetch cache instead
+(`tests/test_arxiv_window_integration.py`). Use `pool` to see whether
+arXiv rows are then deferred, filtered or published.
+
 ## Source additions and exclusions
 
 The October audit pauses failed/non-feed feeds and robots-disallowed
