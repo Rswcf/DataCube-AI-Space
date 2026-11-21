@@ -35,7 +35,7 @@ Disp: facts + short attributed quotation on our pages · Exp: facts in CSV.
 | Source | Type | Terms reference | Reviewed | Acq | Proc | Disp | Exp | Notes |
 |---|---|---|---|---|---|---|---|---|
 | TechCrunch (Fundraising, M&A) | funding + M&A | https://techcrunch.com/terms-of-service/ | 2026-08-01 | ✅ | ✅ | ✅ | ✅ | RSS ToU permits reader-style use; attribution + link |
-| Techmeme | funding | https://www.techmeme.com/about | 2026-08-02 | ✅ | ✅ | ✅ | ✅ | No formal ToS published; headline aggregator — evidence preferred from the original source |
+| Techmeme | funding | https://www.techmeme.com/about | 2026-08-02 | ✅ | ✅ | ✅ | ✅ | No formal ToS published; headline aggregator. Since 2026-11-21 each row links the original report named in the Techmeme entry (`original_link`); the Techmeme permalink is kept as `via`. The original page is never fetched; text still comes only from the Techmeme feed |
 | Tech.eu | funding | https://tech.eu/terms-conditions/ | 2026-08-02 | ✅ | ✅ | ✅ | ✅ | We do not access the Funding Explorer product |
 | TechNode | funding | none published (verified 2026-08-02; about: https://technode.com/about/) | 2026-08-02 | ✅ | ✅ | ✅ | ✅ | Strictest-publisher default: facts + ≤2-sentence attributed excerpt + prominent link; no TN Data access |
 | Pandaily | funding | none published (verified 2026-08-02; about: https://pandaily.com/about/) | 2026-08-02 | ✅ | ✅ | ✅ | ✅ | Strictest-publisher default (as above) |
