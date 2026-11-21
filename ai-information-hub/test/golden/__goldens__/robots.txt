@@ -108,6 +108,16 @@ Disallow: /login
 Disallow: /*/topic/*?
 Crawl-delay: 2
 
+# Ahrefs SEO crawler: ~3.5k requests/day (2026-11-20). Throttled, not blocked,
+# so the site stays in the Ahrefs index.
+User-agent: AhrefsBot
+Allow: /
+Disallow: /api/
+Allow: /api/content-summary
+Disallow: /login
+Disallow: /*/topic/*?
+Crawl-delay: 10
+
 # Meta's AI-training crawler fetched ~275K pages/day here (85% of all requests)
 # with no referral value. Blocked at the Vercel WAF since 2026-09-15; this
 # group documents the decision for well-behaved operators.
