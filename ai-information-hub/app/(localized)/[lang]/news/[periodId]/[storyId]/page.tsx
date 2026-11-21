@@ -29,6 +29,13 @@ import type {
   TechPost,
   TipPost,
 } from '@/lib/types'
+import {
+  feedData,
+  feedRevalidateSeconds,
+  loadFeed,
+  resolveStory,
+} from '@/lib/article-feed'
+import type { FeedResult } from '@/lib/article-feed'
 import { BRAND, fillBrand } from '@/lib/brand'
 import { jsonLdScript } from '@/lib/json-ld'
 import { translations } from '@/lib/translations'
@@ -46,7 +53,11 @@ const SITE_URL = BRAND.siteUrl
 // Revisit once domain authority is established.
 const INDEXED_ARTICLE_LANGS = new Set(['de', 'en', 'zh'])
 
-export const revalidate = 3600
+// Upper bound only. Each render's feed fetches lower it to 1 h for periods
+// from the last 3 days (lib/article-feed.ts → feedRevalidateSeconds), because
+// translations can still land; older articles no longer change. Must stay a
+// literal: Next.js reads it at build time.
+export const revalidate = 21600
 
 // No article is prerendered at build time — every story renders on its first
 // request and is then cached for `revalidate` seconds (on-demand ISR). The
@@ -246,15 +257,13 @@ async function readStaticJson<T>(periodId: string, filename: string): Promise<T 
   }
 }
 
-async function fetchFeed<T>(periodId: string, endpoint: string, filename: string): Promise<T | null> {
-  try {
-    const response = await fetch(`${API_BASE}/${endpoint}/${periodId}`, { next: { revalidate: 3600 } })
-    if (response.ok) return (await response.json()) as T
-  } catch {
-    // Static fallback below.
-  }
-
-  return readStaticJson<T>(periodId, filename)
+function fetchFeed<T>(periodId: string, endpoint: string, filename: string): Promise<FeedResult<T>> {
+  // The fetch's revalidate also sets the page's: Next.js caches the route for
+  // the lowest value among its fetches and the segment config below.
+  return loadFeed<T>(`${API_BASE}/${endpoint}/${periodId}`, {
+    revalidate: feedRevalidateSeconds(periodPublishedDate(periodId)),
+    readStatic: () => readStaticJson<T>(periodId, filename),
+  })
 }
 
 function techToStory(post: TechPost, lang: AppLanguage): ArticleStory {
@@ -378,11 +387,14 @@ function maToStory(post: MAPost, lang: AppLanguage): ArticleStory {
 }
 
 const getArticleStory = cache(async (periodId: string, storyId: string, lang: AppLanguage): Promise<ArticleStory | null> => {
-  const [techData, investmentData, tipsData] = await Promise.all([
+  const results = await Promise.all([
     fetchFeed<MultilingualData<TechPost>>(periodId, 'tech', 'tech.json'),
     fetchFeed<InvestmentData>(periodId, 'investment', 'investment.json'),
     fetchFeed<MultilingualData<TipPost>>(periodId, 'tips', 'tips.json'),
-  ])
+  ] as const)
+  const techData = feedData(results[0])
+  const investmentData = feedData(results[1])
+  const tipsData = feedData(results[2])
 
   const stories = [
     ...getLocalizedArray(techData, lang).map((post) => techToStory(post, lang)),
@@ -398,7 +410,9 @@ const getArticleStory = cache(async (periodId: string, storyId: string, lang: Ap
     ...getLocalizedArray(investmentData?.ma, lang).map((post) => maToStory(post, lang)),
   ]
 
-  return stories.find((story) => story.id === storyId) || null
+  // Throws when the story is absent and a feed was unreachable, so an outage
+  // is never cached as a 404 (see lib/article-feed.ts).
+  return resolveStory(results, stories.find((story) => story.id === storyId) || null)
 })
 
 function validIso(value: string | undefined, fallback: Date): string {
