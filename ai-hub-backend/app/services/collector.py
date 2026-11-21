@@ -3,6 +3,7 @@ Main data collection orchestrator with two-stage processing and parallel LLM cal
 """
 
 import logging
+from collections import Counter
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta
 from typing import Optional
@@ -823,11 +824,33 @@ def stage1_fetch_and_store(db: Session, week_id: str) -> dict:
     db.commit()
     logger.info(f"Stored {len(all_articles)} raw articles and {len(youtube_videos)} raw videos")
 
+    # The live report covers one fetch at run time. Short feeds (arXiv's
+    # announcement batch) roll over before it, so also record what each
+    # source actually holds in the edition's raw pool (cache + live + HN).
+    cached = Counter(a.get("source") for a in retained)
+    for name, report in source_reports.items():
+        report["cached"] = cached.get(name, 0)
     return {
         "articles": db.query(RawArticle).filter(RawArticle.week_id == week_id).count(),
         "videos": db.query(RawVideo).filter(RawVideo.week_id == week_id).count(),
         "sources": source_reports,
+        "pool": pool_by_source(db, week_id),
     }
+
+
+def pool_by_source(db: Session, week_id: str) -> dict:
+    """Raw rows per source and section label, e.g. {"arXiv": {"deferred": 8}}.
+
+    Before stage 2 the label is "unclassified"; afterwards it shows where each
+    source's rows went (a section, "deferred" by the input cap, "offtopic").
+    """
+    pool: dict = {}
+    for source, section in db.query(RawArticle.source, RawArticle.section).filter(
+            RawArticle.week_id == week_id).all():
+        bucket = pool.setdefault(source or "Unknown", {})
+        label = section or "unclassified"
+        bucket[label] = bucket.get(label, 0) + 1
+    return pool
 
 
 def _drop_articles_not_about_ai(articles: list) -> list:
@@ -2028,7 +2051,8 @@ def run_collection(db: Session, week_id: Optional[str] = None, *, fetch: bool = 
 
         # Stage 2: Classification
         stage2_classify_articles(db, week_id, processor)
-        set_collection_status(week_id, "running", stage="stage3")
+        stage1_counts = {**stage1_counts, "pool": pool_by_source(db, week_id)}
+        set_collection_status(week_id, "running", stage="stage3", raw_counts=stage1_counts)
 
         # Stage 3: Parallel processing (produces EN natively)
         results = stage3_parallel_processing(db, week_id, processor)

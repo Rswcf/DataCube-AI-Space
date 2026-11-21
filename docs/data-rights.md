@@ -103,6 +103,32 @@ commercial reuse licence. Existing rights exclusions remain in force.
 | Microsoft Research / AWS ML | Remain candidates, not additions in this release; a working feed is insufficient to resolve reuse terms. |
 | Council of the EU RSS | Not enabled after the identified client's robots request returned 403. No bypass. The central Commission RSS supplies an accessible policy source instead. |
 
+## 2026-11-21 M&A candidate review
+
+The M&A section published nothing on 8 of 17 editions (2026-11-04 to
+2026-11-20). Its only enabled dedicated feed is TechCrunch M&A. Candidates
+were probed with the identified, robots-aware client from a local machine,
+not from Railway. "AI deals" counts items from the last 14 days whose title
+or summary matches the `ai_only` pattern and a deal keyword. Acceptance
+needs clear acquisition rights and at least about one AI deal per week. No
+candidate passed, so none was added.
+
+| Candidate | Result |
+|---|---|
+| GlobeNewswire M&A | Still blocked: robots.txt returns HTTP 403. No bypass. |
+| Business Wire M&A RSS, Axios RSS | robots.txt disallows the feed URL. |
+| TechCrunch `acquisitions` / `acquisition` tags | Feeds work; 0 items in 14 days. |
+| Tech.eu `acquisition` tag | Feed works; 0 items in 14 days. |
+| UK CMA merger cases (GOV.UK Atom, Open Government Licence) | Rights clear; 8 items in 14 days, 0 AI-related. |
+| US FTC competition press releases (US government work) | Rights clear; 1 item in 14 days, 0 AI-related. |
+| SiliconANGLE | 1 AI deal in its 30 latest items. Terms grant viewing and printing "for your own personal use" only; acquisition not clear. |
+| GeekWire | 3 AI deals in its 35 latest items; robots.txt allows `/feed`. Terms page not found (404 in a browser, 403 to the client); acquisition not cleared. |
+| CRN | 1 AI deal in its 20 latest items; terms page not found. Not cleared. |
+
+Next step if coverage matters: review GeekWire's terms by hand or ask the
+publisher for RSS permission. Until then M&A items come from the classifier
+routing general tech and funding feeds.
+
 Robots-aware access now applies in code to RSS and HN
 article enrichment. A robots check is an access control check, not a substitute
 for the publisher's terms. Per-source operational health is separate from the
