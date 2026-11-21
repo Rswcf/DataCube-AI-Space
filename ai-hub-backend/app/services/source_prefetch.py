@@ -20,6 +20,11 @@ def cache_sources(db, sources):
         if not dt or dt.replace(tzinfo=None) < now - timedelta(days=7):
             continue
         key = hashlib.sha256(canonical_url(article["link"]).encode()).hexdigest()
+        if article.get("via"):
+            # Rows cached before original-link resolution were keyed by the
+            # aggregator permalink; drop them so one story is not cached twice.
+            old = hashlib.sha256(canonical_url(article["via"]).encode()).hexdigest()
+            db.query(SourceCache).filter(SourceCache.key == old).delete(synchronize_session=False)
         stmt = insert(SourceCache).values(key=key, published_at=dt.replace(tzinfo=None), payload=article)
         db.execute(stmt.on_conflict_do_update(index_elements=[SourceCache.key],
                                              set_={"payload": stmt.excluded.payload, "published_at": stmt.excluded.published_at}))

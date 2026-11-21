@@ -3,6 +3,7 @@ import logging
 import re
 from datetime import datetime, timedelta
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from urllib.parse import urlsplit
 
 import feedparser
 
@@ -11,6 +12,28 @@ from app.services.source_http import fetch_source, SourceAccessError
 from app.services.source_integrity import canonical_url
 
 logger = logging.getLogger(__name__)
+
+_HREF = re.compile(r"""<a\s[^>]*href=["']([^"']+)["']""", re.I)
+
+
+def original_link(summary_html: str, aggregator_host: str) -> str | None:
+    """First article URL in an aggregator entry that points off the aggregator.
+
+    Techmeme entries link the original report first (image and headline),
+    then the publisher's home page. Home pages and the aggregator's own
+    permalinks are skipped. Returns None when no article URL is present.
+    """
+    for href in _HREF.findall(summary_html or ""):
+        url = canonical_url(href)
+        if not url:
+            continue
+        parts = urlsplit(url)
+        if parts.hostname == aggregator_host or parts.hostname.endswith("." + aggregator_host):
+            continue
+        if parts.path in {"", "/"}:
+            continue
+        return href
+    return None
 
 
 def fetch_feed_with_timeout(url, days=7, timeout=20, *, window_start=None, window_end=None, report=None, max_items=200):
@@ -76,6 +99,11 @@ def fetch_rss_feeds_parallel(sources, exclude_names=None, *, window_start=None, 
             for row in rows:
                 if source.get("ai_only") and not re.search(r"\b(artificial intelligence|AI|machine learning|semiconductor|chips? act)\b", row["title"] + " " + row["summary"], re.I):
                     continue
+                if source.get("original_link"):
+                    # Link the original report; keep the aggregator permalink as `via`.
+                    original = original_link(row["summary"], source["original_link"])
+                    if original:
+                        row["via"], row["link"] = row["link"], original
                 if source.get("preprint"):
                     row["summary"] = "PREPRINT: research claims are not independently validated. " + row["summary"]
                 row.update(source=source["name"], original_section=section)

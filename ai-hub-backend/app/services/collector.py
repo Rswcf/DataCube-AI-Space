@@ -458,7 +458,8 @@ def load_sources() -> dict:
             # prohibit automated access / scraping / TDM, so acquisition is
             # blocked pending explicit RSS permission or legal clearance.
             # See docs/data-rights.md (acquisition column).
-            {"url": "https://www.techmeme.com/feed.xml", "name": "Techmeme"},
+            {"url": "https://www.techmeme.com/feed.xml", "name": "Techmeme",
+             "original_link": "techmeme.com"},
             {"url": "https://36kr.com/feed", "name": "36Kr", "lang": "zh"},
             {"url": "https://tech.eu/feed", "name": "Tech.eu"},
             {"url": "https://technode.com/feed/", "name": "TechNode"},
@@ -793,6 +794,7 @@ def stage1_fetch_and_store(db: Session, week_id: str) -> dict:
                 "points": article.get("points"),
                 "comments": article.get("comments"),
                 "hn_url": article.get("hn_url"),
+                "via": article.get("via"),
             },
         )
         db.add(raw_article)
