@@ -26,6 +26,10 @@ export default function robots(): MetadataRoute.Robots {
       ...AI_CRAWLERS_WITHOUT_DELAY.map((userAgent) => ({ userAgent, allow: ALLOW, disallow: DISALLOW })),
       // Common Crawl feeds many AI training corpora; allowing it helps long-tail AI citation.
       { userAgent: 'CCBot', allow: ALLOW, disallow: DISALLOW, crawlDelay: 2 },
+      // SEO crawler: ~3.5k requests/day (2026-11-20), each an uncached render on
+      // the topic and article routes. 10 s caps it at ~8.6k/day and in practice
+      // spreads it far thinner, while the site stays in the Ahrefs index.
+      { userAgent: 'AhrefsBot', allow: ALLOW, disallow: DISALLOW, crawlDelay: 10 },
       // Meta's AI-training crawler brings no referrals; the Vercel WAF has denied it since 2026-09-15.
       { userAgent: 'meta-externalagent', disallow: '/' },
     ],
